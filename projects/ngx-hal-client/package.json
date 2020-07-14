@@ -1,6 +1,6 @@
 {
-  "name": "ngx-hal-client",
-  "version": "0.0.1",
+  "name": "@lagoshny/ngx-hal-client",
+  "version": "2.0.0",
   "peerDependencies": {
     "@angular/common": "^9.1.12",
     "@angular/core": "^9.1.12"

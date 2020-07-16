@@ -7,7 +7,9 @@ export { HalConfiguration } from './config/hal-configuration.interface';
 export { HalConfigurationService } from './config/hal-configuration.service';
 
 @NgModule({
-  imports: [HttpClientModule],
+  imports: [
+    HttpClientModule
+  ],
   declarations: [],
   providers: [
     HttpClient,

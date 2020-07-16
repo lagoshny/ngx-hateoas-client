@@ -5,6 +5,9 @@ import { HttpConfigService } from './config/http-config.service';
 
 export { HalConfiguration } from './config/hal-configuration.interface';
 export { HalConfigurationService } from './config/hal-configuration.service';
+export { Resource } from './hal-resource/model/resource';
+export { EmbeddedResource } from './hal-resource/model/embedded-resource';
+export { HalResourceService } from './service/hal-resource.service';
 
 @NgModule({
   imports: [

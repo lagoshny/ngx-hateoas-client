@@ -1,5 +1,7 @@
-import url from 'url';
-import { ObjectUtils } from './object.utils';
+import { HalParam } from '../service/hal-resource.service';
+import { HttpParams } from '@angular/common/http';
+import { isResource } from '../hal-resource/model/defenition';
+import * as _ from 'lodash';
 
 export class UrlUtils {
 

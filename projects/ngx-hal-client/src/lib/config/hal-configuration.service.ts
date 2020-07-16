@@ -2,6 +2,7 @@ import { Injectable, Injector } from '@angular/core';
 import { DependencyInjector } from '../util/dependency-injector';
 import { HttpConfigService } from './http-config.service';
 import { HalConfiguration } from './hal-configuration.interface';
+import { ConsoleLogger } from '../logger/console-logger';
 
 /**
  * Service allows pass configuration params to lib.
@@ -16,6 +17,7 @@ export class HalConfigurationService {
 
   public configure(config: HalConfiguration): void {
     this.httpConfig.baseApiUrl = config.baseApiUrl;
+    ConsoleLogger.enabled = config.verboseLogs;
   }
 
 }

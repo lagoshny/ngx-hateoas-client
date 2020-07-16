@@ -10,4 +10,9 @@ export interface HalConfiguration {
    */
   baseApiUrl: string;
 
+  /**
+   * Should print verbose logs to the console.
+   */
+  verboseLogs?: boolean;
+
 }

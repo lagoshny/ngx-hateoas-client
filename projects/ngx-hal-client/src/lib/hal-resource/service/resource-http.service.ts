@@ -7,7 +7,7 @@ import { catchError, map } from 'rxjs/operators';
 import { ResourceUtils } from '../../util/resource.utils';
 import { BaseResource } from '../model/base-resource';
 import { DependencyInjector } from '../../util/dependency-injector';
-import { HalParam } from '../../service/hal-resource.service';
+import { HalParam } from '../../service/hal-resource-operation';
 import { UrlUtils } from '../../util/url.utils';
 import * as _ from 'lodash';
 import { ConsoleLogger } from '../../logger/console-logger';
@@ -25,7 +25,7 @@ export class ResourceHttpService<T extends BaseResource> {
               private httpConfig: HttpConfigService) {
   }
 
-  public getResource(resourceType: T, url: string, options?: {
+  public getResource(url: string, options?: {
     headers?: {
       [header: string]: string | string[];
     };
@@ -66,7 +66,6 @@ export class ResourceHttpService<T extends BaseResource> {
         // }
 
         ConsoleLogger.prettyInfo('GET_RESOURCE RESPONSE', {
-          resource: resourceType.constructor.name,
           url,
           params: options?.params,
           body: JSON.stringify(data, null, 4)
@@ -78,7 +77,7 @@ export class ResourceHttpService<T extends BaseResource> {
             return observableThrowError('You try to get collection when expected single resource! Please, use suitable method for this.');
           }
           if ((isResource(data) || isEmbeddedResource(data))) {
-            const resource: T = ResourceUtils.instantiateResource(resourceType, data);
+            const resource: T = ResourceUtils.instantiateResource(data);
             this.cacheService.putResource(url, resource);
             return resource;
           }
@@ -89,7 +88,7 @@ export class ResourceHttpService<T extends BaseResource> {
       catchError(error => observableThrowError(error)));
   }
 
-  public postResource(resourceType: T, url: string, body: any | null, options?: {
+  public postResource(url: string, body: any | null, options?: {
     headers?: HttpHeaders | {
       [header: string]: string | string[];
     };
@@ -124,7 +123,7 @@ export class ResourceHttpService<T extends BaseResource> {
 
         this.cacheService.evictResource(url);
         if (!_.isEmpty(data) && (isResource(data) || isEmbeddedResource(data))) {
-          return ResourceUtils.instantiateResource(resourceType, data);
+          return ResourceUtils.instantiateResource(data);
         }
         return data;
       }),
@@ -195,8 +194,7 @@ export class ResourceHttpService<T extends BaseResource> {
   //   return url;
   // }
 
-  public getProjection(resourceType: T,
-                       resourceName: string,
+  public getProjection(resourceName: string,
                        id: string,
                        projectionName: string,
                        // expireMs: number = CacheHelper.defaultExpire,
@@ -204,15 +202,15 @@ export class ResourceHttpService<T extends BaseResource> {
   ): Observable<BaseResource> {
     const uri = this.generateResourceUrl(resourceName).concat('/', id).concat('?projection=' + projectionName);
 
-    return this.getResource(resourceType, uri);
+    return this.getResource(uri);
   }
 
 
-  public get(resourceType: new() => T, resourceName: string, id: any, params?: HalParam): Observable<T> {
+  public get(resourceName: string, id: any, params?: HalParam): Observable<T> {
     const uri = this.generateResourceUrl(resourceName).concat('/', id);
     const httpParams = UrlUtils.convertToHttpParams(params);
 
-    return this.getResource(new resourceType(), uri, {params: httpParams});
+    return this.getResource(uri, {params: httpParams});
   }
 
   public generateResourceUrl(resource?: string): string {

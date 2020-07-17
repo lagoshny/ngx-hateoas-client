@@ -4,13 +4,25 @@ import { ResourceCollection } from '../hal-resource/model/resource-collection';
 
 export class ResourceUtils {
 
+  private static resourceType: new() => BaseResource;
+
+  private static resourceCollectionType: new() => ResourceCollection<BaseResource>;
+
   private static embeddedResourceType: new() => BaseResource;
 
-  public static withEmbeddedResourceType(type: new() => BaseResource) {
+  public static useResourceType(type: new () => BaseResource) {
+    this.resourceType = type;
+  }
+
+  public static useResourceCollectionType(type: new() => ResourceCollection<BaseResource>) {
+    this.resourceCollectionType = type;
+  }
+
+  public static useEmbeddedResourceType(type: new() => BaseResource) {
     this.embeddedResourceType = type;
   }
 
-  public static instantiateResource<T extends BaseResource>(entity: T, payload: any): T {
+  public static instantiateResource<T extends BaseResource>(payload: any): T {
     // TODO: Все эти проверки используются для embedded ресурсов, типа коллекций, подумать как их упроситить
     for (const key of Object.keys(payload)) {
       if (payload[key] instanceof Array) {
@@ -24,16 +36,16 @@ export class ResourceUtils {
       }
     }
 
-    return ResourceUtils.createResource(entity, payload);
+    return ResourceUtils.createResource(new this.resourceType() as T, payload);
   }
 
 
   // Type - тип ресурсов внутри коллекции, payload - ответ от сервера, result - результирующий массив, куда будем добалвять ресурсы
-  static instantiateResourceCollection<T extends ResourceCollection<BaseResource>>(collection: T,
-                                                                                   payload: any,
+  static instantiateResourceCollection<T extends ResourceCollection<BaseResource>>(payload: any,
                                                                                    // result: ResourceArray<T>,
                                                                                    // builder?: SubTypeBuilder
   ): T {
+    const collection = new this.resourceCollectionType() as T;
     collection['_links'] = payload['_links'];
     const resourceCollection = payload['_embedded'];
     if (resourceCollection) {
@@ -44,7 +56,7 @@ export class ResourceUtils {
           // let instance: T = new type();
           // Инициализируем подтипы
           // instance = this.searchSubtypes(builder, embeddedClassName, instance);
-          collection.resources.push(this.instantiateResource(new class extends BaseResource {}(), resource));
+          collection.resources.push(this.instantiateResource(resource));
           // collection._embedded['resourceName'].push(this.instantiateResource(new class extends BaseResource {}(), resource));
         });
       }

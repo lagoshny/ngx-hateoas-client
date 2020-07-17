@@ -2,7 +2,7 @@ import { Observable, throwError as observableThrowError } from 'rxjs';
 import * as _ from 'lodash';
 import { getResourceHttpService } from '../service/resource-http.service';
 import { UrlUtils } from '../../util/url.utils';
-import { HalParam } from '../../service/hal-resource.service';
+import { HalParam } from '../../service/hal-resource-operation';
 import uriTemplates from 'uri-templates';
 import { ResourceIdentifiable } from './resource-identifiable';
 import { ResourceCollection } from './resource-collection';
@@ -26,14 +26,14 @@ export abstract class BaseResource extends ResourceIdentifiable {
                                                      // builder?: SubTypeBuilder,
                                                      // expireMs: number = CacheHelper.defaultExpire,
                                                      // isCacheActive: boolean = true
-  ): Observable<BaseResource> {
+  ): Observable<T> {
     const relationLink = this._links[relation];
     if (_.isEmpty(relationLink) || _.isEmpty(relationLink.href)) {
       return observableThrowError('no relation found');
     }
     const uri = relationLink.templated ? uriTemplates(relationLink.href).fill({}) : relationLink.href;
 
-    return getResourceHttpService().getResource(new class extends BaseResource {}(), uri);
+    return getResourceHttpService().getResource(uri) as Observable<T>;
   }
 
   public getProjection<T extends BaseResource>(resource: string,
@@ -41,12 +41,12 @@ export abstract class BaseResource extends ResourceIdentifiable {
                                                projectionName: string,
                                                // expireMs: number = CacheHelper.defaultExpire,
                                                // isCacheActive: boolean = true
-  ): Observable<BaseResource> {
+  ): Observable<T> {
     if (_.isEmpty(projectionName)) {
       return observableThrowError('no projection found');
     }
 
-    return getResourceHttpService().getProjection(new class extends BaseResource {}(), resource, id, projectionName);
+    return getResourceHttpService().getProjection(resource, id, projectionName) as Observable<T>;
   }
 
   public getRelatedCollection<T extends ResourceCollection<BaseResource>>(relation: string,
@@ -55,7 +55,7 @@ export abstract class BaseResource extends ResourceIdentifiable {
                                                                            // builder?: SubTypeBuilder,
                                                                            // expireMs: number = CacheHelper.defaultExpire,
                                                                            // isCacheActive: boolean = true
-  ): Observable<ResourceCollection<BaseResource>> {
+  ): Observable<T> {
     const relationLink = this._links[relation];
     if (_.isEmpty(relationLink) || _.isEmpty(relationLink.href)) {
       return observableThrowError('no relation found');
@@ -64,7 +64,7 @@ export abstract class BaseResource extends ResourceIdentifiable {
     // TODO: добавить заполнение параметров
     const uri = relationLink.templated ? uriTemplates(relationLink.href).fill({}) : relationLink.href;
 
-    return getResourceCollectionHttpService().getResourceCollection(new ResourceCollection<BaseResource>(), uri);
+    return getResourceCollectionHttpService().getResourceCollection(uri) as Observable<T>;
   }
 
 
@@ -143,7 +143,7 @@ export abstract class BaseResource extends ResourceIdentifiable {
     }
 
     return getResourceHttpService()
-      .postResource(new class extends BaseResource {}(), url, body, httpParams ? {params: httpParams} : {});
+      .postResource(url, body, httpParams ? {params: httpParams} : {});
   }
 
   // // Perform patch request for relation with body and url params

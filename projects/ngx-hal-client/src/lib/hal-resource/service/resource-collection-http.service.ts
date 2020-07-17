@@ -26,7 +26,7 @@ export class ResourceCollectionHttpService<T extends ResourceCollection<BaseReso
               private httpConfig: HttpConfigService) {
   }
 
-  public getResourceCollection(resourceType: T, url: string, options?: {
+  public getResourceCollection(url: string, options?: {
     headers?: {
       [header: string]: string | string[];
     };
@@ -68,7 +68,6 @@ export class ResourceCollectionHttpService<T extends ResourceCollection<BaseReso
         // }
 
         ConsoleLogger.prettyInfo('GET_RESOURCE_COLLECTION RESPONSE', {
-          resource: resourceType.constructor.name,
           url,
           params: options?.params,
           body: JSON.stringify(data, null, 4)
@@ -80,7 +79,7 @@ export class ResourceCollectionHttpService<T extends ResourceCollection<BaseReso
             return observableThrowError('You try to get single resource when expected resource collection! Please, use suitable method for this.');
           }
           if (isCollectionResource(data)) {
-            const resource: T = ResourceUtils.instantiateResourceCollection(resourceType, data);
+            const resource: T = ResourceUtils.instantiateResourceCollection(data);
             this.cacheService.putResource(url, resource);
             return resource;
           }

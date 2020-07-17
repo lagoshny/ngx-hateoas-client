@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { BaseResource } from '../model/base-resource';
 import { ResourceIdentifiable } from '../model/resource-identifiable';
 
 @Injectable({providedIn: 'root'})

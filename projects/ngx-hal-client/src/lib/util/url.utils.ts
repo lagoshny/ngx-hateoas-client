@@ -1,4 +1,4 @@
-import { HalParam } from '../service/hal-resource.service';
+import { HalParam } from '../service/hal-resource-operation';
 import { HttpParams } from '@angular/common/http';
 import { isResource } from '../hal-resource/model/defenition';
 import * as _ from 'lodash';

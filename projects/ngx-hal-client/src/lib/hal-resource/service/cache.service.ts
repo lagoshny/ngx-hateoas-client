@@ -1,22 +1,30 @@
 import { Injectable } from '@angular/core';
 import { BaseResource } from '../model/base-resource';
+import { ResourceIdentifiable } from '../model/resource-identifiable';
 
 @Injectable({providedIn: 'root'})
-export class CacheService {
+export class CacheService<T extends ResourceIdentifiable> {
 
   public hasResource(url: string): boolean {
     return false;
   }
 
-  public getResource(): BaseResource {
+  public getResource(): T {
     return null;
   }
 
-  public putResource<T extends BaseResource>(url: string, resource: T) {
+  public putResource(url: string, resource: T) {
   }
 
   public evictResource(url: string) {
-
   }
+
+  public getResourceCollection(): T {
+    return null;
+  }
+
+  public putResourceCollection(url: string, resource: T) {
+  }
+
 
 }

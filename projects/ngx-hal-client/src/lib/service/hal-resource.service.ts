@@ -5,6 +5,8 @@ import { ResourceHttpService } from '../hal-resource/service/resource-http.servi
 import { DependencyInjector } from '../util/dependency-injector';
 import { BaseResource } from '../hal-resource/model/base-resource';
 import { Resource } from '../ngx-hal-client.module';
+import { ResourceIdentifiable } from '../hal-resource/model/resource-identifiable';
+import { ResourceCollection } from '../hal-resource/model/resource-collection';
 
 export interface HalParam {
   [paramName: string]: Resource | string | number | boolean;
@@ -13,7 +15,7 @@ export interface HalParam {
 export class HalResourceService<T extends BaseResource> {
   private readonly type: any;
   private readonly resource: string;
-  // public resourceArray: ResourceArray<T>;
+  // public resourceArray: ResourceCollection<T>;
   // private resourceService: ResourceService;
 
   private resourceHttpService: ResourceHttpService<BaseResource>;
@@ -43,7 +45,7 @@ export class HalResourceService<T extends BaseResource> {
   // public getAllPage(options?: HalOptions, subType?: SubTypeBuilder): Observable<ResourcePage<T>> {
   //   return this.resourceService.getAll(this.type, this.resource, this.embedded, options, subType)
   //     .pipe(
-  //       mergeMap((resourceArray: ResourceArray<T>) => {
+  //       mergeMap((resourceArray: ResourceCollection<T>) => {
   //         return observableOf(new ResourcePage<T>(resourceArray));
   //       })
   //     );
@@ -55,7 +57,7 @@ export class HalResourceService<T extends BaseResource> {
   //
   // public search(query: string, options?: HalOptions, subType?: SubTypeBuilder): Observable<T[]> {
   //   return this.resourceService.search(this.type, query, this.resource, this.embedded, options, subType).pipe(
-  //     mergeMap((resourceArray: ResourceArray<T>) => {
+  //     mergeMap((resourceArray: ResourceCollection<T>) => {
   //       if (options && options.notPaged && !ObjectUtils.isNullOrUndefined(resourceArray.firstUri)) {
   //         options.notPaged = false;
   //         options.size = resourceArray.totalElements;
@@ -70,7 +72,7 @@ export class HalResourceService<T extends BaseResource> {
   // public searchPage(query: string, options?: HalOptions, subType?: SubTypeBuilder): Observable<ResourcePage<T>> {
   //   return this.resourceService.search(this.type, query, this.resource, this.embedded, options, subType)
   //     .pipe(
-  //       mergeMap((resourceArray: ResourceArray<T>) => {
+  //       mergeMap((resourceArray: ResourceCollection<T>) => {
   //         return observableOf(new ResourcePage<T>(resourceArray));
   //       })
   //     );
@@ -82,7 +84,7 @@ export class HalResourceService<T extends BaseResource> {
   //
   // public customQuery(query: string, options?: HalOptions, subType?: SubTypeBuilder): Observable<T[]> {
   //   return this.resourceService.customQuery(this.type, query, this.resource, this.embedded, options, subType).pipe(
-  //     mergeMap((resourceArray: ResourceArray<T>) => {
+  //     mergeMap((resourceArray: ResourceCollection<T>) => {
   //       if (options && options.notPaged && !ObjectUtils.isNullOrUndefined(resourceArray.firstUri)) {
   //         options.notPaged = false;
   //         options.size = resourceArray.totalElements;
@@ -96,7 +98,7 @@ export class HalResourceService<T extends BaseResource> {
   //
   // public customQueryPost(query: string, options?: HalOptions, body?: any, subType?: SubTypeBuilder): Observable<T[]> {
   //   return this.resourceService.customQueryPost(this.type, query, this.resource, this.embedded, options, body, subType).pipe(
-  //     mergeMap((resourceArray: ResourceArray<T>) => {
+  //     mergeMap((resourceArray: ResourceCollection<T>) => {
   //       if (options && options.notPaged && !ObjectUtils.isNullOrUndefined(resourceArray.firstUri)) {
   //         options.notPaged = false;
   //         options.size = resourceArray.totalElements;
@@ -110,7 +112,7 @@ export class HalResourceService<T extends BaseResource> {
   //
   // public getByRelationArray(relation: string, builder?: SubTypeBuilder): Observable<T[]> {
   //   return this.resourceService.getByRelationArray(this.type, relation, this.embedded, builder).pipe(
-  //     map((resourceArray: ResourceArray<T>) => {
+  //     map((resourceArray: ResourceCollection<T>) => {
   //       this.resourceArray = resourceArray;
   //       return resourceArray.result;
   //     }));
@@ -191,7 +193,7 @@ export class HalResourceService<T extends BaseResource> {
   // public next(): Observable<T[]> {
   //   if (this.resourceArray) {
   //     return this.resourceService.next(this.resourceArray, this.type).pipe(
-  //       map((resourceArray: ResourceArray<T>) => {
+  //       map((resourceArray: ResourceCollection<T>) => {
   //         this.resourceArray = resourceArray;
   //         return resourceArray.result;
   //       }));
@@ -203,7 +205,7 @@ export class HalResourceService<T extends BaseResource> {
   // public prev(): Observable<T[]> {
   //   if (this.resourceArray) {
   //     return this.resourceService.prev(this.resourceArray, this.type).pipe(
-  //       map((resourceArray: ResourceArray<T>) => {
+  //       map((resourceArray: ResourceCollection<T>) => {
   //         this.resourceArray = resourceArray;
   //         return resourceArray.result;
   //       }));
@@ -216,7 +218,7 @@ export class HalResourceService<T extends BaseResource> {
   //   if (this.resourceArray) {
   //     return this.resourceService.first(this.resourceArray, this.type)
   //       .pipe(
-  //         map((resourceArray: ResourceArray<T>) => {
+  //         map((resourceArray: ResourceCollection<T>) => {
   //           this.resourceArray = resourceArray;
   //           return resourceArray.result;
   //         })
@@ -230,7 +232,7 @@ export class HalResourceService<T extends BaseResource> {
   //   if (this.resourceArray) {
   //     return this.resourceService.last(this.resourceArray, this.type)
   //       .pipe(
-  //         map((resourceArray: ResourceArray<T>) => {
+  //         map((resourceArray: ResourceCollection<T>) => {
   //           this.resourceArray = resourceArray;
   //           return resourceArray.result;
   //         })
@@ -243,7 +245,7 @@ export class HalResourceService<T extends BaseResource> {
   // public page(pageNumber: number): Observable<T[]> {
   //   if (this.resourceArray) {
   //     return this.resourceService.page(this.resourceArray, this.type, pageNumber).pipe(
-  //       map((resourceArray: ResourceArray<T>) => {
+  //       map((resourceArray: ResourceCollection<T>) => {
   //         this.resourceArray = resourceArray;
   //         return resourceArray.result;
   //       }));

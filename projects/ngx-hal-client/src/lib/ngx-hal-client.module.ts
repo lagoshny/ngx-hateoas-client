@@ -7,6 +7,7 @@ export { HalConfiguration } from './config/hal-configuration.interface';
 export { HalConfigurationService } from './config/hal-configuration.service';
 export { Resource } from './hal-resource/model/resource';
 export { EmbeddedResource } from './hal-resource/model/embedded-resource';
+export { ResourceCollection } from './hal-resource/model/resource-collection';
 export { HalResourceService } from './service/hal-resource.service';
 
 @NgModule({

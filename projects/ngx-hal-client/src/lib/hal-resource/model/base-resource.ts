@@ -1,45 +1,42 @@
 import { Observable, throwError as observableThrowError } from 'rxjs';
 import * as _ from 'lodash';
-import { getHttpResourceService } from '../service/resource-http.service';
+import { getResourceHttpService } from '../service/resource-http.service';
 import { UrlUtils } from '../../util/url.utils';
 import { HalParam } from '../../service/hal-resource.service';
 import uriTemplates from 'uri-templates';
-import { Resource } from './resource';
+import { ResourceIdentifiable } from './resource-identifiable';
+import { ResourceCollection } from './resource-collection';
+import { getResourceCollectionHttpService } from '../service/resource-collection-http.service';
 
-export interface Link {
-  [key: string]: {
-    href: string;
-    templated?: boolean;
-  };
-}
+// export interface Link {
+//   [key: string]: {
+//     href: string;
+//     templated?: boolean;
+//   };
+// }
 
 
-// TODO: надо что-то делать с сервисом, делать через статику.... иначе лишние поля
-export abstract class BaseResource {
-
-  public _links: Link;
+export abstract class BaseResource extends ResourceIdentifiable {
 
   /**
    * Get resource relation.
    */
-  public getRelation<T extends BaseResource>(resourceType: new() => T,
-                                             relation: string,
-                                             // TODO: подумать об options (возможно они будут разные для GET, POST и т.д.)
-                                             // builder?: SubTypeBuilder,
-                                             // expireMs: number = CacheHelper.defaultExpire,
-                                             // isCacheActive: boolean = true
-  ): Observable<T> {
+  public getRelation<T extends BaseResource>(relation: string,
+                                                     // TODO: подумать об options (возможно они будут разные для GET, POST и т.д.)
+                                                     // builder?: SubTypeBuilder,
+                                                     // expireMs: number = CacheHelper.defaultExpire,
+                                                     // isCacheActive: boolean = true
+  ): Observable<BaseResource> {
     const relationLink = this._links[relation];
     if (_.isEmpty(relationLink) || _.isEmpty(relationLink.href)) {
       return observableThrowError('no relation found');
     }
     const uri = relationLink.templated ? uriTemplates(relationLink.href).fill({}) : relationLink.href;
 
-    return getHttpResourceService().getResource(new resourceType(), uri);
+    return getResourceHttpService().getResource(new class extends BaseResource {}(), uri);
   }
 
-  public getProjection<T extends BaseResource>(type: new() => T,
-                                               resource: string,
+  public getProjection<T extends BaseResource>(resource: string,
                                                id: string,
                                                projectionName: string,
                                                // expireMs: number = CacheHelper.defaultExpire,
@@ -49,8 +46,27 @@ export abstract class BaseResource {
       return observableThrowError('no projection found');
     }
 
-    return getHttpResourceService().getProjection(new type(), resource, id, projectionName);
+    return getResourceHttpService().getProjection(new class extends BaseResource {}(), resource, id, projectionName);
   }
+
+  public getRelatedCollection<T extends ResourceCollection<BaseResource>>(relation: string,
+                                                                           // options?: HalOptions,
+                                                                           // embedded?: string,
+                                                                           // builder?: SubTypeBuilder,
+                                                                           // expireMs: number = CacheHelper.defaultExpire,
+                                                                           // isCacheActive: boolean = true
+  ): Observable<ResourceCollection<BaseResource>> {
+    const relationLink = this._links[relation];
+    if (_.isEmpty(relationLink) || _.isEmpty(relationLink.href)) {
+      return observableThrowError('no relation found');
+    }
+
+    // TODO: добавить заполнение параметров
+    const uri = relationLink.templated ? uriTemplates(relationLink.href).fill({}) : relationLink.href;
+
+    return getResourceCollectionHttpService().getResourceCollection(new ResourceCollection<BaseResource>(), uri);
+  }
+
 
   // // Get collection of related resources
   // public getRelationArray<T extends Resource>(type: new() => T,
@@ -62,7 +78,7 @@ export abstract class BaseResource {
   //                                             isCacheActive: boolean = true): Observable<T[]> {
   //
   //   const httpParams = UrlUtils.optionParams(new HttpParams({encoder: new CustomEncoder()}), options);
-  //   const result: ResourceArray<T> = new ResourceArray<T>(ObjectUtils.isNullOrUndefined(embedded) ? '_embedded' : embedded);
+  //   const result: ResourceCollection<T> = new ResourceCollection<T>(ObjectUtils.isNullOrUndefined(embedded) ? '_embedded' : embedded);
   //   if (this.existRelationLink(relation)) {
   //     if (CacheHelper.ifPresent(this.getRelationLinkHref(relation), null, options, isCacheActive)) {
   //       return observableOf(CacheHelper.getArray(this.getRelationLinkHref(relation)));
@@ -78,7 +94,7 @@ export abstract class BaseResource {
   //         map(response => ResourceUtils.instantiateResourceCollection<T>(type, response, result, builder)),
   //         catchError(error => observableThrowError(error))
   //       )
-  //       .pipe(map((array: ResourceArray<T>) => {
+  //       .pipe(map((array: ResourceCollection<T>) => {
   //         CacheHelper.putArray(this.getRelationLinkHref(relation), array.result, expireMs);
   //         return array.result;
   //       }));
@@ -93,7 +109,7 @@ export abstract class BaseResource {
   //                                               expireMs: number = CacheHelper.defaultExpire,
   //                                               isCacheActive: boolean = true): Observable<T[]> {
   //   const uri = this.resourceClientService.generateResourceUrl(resource).concat('?projection=' + projectionName);
-  //   const result: ResourceArray<T> = new ResourceArray<T>('_embedded');
+  //   const result: ResourceCollection<T> = new ResourceCollection<T>('_embedded');
   //
   //   if (CacheHelper.ifPresent(uri, null, null, isCacheActive)) {
   //     return observableOf(CacheHelper.getArray(uri));
@@ -101,7 +117,7 @@ export abstract class BaseResource {
   //   return this.resourceClientService.getResource(uri)
   //     .pipe(
   //       map(response => ResourceUtils.instantiateResourceCollection<T>(type, response, result)),
-  //       map((array: ResourceArray<T>) => {
+  //       map((array: ResourceCollection<T>) => {
   //         CacheHelper.putArray(uri, array.result, expireMs);
   //         return array.result;
   //       })
@@ -126,8 +142,8 @@ export abstract class BaseResource {
       }
     }
 
-    // TODO: почему возвращается текущий объект?
-    return getHttpResourceService().postResource(new class extends BaseResource {}(), url, body, httpParams ? {params: httpParams} : {});
+    return getResourceHttpService()
+      .postResource(new class extends BaseResource {}(), url, body, httpParams ? {params: httpParams} : {});
   }
 
   // // Perform patch request for relation with body and url params

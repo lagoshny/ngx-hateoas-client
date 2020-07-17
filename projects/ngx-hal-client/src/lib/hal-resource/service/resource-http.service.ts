@@ -11,9 +11,9 @@ import { HalParam } from '../../service/hal-resource.service';
 import { UrlUtils } from '../../util/url.utils';
 import * as _ from 'lodash';
 import { ConsoleLogger } from '../../logger/console-logger';
-import { isEmbeddedResource, isResource } from '../model/defenition';
+import { isCollectionResource, isEmbeddedResource, isResource } from '../model/defenition';
 
-export function getHttpResourceService(): ResourceHttpService<BaseResource> {
+export function getResourceHttpService(): ResourceHttpService<BaseResource> {
   return DependencyInjector.get(ResourceHttpService);
 }
 
@@ -21,7 +21,7 @@ export function getHttpResourceService(): ResourceHttpService<BaseResource> {
 export class ResourceHttpService<T extends BaseResource> {
 
   constructor(private httpClient: HttpClient,
-              private cacheService: CacheService,
+              private cacheService: CacheService<T>,
               private httpConfig: HttpConfigService) {
   }
 
@@ -33,10 +33,9 @@ export class ResourceHttpService<T extends BaseResource> {
     params?: HttpParams | {
       [param: string]: string | string[];
     }
-  }): Observable<any> {
-
+  }): Observable<T> {
     ConsoleLogger.prettyInfo('GET_RESOURCE REQUEST', {
-      resource: resourceType.constructor.name,
+      // resource: resourceType.constructor.name,
       url,
       params: options?.params
     });
@@ -73,9 +72,16 @@ export class ResourceHttpService<T extends BaseResource> {
           body: JSON.stringify(data, null, 4)
         });
 
-        if (!_.isEmpty(data) && (isResource(data) || isEmbeddedResource(data))) {
-          const resource: T = ResourceUtils.instantiateResource(resourceType, data);
-          this.cacheService.putResource(url, resource);
+        if (!_.isEmpty(data)) {
+          if (isCollectionResource(data)) {
+            ConsoleLogger.error('You try to get collection when expected single resource! Please, use suitable method for this.');
+            return observableThrowError('You try to get collection when expected single resource! Please, use suitable method for this.');
+          }
+          if ((isResource(data) || isEmbeddedResource(data))) {
+            const resource: T = ResourceUtils.instantiateResource(resourceType, data);
+            this.cacheService.putResource(url, resource);
+            return resource;
+          }
         }
 
         return data;

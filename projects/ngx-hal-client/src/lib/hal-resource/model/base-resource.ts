@@ -3,38 +3,38 @@ import * as _ from 'lodash';
 import { getHttpResourceService } from '../service/resource-http.service';
 import { UrlUtils } from '../../util/url.utils';
 import { HalParam } from '../../service/hal-resource.service';
-import { ObjectUtils } from '../../util/object.utils';
 import uriTemplates from 'uri-templates';
+import { Resource } from './resource';
 
 export interface Link {
-  href: string;
-  templated?: boolean;
-}
-
-export interface Links {
-  [key: string]: Link;
+  [key: string]: {
+    href: string;
+    templated?: boolean;
+  };
 }
 
 
 // TODO: надо что-то делать с сервисом, делать через статику.... иначе лишние поля
 export abstract class BaseResource {
 
-  public _links: Links;
+  public _links: Link;
 
   /**
    * Get resource relation.
    */
   public getRelation<T extends BaseResource>(resourceType: new() => T,
                                              relation: string,
+                                             // TODO: подумать об options (возможно они будут разные для GET, POST и т.д.)
                                              // builder?: SubTypeBuilder,
                                              // expireMs: number = CacheHelper.defaultExpire,
                                              // isCacheActive: boolean = true
   ): Observable<T> {
     const relationLink = this._links[relation];
-    if (_.isEmpty(relationLink.href)) {
+    if (_.isEmpty(relationLink) || _.isEmpty(relationLink.href)) {
       return observableThrowError('no relation found');
     }
-    const uri = relationLink.templated ? UrlUtils.removeUrlTemplateVars(relationLink.href) : relationLink.href;
+    const uri = relationLink.templated ? uriTemplates(relationLink.href).fill({}) : relationLink.href;
+
     return getHttpResourceService().getResource(new resourceType(), uri);
   }
 
@@ -111,7 +111,7 @@ export abstract class BaseResource {
   // Perform post request for relation with body and url params
   public postRelation(relation: string, body: any, params?: HalParam): Observable<any> {
     const relationLink = this._links[relation];
-    if (_.isEmpty(relationLink.href)) {
+    if (_.isEmpty(relationLink) || _.isEmpty(relationLink.href)) {
       return observableThrowError('no relation found');
     }
 
@@ -120,15 +120,14 @@ export abstract class BaseResource {
     let url = relationLink.href;
     if (!_.isEmpty(params)) {
       if (relationLink.templated) {
-        // TODO: проверить как рабоатет темплейтные парамтеры
         url = uriTemplates(url).fillFromObject(params);
       } else {
         httpParams = UrlUtils.convertToHttpParams(params);
       }
     }
 
-    return getHttpResourceService().postResource(ObjectUtils.clone(this), url, body,
-      httpParams ? {params: httpParams} : {});
+    // TODO: почему возвращается текущий объект?
+    return getHttpResourceService().postResource(new class extends BaseResource {}(), url, body, httpParams ? {params: httpParams} : {});
   }
 
   // // Perform patch request for relation with body and url params

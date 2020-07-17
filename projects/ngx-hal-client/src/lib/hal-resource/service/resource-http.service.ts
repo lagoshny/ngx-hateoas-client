@@ -11,6 +11,7 @@ import { HalParam } from '../../service/hal-resource.service';
 import { UrlUtils } from '../../util/url.utils';
 import * as _ from 'lodash';
 import { ConsoleLogger } from '../../logger/console-logger';
+import { isEmbeddedResource, isResource } from '../model/defenition';
 
 export function getHttpResourceService(): ResourceHttpService<BaseResource> {
   return DependencyInjector.get(ResourceHttpService);
@@ -72,10 +73,12 @@ export class ResourceHttpService<T extends BaseResource> {
           body: JSON.stringify(data, null, 4)
         });
 
-        const resource: T = ResourceUtils.instantiateResource(resourceType, data);
-        this.cacheService.putResource(url, resource);
+        if (!_.isEmpty(data) && (isResource(data) || isEmbeddedResource(data))) {
+          const resource: T = ResourceUtils.instantiateResource(resourceType, data);
+          this.cacheService.putResource(url, resource);
+        }
 
-        return resource;
+        return data;
       }),
       catchError(error => observableThrowError(error)));
   }
@@ -91,7 +94,7 @@ export class ResourceHttpService<T extends BaseResource> {
   }): Observable<any> {
 
     ConsoleLogger.prettyInfo('POST_RESOURCE REQUEST', {
-      resource: resourceType.constructor.name,
+      // resource: resourceType.constructor.name,
       url,
       params: options?.params,
       body: JSON.stringify(body, null, 4)
@@ -107,14 +110,14 @@ export class ResourceHttpService<T extends BaseResource> {
     return response.pipe(
       map((data: any) => {
         ConsoleLogger.prettyInfo('POST_RESOURCE RESPONSE', {
-          resource: resourceType.constructor.name,
+          // resource: resourceType.constructor.name,
           url,
           params: options?.params,
           body: JSON.stringify(data, null, 4)
         });
 
         this.cacheService.evictResource(url);
-        if (!_.isEmpty(data)) {
+        if (!_.isEmpty(data) && (isResource(data) || isEmbeddedResource(data))) {
           return ResourceUtils.instantiateResource(resourceType, data);
         }
         return data;

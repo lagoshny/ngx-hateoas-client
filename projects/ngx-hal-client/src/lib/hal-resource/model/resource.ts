@@ -5,7 +5,7 @@ import { BaseResource } from './base-resource';
 //     && typeof (value as Resource).getSelfLinkHref === 'function';
 // }
 
-export abstract class Resource extends BaseResource {
+export class Resource extends BaseResource {
     //
     // // Adds the given resource to the bound collection by the relation
     // public addRelation<T extends Resource>(relation: string, resource: T): Observable<any> {

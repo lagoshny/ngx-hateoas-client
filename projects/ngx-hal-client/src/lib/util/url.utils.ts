@@ -2,6 +2,7 @@ import { HalParam } from '../service/hal-resource.service';
 import { HttpParams } from '@angular/common/http';
 import { isResource } from '../hal-resource/model/defenition';
 import * as _ from 'lodash';
+import { Resource } from '../hal-resource/model/resource';
 
 export class UrlUtils {
 
@@ -18,7 +19,7 @@ export class UrlUtils {
       for (const [key, value] of Object.entries(params)) {
         if (params.hasOwnProperty(key)) {
           const paramValue = isResource(value)
-            ? value.getSelfLinkHref()
+            ? (value as Resource).getSelfLinkHref()
             : value.toString();
 
           resultParams = resultParams.append(key, paramValue);

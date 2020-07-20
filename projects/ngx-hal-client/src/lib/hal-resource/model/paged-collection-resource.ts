@@ -32,7 +32,10 @@ export interface HalPageParam {
 export type SortOrder = 'DESC' | 'ASC';
 
 export interface Sort {
-  [path: string]: SortOrder;
+  /**
+   * Name of the property to sort.
+   */
+  [propertyToSort: string]: SortOrder;
 }
 
 /**

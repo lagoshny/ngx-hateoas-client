@@ -8,14 +8,6 @@ import { ResourceIdentifiable } from './resource-identifiable';
 import { CollectionResource } from './collection-resource';
 import { getCollectionResourceHttpService } from '../service/collection-resource-http.service';
 
-// export interface Link {
-//   [key: string]: {
-//     href: string;
-//     templated?: boolean;
-//   };
-// }
-
-
 export abstract class BaseResource extends ResourceIdentifiable {
 
   /**

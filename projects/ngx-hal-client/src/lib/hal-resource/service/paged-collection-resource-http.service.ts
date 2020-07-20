@@ -16,10 +16,16 @@ import { UrlUtils } from '../../util/url.utils';
 import { DependencyInjector } from '../../util/dependency-injector';
 import { ConstantUtil } from '../../util/constant.util';
 
+/**
+ * Get instance of the PagedCollectionResourceHttpService by Angular DependencyInjector.
+ */
 export function getPagedCollectionResourceHttpService(): PagedCollectionResourceHttpService<PagedCollectionResource<BaseResource>> {
   return DependencyInjector.get(PagedCollectionResourceHttpService);
 }
 
+/**
+ * Service to work with {@link PagedCollectionResource}.
+ */
 @Injectable({providedIn: 'root'})
 export class PagedCollectionResourceHttpService<T extends PagedCollectionResource<BaseResource>> {
 
@@ -90,6 +96,12 @@ export class PagedCollectionResourceHttpService<T extends PagedCollectionResourc
       catchError(error => observableThrowError(error)));
   }
 
+  /**
+   * Perform page request by resourceName with params.
+   *
+   * @param resourceName resource to perform page request
+   * @param param page params
+   */
   public getPage(resourceName: string, param?: HalPageParam): Observable<T> {
     const url = UrlUtils.removeUrlTemplateVars(UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName));
     if (_.isEmpty(param)) {

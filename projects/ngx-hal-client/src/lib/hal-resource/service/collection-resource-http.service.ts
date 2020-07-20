@@ -6,7 +6,7 @@ import { Observable, of as observableOf } from 'rxjs';
 import { ConsoleLogger } from '../../logger/console-logger';
 import { catchError, map } from 'rxjs/operators';
 import * as _ from 'lodash';
-import { isCollectionResource } from '../model/defenition';
+import { isCollectionResource } from '../model/resource-type';
 import { throwError as observableThrowError } from 'rxjs/internal/observable/throwError';
 import { ResourceUtils } from '../../util/resource.utils';
 import { CollectionResource } from '../model/collection-resource';

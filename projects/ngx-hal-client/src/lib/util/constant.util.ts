@@ -1,7 +1,7 @@
-import { HalPageParam } from '../hal-resource/model/paged-collection-resource';
+import { PageParam } from '../hal-resource/model/declarations';
 
 export class ConstantUtil {
-  public static readonly DEFAULT_PAGE: HalPageParam = {
+  public static readonly DEFAULT_PAGE: PageParam = {
     page: 0,
     size: 20,
   };

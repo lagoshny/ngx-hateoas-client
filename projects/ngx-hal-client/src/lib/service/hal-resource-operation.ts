@@ -3,12 +3,7 @@ import { ObjectUtils } from '../util/object.utils';
 import { DependencyInjector } from '../util/dependency-injector';
 import { BaseResource } from '../hal-resource/model/base-resource';
 import { HalResourceService } from './hal-resource.service';
-import { Sort } from '../hal-resource/model/paged-collection-resource';
-import { Resource } from '../hal-resource/model/resource';
-
-export interface HalParam {
-  [paramName: string]: Resource | string | number | boolean | Sort;
-}
+import { RequestParam } from '../hal-resource/model/declarations';
 
 export class HalResourceOperation<T extends BaseResource> {
 
@@ -249,7 +244,7 @@ export class HalResourceOperation<T extends BaseResource> {
   //   }
   // }
 
-  public get(id: any, params?: HalParam): Observable<T> {
+  public get(id: any, params?: RequestParam): Observable<T> {
     return this.halResourceService.get(this.resource, id, params) as Observable<T>;
   }
 }

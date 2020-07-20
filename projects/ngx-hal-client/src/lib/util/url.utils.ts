@@ -1,13 +1,13 @@
-import { HalParam } from '../service/hal-resource-operation';
 import { HttpParams } from '@angular/common/http';
-import { isResource } from '../hal-resource/model/defenition';
+import { isResource } from '../hal-resource/model/resource-type';
 import * as _ from 'lodash';
 import { Resource } from '../hal-resource/model/resource';
 import uriTemplates from 'uri-templates';
+import { RequestParam } from '../hal-resource/model/declarations';
 
 export class UrlUtils {
 
-  public static convertToHttpParams(params: HalParam, httpParams?: HttpParams): HttpParams {
+  public static convertToHttpParams(params: RequestParam, httpParams?: HttpParams): HttpParams {
     let resultParams = httpParams ? httpParams : new HttpParams();
     if (_.isObject(params)) {
       for (const [key, value] of Object.entries(params)) {

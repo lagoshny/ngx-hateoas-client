@@ -1,18 +1,4 @@
-export interface Link {
-  /**
-   * Link name.
-   */
-  [key: string]: {
-    /**
-     * Link url.
-     */
-    href: string;
-    /**
-     * {@code true} if <b>href</b> has template, {@code false} otherwise.
-     */
-    templated?: boolean;
-  };
-}
+import { Link } from './declarations';
 
 /**
  *  Common class that identify resource by links.

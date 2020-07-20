@@ -7,11 +7,11 @@ import { catchError, map } from 'rxjs/operators';
 import { ResourceUtils } from '../../util/resource.utils';
 import { BaseResource } from '../model/base-resource';
 import { DependencyInjector } from '../../util/dependency-injector';
-import { HalParam } from '../../service/hal-resource-operation';
 import { UrlUtils } from '../../util/url.utils';
 import * as _ from 'lodash';
 import { ConsoleLogger } from '../../logger/console-logger';
-import { isCollectionResource, isEmbeddedResource, isResource } from '../model/defenition';
+import { isCollectionResource, isEmbeddedResource, isResource } from '../model/resource-type';
+import { RequestParam } from '../model/declarations';
 
 export function getResourceHttpService(): ResourceHttpService<BaseResource> {
   return DependencyInjector.get(ResourceHttpService);
@@ -208,7 +208,7 @@ export class ResourceHttpService<T extends BaseResource> {
   }
 
 
-  public get(resourceName: string, id: any, params?: HalParam): Observable<T> {
+  public get(resourceName: string, id: any, params?: RequestParam): Observable<T> {
     const uri = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName).concat('/', id);
     const httpParams = UrlUtils.convertToHttpParams(params);
 

@@ -3,18 +3,18 @@ import { BaseResource } from '../model/base-resource';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { CacheService } from './cache.service';
 import { HttpConfigService } from '../../config/http-config.service';
-import { HalPageParam, PagedCollectionResource } from '../model/paged-collection-resource';
+import { PagedCollectionResource } from '../model/paged-collection-resource';
 import { Observable, of as observableOf } from 'rxjs';
 import { ConsoleLogger } from '../../logger/console-logger';
 import { catchError, map } from 'rxjs/operators';
 import * as _ from 'lodash';
-import { isPagedCollectionResource } from '../model/defenition';
+import { isPagedCollectionResource } from '../model/resource-type';
 import { throwError as observableThrowError } from 'rxjs/internal/observable/throwError';
 import { ResourceUtils } from '../../util/resource.utils';
-import { HalParam } from '../../service/hal-resource-operation';
 import { UrlUtils } from '../../util/url.utils';
 import { DependencyInjector } from '../../util/dependency-injector';
 import { ConstantUtil } from '../../util/constant.util';
+import { PageParam, RequestParam } from '../model/declarations';
 
 /**
  * Get instance of the PagedCollectionResourceHttpService by Angular DependencyInjector.
@@ -102,12 +102,12 @@ export class PagedCollectionResourceHttpService<T extends PagedCollectionResourc
    * @param resourceName resource to perform page request
    * @param param page params
    */
-  public getPage(resourceName: string, param?: HalPageParam): Observable<T> {
+  public getPage(resourceName: string, param?: PageParam): Observable<T> {
     const url = UrlUtils.removeUrlTemplateVars(UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName));
     if (_.isEmpty(param)) {
       param = ConstantUtil.DEFAULT_PAGE;
     }
-    const httpParams = UrlUtils.convertToHttpParams(param as HalParam);
+    const httpParams = UrlUtils.convertToHttpParams(param as RequestParam);
 
     return this.getResourcePage(url, {params: httpParams});
   }

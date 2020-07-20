@@ -8,7 +8,8 @@ export { HalConfigurationService } from './config/hal-configuration.service';
 export { Resource } from './hal-resource/model/resource';
 export { EmbeddedResource } from './hal-resource/model/embedded-resource';
 export { CollectionResource } from './hal-resource/model/collection-resource';
-export { PagedCollectionResource, SortOrder } from './hal-resource/model/paged-collection-resource';
+export { PagedCollectionResource } from './hal-resource/model/paged-collection-resource';
+export { SortOrder } from './hal-resource/model/declarations';
 export { HalResourceOperation } from './service/hal-resource-operation';
 export { HalResourceService } from './service/hal-resource.service';
 

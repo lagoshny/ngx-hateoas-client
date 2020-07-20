@@ -2,11 +2,11 @@ import { Observable, throwError as observableThrowError } from 'rxjs';
 import * as _ from 'lodash';
 import { getResourceHttpService } from '../service/resource-http.service';
 import { UrlUtils } from '../../util/url.utils';
-import { HalParam } from '../../service/hal-resource-operation';
 import uriTemplates from 'uri-templates';
 import { ResourceIdentifiable } from './resource-identifiable';
 import { CollectionResource } from './collection-resource';
 import { getCollectionResourceHttpService } from '../service/collection-resource-http.service';
+import { RequestParam } from './declarations';
 
 export abstract class BaseResource extends ResourceIdentifiable {
 
@@ -23,7 +23,7 @@ export abstract class BaseResource extends ResourceIdentifiable {
     if (_.isEmpty(relationLink) || _.isEmpty(relationLink.href)) {
       return observableThrowError('no relation found');
     }
-    const uri = relationLink.templated ? uriTemplates(relationLink.href).fill({}) : relationLink.href;
+    const uri = relationLink.templated ? UrlUtils.removeUrlTemplateVars(relationLink.href) : relationLink.href;
 
     return getResourceHttpService().getResource(uri) as Observable<T>;
   }
@@ -117,7 +117,7 @@ export abstract class BaseResource extends ResourceIdentifiable {
   // }
 
   // Perform post request for relation with body and url params
-  public postRelation(relation: string, body: any, params?: HalParam): Observable<any> {
+  public postRelation(relation: string, body: any, params?: RequestParam): Observable<any> {
     const relationLink = this._links[relation];
     if (_.isEmpty(relationLink) || _.isEmpty(relationLink.href)) {
       return observableThrowError('no relation found');

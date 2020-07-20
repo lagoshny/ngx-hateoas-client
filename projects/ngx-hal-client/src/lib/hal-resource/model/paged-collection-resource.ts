@@ -3,40 +3,11 @@ import { BaseResource } from './base-resource';
 import { Observable } from 'rxjs';
 import { getPagedCollectionResourceHttpService } from '../service/paged-collection-resource-http.service';
 import { throwError as observableThrowError } from 'rxjs/internal/observable/throwError';
-import { HalParam } from '../../service/hal-resource-operation';
 import { UrlUtils } from '../../util/url.utils';
 import { PageData } from './interface/page-data';
 import * as _ from 'lodash';
 import { ConsoleLogger } from '../../logger/console-logger';
-
-/**
- * Params allow control page settings.
- */
-export interface HalPageParam {
-  /**
-   * Number of page.
-   */
-  page?: number;
-
-  /**
-   * Page size.
-   */
-  size?: number;
-
-  /**
-   * Sorting options for page data.
-   */
-  sort?: Sort;
-}
-
-export type SortOrder = 'DESC' | 'ASC';
-
-export interface Sort {
-  /**
-   * Name of the property to sort.
-   */
-  [propertyToSort: string]: SortOrder;
-}
+import { PageParam, RequestParam } from './declarations';
 
 /**
  * A resource type that adds pagination functionality.
@@ -115,7 +86,7 @@ export class PagedCollectionResource<T extends BaseResource> extends CollectionR
    * @param pageParam holds data about new page param
    * @throws error when passed inconsistent data
    */
-  public customPage(pageParam: HalPageParam): Observable<PagedCollectionResource<T>> {
+  public customPage(pageParam: PageParam): Observable<PagedCollectionResource<T>> {
     ConsoleLogger.prettyInfo('Preparing custom page request');
     if (!_.isNumber(pageParam.page) || pageParam.page < 0) {
       pageParam.page = this.pageNumber;
@@ -148,7 +119,7 @@ export class PagedCollectionResource<T extends BaseResource> extends CollectionR
 
 }
 
-function doRequest<T extends BaseResource>(uri: string, pageParams?: HalPageParam): Observable<PagedCollectionResource<T>> {
+function doRequest<T extends BaseResource>(uri: string, pageParams?: PageParam): Observable<PagedCollectionResource<T>> {
   if (!uri) {
     ConsoleLogger.error('During page request error occurs: url is empty');
     return observableThrowError(`During page request error occurs: url is empty`);
@@ -156,7 +127,7 @@ function doRequest<T extends BaseResource>(uri: string, pageParams?: HalPagePara
 
   let httpParams;
   if (pageParams) {
-    httpParams = UrlUtils.convertToHttpParams(pageParams as HalParam);
+    httpParams = UrlUtils.convertToHttpParams(pageParams as RequestParam);
   }
 
   return getPagedCollectionResourceHttpService()

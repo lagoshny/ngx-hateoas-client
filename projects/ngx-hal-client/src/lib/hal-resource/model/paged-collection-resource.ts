@@ -4,10 +4,9 @@ import { Observable } from 'rxjs';
 import { getPagedCollectionResourceHttpService } from '../service/paged-collection-resource-http.service';
 import { throwError as observableThrowError } from 'rxjs/internal/observable/throwError';
 import { UrlUtils } from '../../util/url.utils';
-import { PageData } from './interface/page-data';
 import * as _ from 'lodash';
 import { ConsoleLogger } from '../../logger/console-logger';
-import { PageParam, RequestParam } from './declarations';
+import { PageData, PageParam, RequestParam } from './declarations';
 
 /**
  * A resource type that adds pagination functionality.

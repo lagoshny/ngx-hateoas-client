@@ -9,7 +9,7 @@ export class UrlUtils {
 
   public static convertToHttpParams(params: RequestParam, httpParams?: HttpParams): HttpParams {
     let resultParams = httpParams ? httpParams : new HttpParams();
-    if (_.isObject(params)) {
+    if (_.isObject(params) && !_.isEmpty(params)) {
       for (const [key, value] of Object.entries(params)) {
         if (params.hasOwnProperty(key)) {
           if (isResource(value)) {

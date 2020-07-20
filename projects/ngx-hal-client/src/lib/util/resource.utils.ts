@@ -2,7 +2,7 @@ import { BaseResource } from '../hal-resource/model/base-resource';
 import { isEmbeddedResource } from '../hal-resource/model/resource-type';
 import { CollectionResource } from '../hal-resource/model/collection-resource';
 import { PagedCollectionResource } from '../hal-resource/model/paged-collection-resource';
-import { PageData } from '../hal-resource/model/interface/page-data';
+import { PageData } from '../hal-resource/model/declarations';
 
 export class ResourceUtils {
 

@@ -2,33 +2,44 @@ import { Observable, throwError as observableThrowError } from 'rxjs';
 import * as _ from 'lodash';
 import { getResourceHttpService } from '../service/resource-http.service';
 import { UrlUtils } from '../../util/url.utils';
-import uriTemplates from 'uri-templates';
 import { ResourceIdentifiable } from './resource-identifiable';
 import { CollectionResource } from './collection-resource';
 import { getCollectionResourceHttpService } from '../service/collection-resource-http.service';
-import { RequestParam } from './declarations';
+import { HalOption, RequestParam } from './declarations';
 
+/**
+ * Common single resource class.
+ * This class Holds all common logic for resource.
+ */
 export abstract class BaseResource extends ResourceIdentifiable {
 
   /**
-   * Get resource relation.
+   * Get single resource by relation name.
+   *
+   * @param relationName relation that need to get
+   * @throws error when link by relation doesn't exist
    */
-  public getRelation<T extends BaseResource>(relation: string,
-                                                     // TODO: подумать об options (возможно они будут разные для GET, POST и т.д.)
-                                                     // builder?: SubTypeBuilder,
-                                                     // expireMs: number = CacheHelper.defaultExpire,
-                                                     // isCacheActive: boolean = true
+  public getRelation<T extends BaseResource>(relationName: string,
+                                             // builder?: SubTypeBuilder,
+                                             // expireMs: number = CacheHelper.defaultExpire,
+                                             // isCacheActive: boolean = true
   ): Observable<T> {
-    const relationLink = this._links[relation];
-    if (_.isEmpty(relationLink) || _.isEmpty(relationLink.href)) {
-      return observableThrowError('no relation found');
-    }
+    const relationLink = this.getRelationLink(relationName);
     const uri = relationLink.templated ? UrlUtils.removeUrlTemplateVars(relationLink.href) : relationLink.href;
 
     return getResourceHttpService().getResource(uri) as Observable<T>;
   }
 
-  public getProjection<T extends BaseResource>(resource: string,
+  /**
+   * TODO: а нужен ли тут этот метод вообще?
+   * Get single resource projection.
+   *
+   * @param resourceName name of the resource to get projection
+   * @param id resource id
+   * @param projectionName projection that will be applied to resource
+   * @throws error when projectionName is empty
+   */
+  public getProjection<T extends BaseResource>(resourceName: string,
                                                id: string,
                                                projectionName: string,
                                                // expireMs: number = CacheHelper.defaultExpire,
@@ -38,63 +49,35 @@ export abstract class BaseResource extends ResourceIdentifiable {
       return observableThrowError('no projection found');
     }
 
-    return getResourceHttpService().getProjection(resource, id, projectionName) as Observable<T>;
+    return getResourceHttpService().getProjection(resourceName, id, projectionName) as Observable<T>;
   }
 
-  public getRelatedCollection<T extends CollectionResource<BaseResource>>(relation: string,
-                                                                          // options?: HalOptions,
+  /**
+   * Get collection of the resources by relation name.
+   *
+   * @param relationName relation that need to get
+   * @param options <b>not required</b> additional options that need to apply to the request
+   * @throws error when link by relation doesn't exist
+   */
+  public getRelatedCollection<T extends CollectionResource<BaseResource>>(relationName: string,
+                                                                          options?: HalOption
                                                                           // embedded?: string,
                                                                           // builder?: SubTypeBuilder,
                                                                           // expireMs: number = CacheHelper.defaultExpire,
                                                                           // isCacheActive: boolean = true
   ): Observable<T> {
-    const relationLink = this._links[relation];
-    if (_.isEmpty(relationLink) || _.isEmpty(relationLink.href)) {
-      return observableThrowError('no relation found');
+    const relationLink = this.getRelationLink(relationName);
+    const uri = relationLink.templated ? UrlUtils.removeUrlTemplateVars(relationLink.href) : relationLink.href;
+    let httpParams;
+    if (!_.isEmpty(options)) {
+      httpParams = UrlUtils.convertToHttpParams(options.params);
+      httpParams = UrlUtils.convertToHttpParams(options.page as RequestParam, httpParams);
     }
 
-    // TODO: добавить заполнение параметров
-    const uri = relationLink.templated ? uriTemplates(relationLink.href).fill({}) : relationLink.href;
-
-    return getCollectionResourceHttpService().getResourceCollection(uri) as Observable<T>;
+    return getCollectionResourceHttpService().getResourceCollection(uri, {params: httpParams}) as Observable<T>;
   }
 
-
-  // // Get collection of related resources
-  // public getRelationArray<T extends Resource>(type: new() => T,
-  //                                             relation: string,
-  //                                             options?: HalOptions,
-  //                                             embedded?: string,
-  //                                             builder?: SubTypeBuilder,
-  //                                             expireMs: number = CacheHelper.defaultExpire,
-  //                                             isCacheActive: boolean = true): Observable<T[]> {
-  //
-  //   const httpParams = UrlUtils.optionParams(new HttpParams({encoder: new CustomEncoder()}), options);
-  //   const result: ResourceCollection<T> = new ResourceCollection<T>(ObjectUtils.isNullOrUndefined(embedded) ? '_embedded' : embedded);
-  //   if (this.existRelationLink(relation)) {
-  //     if (CacheHelper.ifPresent(this.getRelationLinkHref(relation), null, options, isCacheActive)) {
-  //       return observableOf(CacheHelper.getArray(this.getRelationLinkHref(relation)));
-  //     }
-  //
-  //     // Use this obj to clear relation url from any http params template because we will pass params in request
-  //     const urlAsObj = new URL(this.getRelationLinkHref(relation));
-  //     return this.resourceClientService.getResource(`${ urlAsObj.origin }${ urlAsObj.pathname }`,
-  //       {
-  //         params: httpParams
-  //       })
-  //       .pipe(
-  //         map(response => ResourceUtils.instantiateResourceCollection<T>(type, response, result, builder)),
-  //         catchError(error => observableThrowError(error))
-  //       )
-  //       .pipe(map((array: ResourceCollection<T>) => {
-  //         CacheHelper.putArray(this.getRelationLinkHref(relation), array.result, expireMs);
-  //         return array.result;
-  //       }));
-  //   } else {
-  //     return observableOf([]);
-  //   }
-  // }
-  //
+  //   TODO: а нужен ли тут этот метод вообще?
   // public getProjectionArray<T extends Resource>(type: new() => T,
   //                                               resource: string,
   //                                               projectionName: string,
@@ -116,75 +99,46 @@ export abstract class BaseResource extends ResourceIdentifiable {
   //     );
   // }
 
-  // Perform post request for relation with body and url params
-  public postRelation(relation: string, body: any, params?: RequestParam): Observable<any> {
-    const relationLink = this._links[relation];
-    if (_.isEmpty(relationLink) || _.isEmpty(relationLink.href)) {
-      return observableThrowError('no relation found');
-    }
-
+  /**
+   *  Perform post request to relation with body and url params.
+   *
+   * @param relationName relation that need to get
+   * @param body body to post request
+   * @param params http request params that will be applied to result url
+   * @throws error when link by relation doesn't exist
+   */
+  public postRelation(relationName: string, body: any, params?: RequestParam): Observable<any> {
+    const relationLink = this.getRelationLink(relationName);
     // TODO: подумать о логировании и о strict params и проверить template
     let httpParams;
-    let url = relationLink.href;
+    const url = relationLink.templated ? UrlUtils.removeUrlTemplateVars(relationLink.href) : relationLink.href;
     if (!_.isEmpty(params)) {
-      if (relationLink.templated) {
-        url = uriTemplates(url).fillFromObject(params);
-      } else {
-        httpParams = UrlUtils.convertToHttpParams(params);
-      }
+      httpParams = UrlUtils.convertToHttpParams(params);
     }
 
     return getResourceHttpService()
-      .postResource(url, body, httpParams ? {params: httpParams} : {});
+      .postResource(url, body, {params: httpParams});
   }
 
-  // // Perform patch request for relation with body and url params
-  // public patchRelation(relation: string, body: any, options?: LinkOptions): Observable<any> {
-  //   if (!this.existRelationLink(relation)) {
-  //     return observableThrowError('no relation found');
-  //   }
-  //   if (!ObjectUtils.isNullOrUndefined(options) && !ObjectUtils.isNullOrUndefined(options.params)) {
-  //     if (this._links[relation].templated
-  //       && !ObjectUtils.isNullOrUndefined(options.strictParams) && options.strictParams) {
-  //       CacheHelper.evictEntityLink(this.getRelationLinkHref(relation));
-  //
-  //       const uriTemplate = uriTemplates(this._links[relation].href);
-  //       const url = uriTemplate.fillFromObject(options.params);
-  //
-  //       return this.resourceClientService.patchResource(url, body)
-  //         .pipe(
-  //           map(data => ResourceUtils.instantiateResource(ObjectUtils.clone(this), data))
-  //         );
-  //     }
-  //
-  //     const httpParams = UrlUtils.linkParamsToHttpParams(options.params);
-  //     CacheHelper.evictEntityLink(this.getRelationLinkHref(relation));
-  //
-  //     return this.resourceClientService.patchResource(this.getRelationLinkHref(relation), body,
-  //       {
-  //         params: httpParams
-  //       })
-  //       .pipe(
-  //         map(data => ResourceUtils.instantiateResource(ObjectUtils.clone(this), data))
-  //       );
-  //   }
-  //
-  //   return this.resourceClientService.patchResource(this.getRelationLinkHref(relation), body)
-  //     .pipe(
-  //       map(data => ResourceUtils.instantiateResource(ObjectUtils.clone(this), data))
-  //     );
-  // }
-
-  // protected existRelationLink(relation: string): boolean {
-  // return !ObjectUtils.isNullOrUndefined(this._links) && !ObjectUtils.isNullOrUndefined(this._links[relation]);
-  // }
-
-  protected getRelationLinkHref(relation: string) {
-    if (this._links[relation].templated) {
-      return UrlUtils.removeUrlTemplateVars(this._links[relation].href);
+  /**
+   *  Perform patch request to relation with body and url params.
+   *
+   * @param relationName relation that need to get
+   * @param body body to post request
+   * @param params http request params that will be applied to result url
+   * @throws error when link by relation doesn't exist
+   */
+  public patchRelation(relationName: string, body: any, params?: RequestParam): Observable<any> {
+    const relationLink = this.getRelationLink(relationName);
+    // TODO: подумать о логировании и о strict params и проверить template
+    let httpParams;
+    const url = relationLink.templated ? UrlUtils.removeUrlTemplateVars(relationLink.href) : relationLink.href;
+    if (!_.isEmpty(params)) {
+      httpParams = UrlUtils.convertToHttpParams(params);
     }
 
-    return this._links[relation].href;
+    return getResourceHttpService()
+      .patchResource(url, body, {params: httpParams});
   }
 
 }

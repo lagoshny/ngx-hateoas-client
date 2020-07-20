@@ -72,15 +72,14 @@ export class ResourceHttpService<T extends BaseResource> {
         });
 
         if (!_.isEmpty(data)) {
-          if (isCollectionResource(data)) {
-            ConsoleLogger.error('You try to get collection when expected single resource! Please, use suitable method for this.');
-            return observableThrowError('You try to get collection when expected single resource! Please, use suitable method for this.');
+          if (!isResource(data) && !isEmbeddedResource(data)) {
+            ConsoleLogger.error('You try to get wrong resource type, expected single resource.');
+            return observableThrowError('You try to get wrong resource type, expected single resource.');
           }
-          if ((isResource(data) || isEmbeddedResource(data))) {
-            const resource: T = ResourceUtils.instantiateResource(data);
-            this.cacheService.putResource(url, resource);
-            return resource;
-          }
+
+          const resource: T = ResourceUtils.instantiateResource(data);
+          this.cacheService.putResource(url, resource);
+          return resource;
         }
 
         return data;
@@ -130,6 +129,51 @@ export class ResourceHttpService<T extends BaseResource> {
       catchError(error => observableThrowError(error))
     );
   }
+
+  public patchResource(url: string, body: any | null, options?: {
+    headers?: HttpHeaders | {
+      [header: string]: string | string[];
+    };
+    observe?: 'body' | 'response';
+    params?: HttpParams | {
+      [param: string]: string | string[];
+    }
+  }): Observable<any> {
+
+    ConsoleLogger.prettyInfo('PATH_RESOURCE REQUEST', {
+      // resource: resourceType.constructor.name,
+      url,
+      params: options?.params,
+      body: JSON.stringify(body, null, 4)
+    });
+
+    let response;
+    if (options?.observe === 'response') {
+      response = this.httpClient.patch(url, body, {...options, observe: 'response'});
+    } else {
+      response = this.httpClient.patch(url, body, {...options, observe: 'body'});
+    }
+
+    return response.pipe(
+      map((data: any) => {
+        ConsoleLogger.prettyInfo('PATH_RESOURCE RESPONSE', {
+          // resource: resourceType.constructor.name,
+          url,
+          params: options?.params,
+          body: JSON.stringify(data, null, 4)
+        });
+
+        this.cacheService.evictResource(url);
+        if (!_.isEmpty(data) && (isResource(data) || isEmbeddedResource(data))) {
+          return ResourceUtils.instantiateResource(data);
+        }
+
+        return data;
+      }),
+      catchError(error => observableThrowError(error))
+    );
+  }
+
 
   //
   // public putResource(url: string, body: any | null, options?: {

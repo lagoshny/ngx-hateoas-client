@@ -5,8 +5,9 @@ import { HalConfiguration } from './hal-configuration.interface';
 import { ConsoleLogger } from '../logger/console-logger';
 import { ResourceUtils } from '../util/resource.utils';
 import { Resource } from '../hal-resource/model/resource';
-import { ResourceCollection } from '../hal-resource/model/resource-collection';
+import { CollectionResource } from '../hal-resource/model/collection-resource';
 import { EmbeddedResource } from '../hal-resource/model/embedded-resource';
+import { PagedCollectionResource } from '../hal-resource/model/paged-collection-resource';
 
 /**
  * Service allows pass configuration params to lib.
@@ -19,7 +20,8 @@ export class HalConfigurationService {
     DependencyInjector.injector = injector;
     // Sets resource types to prevent circular dependencies
     ResourceUtils.useResourceType(Resource);
-    ResourceUtils.useResourceCollectionType(ResourceCollection);
+    ResourceUtils.useCollectionResourceType(CollectionResource);
+    ResourceUtils.usePagedCollectionResourceType(PagedCollectionResource);
     ResourceUtils.useEmbeddedResourceType(EmbeddedResource);
   }
 

@@ -63,7 +63,7 @@ export class ConsoleLogger {
 
     if (!_.isEmpty(params)) {
       for (const [key, value] of Object.entries(params)) {
-        msg += `%c${ _.capitalize(key) }: %c${ value }\n`;
+        msg += `%c${ _.camelCase(key) }: %c${ value }\n`;
         color.push('color: #3AA6D0;', 'color: default;');
       }
     }

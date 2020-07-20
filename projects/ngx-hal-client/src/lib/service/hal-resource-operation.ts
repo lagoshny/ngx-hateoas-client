@@ -1,13 +1,13 @@
-import { throwError as observableThrowError } from 'rxjs';
 import { Observable } from 'rxjs/internal/Observable';
 import { ObjectUtils } from '../util/object.utils';
 import { DependencyInjector } from '../util/dependency-injector';
 import { BaseResource } from '../hal-resource/model/base-resource';
-import { Resource } from '../ngx-hal-client.module';
 import { HalResourceService } from './hal-resource.service';
+import { Sort } from '../hal-resource/model/paged-collection-resource';
+import { Resource } from '../hal-resource/model/resource';
 
 export interface HalParam {
-  [paramName: string]: Resource | string | number | boolean;
+  [paramName: string]: Resource | string | number | boolean | Sort;
 }
 
 export class HalResourceOperation<T extends BaseResource> {
@@ -20,6 +20,7 @@ export class HalResourceOperation<T extends BaseResource> {
 
   // private resourceHttpService: ResourceHttpService<BaseResource>;
 
+  // TODO: а оно надо?
   private embedded = '_embedded';
 
   constructor(resource: string,

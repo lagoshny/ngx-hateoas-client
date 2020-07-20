@@ -1,32 +1,34 @@
 import { Injectable } from '@angular/core';
+import { BaseResource } from '../model/base-resource';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { CacheService } from './cache.service';
 import { HttpConfigService } from '../../config/http-config.service';
+import { HalPageParam, PagedCollectionResource } from '../model/paged-collection-resource';
 import { Observable, of as observableOf } from 'rxjs';
 import { ConsoleLogger } from '../../logger/console-logger';
 import { catchError, map } from 'rxjs/operators';
 import * as _ from 'lodash';
-import { isCollectionResource, isEmbeddedResource, isPagedCollectionResource, isResource } from '../model/defenition';
+import { isPagedCollectionResource } from '../model/defenition';
 import { throwError as observableThrowError } from 'rxjs/internal/observable/throwError';
 import { ResourceUtils } from '../../util/resource.utils';
-import { ResourceCollection } from '../model/resource-collection';
-import { BaseResource } from '../model/base-resource';
+import { HalParam } from '../../service/hal-resource-operation';
+import { UrlUtils } from '../../util/url.utils';
 import { DependencyInjector } from '../../util/dependency-injector';
+import { ConstantUtil } from '../../util/constant.util';
 
-export function getResourceCollectionHttpService(): ResourceCollectionHttpService<ResourceCollection<BaseResource>> {
-  return DependencyInjector.get(ResourceCollectionHttpService);
+export function getPagedCollectionResourceHttpService(): PagedCollectionResourceHttpService<PagedCollectionResource<BaseResource>> {
+  return DependencyInjector.get(PagedCollectionResourceHttpService);
 }
 
 @Injectable({providedIn: 'root'})
-export class ResourceCollectionHttpService<T extends ResourceCollection<BaseResource>> {
-
+export class PagedCollectionResourceHttpService<T extends PagedCollectionResource<BaseResource>> {
 
   constructor(private httpClient: HttpClient,
               private cacheService: CacheService<T>,
               private httpConfig: HttpConfigService) {
   }
 
-  public getResourceCollection(url: string, options?: {
+  public getResourcePage(url: string, options?: {
     headers?: {
       [header: string]: string | string[];
     };
@@ -36,8 +38,7 @@ export class ResourceCollectionHttpService<T extends ResourceCollection<BaseReso
     }
   }): Observable<T> {
 
-    ConsoleLogger.prettyInfo('GET_RESOURCE_COLLECTION REQUEST', {
-      // resource: resourceType.constructor.name,
+    ConsoleLogger.prettyInfo('GET_RESOURCE_PAGE REQUEST', {
       url,
       params: options?.params
     });
@@ -67,27 +68,36 @@ export class ResourceCollectionHttpService<T extends ResourceCollection<BaseReso
         //   }
         // }
 
-        ConsoleLogger.prettyInfo('GET_RESOURCE_COLLECTION RESPONSE', {
+        ConsoleLogger.prettyInfo('GET_RESOURCE_PAGE RESPONSE', {
           url,
           params: options?.params,
           body: JSON.stringify(data, null, 4)
         });
 
         if (!_.isEmpty(data)) {
-          if (isResource(data) || isEmbeddedResource(data) || isPagedCollectionResource(data)) {
-            ConsoleLogger.error('You try to get single/paged resource when expected resource collection! Please, use suitable method for this.');
-            return observableThrowError('You try to get single resource when expected resource collection! Please, use suitable method for this.');
+          if (!isPagedCollectionResource(data)) {
+            ConsoleLogger.error('You try to get wrong resource type, expected paged resource collection type.');
+            return observableThrowError('You try to get wrong resource type, expected paged resource collection type.');
           }
-          if (isCollectionResource(data)) {
-            const resource: T = ResourceUtils.instantiateResourceCollection(data);
-            this.cacheService.putResource(url, resource);
-            return resource;
-          }
+          const resource: T = ResourceUtils.instantiatePagedCollectionResource(data);
+          this.cacheService.putResource(url, resource);
+
+          return resource;
         }
 
         return data;
       }),
       catchError(error => observableThrowError(error)));
+  }
+
+  public getPage(resourceName: string, param?: HalPageParam): Observable<T> {
+    const url = UrlUtils.removeUrlTemplateVars(UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName));
+    if (_.isEmpty(param)) {
+      param = ConstantUtil.DEFAULT_PAGE;
+    }
+    const httpParams = UrlUtils.convertToHttpParams(param as HalParam);
+
+    return this.getResourcePage(url, {params: httpParams});
   }
 
 }

@@ -1,12 +1,16 @@
 import { BaseResource } from '../hal-resource/model/base-resource';
 import { isEmbeddedResource } from '../hal-resource/model/defenition';
-import { ResourceCollection } from '../hal-resource/model/resource-collection';
+import { CollectionResource } from '../hal-resource/model/collection-resource';
+import { PagedCollectionResource } from '../hal-resource/model/paged-collection-resource';
+import { PageData } from '../hal-resource/model/interface/page-data';
 
 export class ResourceUtils {
 
   private static resourceType: new() => BaseResource;
 
-  private static resourceCollectionType: new() => ResourceCollection<BaseResource>;
+  private static collectionResourceType: new() => CollectionResource<BaseResource>;
+
+  private static pagedCollectionResourceType: new(collection: CollectionResource<BaseResource>, pageData?: PageData) => PagedCollectionResource<BaseResource>;
 
   private static embeddedResourceType: new() => BaseResource;
 
@@ -14,8 +18,12 @@ export class ResourceUtils {
     this.resourceType = type;
   }
 
-  public static useResourceCollectionType(type: new() => ResourceCollection<BaseResource>) {
-    this.resourceCollectionType = type;
+  public static useCollectionResourceType(type: new() => CollectionResource<BaseResource>) {
+    this.collectionResourceType = type;
+  }
+
+  public static usePagedCollectionResourceType(type: new(collection: CollectionResource<BaseResource>) => PagedCollectionResource<BaseResource>) {
+    this.pagedCollectionResourceType = type;
   }
 
   public static useEmbeddedResourceType(type: new() => BaseResource) {
@@ -41,12 +49,12 @@ export class ResourceUtils {
 
 
   // Type - тип ресурсов внутри коллекции, payload - ответ от сервера, result - результирующий массив, куда будем добалвять ресурсы
-  static instantiateResourceCollection<T extends ResourceCollection<BaseResource>>(payload: any,
+  static instantiateCollectionResource<T extends CollectionResource<BaseResource>>(payload: any,
                                                                                    // result: ResourceArray<T>,
                                                                                    // builder?: SubTypeBuilder
   ): T {
-    const collection = new this.resourceCollectionType() as T;
-    collection['_links'] = payload['_links'];
+    const result = new this.collectionResourceType() as T;
+    result['_links'] = payload['_links'];
     const resourceCollection = payload['_embedded'];
     if (resourceCollection) {
       for (const resourceName of Object.keys(resourceCollection)) {
@@ -56,14 +64,39 @@ export class ResourceUtils {
           // let instance: T = new type();
           // Инициализируем подтипы
           // instance = this.searchSubtypes(builder, embeddedClassName, instance);
-          collection.resources.push(this.instantiateResource(resource));
-          // collection._embedded['resourceName'].push(this.instantiateResource(new class extends BaseResource {}(), resource));
+          result.resources.push(this.instantiateResource(resource));
+          // result._embedded['resourceName'].push(this.instantiateResource(new class extends BaseResource {}(), resource));
         });
       }
     }
 
-    return collection;
+    return result;
+  }
 
+  static instantiatePagedCollectionResource<T extends PagedCollectionResource<BaseResource>>(payload: any,
+                                                                                             // result: ResourceArray<T>,
+                                                                                             // builder?: SubTypeBuilder
+  ): T {
+    const resourceCollection = this.instantiateCollectionResource(payload);
+    let result;
+    if (payload.page && payload._links) {
+       result = new this.pagedCollectionResourceType(resourceCollection, payload as PageData);
+    } else {
+       result = new this.pagedCollectionResourceType(resourceCollection);
+    }
+
+    // result.totalElements = payload.page ? payload.page.totalElements : result.resources.length;
+    // result.totalPages = payload.page ? payload.page.totalPages : 1;
+    // result.pageNumber = payload.page ? payload.page.number : 0;
+    // result.pageSize = payload.page ? payload.page.size : 20;
+    //
+    // result.selfUri = payload._links && payload._links.self ? payload._links.self.href : undefined;
+    // result.nextUri = payload._links && payload._links.next ? payload._links.next.href : undefined;
+    // result.prevUri = payload._links && payload._links.prev ? payload._links.prev.href : undefined;
+    // result.firstUri = payload._links && payload._links.first ? payload._links.first.href : undefined;
+    // result.lastUri = payload._links && payload._links.last ? payload._links.last.href : undefined;
+
+    return result as T;
     //
     // // Проверка на то, что в payload есть объект _embedded
     // if (payload[result._embedded]) {
@@ -99,6 +132,7 @@ export class ResourceUtils {
     // result.lastUri = payload._links && payload._links.last ? payload._links.last.href : undefined;
     // return result;
   }
+
 
   private static createResource<T extends BaseResource>(entity: T, payload: any): T {
     for (const p in payload) {

@@ -7,7 +7,8 @@ export { HalConfiguration } from './config/hal-configuration.interface';
 export { HalConfigurationService } from './config/hal-configuration.service';
 export { Resource } from './hal-resource/model/resource';
 export { EmbeddedResource } from './hal-resource/model/embedded-resource';
-export { ResourceCollection } from './hal-resource/model/resource-collection';
+export { CollectionResource } from './hal-resource/model/collection-resource';
+export { PagedCollectionResource, SortOrder } from './hal-resource/model/paged-collection-resource';
 export { HalResourceOperation } from './service/hal-resource-operation';
 export { HalResourceService } from './service/hal-resource.service';
 

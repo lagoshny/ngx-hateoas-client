@@ -200,30 +200,19 @@ export class ResourceHttpService<T extends BaseResource> {
                        // expireMs: number = CacheHelper.defaultExpire,
                        // isCacheActive: boolean = true
   ): Observable<BaseResource> {
-    const uri = this.generateResourceUrl(resourceName).concat('/', id).concat('?projection=' + projectionName);
+    const uri = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName)
+      .concat('/', id)
+      .concat('?projection=' + projectionName);
 
     return this.getResource(uri);
   }
 
 
   public get(resourceName: string, id: any, params?: HalParam): Observable<T> {
-    const uri = this.generateResourceUrl(resourceName).concat('/', id);
+    const uri = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName).concat('/', id);
     const httpParams = UrlUtils.convertToHttpParams(params);
 
     return this.getResource(uri, {params: httpParams});
-  }
-
-  public generateResourceUrl(resource?: string): string {
-    let url = this.httpConfig.baseApiUrl;
-    if (!url.endsWith('/')) {
-      url = url.concat('/');
-    }
-    if (resource) {
-      return url.concat(resource);
-    }
-
-    url = url.replace('{?projection}', '');
-    return url;
   }
 
 }

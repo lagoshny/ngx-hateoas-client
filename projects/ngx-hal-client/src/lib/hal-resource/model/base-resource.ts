@@ -5,8 +5,8 @@ import { UrlUtils } from '../../util/url.utils';
 import { HalParam } from '../../service/hal-resource-operation';
 import uriTemplates from 'uri-templates';
 import { ResourceIdentifiable } from './resource-identifiable';
-import { ResourceCollection } from './resource-collection';
-import { getResourceCollectionHttpService } from '../service/resource-collection-http.service';
+import { CollectionResource } from './collection-resource';
+import { getCollectionResourceHttpService } from '../service/collection-resource-http.service';
 
 // export interface Link {
 //   [key: string]: {
@@ -49,12 +49,12 @@ export abstract class BaseResource extends ResourceIdentifiable {
     return getResourceHttpService().getProjection(resource, id, projectionName) as Observable<T>;
   }
 
-  public getRelatedCollection<T extends ResourceCollection<BaseResource>>(relation: string,
-                                                                           // options?: HalOptions,
-                                                                           // embedded?: string,
-                                                                           // builder?: SubTypeBuilder,
-                                                                           // expireMs: number = CacheHelper.defaultExpire,
-                                                                           // isCacheActive: boolean = true
+  public getRelatedCollection<T extends CollectionResource<BaseResource>>(relation: string,
+                                                                          // options?: HalOptions,
+                                                                          // embedded?: string,
+                                                                          // builder?: SubTypeBuilder,
+                                                                          // expireMs: number = CacheHelper.defaultExpire,
+                                                                          // isCacheActive: boolean = true
   ): Observable<T> {
     const relationLink = this._links[relation];
     if (_.isEmpty(relationLink) || _.isEmpty(relationLink.href)) {
@@ -64,7 +64,7 @@ export abstract class BaseResource extends ResourceIdentifiable {
     // TODO: добавить заполнение параметров
     const uri = relationLink.templated ? uriTemplates(relationLink.href).fill({}) : relationLink.href;
 
-    return getResourceCollectionHttpService().getResourceCollection(uri) as Observable<T>;
+    return getCollectionResourceHttpService().getResourceCollection(uri) as Observable<T>;
   }
 
 

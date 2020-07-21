@@ -1,5 +1,4 @@
 import { Observable } from 'rxjs/internal/Observable';
-import { ObjectUtils } from '../util/object.utils';
 import { DependencyInjector } from '../util/dependency-injector';
 import { HalResourceService } from './hal-resource.service';
 import { RequestParam } from '../hal-resource/model/declarations';
@@ -15,16 +14,13 @@ export class HalResourceOperation<T extends Resource> {
 
   // private resourceHttpService: ResourceHttpService<BaseResource>;
 
-  // TODO: а оно надо?
-  private embedded = '_embedded';
-
-  constructor(resource: string,
-              embedded?: string) {
+  constructor(resource: string) {
     this.resource = resource;
     this.halResourceService = DependencyInjector.get(HalResourceService) as HalResourceService<T>;
-    if (!ObjectUtils.isNullOrUndefined(embedded)) {
-      this.embedded = embedded;
-    }
+  }
+
+  public get(id: any, params?: RequestParam): Observable<T> {
+    return this.halResourceService.get(this.resource, id, params) as Observable<T>;
   }
 
   //
@@ -244,7 +240,4 @@ export class HalResourceOperation<T extends Resource> {
   //   }
   // }
 
-  public get(id: any, params?: RequestParam): Observable<T> {
-    return this.halResourceService.get(this.resource, id, params) as Observable<T>;
-  }
 }

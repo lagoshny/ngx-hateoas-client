@@ -27,21 +27,4 @@ export class HalResourceService<T extends Resource> {
     return this.resourceHttpService.post(resourceName, ResourceUtils.resolveRelations(resource));
   }
 
-
-  // public create<T extends Resource>(selfResource: string, entity: T) {
-  //   const uri = ResourceHelper.getURL() + selfResource;
-  //   const payload = ResourceHelper.resolveRelations(entity);
-  //
-  //   this.setUrlsResource(entity);
-  //   const observable = ResourceHelper.getHttp().post(uri, payload, {headers: ResourceHelper.headers, observe: 'response'});
-  //   return observable.pipe(map((response: HttpResponse<string>) => {
-  //     if (response.status >= 200 && response.status <= 207) {
-  //       return ResourceHelper.instantiateResource(entity, response.body);
-  //     } else if (response.status === 500) {
-  //       const body: any = response.body;
-  //       return observableThrowError(body.error);
-  //     }
-  //   }), catchError(error => observableThrowError(error)));
-  // }
-
 }

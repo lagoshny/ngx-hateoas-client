@@ -1,11 +1,11 @@
 import { Observable } from 'rxjs/internal/Observable';
 import { ObjectUtils } from '../util/object.utils';
 import { DependencyInjector } from '../util/dependency-injector';
-import { BaseResource } from '../hal-resource/model/base-resource';
 import { HalResourceService } from './hal-resource.service';
 import { RequestParam } from '../hal-resource/model/declarations';
+import { Resource } from '../hal-resource/model/resource';
 
-export class HalResourceOperation<T extends BaseResource> {
+export class HalResourceOperation<T extends Resource> {
 
   private readonly resource: string;
   // public resourceArray: ResourceCollection<T>;

@@ -6,6 +6,7 @@ import { ResourceIdentifiable } from './resource-identifiable';
 import { CollectionResource } from './collection-resource';
 import { getCollectionResourceHttpService } from '../service/collection-resource-http.service';
 import { HalOption, RequestParam } from './declarations';
+import { HttpResponse } from '@angular/common/http';
 
 /**
  * Common single resource class.
@@ -107,7 +108,7 @@ export abstract class BaseResource extends ResourceIdentifiable {
    * @param params http request params that will be applied to result url
    * @throws error when link by relation doesn't exist
    */
-  public postRelation(relationName: string, body: any, params?: RequestParam): Observable<any> {
+  public postRelation(relationName: string, body: any, params?: RequestParam): Observable<HttpResponse<any>> {
     const relationLink = this.getRelationLink(relationName);
     // TODO: подумать о логировании и о strict params и проверить template
     let httpParams;
@@ -117,7 +118,7 @@ export abstract class BaseResource extends ResourceIdentifiable {
     }
 
     return getResourceHttpService()
-      .postResource(url, body, {params: httpParams});
+      .postResource(url, body, {observe: 'response', params: httpParams});
   }
 
   /**
@@ -128,7 +129,7 @@ export abstract class BaseResource extends ResourceIdentifiable {
    * @param params http request params that will be applied to result url
    * @throws error when link by relation doesn't exist
    */
-  public patchRelation(relationName: string, body: any, params?: RequestParam): Observable<any> {
+  public patchRelation(relationName: string, body: any, params?: RequestParam): Observable<HttpResponse<any>> {
     const relationLink = this.getRelationLink(relationName);
     // TODO: подумать о логировании и о strict params и проверить template
     let httpParams;
@@ -138,7 +139,7 @@ export abstract class BaseResource extends ResourceIdentifiable {
     }
 
     return getResourceHttpService()
-      .patchResource(url, body, {params: httpParams});
+      .patchResource(url, body, {observe: 'response', params: httpParams});
   }
 
 }

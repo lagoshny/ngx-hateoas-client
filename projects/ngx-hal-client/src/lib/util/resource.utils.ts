@@ -1,8 +1,10 @@
 import { BaseResource } from '../hal-resource/model/base-resource';
-import { isEmbeddedResource } from '../hal-resource/model/resource-type';
+import { isEmbeddedResource, isResource } from '../hal-resource/model/resource-type';
 import { CollectionResource } from '../hal-resource/model/collection-resource';
 import { PagedCollectionResource } from '../hal-resource/model/paged-collection-resource';
-import { PageData } from '../hal-resource/model/declarations';
+import { Include, PageData, ResourceOptions } from '../hal-resource/model/declarations';
+import * as _ from 'lodash';
+import { Resource } from '../hal-resource/model/resource';
 
 export class ResourceUtils {
 
@@ -80,57 +82,11 @@ export class ResourceUtils {
     const resourceCollection = this.instantiateCollectionResource(payload);
     let result;
     if (payload.page && payload._links) {
-       result = new this.pagedCollectionResourceType(resourceCollection, payload as PageData);
+      result = new this.pagedCollectionResourceType(resourceCollection, payload as PageData);
     } else {
-       result = new this.pagedCollectionResourceType(resourceCollection);
+      result = new this.pagedCollectionResourceType(resourceCollection);
     }
-
-    // result.totalElements = payload.page ? payload.page.totalElements : result.resources.length;
-    // result.totalPages = payload.page ? payload.page.totalPages : 1;
-    // result.pageNumber = payload.page ? payload.page.number : 0;
-    // result.pageSize = payload.page ? payload.page.size : 20;
-    //
-    // result.selfUri = payload._links && payload._links.self ? payload._links.self.href : undefined;
-    // result.nextUri = payload._links && payload._links.next ? payload._links.next.href : undefined;
-    // result.prevUri = payload._links && payload._links.prev ? payload._links.prev.href : undefined;
-    // result.firstUri = payload._links && payload._links.first ? payload._links.first.href : undefined;
-    // result.lastUri = payload._links && payload._links.last ? payload._links.last.href : undefined;
-
     return result as T;
-    //
-    // // Проверка на то, что в payload есть объект _embedded
-    // if (payload[result._embedded]) {
-    //   // Начинаем идти по ключам объекта _embedded
-    //   for (const embeddedClassName of Object.keys(payload[result._embedded])) {
-    //     const embedded: any = payload[result._embedded];
-    //     // Получаем конкретный объект из _embedded по ключу
-    //     const items = embedded[embeddedClassName];
-    //     for (const item of items) {
-    //       // Итерируемся по каждому элементу (ресурсу) из _embedded
-    //
-    //       // Создаём новый экземпляр ресурса
-    //       let instance: T = new type();
-    //       // Инициализируем подтипы
-    //       instance = this.searchSubtypes(builder, embeddedClassName, instance);
-    //
-    //       // И создаём сам ресурс
-    //       this.instantiateResource(instance, item);
-    //       result.push(instance);
-    //     }
-    //   }
-    // }
-    //
-    // result.totalElements = payload.page ? payload.page.totalElements : result.length;
-    // result.totalPages = payload.page ? payload.page.totalPages : 1;
-    // result.pageNumber = payload.page ? payload.page.number : 1;
-    // result.pageSize = payload.page ? payload.page.size : 20;
-    //
-    // result.selfUri = payload._links && payload._links.self ? payload._links.self.href : undefined;
-    // result.nextUri = payload._links && payload._links.next ? payload._links.next.href : undefined;
-    // result.prevUri = payload._links && payload._links.prev ? payload._links.prev.href : undefined;
-    // result.firstUri = payload._links && payload._links.first ? payload._links.first.href : undefined;
-    // result.lastUri = payload._links && payload._links.last ? payload._links.last.href : undefined;
-    // return result;
   }
 
 
@@ -139,6 +95,71 @@ export class ResourceUtils {
       entity[p] = payload[p];
     }
     return entity;
+  }
+
+  static resolveRelations(resource: Resource, options?: Array<ResourceOptions> | Include): object {
+    const result: object = {};
+    for (const key in resource) {
+      if (resource[key] == null && options) {
+        if (Array.isArray(options)) {
+          options.forEach(option => {
+            if (Include.NULL_VALUES === option?.include) {
+              if (Array.isArray(option.props)) {
+                if (option.props.includes(key)) {
+                  result[key] = null;
+                }
+              }
+            }
+          });
+        } else {
+          result[key] = null;
+        }
+      } else if (!_.isNull(resource[key]) && !_.isUndefined(resource[key])) {
+        if (_.isArray(resource[key])) {
+          const array: any[] = resource[key];
+          result[key] = [];
+          array.forEach((element) => {
+            result[key].push(this.resolveRelations(element));
+            // if (!_.isFunction(element) && !_.isObject(element)) {
+            //   result[key].push(element);
+            // } else if (isResource(element)) {
+            //   result[key].push(element['_links'].self.href);
+            // } else {
+            //   result[key].push(this.resolveRelations(element));
+            // }
+          });
+        } else if (isResource(resource[key])) {
+          result[key] = resource[key]._links.self.href;
+        } else {
+          result[key] = resource[key];
+        }
+
+
+        // if (/*ResourceHelper.className(resource[key]).find((className: string) => className === 'Resource') || */resource[key]._links) {
+        //   // if (resource[key]._links) {
+        //     result[key] = resource[key]._links.self.href;
+        //   // }
+        // } else if (Array.isArray(resource[key])) {
+        //   // const array: any[] = resource[key];
+        //   // if (array) {
+        //   //   result[key] = [];
+        //   //   array.forEach((element) => {
+        //   //     if (Utils.isPrimitive(element)) {
+        //   //       result[key].push(element);
+        //   //     } else if (ResourceHelper.className(element)
+        //   //       .find((className: string) => className === 'Resource') || element._links) {
+        //   //       result[key].push(element._links.self.href);
+        //   //     } else {
+        //   //       result[key].push(this.resolveRelations(element));
+        //   //     }
+        //   //   });
+        //   // }
+        // } else {
+        //   result[key] = resource[key];
+        // }
+      }
+    }
+    return result;
   }
 
 }

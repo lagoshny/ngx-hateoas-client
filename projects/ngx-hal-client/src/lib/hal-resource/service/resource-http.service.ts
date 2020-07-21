@@ -10,7 +10,7 @@ import { DependencyInjector } from '../../util/dependency-injector';
 import { UrlUtils } from '../../util/url.utils';
 import * as _ from 'lodash';
 import { ConsoleLogger } from '../../logger/console-logger';
-import { isCollectionResource, isEmbeddedResource, isResource } from '../model/resource-type';
+import { isEmbeddedResource, isResource } from '../model/resource-type';
 import { RequestParam } from '../model/declarations';
 
 export function getResourceHttpService(): ResourceHttpService<BaseResource> {
@@ -121,6 +121,48 @@ export class ResourceHttpService<T extends BaseResource> {
         });
 
         this.cacheService.evictResource(url);
+        if (!_.isEmpty(data) && (isResource(data) || isEmbeddedResource(data))) {
+          return ResourceUtils.instantiateResource(data);
+        }
+        return data;
+      }),
+      catchError(error => observableThrowError(error))
+    );
+  }
+
+  public putResource(url: string, body: any | null, options?: {
+    headers?: HttpHeaders | {
+      [header: string]: string | string[];
+    };
+    observe?: 'body' | 'response';
+    params?: HttpParams | {
+      [param: string]: string | string[];
+    }
+  }): Observable<any> {
+
+    ConsoleLogger.prettyInfo('PUT_RESOURCE REQUEST', {
+      // resource: resourceType.constructor.name,
+      url,
+      params: options?.params,
+      body: JSON.stringify(body, null, 4)
+    });
+
+    let response;
+    if (options?.observe === 'response') {
+      response = this.httpClient.put(url, body, {...options, observe: 'response'});
+    } else {
+      response = this.httpClient.put(url, body, {...options, observe: 'body'});
+    }
+
+    return response.pipe(
+      map((data: any) => {
+        ConsoleLogger.prettyInfo('PUT_RESOURCE RESPONSE', {
+          // resource: resourceType.constructor.name,
+          url,
+          params: options?.params,
+          body: JSON.stringify(data, null, 4)
+        });
+
         if (!_.isEmpty(data) && (isResource(data) || isEmbeddedResource(data))) {
           return ResourceUtils.instantiateResource(data);
         }
@@ -257,6 +299,13 @@ export class ResourceHttpService<T extends BaseResource> {
     const httpParams = UrlUtils.convertToHttpParams(params);
 
     return this.getResource(uri, {params: httpParams});
+  }
+
+  public post(resourceName: string, body: any, params?: RequestParam): Observable<T> {
+    const uri = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName);
+    const httpParams = UrlUtils.convertToHttpParams(params);
+
+    return this.postResource(uri, body, {params: httpParams});
   }
 
 }

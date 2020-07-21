@@ -121,6 +121,7 @@ export class ResourceHttpService<T extends BaseResource> {
         });
 
         this.cacheService.evictResource(url);
+        // TODO: а надо ли тут создавать ресурс?
         if (!_.isEmpty(data) && (isResource(data) || isEmbeddedResource(data))) {
           return ResourceUtils.instantiateResource(data);
         }
@@ -163,6 +164,7 @@ export class ResourceHttpService<T extends BaseResource> {
           body: JSON.stringify(data, null, 4)
         });
 
+        // TODO: а надо ли тут создавать ресурс?
         if (!_.isEmpty(data) && (isResource(data) || isEmbeddedResource(data))) {
           return ResourceUtils.instantiateResource(data);
         }
@@ -206,6 +208,8 @@ export class ResourceHttpService<T extends BaseResource> {
         });
 
         this.cacheService.evictResource(url);
+
+        // TODO: а надо ли тут создавать ресурс?
         if (!_.isEmpty(data) && (isResource(data) || isEmbeddedResource(data))) {
           return ResourceUtils.instantiateResource(data);
         }
@@ -215,6 +219,49 @@ export class ResourceHttpService<T extends BaseResource> {
       catchError(error => observableThrowError(error))
     );
   }
+
+  public deleteResource(url: string,  options?: {
+    headers?: HttpHeaders | {
+      [header: string]: string | string[];
+    };
+    observe?: 'body' | 'response';
+    params?: HttpParams | {
+      [param: string]: string | string[];
+    }
+  }): Observable<any> {
+
+    ConsoleLogger.prettyInfo('DELETE_RESOURCE REQUEST', {
+      url,
+      params: options?.params
+    });
+
+    let response;
+    if (options?.observe === 'response') {
+      response = this.httpClient.delete(url, {...options, observe: 'response'});
+    } else {
+      response = this.httpClient.delete(url, {...options, observe: 'body'});
+    }
+
+    return response.pipe(
+      map((data: any) => {
+        ConsoleLogger.prettyInfo('DELETE_RESOURCE RESPONSE', {
+          url,
+          params: options?.params,
+          body: JSON.stringify(data, null, 4)
+        });
+
+        this.cacheService.evictResource(url);
+        // TODO: а надо ли тут создавать ресурс?
+        if (!_.isEmpty(data) && (isResource(data) || isEmbeddedResource(data))) {
+          return ResourceUtils.instantiateResource(data);
+        }
+
+        return data;
+      }),
+      catchError(error => observableThrowError(error))
+    );
+  }
+
 
 
   //

@@ -2,6 +2,7 @@ import { BaseResource } from './base-resource';
 import { getResourceHttpService } from '../service/resource-http.service';
 import { HttpHeaders, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import * as _ from 'lodash';
 
 export class Resource extends BaseResource {
   //
@@ -19,58 +20,47 @@ export class Resource extends BaseResource {
   public addRelation<T extends Resource>(relationName: string, resource: T): Observable<HttpResponse<any>> {
     const relationLink = this.getRelationLink(relationName);
 
-    return getResourceHttpService().putResource(relationLink.href, resource.getSelfLinkHref(), {
+    return getResourceHttpService().postResource(relationLink.href, resource.getSelfLinkHref(), {
       observe: 'response',
-      headers:
-        new HttpHeaders({'Content-Type': 'text/uri-list'})
+      headers: new HttpHeaders({'Content-Type': 'text/uri-list'})
     });
   }
 
-  //
-  // // Bind the given resource to this resource by the given relation
-  // public updateRelation<T extends Resource>(relation: string, resource: T): Observable<any> {
-  //     if (!this.existRelationLink(relation)) {
-  //         return observableThrowError('no relation found');
-  //     }
-  //
-  //     CacheHelper.evictEntityLink(this.getRelationLinkHref(relation));
-  //     return this.resourceClientService.patchResource(this.getRelationLinkHref(relation),
-  //         resource._links.self.href, {
-  //             headers: new HttpHeaders({'Content-Type': 'text/uri-list'})
-  //         });
-  // }
-  //
-  // // Bind the given resource to this resource by the given relation
-  // public substituteRelation<T extends Resource>(relation: string, resource: T): Observable<any> {
-  //     if (!this.existRelationLink(relation)) {
-  //         return observableThrowError('no relation found');
-  //     }
-  //
-  //     CacheHelper.evictEntityLink(this.getRelationLinkHref(relation));
-  //     return this.resourceClientService.putResource(this.getRelationLinkHref(relation),
-  //         resource._links.self.href, {
-  //             headers: new HttpHeaders({'Content-Type': 'text/uri-list'})
-  //         });
-  // }
-  //
-  // // Unbind the resource with the given relation from this resource
-  // public deleteRelation<T extends Resource>(relation: string, resource: T): Observable<any> {
-  //     if (!this.existRelationLink(relation)) {
-  //         return observableThrowError('no relation found');
-  //     }
-  //     const link: string = resource._links.self.href;
-  //     const idx: number = link.lastIndexOf('/') + 1;
-  //
-  //     if (idx === -1) {
-  //         return observableThrowError('no relation found');
-  //     }
-  //
-  //     const relationId: string = link.substring(idx);
-  //     CacheHelper.evictEntityLink(this.getRelationLinkHref(relation) + '/' + relationId);
-  //
-  //     return this.resourceClientService
-  //         .deleteResource(this.getRelationLinkHref(relation) + '/' + relationId);
-  // }
+  // Bind the given resource to this resource by the given relation
+  public bindRelation<T extends Resource>(relationName: string, resource: T): Observable<HttpResponse<any>> {
+    const relationLink = this.getRelationLink(relationName);
+
+    return getResourceHttpService().putResource(relationLink.href, resource.getSelfLinkHref(), {
+      observe: 'response',
+      headers: new HttpHeaders({'Content-Type': 'text/uri-list'})
+    });
+  }
+
+  /**
+   * Delete all relation resources. Replace with empty object.
+   * @param relationName
+   */
+  public clearRelation<T extends Resource>(relationName: string): Observable<HttpResponse<any>> {
+    const relationLink = this.getRelationLink(relationName);
+    return getResourceHttpService().putResource(relationLink.href, '', {
+      observe: 'response',
+      headers: new HttpHeaders({'Content-Type': 'text/uri-list'})
+    });
+  }
+
+  // Unbind the resource with the given relation from this resource
+  public deleteRelation<T extends Resource>(relationName: string, resource: T): Observable<HttpResponse<any>> {
+    const relationLink = this.getRelationLink(relationName);
+    const resourceId = _.last(_.split(resource.getSelfLinkHref(), '/'));
+
+    if (_.isUndefined(resourceId) || _.isNull(resourceId)) {
+      throw Error('relation should has id');
+    }
+
+    return getResourceHttpService().deleteResource(relationLink.href + '/' + resourceId, {
+      observe: 'response'
+    });
+  }
 
   public getSelfLinkHref(): string {
     return this.getRelationLink('self').href;

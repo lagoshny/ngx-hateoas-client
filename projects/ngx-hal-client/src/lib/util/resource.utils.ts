@@ -101,19 +101,7 @@ export class ResourceUtils {
     const result: object = {};
     for (const key in resource) {
       if (resource[key] == null && options) {
-        if (Array.isArray(options)) {
-          options.forEach(option => {
-            if (Include.NULL_VALUES === option?.include) {
-              if (Array.isArray(option.props)) {
-                if (option.props.includes(key)) {
-                  result[key] = null;
-                }
-              }
-            }
-          });
-        } else {
-          result[key] = null;
-        }
+        this.appendNullValues(key, result, options);
       } else if (!_.isNull(resource[key]) && !_.isUndefined(resource[key])) {
         if (_.isArray(resource[key])) {
           const array: any[] = resource[key];
@@ -160,6 +148,22 @@ export class ResourceUtils {
       }
     }
     return result;
+  }
+
+  private static appendNullValues(key: string, result: object, options: Array<ResourceOptions> | Include.NULL_VALUES): void {
+    if (_.isArray(options)) {
+      options.forEach(option => {
+        if (Include.NULL_VALUES === option?.include) {
+          if (_.isArray(option.props)) {
+            if (option.props.includes(key)) {
+              result[key] = null;
+            }
+          }
+        }
+      });
+    } else {
+      result[key] = null;
+    }
   }
 
 }

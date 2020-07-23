@@ -95,11 +95,9 @@ export enum Include {
   NULL_VALUES = 'NULL_VALUES'
 }
 
-
 /**
  * Additional resource options that allow configure should include or not some specific values (e.q. null values).
  */
-export interface ResourceOptions {
+export interface ResourceOption {
   include: Include;
-  props: Array<string>;
 }

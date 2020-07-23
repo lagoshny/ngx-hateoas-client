@@ -1,12 +1,13 @@
 import { Observable } from 'rxjs/internal/Observable';
 import { DependencyInjector } from '../util/dependency-injector';
 import { HalResourceService } from './hal-resource.service';
-import { RequestParam } from '../hal-resource/model/declarations';
+import { PageParam, RequestParam, ResourceOption } from '../hal-resource/model/declarations';
 import { Resource } from '../hal-resource/model/resource';
+import { PagedCollectionResource } from '../hal-resource/model/paged-collection-resource';
 
 export class HalResourceOperation<T extends Resource> {
 
-  private readonly resource: string;
+  private readonly resourceName: string;
   // public resourceArray: ResourceCollection<T>;
   // private resourceService: ResourceService;
 
@@ -14,35 +15,48 @@ export class HalResourceOperation<T extends Resource> {
 
   // private resourceHttpService: ResourceHttpService<BaseResource>;
 
-  constructor(resource: string) {
-    this.resource = resource;
+  constructor(resourceName: string) {
+    this.resourceName = resourceName;
     this.halResourceService = DependencyInjector.get(HalResourceService) as HalResourceService<T>;
   }
 
-  public get(id: any, params?: RequestParam): Observable<T> {
-    return this.halResourceService.get(this.resource, id, params) as Observable<T>;
+  public get(id: any, requestParam?: RequestParam): Observable<T> {
+    return this.halResourceService.get(this.resourceName, id, requestParam) as Observable<T>;
   }
 
-  //
-  // public get(id: any, params?: HalParam[]): Observable<T> {
-  //   return this.resourceService.get(this.type, this.resource, id, params);
-  // }
-  //
-  // public getAllPage(options?: HalOptions, subType?: SubTypeBuilder): Observable<ResourcePage<T>> {
-  //   return this.resourceService.getAll(this.type, this.resource, this.embedded, options, subType)
-  //     .pipe(
-  //       mergeMap((resourceArray: ResourceCollection<T>) => {
-  //         return observableOf(new ResourcePage<T>(resourceArray));
-  //       })
-  //     );
-  // }
+  // TODO: подумать об options и subTypes
+  public getAllPage(pageParam?: PageParam, subType?: any): Observable<PagedCollectionResource<T>> {
+    return this.halResourceService.getAllPage(this.resourceName, pageParam);
+  }
+
+  public create(resource: T): Observable<T> {
+    return this.halResourceService.create(this.resourceName, resource);
+  }
+
+  public update(resource: T): Observable<T> {
+    return this.halResourceService.update(resource);
+  }
+
+  public count(query?: string, requestParam?: RequestParam): Observable<number> {
+    return this.halResourceService.count(this.resourceName, query, requestParam);
+  }
+
+  public patch(resource: T, resourceOption?: ResourceOption): Observable<T> {
+    return this.halResourceService.patch(resource, resourceOption);
+  }
+
+  // TODO: проверить возвращаемый объект
+  public delete(resource: T): Observable<any> {
+    return this.halResourceService.delete(resource);
+  }
+
   //
   // public getBySelfLink(selfLink: string): Observable<T> {
   //   return this.resourceService.getBySelfLink(this.type, selfLink);
   // }
   //
   // public search(query: string, options?: HalOptions, subType?: SubTypeBuilder): Observable<T[]> {
-  //   return this.resourceService.search(this.type, query, this.resource, this.embedded, options, subType).pipe(
+  //   return this.resourceService.search(this.type, query, this.resourceName, this.embedded, options, subType).pipe(
   //     mergeMap((resourceArray: ResourceCollection<T>) => {
   //       if (options && options.notPaged && !ObjectUtils.isNullOrUndefined(resourceArray.firstUri)) {
   //         options.notPaged = false;
@@ -56,7 +70,7 @@ export class HalResourceOperation<T extends Resource> {
   // }
   //
   // public searchPage(query: string, options?: HalOptions, subType?: SubTypeBuilder): Observable<ResourcePage<T>> {
-  //   return this.resourceService.search(this.type, query, this.resource, this.embedded, options, subType)
+  //   return this.resourceService.search(this.type, query, this.resourceName, this.embedded, options, subType)
   //     .pipe(
   //       mergeMap((resourceArray: ResourceCollection<T>) => {
   //         return observableOf(new ResourcePage<T>(resourceArray));
@@ -65,11 +79,11 @@ export class HalResourceOperation<T extends Resource> {
   // }
   //
   // public searchSingle(query: string, options?: HalOptions): Observable<T> {
-  //   return this.resourceService.searchSingle(this.type, query, this.resource, options);
+  //   return this.resourceService.searchSingle(this.type, query, this.resourceName, options);
   // }
   //
   // public customQuery(query: string, options?: HalOptions, subType?: SubTypeBuilder): Observable<T[]> {
-  //   return this.resourceService.customQuery(this.type, query, this.resource, this.embedded, options, subType).pipe(
+  //   return this.resourceService.customQuery(this.type, query, this.resourceName, this.embedded, options, subType).pipe(
   //     mergeMap((resourceArray: ResourceCollection<T>) => {
   //       if (options && options.notPaged && !ObjectUtils.isNullOrUndefined(resourceArray.firstUri)) {
   //         options.notPaged = false;
@@ -83,7 +97,7 @@ export class HalResourceOperation<T extends Resource> {
   // }
   //
   // public customQueryPost(query: string, options?: HalOptions, body?: any, subType?: SubTypeBuilder): Observable<T[]> {
-  //   return this.resourceService.customQueryPost(this.type, query, this.resource, this.embedded, options, body, subType).pipe(
+  //   return this.resourceService.customQueryPost(this.type, query, this.resourceName, this.embedded, options, body, subType).pipe(
   //     mergeMap((resourceArray: ResourceCollection<T>) => {
   //       if (options && options.notPaged && !ObjectUtils.isNullOrUndefined(resourceArray.firstUri)) {
   //         options.notPaged = false;
@@ -108,31 +122,6 @@ export class HalResourceOperation<T extends Resource> {
   //   return this.resourceService.getByRelation(this.type, relation);
   // }
   //
-  // public count(query?: string, options?: HalOptions): Observable<number> {
-  //   return this.resourceService.count(this.resource, query, options);
-  // }
-  //
-  // public create(entity: T) {
-  //   return this.resourceService.create(this.resource, entity);
-  // }
-  //
-  // public update(entity: T) {
-  //   return this.resourceService.update(entity);
-  // }
-  //
-  // public patch(entity: T, options?: Array<ResourceOptions> | Include) {
-  //   if (Array.isArray(options)) {
-  //     return this.resourceService.patch(entity, options);
-  //   } else if (!ObjectUtils.isNullOrUndefined(options)) {
-  //     return this.resourceService.patch(entity, options);
-  //   } else {
-  //     return this.resourceService.patch(entity);
-  //   }
-  // }
-  //
-  // public delete(entity: T): Observable<object> {
-  //   return this.resourceService.delete(entity);
-  // }
   //
   // public totalElement(): number {
   //   if (this.resourceArray && this.resourceArray.totalElements) {

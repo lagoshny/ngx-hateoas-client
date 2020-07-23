@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable, of as observableOf, throwError as observableThrowError } from 'rxjs';
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams, HttpResponse } from '@angular/common/http';
 import { HttpConfigService } from '../../config/http-config.service';
 import { CacheService } from './cache.service';
 import { catchError, map } from 'rxjs/operators';
@@ -11,7 +11,7 @@ import { UrlUtils } from '../../util/url.utils';
 import * as _ from 'lodash';
 import { ConsoleLogger } from '../../logger/console-logger';
 import { isEmbeddedResource, isResource } from '../model/resource-type';
-import { RequestParam } from '../model/declarations';
+import { RequestParam, ResourceOption } from '../model/declarations';
 
 export function getResourceHttpService(): ResourceHttpService<BaseResource> {
   return DependencyInjector.get(ResourceHttpService);
@@ -220,7 +220,7 @@ export class ResourceHttpService<T extends BaseResource> {
     );
   }
 
-  public deleteResource(url: string,  options?: {
+  public deleteResource(url: string, options?: {
     headers?: HttpHeaders | {
       [header: string]: string | string[];
     };
@@ -262,6 +262,31 @@ export class ResourceHttpService<T extends BaseResource> {
     );
   }
 
+  public count(resourceName: string, query: string, params?: RequestParam): Observable<number> {
+    const url = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName)
+      .concat('/search/' + (query === undefined ? 'countAll' : query));
+    const httpParams = UrlUtils.convertToHttpParams(params);
+
+    ConsoleLogger.prettyInfo('COUNT REQUEST', {
+      url,
+      params
+    });
+
+    return this.httpClient.get(url, {params: httpParams})
+      .pipe(
+        map((data: any) => {
+          ConsoleLogger.prettyInfo('COUNT RESPONSE', {
+            url,
+            params,
+            data
+          });
+          return data as number;
+        }),
+        catchError(error => observableThrowError(error))
+      );
+
+    // return this.getResource(url, {params: httpParams}) as Observable<number>;
+  }
 
 
   //
@@ -341,18 +366,29 @@ export class ResourceHttpService<T extends BaseResource> {
   }
 
 
-  public get(resourceName: string, id: any, params?: RequestParam): Observable<T> {
+  public get(resourceName: string, id: any, requestParam?: RequestParam): Observable<T> {
     const uri = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName).concat('/', id);
-    const httpParams = UrlUtils.convertToHttpParams(params);
+    const httpParams = UrlUtils.convertToHttpParams(requestParam);
 
     return this.getResource(uri, {params: httpParams});
   }
 
-  public post(resourceName: string, body: any, params?: RequestParam): Observable<T> {
+  public post(resourceName: string, body: any): Observable<T> {
     const uri = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName);
-    const httpParams = UrlUtils.convertToHttpParams(params);
 
-    return this.postResource(uri, body, {params: httpParams});
+    return this.postResource(uri, body);
+  }
+
+  public put(resourceName: string, body: any): Observable<T> {
+    const uri = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName);
+
+    return this.putResource(uri, body);
+  }
+
+  public patch(resourceName: string, body: any): Observable<T> {
+    const uri = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName);
+
+    return this.patchResource(uri, body);
   }
 
 }

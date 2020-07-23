@@ -2,7 +2,7 @@ import { BaseResource } from '../hal-resource/model/base-resource';
 import { isEmbeddedResource, isResource } from '../hal-resource/model/resource-type';
 import { CollectionResource } from '../hal-resource/model/collection-resource';
 import { PagedCollectionResource } from '../hal-resource/model/paged-collection-resource';
-import { Include, PageData, ResourceOptions } from '../hal-resource/model/declarations';
+import { Include, PageData, ResourceOption } from '../hal-resource/model/declarations';
 import * as _ from 'lodash';
 import { Resource } from '../hal-resource/model/resource';
 
@@ -35,7 +35,7 @@ export class ResourceUtils {
   public static instantiateResource<T extends BaseResource>(payload: any): T {
     // TODO: Все эти проверки используются для embedded ресурсов, типа коллекций, подумать как их упроситить
     for (const key of Object.keys(payload)) {
-      if (payload[key] instanceof Array) {
+      if (_.isArray(payload[key])) {
         for (let i = 0; i < payload[key].length; i++) {
           if (isEmbeddedResource(payload[key][i]) && this.embeddedResourceType) {
             payload[key][i] = ResourceUtils.createResource(new this.embeddedResourceType(), payload[key][i]);
@@ -97,11 +97,11 @@ export class ResourceUtils {
     return entity;
   }
 
-  static resolveRelations(resource: Resource, options?: Array<ResourceOptions> | Include): object {
+  static resolveRelations(resource: Resource, options?: ResourceOption): object {
     const result: object = {};
     for (const key in resource) {
-      if (resource[key] == null && options) {
-        this.appendNullValues(key, result, options);
+      if (resource[key] == null && Include.NULL_VALUES === options?.include) {
+        result[key] = null;
       } else if (!_.isNull(resource[key]) && !_.isUndefined(resource[key])) {
         if (_.isArray(resource[key])) {
           const array: any[] = resource[key];
@@ -150,7 +150,7 @@ export class ResourceUtils {
     return result;
   }
 
-  private static appendNullValues(key: string, result: object, options: Array<ResourceOptions> | Include.NULL_VALUES): void {
+  private static appendNullValues(key: string, result: object, options: ResourceOption): void {
     if (_.isArray(options)) {
       options.forEach(option => {
         if (Include.NULL_VALUES === option?.include) {

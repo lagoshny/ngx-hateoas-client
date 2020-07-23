@@ -1,8 +1,4 @@
-import { isObject } from 'rxjs/internal-compatibility';
-
-function isObjectHasLinks(object: any) {
-  return isObject(object) && ('_links' in object);
-}
+import * as _ from 'lodash';
 
 export function isEmbeddedResource(object: any) {
   // Embedded resource doesn't have self link in _links array
@@ -14,9 +10,13 @@ export function isResource(object: any): boolean {
 }
 
 export function isCollectionResource(object: any): boolean {
-  return isObject(object) && ('_embedded' in object);
+  return _.isObject(object) && ('_embedded' in object);
 }
 
 export function isPagedCollectionResource(object: any): boolean {
   return isCollectionResource(object) && ('page' in object);
+}
+
+function isObjectHasLinks(object: any) {
+  return _.isObject(object) && ('_links' in object);
 }

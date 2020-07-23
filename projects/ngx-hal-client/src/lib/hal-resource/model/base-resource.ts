@@ -9,7 +9,7 @@ import { HalOption, RequestParam } from './declarations';
 import { HttpResponse } from '@angular/common/http';
 
 /**
- * Common single resource class.
+ * Common resource class.
  * This class Holds all common logic for resource.
  */
 export abstract class BaseResource extends ResourceIdentifiable {

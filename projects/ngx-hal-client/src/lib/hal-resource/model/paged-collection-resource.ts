@@ -9,7 +9,7 @@ import { ConsoleLogger } from '../../logger/console-logger';
 import { PageData, PageParam, RequestParam } from './declarations';
 
 /**
- * A resource type that adds pagination functionality.
+ * A resource type that adds pagination functionality to the collection resource.
  */
 export class PagedCollectionResource<T extends BaseResource> extends CollectionResource<T> {
 

@@ -1,4 +1,4 @@
-import { Observable, throwError as observableThrowError } from 'rxjs';
+import { Observable } from 'rxjs';
 import * as _ from 'lodash';
 import { getResourceHttpService } from '../service/resource-http.service';
 import { UrlUtils } from '../../util/url.utils';
@@ -13,6 +13,12 @@ import { HttpResponse } from '@angular/common/http';
  * This class Holds all common logic for resource.
  */
 export abstract class BaseResource extends ResourceIdentifiable {
+
+  /**
+   * Hold information about resource name.
+   * This field allows to recognize which subtype of resource.
+   */
+  public resourceName: string;
 
   /**
    * Get single resource by relation name.

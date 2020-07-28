@@ -19,7 +19,7 @@ export interface LinkData {
 }
 
 /**
- * Contains options that can be applied to request.
+ * Contains options that can be applied to the request.
  */
 export interface HalOption {
   params?: RequestParam;
@@ -29,7 +29,7 @@ export interface HalOption {
 }
 
 /**
- * Request params that will be applied to result url as http request params.
+ * Request params that will be applied to the result url as http request params.
  */
 export interface RequestParam {
   [paramName: string]: Resource | string | number | boolean | Sort;

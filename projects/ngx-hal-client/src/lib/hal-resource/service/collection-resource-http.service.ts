@@ -146,8 +146,8 @@ export class CollectionResourceHttpService<T extends CollectionResource<BaseReso
       catchError(error => observableThrowError(error)));
   }
 
-  public get(resourceName: string, query: string, requestParam?: RequestParam): Observable<T> {
-    const url = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName).concat(query);
+  public get(resourceName: string, query?: string, requestParam?: RequestParam): Observable<T> {
+    const url = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName).concat(query ? query : '');
     const httpParams = UrlUtils.convertToHttpParams(requestParam);
 
     return this.getResourceCollection(url, {params: httpParams});

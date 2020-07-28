@@ -26,6 +26,11 @@ export class HalResourceOperation<T extends Resource> {
   }
 
   // TODO: подумать об options и subTypes
+  public getAll(subType?: any): Observable<CollectionResource<T>> {
+    return this.halResourceService.getAll(this.resourceName);
+  }
+
+  // TODO: подумать об options и subTypes
   public getAllPage(pageParam?: PageParam, subType?: any): Observable<PagedCollectionResource<T>> {
     return this.halResourceService.getAllPage(this.resourceName, pageParam);
   }

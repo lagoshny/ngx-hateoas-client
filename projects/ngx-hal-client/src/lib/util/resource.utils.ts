@@ -2,7 +2,7 @@ import { BaseResource } from '../hal-resource/model/base-resource';
 import { isEmbeddedResource, isResource } from '../hal-resource/model/resource-type';
 import { CollectionResource } from '../hal-resource/model/collection-resource';
 import { PagedCollectionResource } from '../hal-resource/model/paged-collection-resource';
-import { Include, PageData, ResourceOption } from '../hal-resource/model/declarations';
+import { Include, Link, PageData, ResourceOption } from '../hal-resource/model/declarations';
 import * as _ from 'lodash';
 import { Resource } from '../hal-resource/model/resource';
 
@@ -46,7 +46,10 @@ export class ResourceUtils {
       }
     }
 
-    return ResourceUtils.createResource(new this.resourceType() as T, payload);
+    const resource = ResourceUtils.createResource(new this.resourceType() as T, payload);
+    resource.resourceName = this.findResourceName(resource);
+
+    return resource;
   }
 
 
@@ -121,59 +124,23 @@ export class ResourceUtils {
         } else {
           result[key] = resource[key];
         }
-
-
-        // if (/*ResourceHelper.className(resource[key]).find((className: string) => className === 'Resource') || */resource[key]._links) {
-        //   // if (resource[key]._links) {
-        //     result[key] = resource[key]._links.self.href;
-        //   // }
-        // } else if (Array.isArray(resource[key])) {
-        //   // const array: any[] = resource[key];
-        //   // if (array) {
-        //   //   result[key] = [];
-        //   //   array.forEach((element) => {
-        //   //     if (Utils.isPrimitive(element)) {
-        //   //       result[key].push(element);
-        //   //     } else if (ResourceHelper.className(element)
-        //   //       .find((className: string) => className === 'Resource') || element._links) {
-        //   //       result[key].push(element._links.self.href);
-        //   //     } else {
-        //   //       result[key].push(this.resolveRelations(element));
-        //   //     }
-        //   //   });
-        //   // }
-        // } else {
-        //   result[key] = resource[key];
-        // }
       }
     }
     return result;
   }
 
-  private static appendNullValues(key: string, result: object, options: ResourceOption): void {
-    if (_.isArray(options)) {
-      options.forEach(option => {
-        if (Include.NULL_VALUES === option?.include) {
-          if (_.isArray(option.props)) {
-            if (option.props.includes(key)) {
-              result[key] = null;
-            }
-          }
-        }
-      });
-    } else {
-      result[key] = null;
+  private static findResourceName(resource: BaseResource): string {
+    // TODO: подумать как быть с embedded
+    const resourceLinks = resource['_links'] as Link;
+    if (_.isEmpty(resourceLinks) || _.isEmpty(resourceLinks.self) || _.isNil(resourceLinks.self.href)) {
+      return undefined;
+    }
+    const selfLink = resourceLinks.self.href;
+
+    for (const link of Object.keys(resourceLinks)) {
+      if (link !== 'self' && resourceLinks[link].href === selfLink) {
+        return _.upperFirst(link);
+      }
     }
   }
-
 }
-
-// export function isEmbeddedResource(object: any) {
-//   // Embedded resource doesn't have self link in _links array
-//   return _.isObject(object) && ('_links' in object) && !('self' in object['_links']);
-// }
-
-// export function isResource(value: Resource | string | number | boolean): value is Resource {
-//   return (value as Resource).getSelfLinkHref !== undefined
-//     && typeof (value as Resource).getSelfLinkHref === 'function';
-// }

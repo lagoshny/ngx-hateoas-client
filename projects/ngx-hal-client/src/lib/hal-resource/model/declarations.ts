@@ -24,6 +24,8 @@ export interface LinkData {
 export interface HalOption {
   params?: RequestParam;
   page?: PageParam;
+  // TODO: projection?
+  // subType?: SubTypeBuilder;
 }
 
 /**

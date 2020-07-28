@@ -100,14 +100,25 @@ export class PagedCollectionResourceHttpService<T extends PagedCollectionResourc
    * Perform page request by resourceName with params.
    *
    * @param resourceName resource to perform page request
-   * @param param page params
+   * @param pageParam page params
    */
-  public getPage(resourceName: string, param?: PageParam): Observable<T> {
+  public getPage(resourceName: string, pageParam?: PageParam): Observable<T> {
     const url = UrlUtils.removeUrlTemplateVars(UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName));
-    if (_.isEmpty(param)) {
-      param = ConstantUtil.DEFAULT_PAGE;
+    if (_.isEmpty(pageParam)) {
+      pageParam = ConstantUtil.DEFAULT_PAGE;
     }
-    const httpParams = UrlUtils.convertToHttpParams(param as RequestParam);
+    const httpParams = UrlUtils.convertToHttpParams(pageParam as RequestParam);
+
+    return this.getResourcePage(url, {params: httpParams});
+  }
+
+  public search(resourceName: string, query: string, pageParam: PageParam): Observable<T> {
+    const url = UrlUtils.removeUrlTemplateVars(
+      UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName)).concat('/search/' + query);
+    if (_.isEmpty(pageParam)) {
+      pageParam = ConstantUtil.DEFAULT_PAGE;
+    }
+    const httpParams = UrlUtils.convertToHttpParams(pageParam as RequestParam);
 
     return this.getResourcePage(url, {params: httpParams});
   }

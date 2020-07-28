@@ -32,28 +32,6 @@ export abstract class BaseResource extends ResourceIdentifiable {
   }
 
   /**
-   * TODO: а нужен ли тут этот метод вообще?
-   * Get single resource projection.
-   *
-   * @param resourceName name of the resource to get projection
-   * @param id resource id
-   * @param projectionName projection that will be applied to resource
-   * @throws error when projectionName is empty
-   */
-  public getProjection<T extends BaseResource>(resourceName: string,
-                                               id: string,
-                                               projectionName: string,
-                                               // expireMs: number = CacheHelper.defaultExpire,
-                                               // isCacheActive: boolean = true
-  ): Observable<T> {
-    if (_.isEmpty(projectionName)) {
-      return observableThrowError('no projection found');
-    }
-
-    return getResourceHttpService().getProjection(resourceName, id, projectionName) as Observable<T>;
-  }
-
-  /**
    * Get collection of the resources by relation name.
    *
    * @param relationName relation that need to get
@@ -77,28 +55,6 @@ export abstract class BaseResource extends ResourceIdentifiable {
 
     return getCollectionResourceHttpService().getResourceCollection(uri, {params: httpParams}) as Observable<T>;
   }
-
-  //   TODO: а нужен ли тут этот метод вообще?
-  // public getProjectionArray<T extends Resource>(type: new() => T,
-  //                                               resource: string,
-  //                                               projectionName: string,
-  //                                               expireMs: number = CacheHelper.defaultExpire,
-  //                                               isCacheActive: boolean = true): Observable<T[]> {
-  //   const uri = this.resourceClientService.generateResourceUrl(resource).concat('?projection=' + projectionName);
-  //   const result: ResourceCollection<T> = new ResourceCollection<T>('_embedded');
-  //
-  //   if (CacheHelper.ifPresent(uri, null, null, isCacheActive)) {
-  //     return observableOf(CacheHelper.getArray(uri));
-  //   }
-  //   return this.resourceClientService.getResource(uri)
-  //     .pipe(
-  //       map(response => ResourceUtils.instantiateResourceCollection<T>(type, response, result)),
-  //       map((array: ResourceCollection<T>) => {
-  //         CacheHelper.putArray(uri, array.result, expireMs);
-  //         return array.result;
-  //       })
-  //     );
-  // }
 
   /**
    *  Perform post request to relation with body and url params.

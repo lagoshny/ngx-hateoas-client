@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable, of as observableOf, throwError as observableThrowError } from 'rxjs';
-import { HttpClient, HttpHeaders, HttpParams, HttpResponse } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { HttpConfigService } from '../../config/http-config.service';
 import { CacheService } from './cache.service';
 import { catchError, map } from 'rxjs/operators';
@@ -11,7 +11,7 @@ import { UrlUtils } from '../../util/url.utils';
 import * as _ from 'lodash';
 import { ConsoleLogger } from '../../logger/console-logger';
 import { isEmbeddedResource, isResource } from '../model/resource-type';
-import { RequestParam, ResourceOption } from '../model/declarations';
+import { RequestParam } from '../model/declarations';
 
 export function getResourceHttpService(): ResourceHttpService<BaseResource> {
   return DependencyInjector.get(ResourceHttpService);
@@ -389,6 +389,13 @@ export class ResourceHttpService<T extends BaseResource> {
     const uri = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName);
 
     return this.patchResource(uri, body);
+  }
+
+  public search(resourceName: string, query: string, requestParam: RequestParam): Observable<T> {
+    const url = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName).concat('/search/' + query);
+    const httpParams = UrlUtils.convertToHttpParams(requestParam);
+
+    return this.getResource(url, {params: httpParams});
   }
 
 }

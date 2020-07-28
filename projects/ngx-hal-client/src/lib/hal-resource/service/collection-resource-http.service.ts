@@ -56,18 +56,6 @@ export class CollectionResourceHttpService<T extends CollectionResource<BaseReso
 
     return response.pipe(
       map((data: any) => {
-        // if (builder) {
-        //   for (const embeddedClassName of Object.keys(data._links)) {
-        //     if (embeddedClassName === 'self') {
-        //       const href: string = data._links[embeddedClassName].href;
-        //       const idx: number = href.lastIndexOf('/');
-        //       const realClassName = href.replace(this.httpConfig.rootUri, '').substring(0, idx);
-        //       response = ResourceUtils.searchSubtypes(builder, realClassName, response);
-        //       break;
-        //     }
-        //   }
-        // }
-
         ConsoleLogger.prettyInfo('GET_RESOURCE_COLLECTION RESPONSE', {
           url,
           params: options?.params,
@@ -115,18 +103,6 @@ export class CollectionResourceHttpService<T extends CollectionResource<BaseReso
 
     return response.pipe(
       map((data: any) => {
-        // if (builder) {
-        //   for (const embeddedClassName of Object.keys(data._links)) {
-        //     if (embeddedClassName === 'self') {
-        //       const href: string = data._links[embeddedClassName].href;
-        //       const idx: number = href.lastIndexOf('/');
-        //       const realClassName = href.replace(this.httpConfig.rootUri, '').substring(0, idx);
-        //       response = ResourceUtils.searchSubtypes(builder, realClassName, response);
-        //       break;
-        //     }
-        //   }
-        // }
-
         ConsoleLogger.prettyInfo('POST_RESOURCE_COLLECTION RESPONSE', {
           url,
           params: options?.params,

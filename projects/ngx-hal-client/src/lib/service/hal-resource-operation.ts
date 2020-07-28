@@ -9,12 +9,8 @@ import { CollectionResource } from '../hal-resource/model/collection-resource';
 export class HalResourceOperation<T extends Resource> {
 
   private readonly resourceName: string;
-  // public resourceArray: ResourceCollection<T>;
-  // private resourceService: ResourceService;
 
   private halResourceService: HalResourceService<T>;
-
-  // private resourceHttpService: ResourceHttpService<BaseResource>;
 
   constructor(resourceName: string) {
     this.resourceName = resourceName;
@@ -25,13 +21,13 @@ export class HalResourceOperation<T extends Resource> {
     return this.halResourceService.get(this.resourceName, id, requestParam) as Observable<T>;
   }
 
-  // TODO: подумать об options и subTypes
+  // TODO: подумать об options
   public getAll(subType?: any): Observable<CollectionResource<T>> {
     return this.halResourceService.getAll(this.resourceName);
   }
 
-  // TODO: подумать об options и subTypes
-  public getAllPage(pageParam?: PageParam, subType?: any): Observable<PagedCollectionResource<T>> {
+  // TODO: подумать об options
+  public getAllPage(pageParam?: PageParam): Observable<PagedCollectionResource<T>> {
     return this.halResourceService.getAllPage(this.resourceName, pageParam);
   }
 

@@ -5,6 +5,7 @@ import { PagedCollectionResource } from '../hal-resource/model/paged-collection-
 import { Include, Link, PageData, ResourceOption } from '../hal-resource/model/declarations';
 import * as _ from 'lodash';
 import { Resource } from '../hal-resource/model/resource';
+import { EmbeddedResource } from '../hal-resource/model/embedded-resource';
 
 export class ResourceUtils {
 
@@ -14,9 +15,9 @@ export class ResourceUtils {
 
   private static pagedCollectionResourceType: new(collection: CollectionResource<BaseResource>, pageData?: PageData) => PagedCollectionResource<BaseResource>;
 
-  private static embeddedResourceType: new() => BaseResource;
+  private static embeddedResourceType: new() => EmbeddedResource;
 
-  public static useResourceType(type: new () => BaseResource) {
+  public static useResourceType(type: new () => Resource) {
     this.resourceType = type;
   }
 
@@ -47,7 +48,7 @@ export class ResourceUtils {
     }
 
     const resource = ResourceUtils.createResource(new this.resourceType() as T, payload);
-    resource.resourceName = this.findResourceName(resource);
+    resource['resourceName'] = this.findResourceName(resource);
 
     return resource;
   }

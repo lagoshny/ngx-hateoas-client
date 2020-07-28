@@ -35,7 +35,6 @@ export class ResourceHttpService<T extends BaseResource> {
     }
   }): Observable<T> {
     ConsoleLogger.prettyInfo('GET_RESOURCE REQUEST', {
-      // resource: resourceType.constructor.name,
       url,
       params: options?.params
     });
@@ -53,18 +52,6 @@ export class ResourceHttpService<T extends BaseResource> {
 
     return response.pipe(
       map((data: any) => {
-        // if (builder) {
-        //   for (const embeddedClassName of Object.keys(data._links)) {
-        //     if (embeddedClassName === 'self') {
-        //       const href: string = data._links[embeddedClassName].href;
-        //       const idx: number = href.lastIndexOf('/');
-        //       const realClassName = href.replace(this.httpConfig.rootUri, '').substring(0, idx);
-        //       response = ResourceUtils.searchSubtypes(builder, realClassName, response);
-        //       break;
-        //     }
-        //   }
-        // }
-
         ConsoleLogger.prettyInfo('GET_RESOURCE RESPONSE', {
           url,
           params: options?.params,
@@ -98,7 +85,6 @@ export class ResourceHttpService<T extends BaseResource> {
   }): Observable<any> {
 
     ConsoleLogger.prettyInfo('POST_RESOURCE REQUEST', {
-      // resource: resourceType.constructor.name,
       url,
       params: options?.params,
       body: JSON.stringify(body, null, 4)
@@ -114,7 +100,6 @@ export class ResourceHttpService<T extends BaseResource> {
     return response.pipe(
       map((data: any) => {
         ConsoleLogger.prettyInfo('POST_RESOURCE RESPONSE', {
-          // resource: resourceType.constructor.name,
           url,
           params: options?.params,
           body: JSON.stringify(data, null, 4)
@@ -142,7 +127,6 @@ export class ResourceHttpService<T extends BaseResource> {
   }): Observable<any> {
 
     ConsoleLogger.prettyInfo('PUT_RESOURCE REQUEST', {
-      // resource: resourceType.constructor.name,
       url,
       params: options?.params,
       body: JSON.stringify(body, null, 4)
@@ -158,7 +142,6 @@ export class ResourceHttpService<T extends BaseResource> {
     return response.pipe(
       map((data: any) => {
         ConsoleLogger.prettyInfo('PUT_RESOURCE RESPONSE', {
-          // resource: resourceType.constructor.name,
           url,
           params: options?.params,
           body: JSON.stringify(data, null, 4)
@@ -185,7 +168,6 @@ export class ResourceHttpService<T extends BaseResource> {
   }): Observable<any> {
 
     ConsoleLogger.prettyInfo('PATH_RESOURCE REQUEST', {
-      // resource: resourceType.constructor.name,
       url,
       params: options?.params,
       body: JSON.stringify(body, null, 4)
@@ -201,7 +183,6 @@ export class ResourceHttpService<T extends BaseResource> {
     return response.pipe(
       map((data: any) => {
         ConsoleLogger.prettyInfo('PATH_RESOURCE RESPONSE', {
-          // resource: resourceType.constructor.name,
           url,
           params: options?.params,
           body: JSON.stringify(data, null, 4)
@@ -284,73 +265,7 @@ export class ResourceHttpService<T extends BaseResource> {
         }),
         catchError(error => observableThrowError(error))
       );
-
-    // return this.getResource(url, {params: httpParams}) as Observable<number>;
   }
-
-
-  //
-  // public putResource(url: string, body: any | null, options?: {
-  //   headers?: HttpHeaders | {
-  //     [header: string]: string | string[];
-  //   };
-  //   observe?: 'body' | 'response';
-  //   params?: HttpParams | {
-  //     [param: string]: string | string[];
-  //   }
-  // }): Observable<any> {
-  //   if (options?.observe === 'response') {
-  //     return this.httpClient.put(url, body, {...options, observe: 'response'});
-  //   } else {
-  //     return this.httpClient.put(url, body, {...options, observe: 'body'});
-  //   }
-  // }
-  //
-  // public patchResource(url: string, body: any | null, options?: {
-  //   headers?: HttpHeaders | {
-  //     [header: string]: string | string[];
-  //   };
-  //   observe?: 'body' | 'response';
-  //   params?: HttpParams | {
-  //     [param: string]: string | string[];
-  //   }
-  // }): Observable<any> {
-  //   if (options?.observe === 'response') {
-  //     return this.httpClient.patch(url, body, {...options, observe: 'response'});
-  //   } else {
-  //     return this.httpClient.patch(url, body, {...options, observe: 'body'});
-  //   }
-  // }
-  //
-  // public deleteResource(url: string, options?: {
-  //   headers?: HttpHeaders | {
-  //     [header: string]: string | string[];
-  //   };
-  //   observe?: 'body' | 'response';
-  //   params?: HttpParams | {
-  //     [param: string]: string | string[];
-  //   }
-  // }): Observable<any> {
-  //   if (options?.observe === 'response') {
-  //     return this.httpClient.delete(url, {...options, observe: 'response'});
-  //   } else {
-  //     return this.httpClient.delete(url, {...options, observe: 'body'});
-  //   }
-  // }
-
-
-  // public generateResourceUrl(resource?: string): string {
-  //   let url = this.httpConfig.getURL();
-  //   if (!url.endsWith('/')) {
-  //     url = url.concat('/');
-  //   }
-  //   if (resource) {
-  //     return url.concat(resource);
-  //   }
-  //
-  //   url = url.replace('{?projection}', '');
-  //   return url;
-  // }
 
   public getProjection(resourceName: string,
                        id: string,

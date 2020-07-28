@@ -27,7 +27,7 @@ export class HalResourceService<T extends Resource> {
     return this.collectionResourceHttpService.get(resourceName);
   }
 
-  // TODO: подумать об options и subTypes
+  // TODO: подумать об options
   public getAllPage(resourceName: string, pageParam?: PageParam): Observable<PagedCollectionResource<T>> {
     return this.pagedCollectionResourceHttpService.getPage(resourceName, pageParam);
   }

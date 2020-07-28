@@ -15,12 +15,6 @@ import { HttpResponse } from '@angular/common/http';
 export abstract class BaseResource extends ResourceIdentifiable {
 
   /**
-   * Hold information about resource name.
-   * This field allows to recognize which subtype of resource.
-   */
-  public resourceName: string;
-
-  /**
    * Get single resource by relation name.
    *
    * @param relationName relation that need to get

@@ -14,6 +14,26 @@ import * as _ from 'lodash';
 export class Resource extends BaseResource {
 
   /**
+   * Contains information about the resource name as it appears in the resource response in an array of links.
+   */
+  private resourceName: string;
+
+  /**
+   * Allows you to find out if a resource is of the desired type by the resource name.
+   *
+   * @param typeOrName if passed class type then compared resource name with class name
+   *        else comparing passed name with resource name
+   */
+  public isResourceOf<T extends Resource>(typeOrName: (new() => T) | string): boolean {
+    if (_.isObject(typeOrName)) {
+      const that = new typeOrName() as T;
+      return _.eq(_.toLower(this.resourceName), _.toLower(that.constructor.name));
+    } else {
+      return _.eq(_.toLower(this.resourceName), _.toLower(typeOrName));
+    }
+  }
+
+  /**
    * Adds the given resource to the bind resource collection by the relation name.
    *
    * @param relationName that contains link to the resource collection
@@ -57,7 +77,6 @@ export class Resource extends BaseResource {
       headers: new HttpHeaders({'Content-Type': 'text/uri-list'})
     });
   }
-
 
   /**
    * Unbind the single resource with the given relation name from this resource.

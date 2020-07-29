@@ -4,7 +4,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { CacheService } from './cache.service';
 import { HttpConfigService } from '../../config/http-config.service';
 import { PagedCollectionResource } from '../model/paged-collection-resource';
-import { Observable, of as observableOf } from 'rxjs';
+import { Observable } from 'rxjs';
 import { ConsoleLogger } from '../../logger/console-logger';
 import { catchError, map } from 'rxjs/operators';
 import * as _ from 'lodash';
@@ -15,6 +15,7 @@ import { UrlUtils } from '../../util/url.utils';
 import { DependencyInjector } from '../../util/dependency-injector';
 import { ConstantUtil } from '../../util/constant.util';
 import { PageParam, RequestParam } from '../model/declarations';
+import { CommonHttpService } from './common-http.service';
 
 /**
  * Get instance of the PagedCollectionResourceHttpService by Angular DependencyInjector.
@@ -27,11 +28,12 @@ export function getPagedCollectionResourceHttpService(): PagedCollectionResource
  * Service to work with {@link PagedCollectionResource}.
  */
 @Injectable({providedIn: 'root'})
-export class PagedCollectionResourceHttpService<T extends PagedCollectionResource<BaseResource>> {
+export class PagedCollectionResourceHttpService<T extends PagedCollectionResource<BaseResource>> extends CommonHttpService<T> {
 
-  constructor(private httpClient: HttpClient,
-              private cacheService: CacheService<T>,
+  constructor(httpClient: HttpClient,
+              cacheService: CacheService<T>,
               private httpConfig: HttpConfigService) {
+    super(httpClient, cacheService);
   }
 
   public get(url: string, options?: {
@@ -43,24 +45,12 @@ export class PagedCollectionResourceHttpService<T extends PagedCollectionResourc
       [param: string]: string | string[];
     }
   }): Observable<T> {
-
     ConsoleLogger.prettyInfo('GET_RESOURCE_PAGE REQUEST', {
       url,
       params: options?.params
     });
 
-    if (this.cacheService.hasResource(url)) {
-      return observableOf(this.cacheService.getResourceCollection());
-    }
-
-    let response;
-    if (options?.observe === 'response') {
-      response = this.httpClient.get(url, {...options, observe: 'response'});
-    } else {
-      response = this.httpClient.get(url, {...options, observe: 'body'});
-    }
-
-    return response.pipe(
+    return super.get(url, options).pipe(
       map((data: any) => {
         ConsoleLogger.prettyInfo('GET_RESOURCE_PAGE RESPONSE', {
           url,

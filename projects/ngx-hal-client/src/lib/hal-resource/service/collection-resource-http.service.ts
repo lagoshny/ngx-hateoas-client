@@ -14,18 +14,19 @@ import { BaseResource } from '../model/base-resource';
 import { DependencyInjector } from '../../util/dependency-injector';
 import { RequestParam } from '../model/declarations';
 import { UrlUtils } from '../../util/url.utils';
+import { CommonHttpService } from './common-http.service';
 
 export function getCollectionResourceHttpService(): CollectionResourceHttpService<CollectionResource<BaseResource>> {
   return DependencyInjector.get(CollectionResourceHttpService);
 }
 
 @Injectable({providedIn: 'root'})
-export class CollectionResourceHttpService<T extends CollectionResource<BaseResource>> {
+export class CollectionResourceHttpService<T extends CollectionResource<BaseResource>> extends CommonHttpService<T> {
 
-
-  constructor(private httpClient: HttpClient,
-              private cacheService: CacheService<T>,
+  constructor(httpClient: HttpClient,
+              cacheService: CacheService<T>,
               private httpConfig: HttpConfigService) {
+    super(httpClient, cacheService);
   }
 
   public get(url: string, options?: {
@@ -37,45 +38,34 @@ export class CollectionResourceHttpService<T extends CollectionResource<BaseReso
       [param: string]: string | string[];
     }
   }): Observable<T> {
-
     ConsoleLogger.prettyInfo('GET_RESOURCE_COLLECTION REQUEST', {
       url,
       params: options?.params
     });
 
-    if (this.cacheService.hasResource(url)) {
-      return observableOf(this.cacheService.getResourceCollection());
-    }
+    return super.get(url, options)
+      .pipe(
+        map((data: any) => {
+          ConsoleLogger.prettyInfo('GET_RESOURCE_COLLECTION RESPONSE', {
+            url,
+            params: options?.params,
+            body: JSON.stringify(data, null, 4)
+          });
 
-    let response;
-    if (options?.observe === 'response') {
-      response = this.httpClient.get(url, {...options, observe: 'response'});
-    } else {
-      response = this.httpClient.get(url, {...options, observe: 'body'});
-    }
+          if (!_.isEmpty(data)) {
+            if (!isCollectionResource(data)) {
+              ConsoleLogger.error('You try to get wrong resource type, expected resource collection type.');
+              return observableThrowError('You try to get wrong resource type, expected resource collection type.');
+            }
+            const resource: T = ResourceUtils.instantiateCollectionResource(data);
+            this.cacheService.putResource(url, resource);
 
-    return response.pipe(
-      map((data: any) => {
-        ConsoleLogger.prettyInfo('GET_RESOURCE_COLLECTION RESPONSE', {
-          url,
-          params: options?.params,
-          body: JSON.stringify(data, null, 4)
-        });
-
-        if (!_.isEmpty(data)) {
-          if (!isCollectionResource(data)) {
-            ConsoleLogger.error('You try to get wrong resource type, expected resource collection type.');
-            return observableThrowError('You try to get wrong resource type, expected resource collection type.');
+            return resource;
           }
-          const resource: T = ResourceUtils.instantiateCollectionResource(data);
-          this.cacheService.putResource(url, resource);
 
-          return resource;
-        }
-
-        return data;
-      }),
-      catchError(error => observableThrowError(error)));
+          return data;
+        }),
+        catchError(error => observableThrowError(error)));
   }
 
   public post(url: string, body: any | null, options?: {
@@ -87,39 +77,32 @@ export class CollectionResourceHttpService<T extends CollectionResource<BaseReso
       [param: string]: string | string[];
     }
   }): Observable<T> {
-
     ConsoleLogger.prettyInfo('POST_RESOURCE_COLLECTION REQUEST', {
       url,
       body,
       params: options?.params
     });
 
-    let response;
-    if (options?.observe === 'response') {
-      response = this.httpClient.get(url, {...options, observe: 'response'});
-    } else {
-      response = this.httpClient.get(url, {...options, observe: 'body'});
-    }
+    return super.post(url, body, options)
+      .pipe(
+        map((data: any) => {
+          ConsoleLogger.prettyInfo('POST_RESOURCE_COLLECTION RESPONSE', {
+            url,
+            params: options?.params,
+            body: JSON.stringify(data, null, 4)
+          });
 
-    return response.pipe(
-      map((data: any) => {
-        ConsoleLogger.prettyInfo('POST_RESOURCE_COLLECTION RESPONSE', {
-          url,
-          params: options?.params,
-          body: JSON.stringify(data, null, 4)
-        });
-
-        if (!_.isEmpty(data)) {
-          if (!isCollectionResource(data)) {
-            ConsoleLogger.error('You try to get wrong resource type, expected resource collection type.');
-            return observableThrowError('You try to get wrong resource type, expected resource collection type.');
+          if (!_.isEmpty(data)) {
+            if (!isCollectionResource(data)) {
+              ConsoleLogger.error('You try to get wrong resource type, expected resource collection type.');
+              return observableThrowError('You try to get wrong resource type, expected resource collection type.');
+            }
+            return ResourceUtils.instantiateCollectionResource(data);
           }
-          return ResourceUtils.instantiateCollectionResource(data);
-        }
 
-        return data;
-      }),
-      catchError(error => observableThrowError(error)));
+          return data;
+        }),
+        catchError(error => observableThrowError(error)));
   }
 
   public getResourceCollection(resourceName: string, query?: string, requestParam?: RequestParam): Observable<T> {

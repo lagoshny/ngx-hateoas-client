@@ -25,7 +25,7 @@ export class ResourceHttpService<T extends BaseResource> {
               private httpConfig: HttpConfigService) {
   }
 
-  public getResource(url: string, options?: {
+  public get(url: string, options?: {
     headers?: {
       [header: string]: string | string[];
     };
@@ -74,7 +74,7 @@ export class ResourceHttpService<T extends BaseResource> {
       catchError(error => observableThrowError(error)));
   }
 
-  public postResource(url: string, body: any | null, options?: {
+  public post(url: string, body: any | null, options?: {
     headers?: HttpHeaders | {
       [header: string]: string | string[];
     };
@@ -116,7 +116,7 @@ export class ResourceHttpService<T extends BaseResource> {
     );
   }
 
-  public putResource(url: string, body: any | null, options?: {
+  public put(url: string, body: any | null, options?: {
     headers?: HttpHeaders | {
       [header: string]: string | string[];
     };
@@ -157,7 +157,7 @@ export class ResourceHttpService<T extends BaseResource> {
     );
   }
 
-  public patchResource(url: string, body: any | null, options?: {
+  public patch(url: string, body: any | null, options?: {
     headers?: HttpHeaders | {
       [header: string]: string | string[];
     };
@@ -201,7 +201,7 @@ export class ResourceHttpService<T extends BaseResource> {
     );
   }
 
-  public deleteResource(url: string, options?: {
+  public delete(url: string, options?: {
     headers?: HttpHeaders | {
       [header: string]: string | string[];
     };
@@ -277,40 +277,40 @@ export class ResourceHttpService<T extends BaseResource> {
       .concat('/', id)
       .concat('?projection=' + projectionName);
 
-    return this.getResource(uri);
+    return this.get(uri);
   }
 
 
-  public get(resourceName: string, id: any, requestParam?: RequestParam): Observable<T> {
+  public getResource(resourceName: string, id: any, requestParam?: RequestParam): Observable<T> {
     const uri = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName).concat('/', id);
     const httpParams = UrlUtils.convertToHttpParams(requestParam);
 
-    return this.getResource(uri, {params: httpParams});
+    return this.get(uri, {params: httpParams});
   }
 
-  public post(resourceName: string, body: any): Observable<T> {
+  public postResource(resourceName: string, body: any): Observable<T> {
     const uri = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName);
 
-    return this.postResource(uri, body);
+    return this.post(uri, body);
   }
 
-  public put(resourceName: string, body: any): Observable<T> {
+  public putResource(resourceName: string, body: any): Observable<T> {
     const uri = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName);
 
-    return this.putResource(uri, body);
+    return this.put(uri, body);
   }
 
-  public patch(resourceName: string, body: any): Observable<T> {
+  public patchResource(resourceName: string, body: any): Observable<T> {
     const uri = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName);
 
-    return this.patchResource(uri, body);
+    return this.patch(uri, body);
   }
 
   public search(resourceName: string, query: string, requestParam: RequestParam): Observable<T> {
     const url = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName).concat('/search/' + query);
     const httpParams = UrlUtils.convertToHttpParams(requestParam);
 
-    return this.getResource(url, {params: httpParams});
+    return this.get(url, {params: httpParams});
   }
 
 }

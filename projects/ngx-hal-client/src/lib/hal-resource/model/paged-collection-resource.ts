@@ -130,5 +130,5 @@ function doRequest<T extends BaseResource>(uri: string, pageParams?: PageParam):
   }
 
   return getPagedCollectionResourceHttpService()
-    .getResourcePage(UrlUtils.removeUrlTemplateVars(uri), {params: httpParams}) as Observable<PagedCollectionResource<T>>;
+    .get(UrlUtils.removeUrlTemplateVars(uri), {params: httpParams}) as Observable<PagedCollectionResource<T>>;
 }

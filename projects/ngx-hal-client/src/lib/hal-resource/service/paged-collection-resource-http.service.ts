@@ -34,7 +34,7 @@ export class PagedCollectionResourceHttpService<T extends PagedCollectionResourc
               private httpConfig: HttpConfigService) {
   }
 
-  public getResourcePage(url: string, options?: {
+  public get(url: string, options?: {
     headers?: {
       [header: string]: string | string[];
     };
@@ -90,14 +90,14 @@ export class PagedCollectionResourceHttpService<T extends PagedCollectionResourc
    * @param resourceName resource to perform page request
    * @param pageParam page params
    */
-  public getPage(resourceName: string, pageParam?: PageParam): Observable<T> {
+  public getResourcePage(resourceName: string, pageParam?: PageParam): Observable<T> {
     const url = UrlUtils.removeUrlTemplateVars(UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName));
     if (_.isEmpty(pageParam)) {
       pageParam = ConstantUtil.DEFAULT_PAGE;
     }
     const httpParams = UrlUtils.convertToHttpParams(pageParam as RequestParam);
 
-    return this.getResourcePage(url, {params: httpParams});
+    return this.get(url, {params: httpParams});
   }
 
   public search(resourceName: string, query: string, pageParam: PageParam): Observable<T> {
@@ -108,7 +108,7 @@ export class PagedCollectionResourceHttpService<T extends PagedCollectionResourc
     }
     const httpParams = UrlUtils.convertToHttpParams(pageParam as RequestParam);
 
-    return this.getResourcePage(url, {params: httpParams});
+    return this.get(url, {params: httpParams});
   }
 
 }

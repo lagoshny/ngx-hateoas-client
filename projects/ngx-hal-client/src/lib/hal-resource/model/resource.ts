@@ -42,7 +42,7 @@ export class Resource extends BaseResource {
   public addRelation<T extends Resource>(relationName: string, resource: T): Observable<HttpResponse<any>> {
     const relationLink = this.getRelationLink(relationName);
 
-    return getResourceHttpService().postResource(relationLink.href, resource.getSelfLinkHref(), {
+    return getResourceHttpService().post(relationLink.href, resource.getSelfLinkHref(), {
       observe: 'response',
       headers: new HttpHeaders({'Content-Type': 'text/uri-list'})
     });
@@ -57,7 +57,7 @@ export class Resource extends BaseResource {
   public bindRelation<T extends Resource>(relationName: string, resource: T): Observable<HttpResponse<any>> {
     const relationLink = this.getRelationLink(relationName);
 
-    return getResourceHttpService().putResource(relationLink.href, resource.getSelfLinkHref(), {
+    return getResourceHttpService().put(relationLink.href, resource.getSelfLinkHref(), {
       observe: 'response',
       headers: new HttpHeaders({'Content-Type': 'text/uri-list'})
     });
@@ -72,7 +72,7 @@ export class Resource extends BaseResource {
    */
   public clearRelation<T extends Resource>(relationName: string): Observable<HttpResponse<any>> {
     const relationLink = this.getRelationLink(relationName);
-    return getResourceHttpService().putResource(relationLink.href, '', {
+    return getResourceHttpService().put(relationLink.href, '', {
       observe: 'response',
       headers: new HttpHeaders({'Content-Type': 'text/uri-list'})
     });
@@ -94,7 +94,7 @@ export class Resource extends BaseResource {
       throw Error('relation should has id');
     }
 
-    return getResourceHttpService().deleteResource(relationLink.href + '/' + resourceId, {
+    return getResourceHttpService().delete(relationLink.href + '/' + resourceId, {
       observe: 'response'
     });
   }

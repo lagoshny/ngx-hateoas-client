@@ -20,24 +20,24 @@ export class HalResourceService<T extends Resource> {
   }
 
   public get(resourceName: string, id: any, requestParam?: RequestParam): Observable<T> {
-    return this.resourceHttpService.get(resourceName, id, requestParam) as Observable<T>;
+    return this.resourceHttpService.getResource(resourceName, id, requestParam) as Observable<T>;
   }
 
   public getAll(resourceName: string): Observable<CollectionResource<T>> {
-    return this.collectionResourceHttpService.get(resourceName);
+    return this.collectionResourceHttpService.getResourceCollection(resourceName);
   }
 
   // TODO: подумать об options
   public getAllPage(resourceName: string, pageParam?: PageParam): Observable<PagedCollectionResource<T>> {
-    return this.pagedCollectionResourceHttpService.getPage(resourceName, pageParam);
+    return this.pagedCollectionResourceHttpService.getResourcePage(resourceName, pageParam);
   }
 
   public create(resourceName: string, resource: T): Observable<T> {
-    return this.resourceHttpService.post(resourceName, ResourceUtils.resolveRelations(resource));
+    return this.resourceHttpService.postResource(resourceName, ResourceUtils.resolveRelations(resource));
   }
 
   public update(resource: T) {
-    return this.resourceHttpService.putResource(resource.getSelfLinkHref(), ResourceUtils.resolveRelations(resource));
+    return this.resourceHttpService.put(resource.getSelfLinkHref(), ResourceUtils.resolveRelations(resource));
   }
 
   public count(resourceName: string, query: string, requestParam: RequestParam): Observable<number> {
@@ -45,11 +45,11 @@ export class HalResourceService<T extends Resource> {
   }
 
   public patch(resource: T, resourceOption: ResourceOption): Observable<T> {
-    return this.resourceHttpService.patchResource(resource.getSelfLinkHref(), ResourceUtils.resolveRelations(resource, resourceOption));
+    return this.resourceHttpService.patch(resource.getSelfLinkHref(), ResourceUtils.resolveRelations(resource, resourceOption));
   }
 
   public delete(resource: T): Observable<any> {
-    return this.resourceHttpService.deleteResource(resource.getSelfLinkHref());
+    return this.resourceHttpService.delete(resource.getSelfLinkHref());
   }
 
   public search(resourceName: string, query: string, requestParam?: RequestParam): Observable<CollectionResource<T>> {
@@ -65,11 +65,11 @@ export class HalResourceService<T extends Resource> {
   }
 
   public collectionQuery(resourceName: string, query: string, requestParam: RequestParam): Observable<CollectionResource<T>> {
-    return this.collectionResourceHttpService.get(resourceName, query, requestParam);
+    return this.collectionResourceHttpService.getResourceCollection(resourceName, query, requestParam);
   }
 
   public collectionQueryPost(resourceName: string, query: string, body: any, requestParam: RequestParam): Observable<CollectionResource<T>> {
-    return this.collectionResourceHttpService.post(resourceName, query, body, requestParam);
+    return this.collectionResourceHttpService.postResourceCollection(resourceName, query, body, requestParam);
   }
 
   /**

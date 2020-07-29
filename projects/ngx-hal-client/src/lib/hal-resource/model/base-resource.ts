@@ -28,7 +28,7 @@ export abstract class BaseResource extends ResourceIdentifiable {
     const relationLink = this.getRelationLink(relationName);
     const uri = relationLink.templated ? UrlUtils.removeUrlTemplateVars(relationLink.href) : relationLink.href;
 
-    return getResourceHttpService().getResource(uri) as Observable<T>;
+    return getResourceHttpService().get(uri) as Observable<T>;
   }
 
   /**
@@ -53,7 +53,7 @@ export abstract class BaseResource extends ResourceIdentifiable {
       httpParams = UrlUtils.convertToHttpParams(options.page as RequestParam, httpParams);
     }
 
-    return getCollectionResourceHttpService().getResourceCollection(uri, {params: httpParams}) as Observable<T>;
+    return getCollectionResourceHttpService().get(uri, {params: httpParams}) as Observable<T>;
   }
 
   /**
@@ -74,7 +74,7 @@ export abstract class BaseResource extends ResourceIdentifiable {
     }
 
     return getResourceHttpService()
-      .postResource(url, body, {observe: 'response', params: httpParams});
+      .post(url, body, {observe: 'response', params: httpParams});
   }
 
   /**
@@ -95,7 +95,7 @@ export abstract class BaseResource extends ResourceIdentifiable {
     }
 
     return getResourceHttpService()
-      .patchResource(url, body, {observe: 'response', params: httpParams});
+      .patch(url, body, {observe: 'response', params: httpParams});
   }
 
 }

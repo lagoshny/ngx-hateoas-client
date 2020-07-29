@@ -28,7 +28,7 @@ export class CollectionResourceHttpService<T extends CollectionResource<BaseReso
               private httpConfig: HttpConfigService) {
   }
 
-  public getResourceCollection(url: string, options?: {
+  public get(url: string, options?: {
     headers?: {
       [header: string]: string | string[];
     };
@@ -78,7 +78,7 @@ export class CollectionResourceHttpService<T extends CollectionResource<BaseReso
       catchError(error => observableThrowError(error)));
   }
 
-  public postResourceCollection(url: string, body: any | null, options?: {
+  public post(url: string, body: any | null, options?: {
     headers?: {
       [header: string]: string | string[];
     };
@@ -122,25 +122,25 @@ export class CollectionResourceHttpService<T extends CollectionResource<BaseReso
       catchError(error => observableThrowError(error)));
   }
 
-  public get(resourceName: string, query?: string, requestParam?: RequestParam): Observable<T> {
+  public getResourceCollection(resourceName: string, query?: string, requestParam?: RequestParam): Observable<T> {
     const url = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName).concat(query ? query : '');
     const httpParams = UrlUtils.convertToHttpParams(requestParam);
 
-    return this.getResourceCollection(url, {params: httpParams});
+    return this.get(url, {params: httpParams});
   }
 
-  public post(resourceName: string, query: string, body: any, requestParam?: RequestParam): Observable<T> {
+  public postResourceCollection(resourceName: string, query: string, body: any, requestParam?: RequestParam): Observable<T> {
     const url = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName).concat(query);
     const httpParams = UrlUtils.convertToHttpParams(requestParam);
 
-    return this.postResourceCollection(url, body, {params: httpParams});
+    return this.post(url, body, {params: httpParams});
   }
 
   public search(resourceName: string, query: string, requestParam?: RequestParam): Observable<T> {
     const url = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName).concat('/search/' + query);
     const httpParams = UrlUtils.convertToHttpParams(requestParam);
 
-    return this.getResourceCollection(url, {params: httpParams});
+    return this.get(url, {params: httpParams});
   }
 
   public getProjection(resourceName: string,
@@ -151,7 +151,7 @@ export class CollectionResourceHttpService<T extends CollectionResource<BaseReso
     const url = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName)
       .concat('?projection=' + projectionName);
 
-    return this.getResourceCollection(url);
+    return this.get(url);
   }
 
 }

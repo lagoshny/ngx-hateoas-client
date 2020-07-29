@@ -1,8 +1,7 @@
 import { CollectionResource } from './collection-resource';
 import { BaseResource } from './base-resource';
-import { Observable } from 'rxjs';
+import { Observable, throwError as observableThrowError } from 'rxjs';
 import { getPagedCollectionResourceHttpService } from '../service/paged-collection-resource-http.service';
-import { throwError as observableThrowError } from 'rxjs/internal/observable/throwError';
 import { UrlUtils } from '../../util/url.utils';
 import * as _ from 'lodash';
 import { ConsoleLogger } from '../../logger/console-logger';

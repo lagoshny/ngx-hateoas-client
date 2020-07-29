@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs/internal/Observable';
+import { Observable, throwError as observableThrowError } from 'rxjs';
 import { ResourceHttpService } from '../hal-resource/service/resource-http.service';
 import { PagedCollectionResourceHttpService } from '../hal-resource/service/paged-collection-resource-http.service';
 import { PagedCollectionResource } from '../hal-resource/model/paged-collection-resource';
@@ -9,7 +9,6 @@ import { Resource } from '../ngx-hal-client.module';
 import { CollectionResource } from '../hal-resource/model/collection-resource';
 import { CollectionResourceHttpService } from '../hal-resource/service/collection-resource-http.service';
 import * as _ from 'lodash';
-import { throwError as observableThrowError } from 'rxjs/internal/observable/throwError';
 
 @Injectable({providedIn: 'root'})
 export class HalResourceService<T extends Resource> {

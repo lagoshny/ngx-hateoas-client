@@ -1,4 +1,4 @@
-import { Observable } from 'rxjs/internal/Observable';
+import { Observable } from 'rxjs';
 import { DependencyInjector } from '../util/dependency-injector';
 import { HalResourceService } from './hal-resource.service';
 import { PageParam, RequestParam, ResourceOption } from '../hal-resource/model/declarations';

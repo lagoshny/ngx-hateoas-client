@@ -1,34 +1,34 @@
 import { Injectable } from '@angular/core';
-import { Observable, throwError as observableThrowError } from 'rxjs';
+import { Observable } from 'rxjs';
 import { ResourceHttpService } from '../hal-resource/service/resource-http.service';
 import { PagedCollectionResourceHttpService } from '../hal-resource/service/paged-collection-resource-http.service';
 import { PagedCollectionResource } from '../hal-resource/model/paged-collection-resource';
-import { PageParam, RequestParam, ResourceOption } from '../hal-resource/model/declarations';
+import { HalOption, HalSimpleOption, HttpMethod, RequestParam, ResourceOption } from '../hal-resource/model/declarations';
 import { ResourceUtils } from '../util/resource.utils';
 import { Resource } from '../ngx-hal-client.module';
 import { CollectionResource } from '../hal-resource/model/collection-resource';
 import { CollectionResourceHttpService } from '../hal-resource/service/collection-resource-http.service';
-import * as _ from 'lodash';
+import { CommonHttpService } from '../hal-resource/service/common-http.service';
 
 @Injectable({providedIn: 'root'})
 export class HalResourceService<T extends Resource> {
 
-  constructor(private resourceHttpService: ResourceHttpService<T>,
+  constructor(private commonHttpService: CommonHttpService<T | CollectionResource<T> | PagedCollectionResource<T>>,
+              private resourceHttpService: ResourceHttpService<T>,
               private collectionResourceHttpService: CollectionResourceHttpService<CollectionResource<T>>,
               private pagedCollectionResourceHttpService: PagedCollectionResourceHttpService<PagedCollectionResource<T>>) {
   }
 
-  public get(resourceName: string, id: any, requestParam?: RequestParam): Observable<T> {
-    return this.resourceHttpService.getResource(resourceName, id, requestParam) as Observable<T>;
+  public get(resourceName: string, id: any, option?: HalSimpleOption): Observable<T> {
+    return this.resourceHttpService.getResource(resourceName, id, option) as Observable<T>;
   }
 
-  public getAll(resourceName: string): Observable<CollectionResource<T>> {
-    return this.collectionResourceHttpService.getResourceCollection(resourceName);
+  public getAll(resourceName: string, option?: HalSimpleOption): Observable<CollectionResource<T>> {
+    return this.collectionResourceHttpService.getResourceCollection(resourceName, null, option);
   }
 
-  // TODO: подумать об options
-  public getAllPage(resourceName: string, pageParam?: PageParam): Observable<PagedCollectionResource<T>> {
-    return this.pagedCollectionResourceHttpService.getResourcePage(resourceName, pageParam);
+  public getAllPage(resourceName: string, option?: HalOption): Observable<PagedCollectionResource<T>> {
+    return this.pagedCollectionResourceHttpService.getResourcePage(resourceName, null, option);
   }
 
   public create(resourceName: string, resource: T): Observable<T> {
@@ -51,50 +51,23 @@ export class HalResourceService<T extends Resource> {
     return this.resourceHttpService.delete(resource.getSelfLinkHref());
   }
 
-  public search(resourceName: string, query: string, requestParam?: RequestParam): Observable<CollectionResource<T>> {
-    return this.collectionResourceHttpService.search(resourceName, query, requestParam);
+  public searchCollection(resourceName: string, query: string, option?: HalSimpleOption): Observable<CollectionResource<T>> {
+    return this.collectionResourceHttpService.search(resourceName, query, option);
   }
 
-  public searchPage(resourceName: string, query: string, pageParam?: PageParam /*,subType?: SubTypeBuilder*/): Observable<PagedCollectionResource<T>> {
-    return this.pagedCollectionResourceHttpService.search(resourceName, query, pageParam);
+  public searchPage(resourceName: string, query: string, option?: HalOption): Observable<PagedCollectionResource<T>> {
+    return this.pagedCollectionResourceHttpService.search(resourceName, query, option);
   }
 
-  public searchSingle(resourceName: string, query: string, requestParam: RequestParam): Observable<T> {
-    return this.resourceHttpService.search(resourceName, query, requestParam);
+  public searchSingle(resourceName: string, query: string, option?: HalSimpleOption): Observable<T> {
+    return this.resourceHttpService.search(resourceName, query, option);
   }
 
-  public collectionQuery(resourceName: string, query: string, requestParam: RequestParam): Observable<CollectionResource<T>> {
-    return this.collectionResourceHttpService.getResourceCollection(resourceName, query, requestParam);
+  public customQuery(resourceName: string,
+                     method: HttpMethod,
+                     query: string,
+                     body: any,
+                     option: HalOption): Observable<any | T | CollectionResource<T> | PagedCollectionResource<T>> {
+    return this.commonHttpService.customQuery(resourceName, method, query, body, option);
   }
-
-  public collectionQueryPost(resourceName: string, query: string, body: any, requestParam: RequestParam): Observable<CollectionResource<T>> {
-    return this.collectionResourceHttpService.postResourceCollection(resourceName, query, body, requestParam);
-  }
-
-  /**
-   * Get single resource projection.
-   *
-   * @param resourceName name of the resource to get projection
-   * @param id resource id
-   * @param projectionName projection that will be applied to resource
-   * @throws error when projectionName is empty
-   */
-  public getProjection(resourceName: string,
-                       id: string,
-                       projectionName: string,
-                       // expireMs: number = CacheHelper.defaultExpire,
-                       // isCacheActive: boolean = true
-  ): Observable<T> {
-    if (_.isEmpty(projectionName)) {
-      return observableThrowError('no projection found');
-    }
-
-    return this.resourceHttpService.getProjection(resourceName, id, projectionName) as Observable<T>;
-  }
-
-  // TODO: а нужен ли getProjectionPage или сделать один метод с параметрами для projection
-  public getProjectionCollection(resourceName: string, projectionName: string): Observable<CollectionResource<T>> {
-    return this.collectionResourceHttpService.getProjection(resourceName, projectionName);
-  }
-
 }

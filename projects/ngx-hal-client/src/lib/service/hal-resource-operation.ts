@@ -1,7 +1,7 @@
 import { Observable } from 'rxjs';
 import { DependencyInjector } from '../util/dependency-injector';
 import { HalResourceService } from './hal-resource.service';
-import { PageParam, RequestParam, ResourceOption } from '../hal-resource/model/declarations';
+import { HalOption, HalSimpleOption, HttpMethod, RequestParam, ResourceOption } from '../hal-resource/model/declarations';
 import { Resource } from '../hal-resource/model/resource';
 import { PagedCollectionResource } from '../hal-resource/model/paged-collection-resource';
 import { CollectionResource } from '../hal-resource/model/collection-resource';
@@ -17,18 +17,16 @@ export class HalResourceOperation<T extends Resource> {
     this.halResourceService = DependencyInjector.get(HalResourceService) as HalResourceService<T>;
   }
 
-  public get(id: any, requestParam?: RequestParam): Observable<T> {
-    return this.halResourceService.get(this.resourceName, id, requestParam) as Observable<T>;
+  public get(id: any, option?: HalSimpleOption): Observable<T> {
+    return this.halResourceService.get(this.resourceName, id, option) as Observable<T>;
   }
 
-  // TODO: подумать об options
-  public getAll(subType?: any): Observable<CollectionResource<T>> {
-    return this.halResourceService.getAll(this.resourceName);
+  public getAll(option?: HalSimpleOption): Observable<CollectionResource<T>> {
+    return this.halResourceService.getAll(this.resourceName, option);
   }
 
-  // TODO: подумать об options
-  public getAllPage(pageParam?: PageParam): Observable<PagedCollectionResource<T>> {
-    return this.halResourceService.getAllPage(this.resourceName, pageParam);
+  public getAllPage(option: HalOption): Observable<PagedCollectionResource<T>> {
+    return this.halResourceService.getAllPage(this.resourceName, option);
   }
 
   public create(resource: T): Observable<T> {
@@ -52,41 +50,23 @@ export class HalResourceOperation<T extends Resource> {
     return this.halResourceService.delete(resource);
   }
 
-  public search(query: string, requestParam?: RequestParam/*, subType?: SubTypeBuilder*/): Observable<CollectionResource<T>> {
-    return this.halResourceService.search(this.resourceName, query, requestParam);
+  public searchCollection(query: string, option?: HalSimpleOption): Observable<CollectionResource<T>> {
+    return this.halResourceService.searchCollection(this.resourceName, query, option);
   }
 
-  public searchPage(query: string, pageParam?: PageParam /*,subType?: SubTypeBuilder*/): Observable<PagedCollectionResource<T>> {
-    return this.halResourceService.searchPage(this.resourceName, query, pageParam);
+  public searchPage(query: string, option?: HalOption): Observable<PagedCollectionResource<T>> {
+    return this.halResourceService.searchPage(this.resourceName, query, option);
   }
 
-  public searchSingle(query: string, requestParam?: RequestParam): Observable<T> {
-    return this.halResourceService.searchSingle(this.resourceName, query, requestParam);
+  public searchSingle(query: string, option?: HalSimpleOption): Observable<T> {
+    return this.halResourceService.searchSingle(this.resourceName, query, option);
   }
 
-  // TODO: подумать об передачи HalParam и возвращать либо PagedCollection либо просто Collection
-  public collectionQuery(query: string, requestParam?: RequestParam /*,subType?: SubTypeBuilder*/): Observable<CollectionResource<T>> {
-    return this.halResourceService.collectionQuery(this.resourceName, query, requestParam);
-  }
-
-  // TODO: подумать об унификации такого метода для коллекций, одного ресурса и для страниц
-  public collectionQueryPost(query: string, body?: any, requestParam?: RequestParam /*, subType?: SubTypeBuilder*/): Observable<CollectionResource<T>> {
-    return this.halResourceService.collectionQueryPost(this.resourceName, query, body, requestParam);
-  }
-
-  public getProjection(id: string,
-                       projectionName: string,
-                       // expireMs: number = CacheHelper.defaultExpire,
-                       // isCacheActive: boolean = true
-  ): Observable<T> {
-    return this.halResourceService.getProjection(this.resourceName, id, projectionName);
-  }
-
-  public getProjectionCollection(projectionName: string
-                                 // expireMs: number = CacheHelper.defaultExpire,
-                                 // isCacheActive: boolean = true
-  ): Observable<CollectionResource<T>> {
-    return this.halResourceService.getProjectionCollection(this.resourceName, projectionName);
+  public customQuery(method: HttpMethod,
+                     query: string,
+                     body?: any,
+                     option?: HalOption): Observable<any | T | CollectionResource<T> | PagedCollectionResource<T>> {
+    return this.halResourceService.customQuery(this.resourceName, method, query, body, option);
   }
 
 }

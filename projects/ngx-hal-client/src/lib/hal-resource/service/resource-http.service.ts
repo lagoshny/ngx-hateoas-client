@@ -9,8 +9,8 @@ import { UrlUtils } from '../../util/url.utils';
 import * as _ from 'lodash';
 import { ConsoleLogger } from '../../logger/console-logger';
 import { isEmbeddedResource, isResource } from '../model/resource-type';
-import { RequestParam } from '../model/declarations';
-import { CommonHttpService } from './common-http.service';
+import { HalOption, HalSimpleOption, RequestParam } from '../model/declarations';
+import { HttpService } from './http.service';
 import { CacheService } from './cache.service';
 import { HttpConfigService } from '../../config/http-config.service';
 
@@ -19,7 +19,7 @@ export function getResourceHttpService(): ResourceHttpService<BaseResource> {
 }
 
 @Injectable({providedIn: 'root'})
-export class ResourceHttpService<T extends BaseResource> extends CommonHttpService<T> {
+export class ResourceHttpService<T extends BaseResource> extends HttpService<T> {
 
   constructor(httpClient: HttpClient,
               cacheService: CacheService<T>,
@@ -245,9 +245,9 @@ export class ResourceHttpService<T extends BaseResource> extends CommonHttpServi
   }
 
 
-  public getResource(resourceName: string, id: any, requestParam?: RequestParam): Observable<T> {
+  public getResource(resourceName: string, id: any, option?: HalSimpleOption): Observable<T> {
     const uri = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName).concat('/', id);
-    const httpParams = UrlUtils.convertToHttpParams(requestParam);
+    const httpParams = UrlUtils.convertToHttpParams(option);
 
     return this.get(uri, {params: httpParams});
   }
@@ -270,9 +270,9 @@ export class ResourceHttpService<T extends BaseResource> extends CommonHttpServi
     return this.patch(uri, body);
   }
 
-  public search(resourceName: string, query: string, requestParam: RequestParam): Observable<T> {
+  public search(resourceName: string, query: string, option?: HalSimpleOption): Observable<T> {
     const url = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName).concat('/search/' + query);
-    const httpParams = UrlUtils.convertToHttpParams(requestParam);
+    const httpParams = UrlUtils.convertToHttpParams(option);
 
     return this.get(url, {params: httpParams});
   }

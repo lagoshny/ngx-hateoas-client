@@ -21,17 +21,21 @@ export interface LinkData {
 /**
  * Contains options that can be applied to the request.
  */
-export interface HalOption {
-  params?: RequestParam;
+export interface HalOption extends HalSimpleOption {
   page?: PageParam;
-  // TODO: projection?
 }
+
+export interface HalSimpleOption {
+  params?: RequestParam;
+  projection?: string;
+}
+
 
 /**
  * Request params that will be applied to the result url as http request params.
  */
 export interface RequestParam {
-  [paramName: string]: Resource | string | number | boolean | Sort;
+    [paramName: string]: Resource | string | number | boolean | Sort;
 }
 
 /**
@@ -101,4 +105,11 @@ export enum Include {
  */
 export interface ResourceOption {
   include: Include;
+}
+
+/**
+ * Supported http methods for custom query
+ */
+export enum HttpMethod {
+  GET = 'GET', POST = 'POST', PUT = 'PUT', PATCH = 'PATCH'
 }

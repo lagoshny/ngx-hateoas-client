@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { ResourceIdentifiable } from '../model/resource-identifiable';
 
-@Injectable({providedIn: 'root'})
+@Injectable()
 export class CacheService<T extends ResourceIdentifiable> {
 
   public hasResource(url: string): boolean {

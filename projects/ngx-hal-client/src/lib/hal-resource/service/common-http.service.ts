@@ -13,7 +13,7 @@ import { isCollectionResource, isPagedCollectionResource, isResource } from '../
 import { ResourceUtils } from '../../util/resource.utils';
 import { ConsoleLogger } from '../../logger/console-logger';
 
-@Injectable({providedIn: 'root'})
+@Injectable()
 export class CommonHttpService<T extends ResourceIdentifiable> extends HttpService<T> {
 
   constructor(httpClient: HttpClient,

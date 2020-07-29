@@ -26,7 +26,7 @@ export function getPagedCollectionResourceHttpService(): PagedCollectionResource
 /**
  * Service to work with {@link PagedCollectionResource}.
  */
-@Injectable({providedIn: 'root'})
+@Injectable()
 export class PagedCollectionResourceHttpService<T extends PagedCollectionResource<BaseResource>> extends HttpService<T> {
 
   constructor(httpClient: HttpClient,

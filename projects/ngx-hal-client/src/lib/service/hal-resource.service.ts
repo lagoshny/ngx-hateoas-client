@@ -10,7 +10,7 @@ import { CollectionResource } from '../hal-resource/model/collection-resource';
 import { CollectionResourceHttpService } from '../hal-resource/service/collection-resource-http.service';
 import { CommonHttpService } from '../hal-resource/service/common-http.service';
 
-@Injectable({providedIn: 'root'})
+@Injectable()
 export class HalResourceService<T extends Resource> {
 
   constructor(private commonHttpService: CommonHttpService<T | CollectionResource<T> | PagedCollectionResource<T>>,
@@ -35,7 +35,8 @@ export class HalResourceService<T extends Resource> {
     return this.resourceHttpService.postResource(resourceName, ResourceUtils.resolveRelations(resource));
   }
 
-  public update(resource: T) {
+  public update(entity: T) {
+    const resource = ResourceUtils.initResource(entity) as Resource;
     return this.resourceHttpService.put(resource.getSelfLinkHref(), ResourceUtils.resolveRelations(resource));
   }
 
@@ -43,11 +44,13 @@ export class HalResourceService<T extends Resource> {
     return this.resourceHttpService.count(resourceName, query, requestParam);
   }
 
-  public patch(resource: T, resourceOption: ResourceOption): Observable<T> {
+  public patch(entity: T, resourceOption: ResourceOption): Observable<T> {
+    const resource = ResourceUtils.initResource(entity) as Resource;
     return this.resourceHttpService.patch(resource.getSelfLinkHref(), ResourceUtils.resolveRelations(resource, resourceOption));
   }
 
-  public delete(resource: T): Observable<any> {
+  public delete(entity: T): Observable<any> {
+    const resource = ResourceUtils.initResource(entity) as Resource;
     return this.resourceHttpService.delete(resource.getSelfLinkHref());
   }
 

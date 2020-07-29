@@ -29,25 +29,25 @@ export class HalResourceOperation<T extends Resource> {
     return this.halResourceService.getAllPage(this.resourceName, option);
   }
 
-  public create(resource: T): Observable<T> {
-    return this.halResourceService.create(this.resourceName, resource);
+  public create(entity: T): Observable<T> {
+    return this.halResourceService.create(this.resourceName, entity);
   }
 
-  public update(resource: T): Observable<T> {
-    return this.halResourceService.update(resource);
+  public update(entity: T): Observable<T> {
+    return this.halResourceService.update(entity);
   }
 
   public count(query?: string, requestParam?: RequestParam): Observable<number> {
     return this.halResourceService.count(this.resourceName, query, requestParam);
   }
 
-  public patch(resource: T, resourceOption?: ResourceOption): Observable<T> {
-    return this.halResourceService.patch(resource, resourceOption);
+  public patch(entity: T, resourceOption?: ResourceOption): Observable<T> {
+    return this.halResourceService.patch(entity, resourceOption);
   }
 
   // TODO: проверить возвращаемый объект
-  public delete(resource: T): Observable<any> {
-    return this.halResourceService.delete(resource);
+  public delete(entity: T): Observable<any> {
+    return this.halResourceService.delete(entity);
   }
 
   public searchCollection(query: string, option?: HalSimpleOption): Observable<CollectionResource<T>> {

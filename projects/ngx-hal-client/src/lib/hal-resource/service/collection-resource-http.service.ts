@@ -19,7 +19,7 @@ export function getCollectionResourceHttpService(): CollectionResourceHttpServic
   return DependencyInjector.get(CollectionResourceHttpService);
 }
 
-@Injectable({providedIn: 'root'})
+@Injectable()
 export class CollectionResourceHttpService<T extends CollectionResource<BaseResource>> extends HttpService<T> {
 
   constructor(httpClient: HttpClient,

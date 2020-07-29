@@ -130,6 +130,16 @@ export class ResourceUtils {
     return result;
   }
 
+  public static initResource(resource: BaseResource): BaseResource {
+    if (isResource(resource)) {
+      return Object.assign(new this.resourceType(), resource);
+    } else if (isEmbeddedResource(resource)) {
+      return Object.assign(new this.embeddedResourceType(), resource);
+    } else {
+      return resource;
+    }
+  }
+
   private static findResourceName(resource: BaseResource): string {
     // TODO: подумать как быть с embedded
     const resourceLinks = resource['_links'] as Link;

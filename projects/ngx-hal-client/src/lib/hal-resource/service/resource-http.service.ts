@@ -9,7 +9,7 @@ import { UrlUtils } from '../../util/url.utils';
 import * as _ from 'lodash';
 import { ConsoleLogger } from '../../logger/console-logger';
 import { isEmbeddedResource, isResource } from '../model/resource-type';
-import { HalOption, HalSimpleOption, RequestParam } from '../model/declarations';
+import { HalSimpleOption, RequestParam } from '../model/declarations';
 import { HttpService } from './http.service';
 import { CacheService } from './cache.service';
 import { HttpConfigService } from '../../config/http-config.service';
@@ -18,7 +18,7 @@ export function getResourceHttpService(): ResourceHttpService<BaseResource> {
   return DependencyInjector.get(ResourceHttpService);
 }
 
-@Injectable({providedIn: 'root'})
+@Injectable()
 export class ResourceHttpService<T extends BaseResource> extends HttpService<T> {
 
   constructor(httpClient: HttpClient,

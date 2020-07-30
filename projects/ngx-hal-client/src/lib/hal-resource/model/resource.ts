@@ -3,6 +3,7 @@ import { getResourceHttpService } from '../service/resource-http.service';
 import { HttpHeaders, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import * as _ from 'lodash';
+import { ResourceUtils } from '../../util/resource.utils';
 
 /**
  * Main Resource class.
@@ -37,10 +38,11 @@ export class Resource extends BaseResource {
    * Adds the given resource to the bind resource collection by the relation name.
    *
    * @param relationName that contains link to the resource collection
-   * @param resource that should be added to the collection
+   * @param entity that should be added to the collection
    */
-  public addRelation<T extends Resource>(relationName: string, resource: T): Observable<HttpResponse<any>> {
+  public addRelation<T extends Resource>(relationName: string, entity: T): Observable<HttpResponse<any>> {
     const relationLink = this.getRelationLink(relationName);
+    const resource = ResourceUtils.initResource(entity) as Resource;
 
     return getResourceHttpService().post(relationLink.href, resource.getSelfLinkHref(), {
       observe: 'response',
@@ -52,10 +54,11 @@ export class Resource extends BaseResource {
    * Bind the given resource to this resource by the given relation name.
    *
    * @param relationName that contains link to the suitable resource type
-   * @param resource that should be bind
+   * @param entity that should be bind
    */
-  public bindRelation<T extends Resource>(relationName: string, resource: T): Observable<HttpResponse<any>> {
+  public bindRelation<T extends Resource>(relationName: string, entity: T): Observable<HttpResponse<any>> {
     const relationLink = this.getRelationLink(relationName);
+    const resource = ResourceUtils.initResource(entity) as Resource;
 
     return getResourceHttpService().put(relationLink.href, resource.getSelfLinkHref(), {
       observe: 'response',
@@ -72,6 +75,7 @@ export class Resource extends BaseResource {
    */
   public clearRelation<T extends Resource>(relationName: string): Observable<HttpResponse<any>> {
     const relationLink = this.getRelationLink(relationName);
+
     return getResourceHttpService().put(relationLink.href, '', {
       observe: 'response',
       headers: new HttpHeaders({'Content-Type': 'text/uri-list'})
@@ -84,10 +88,11 @@ export class Resource extends BaseResource {
    * For resource collection means that only passed resource will be unbind from collection.
    *
    * @param relationName that contains link to the resource collection or resource
-   * @param resource that should be unbind
+   * @param entity that should be unbind
    */
-  public deleteRelation<T extends Resource>(relationName: string, resource: T): Observable<HttpResponse<any>> {
+  public deleteRelation<T extends Resource>(relationName: string, entity: T): Observable<HttpResponse<any>> {
     const relationLink = this.getRelationLink(relationName);
+    const resource = ResourceUtils.initResource(entity) as Resource;
     const resourceId = _.last(_.split(resource.getSelfLinkHref(), '/'));
 
     if (_.isUndefined(resourceId) || _.isNull(resourceId)) {

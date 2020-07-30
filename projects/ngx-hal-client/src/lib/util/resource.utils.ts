@@ -112,13 +112,6 @@ export class ResourceUtils {
           result[key] = [];
           array.forEach((element) => {
             result[key].push(this.resolveRelations(element));
-            // if (!_.isFunction(element) && !_.isObject(element)) {
-            //   result[key].push(element);
-            // } else if (isResource(element)) {
-            //   result[key].push(element['_links'].self.href);
-            // } else {
-            //   result[key].push(this.resolveRelations(element));
-            // }
           });
         } else if (isResource(resource[key])) {
           result[key] = resource[key]._links.self.href;

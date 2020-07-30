@@ -31,20 +31,20 @@ export class HalResourceService<T extends Resource> {
     return this.pagedCollectionResourceHttpService.getResourcePage(resourceName, null, option);
   }
 
-  public create(resourceName: string, resource: T): Observable<T> {
-    return this.resourceHttpService.postResource(resourceName, ResourceUtils.resolveRelations(resource));
+  public create(resourceName: string, resource: T, resourceOption?: ResourceOption): Observable<T> {
+    return this.resourceHttpService.postResource(resourceName, ResourceUtils.resolveRelations(resource, resourceOption));
   }
 
-  public update(entity: T) {
+  public update(entity: T, resourceOption?: ResourceOption) {
     const resource = ResourceUtils.initResource(entity) as Resource;
-    return this.resourceHttpService.put(resource.getSelfLinkHref(), ResourceUtils.resolveRelations(resource));
+    return this.resourceHttpService.put(resource.getSelfLinkHref(), ResourceUtils.resolveRelations(resource, resourceOption));
   }
 
   public count(resourceName: string, query: string, requestParam: RequestParam): Observable<number> {
     return this.resourceHttpService.count(resourceName, query, requestParam);
   }
 
-  public patch(entity: T, resourceOption: ResourceOption): Observable<T> {
+  public patch(entity: T, resourceOption?: ResourceOption): Observable<T> {
     const resource = ResourceUtils.initResource(entity) as Resource;
     return this.resourceHttpService.patch(resource.getSelfLinkHref(), ResourceUtils.resolveRelations(resource, resourceOption));
   }

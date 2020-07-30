@@ -29,12 +29,12 @@ export class HalResourceOperation<T extends Resource> {
     return this.halResourceService.getAllPage(this.resourceName, option);
   }
 
-  public create(entity: T): Observable<T> {
-    return this.halResourceService.create(this.resourceName, entity);
+  public create(entity: T, resourceOption?: ResourceOption): Observable<T> {
+    return this.halResourceService.create(this.resourceName, entity, resourceOption);
   }
 
-  public update(entity: T): Observable<T> {
-    return this.halResourceService.update(entity);
+  public update(entity: T, resourceOption?: ResourceOption): Observable<T> {
+    return this.halResourceService.update(entity, resourceOption);
   }
 
   public count(query?: string, requestParam?: RequestParam): Observable<number> {

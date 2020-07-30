@@ -5,8 +5,10 @@ import { UrlUtils } from '../../util/url.utils';
 import { ResourceIdentifiable } from './resource-identifiable';
 import { CollectionResource } from './collection-resource';
 import { getCollectionResourceHttpService } from '../service/collection-resource-http.service';
-import { HalOption, RequestParam } from './declarations';
+import { HalOption, HalSimpleOption, RequestParam } from './declarations';
 import { HttpResponse } from '@angular/common/http';
+import { getPagedCollectionResourceHttpService } from '../service/paged-collection-resource-http.service';
+import { PagedCollectionResource } from './paged-collection-resource';
 
 /**
  * Common resource class.
@@ -14,21 +16,25 @@ import { HttpResponse } from '@angular/common/http';
  */
 export abstract class BaseResource extends ResourceIdentifiable {
 
+  // TODO: добавить halOption
   /**
    * Get single resource by relation name.
    *
    * @param relationName relation that need to get
+   * @param options
    * @throws error when link by relation doesn't exist
    */
   public getRelation<T extends BaseResource>(relationName: string,
+                                             options?: HalSimpleOption
                                              // builder?: SubTypeBuilder,
                                              // expireMs: number = CacheHelper.defaultExpire,
                                              // isCacheActive: boolean = true
   ): Observable<T> {
     const relationLink = this.getRelationLink(relationName);
-    const uri = relationLink.templated ? UrlUtils.removeUrlTemplateVars(relationLink.href) : relationLink.href;
+    const url = relationLink.templated ? UrlUtils.removeUrlTemplateVars(relationLink.href) : relationLink.href;
+    const httpParams = UrlUtils.convertToHttpParams(options);
 
-    return getResourceHttpService().get(uri) as Observable<T>;
+    return getResourceHttpService().get(url, {params: httpParams}) as Observable<T>;
   }
 
   /**
@@ -39,21 +45,32 @@ export abstract class BaseResource extends ResourceIdentifiable {
    * @throws error when link by relation doesn't exist
    */
   public getRelatedCollection<T extends CollectionResource<BaseResource>>(relationName: string,
-                                                                          options?: HalOption
+                                                                          options?: HalSimpleOption
                                                                           // embedded?: string,
                                                                           // builder?: SubTypeBuilder,
                                                                           // expireMs: number = CacheHelper.defaultExpire,
                                                                           // isCacheActive: boolean = true
   ): Observable<T> {
     const relationLink = this.getRelationLink(relationName);
-    const uri = relationLink.templated ? UrlUtils.removeUrlTemplateVars(relationLink.href) : relationLink.href;
-    let httpParams;
-    if (!_.isEmpty(options)) {
-      httpParams = UrlUtils.convertToHttpParams(options.params);
-      httpParams = UrlUtils.convertToHttpParams(options.page as RequestParam, httpParams);
-    }
+    const url = relationLink.templated ? UrlUtils.removeUrlTemplateVars(relationLink.href) : relationLink.href;
+    const httpParams = UrlUtils.convertToHttpParams(options);
 
-    return getCollectionResourceHttpService().get(uri, {params: httpParams}) as Observable<T>;
+    return getCollectionResourceHttpService().get(url, {params: httpParams}) as Observable<T>;
+  }
+
+  // TODO: проверить, что будет если вернётся не page
+  public getRelatedPage<T extends PagedCollectionResource<BaseResource>>(relationName: string,
+                                                                         options?: HalOption
+                                                                         // embedded?: string,
+                                                                         // builder?: SubTypeBuilder,
+                                                                         // expireMs: number = CacheHelper.defaultExpire,
+                                                                         // isCacheActive: boolean = true
+  ): Observable<T> {
+    const relationLink = this.getRelationLink(relationName);
+    const uri = relationLink.templated ? UrlUtils.removeUrlTemplateVars(relationLink.href) : relationLink.href;
+    const httpParams = UrlUtils.convertToHttpParams(options);
+
+    return getPagedCollectionResourceHttpService().get(uri, {params: httpParams}) as Observable<T>;
   }
 
   /**
@@ -66,11 +83,10 @@ export abstract class BaseResource extends ResourceIdentifiable {
    */
   public postRelation(relationName: string, body: any, params?: RequestParam): Observable<HttpResponse<any>> {
     const relationLink = this.getRelationLink(relationName);
-    // TODO: подумать о логировании и о strict params и проверить template
-    let httpParams;
     const url = relationLink.templated ? UrlUtils.removeUrlTemplateVars(relationLink.href) : relationLink.href;
+    let httpParams;
     if (!_.isEmpty(params)) {
-      httpParams = UrlUtils.convertToHttpParams(params);
+      httpParams = UrlUtils.convertToHttpParams({params});
     }
 
     return getResourceHttpService()
@@ -87,11 +103,11 @@ export abstract class BaseResource extends ResourceIdentifiable {
    */
   public patchRelation(relationName: string, body: any, params?: RequestParam): Observable<HttpResponse<any>> {
     const relationLink = this.getRelationLink(relationName);
+    const url = relationLink.templated ? UrlUtils.removeUrlTemplateVars(relationLink.href) : relationLink.href;
     // TODO: подумать о логировании и о strict params и проверить template
     let httpParams;
-    const url = relationLink.templated ? UrlUtils.removeUrlTemplateVars(relationLink.href) : relationLink.href;
     if (!_.isEmpty(params)) {
-      httpParams = UrlUtils.convertToHttpParams(params);
+      httpParams = UrlUtils.convertToHttpParams({params});
     }
 
     return getResourceHttpService()

@@ -7,13 +7,13 @@ import { PagedCollectionResource } from '../model/paged-collection-resource';
 import { ConsoleLogger } from '../../logger/console-logger';
 import { catchError, map } from 'rxjs/operators';
 import * as _ from 'lodash';
-import { isCollectionResource, isPagedCollectionResource } from '../model/resource-type';
+import { isPagedCollectionResource } from '../model/resource-type';
 import { Observable, throwError as observableThrowError } from 'rxjs';
 import { ResourceUtils } from '../../util/resource.utils';
 import { UrlUtils } from '../../util/url.utils';
 import { DependencyInjector } from '../../util/dependency-injector';
 import { ConstantUtil } from '../../util/constant.util';
-import { HalOption, PageParam, RequestParam } from '../model/declarations';
+import { HalOption } from '../model/declarations';
 import { HttpService } from './http.service';
 
 /**

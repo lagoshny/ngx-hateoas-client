@@ -209,7 +209,7 @@ export class ResourceHttpService<T extends BaseResource> extends HttpService<T> 
 
   public count(resourceName: string, query: string, params?: RequestParam): Observable<number> {
     const url = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName)
-      .concat('/search/' + (query === undefined ? 'countAll' : query));
+      .concat('/search/' + (_.isNil(query) ? 'countAll' : query));
     const httpParams = UrlUtils.convertToHttpParams(params);
 
     ConsoleLogger.prettyInfo('COUNT REQUEST', {

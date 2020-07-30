@@ -3,13 +3,12 @@ import { Observable } from 'rxjs';
 import { ResourceHttpService } from '../hal-resource/service/resource-http.service';
 import { PagedCollectionResourceHttpService } from '../hal-resource/service/paged-collection-resource-http.service';
 import { PagedCollectionResource } from '../hal-resource/model/paged-collection-resource';
-import { PagedGetOption, GetOption, HttpMethod, RequestBody, RequestParam, ResourceValuesOption } from '../hal-resource/model/declarations';
+import { GetOption, HttpMethod, PagedGetOption, RequestBody, RequestParam, ValuesOption } from '../hal-resource/model/declarations';
 import { ResourceUtils } from '../util/resource.utils';
 import { Resource } from '../ngx-hal-client.module';
 import { CollectionResource } from '../hal-resource/model/collection-resource';
 import { CollectionResourceHttpService } from '../hal-resource/service/collection-resource-http.service';
 import { CommonHttpService } from '../hal-resource/service/common-http.service';
-import { isResource } from '../hal-resource/model/resource-type';
 
 @Injectable()
 export class HalResourceService<T extends Resource> {
@@ -32,22 +31,27 @@ export class HalResourceService<T extends Resource> {
     return this.pagedCollectionResourceHttpService.getResourcePage(resourceName, null, option);
   }
 
-  public create(resourceName: string, resource: T, resourceOption?: ResourceValuesOption): Observable<T> {
-    return this.resourceHttpService.postResource(resourceName, ResourceUtils.resolveRelations(resource, resourceOption));
+  public create(resourceName: string, resource: T, valuesOption?: ValuesOption): Observable<T> {
+    const body = ResourceUtils.resolveValues({body: resource, valuesOption});
+
+    return this.resourceHttpService.postResource(resourceName, body);
   }
 
-  public update(entity: T, resourceOption?: ResourceValuesOption) {
+  public update(entity: T, valuesOption?: ValuesOption) {
     const resource = ResourceUtils.initResource(entity) as Resource;
-    return this.resourceHttpService.put(resource.getSelfLinkHref(), ResourceUtils.resolveRelations(resource, resourceOption));
+    const body = ResourceUtils.resolveValues({body: resource, valuesOption});
+
+    return this.resourceHttpService.put(resource.getSelfLinkHref(), body);
   }
 
   public count(resourceName: string, query: string, requestParam: RequestParam): Observable<number> {
     return this.resourceHttpService.count(resourceName, query, requestParam);
   }
 
-  public patch(entity: T, resourceOption?: ResourceValuesOption): Observable<T> {
+  public patch(entity: T, valuesOption?: ValuesOption): Observable<T> {
     const resource = ResourceUtils.initResource(entity) as Resource;
-    return this.resourceHttpService.patch(resource.getSelfLinkHref(), ResourceUtils.resolveRelations(resource, resourceOption));
+    const body = ResourceUtils.resolveValues({body: resource, valuesOption});
+    return this.resourceHttpService.patch(resource.getSelfLinkHref(), body);
   }
 
   public delete(entity: T): Observable<any> {
@@ -72,10 +76,8 @@ export class HalResourceService<T extends Resource> {
                      query: string,
                      requestBody: RequestBody,
                      option: PagedGetOption): Observable<any | T | CollectionResource<T> | PagedCollectionResource<T>> {
-    if (isResource(requestBody.body)) {
-      requestBody.body = ResourceUtils.resolveRelations(requestBody.body, requestBody.resourceValues);
-    }
+    const body = ResourceUtils.resolveValues(requestBody);
 
-    return this.commonHttpService.customQuery(resourceName, method, query, requestBody.body, option);
+    return this.commonHttpService.customQuery(resourceName, method, query, body, option);
   }
 }

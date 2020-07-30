@@ -2,7 +2,7 @@ import { BaseResource } from '../hal-resource/model/base-resource';
 import { isEmbeddedResource, isResource } from '../hal-resource/model/resource-type';
 import { CollectionResource } from '../hal-resource/model/collection-resource';
 import { PagedCollectionResource } from '../hal-resource/model/paged-collection-resource';
-import { Include, Link, PageData, ResourceValuesOption } from '../hal-resource/model/declarations';
+import { Include, Link, PageData, RequestBody, ValuesOption } from '../hal-resource/model/declarations';
 import * as _ from 'lodash';
 import { Resource } from '../hal-resource/model/resource';
 import { EmbeddedResource } from '../hal-resource/model/embedded-resource';
@@ -55,9 +55,9 @@ export class ResourceUtils {
 
 
   // Type - тип ресурсов внутри коллекции, payload - ответ от сервера, result - результирующий массив, куда будем добалвять ресурсы
-  static instantiateCollectionResource<T extends CollectionResource<BaseResource>>(payload: any,
-                                                                                   // result: ResourceArray<T>,
-                                                                                   // builder?: SubTypeBuilder
+  public static instantiateCollectionResource<T extends CollectionResource<BaseResource>>(payload: any,
+                                                                                          // result: ResourceArray<T>,
+                                                                                          // builder?: SubTypeBuilder
   ): T {
     const result = new this.collectionResourceType() as T;
     result['_links'] = payload['_links'];
@@ -79,9 +79,9 @@ export class ResourceUtils {
     return result;
   }
 
-  static instantiatePagedCollectionResource<T extends PagedCollectionResource<BaseResource>>(payload: any,
-                                                                                             // result: ResourceArray<T>,
-                                                                                             // builder?: SubTypeBuilder
+  public static instantiatePagedCollectionResource<T extends PagedCollectionResource<BaseResource>>(payload: any,
+                                                                                                    // result: ResourceArray<T>,
+                                                                                                    // builder?: SubTypeBuilder
   ): T {
     const resourceCollection = this.instantiateCollectionResource(payload);
     let result;
@@ -95,29 +95,37 @@ export class ResourceUtils {
 
 
   private static createResource<T extends BaseResource>(entity: T, payload: any): T {
-    for (const p in payload) {
-      entity[p] = payload[p];
-    }
-    return entity;
+    return Object.assign(entity, payload);
   }
 
-  static resolveRelations(resource: Resource, options?: ResourceValuesOption): object {
+  public static resolveValues(requestBody: RequestBody): any {
+    const body = requestBody.body;
+    if (!_.isObject(body)) {
+      return body;
+    }
+
     const result: object = {};
-    for (const key in resource) {
-      if (resource[key] == null && Include.NULL_VALUES === options?.include) {
+    for (const key in body) {
+      if (!body.hasOwnProperty(key)) {
+        continue;
+      }
+      if (body[key] == null && Include.NULL_VALUES === requestBody?.valuesOption?.include) {
         result[key] = null;
-      } else if (!_.isNull(resource[key]) && !_.isUndefined(resource[key])) {
-        if (_.isArray(resource[key])) {
-          const array: any[] = resource[key];
-          result[key] = [];
-          array.forEach((element) => {
-            result[key].push(this.resolveRelations(element));
-          });
-        } else if (isResource(resource[key])) {
-          result[key] = resource[key]._links.self.href;
-        } else {
-          result[key] = resource[key];
-        }
+        continue;
+      }
+      if (_.isNil(body[key])) {
+        continue;
+      }
+      if (_.isArray(body[key])) {
+        const array: any[] = body[key];
+        result[key] = [];
+        array.forEach((element) => {
+          result[key].push(this.resolveValues({body: element, valuesOption: requestBody?.valuesOption}));
+        });
+      } else if (isResource(body[key])) {
+        result[key] = body[key]._links?.self?.href;
+      } else {
+        result[key] = body[key];
       }
     }
     return result;

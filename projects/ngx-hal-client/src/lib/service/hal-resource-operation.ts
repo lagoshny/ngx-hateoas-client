@@ -1,7 +1,7 @@
 import { Observable } from 'rxjs';
 import { DependencyInjector } from '../util/dependency-injector';
 import { HalResourceService } from './hal-resource.service';
-import { PagedGetOption, GetOption, HttpMethod, RequestBody, RequestParam, ResourceValuesOption } from '../hal-resource/model/declarations';
+import { PagedGetOption, GetOption, HttpMethod, RequestBody, RequestParam, ValuesOption } from '../hal-resource/model/declarations';
 import { Resource } from '../hal-resource/model/resource';
 import { PagedCollectionResource } from '../hal-resource/model/paged-collection-resource';
 import { CollectionResource } from '../hal-resource/model/collection-resource';
@@ -29,11 +29,11 @@ export class HalResourceOperation<T extends Resource> {
     return this.halResourceService.getAllPage(this.resourceName, option);
   }
 
-  public create(entity: T, resourceOption?: ResourceValuesOption): Observable<T> {
+  public create(entity: T, resourceOption?: ValuesOption): Observable<T> {
     return this.halResourceService.create(this.resourceName, entity, resourceOption);
   }
 
-  public update(entity: T, resourceOption?: ResourceValuesOption): Observable<T> {
+  public update(entity: T, resourceOption?: ValuesOption): Observable<T> {
     return this.halResourceService.update(entity, resourceOption);
   }
 
@@ -41,7 +41,7 @@ export class HalResourceOperation<T extends Resource> {
     return this.halResourceService.count(this.resourceName, query, requestParam);
   }
 
-  public patch(entity: T, resourceOption?: ResourceValuesOption): Observable<T> {
+  public patch(entity: T, resourceOption?: ValuesOption): Observable<T> {
     return this.halResourceService.patch(entity, resourceOption);
   }
 

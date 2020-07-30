@@ -84,12 +84,10 @@ export abstract class BaseResource extends ResourceIdentifiable {
     const relationLink = this.getRelationLink(relationName);
     const url = relationLink.templated ? UrlUtils.removeUrlTemplateVars(relationLink.href) : relationLink.href;
     const httpParams = UrlUtils.convertToHttpParams({params});
-    if (isResource(requestBody.body)) {
-      requestBody.body = ResourceUtils.resolveRelations(requestBody.body, requestBody.resourceValues);
-    }
+    const body = ResourceUtils.resolveValues(requestBody);
 
     return getResourceHttpService()
-      .post(url, requestBody.body, {observe: 'response', params: httpParams});
+      .post(url, body, {observe: 'response', params: httpParams});
   }
 
   /**
@@ -106,12 +104,10 @@ export abstract class BaseResource extends ResourceIdentifiable {
     const relationLink = this.getRelationLink(relationName);
     const url = relationLink.templated ? UrlUtils.removeUrlTemplateVars(relationLink.href) : relationLink.href;
     const httpParams = UrlUtils.convertToHttpParams({params});
-    if (isResource(requestBody.body)) {
-      requestBody.body = ResourceUtils.resolveRelations(requestBody.body, requestBody.resourceValues);
-    }
+    const body = ResourceUtils.resolveValues(requestBody);
 
     return getResourceHttpService()
-      .patch(url, requestBody.body, {observe: 'response', params: httpParams});
+      .patch(url, body, {observe: 'response', params: httpParams});
   }
 
   /**
@@ -129,12 +125,10 @@ export abstract class BaseResource extends ResourceIdentifiable {
     const url = relationLink.templated ? UrlUtils.removeUrlTemplateVars(relationLink.href) : relationLink.href;
     // TODO: подумать о логировании и о strict params и проверить template
     const httpParams = UrlUtils.convertToHttpParams({params});
-    if (isResource(requestBody.body)) {
-      requestBody.body = ResourceUtils.resolveRelations(requestBody.body, requestBody.resourceValues);
-    }
+    const body = ResourceUtils.resolveValues(requestBody);
 
     return getResourceHttpService()
-      .put(url, requestBody.body, {observe: 'response', params: httpParams});
+      .put(url, body, {observe: 'response', params: httpParams});
   }
 
 }

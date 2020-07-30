@@ -107,7 +107,7 @@ export enum Include {
  * Additional resource options that allow configure should include or not some specific values
  * (e.q. null values).
  */
-export interface ResourceValuesOption {
+export interface ValuesOption {
   include: Include;
 }
 
@@ -123,7 +123,7 @@ export interface RequestBody {
    * When body is {@link Resource} type then this param influence on include
    * some value types of resource or not.
    */
-  resourceValues?: ResourceValuesOption;
+  valuesOption?: ValuesOption;
 }
 
 /**

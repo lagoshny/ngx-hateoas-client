@@ -3,12 +3,13 @@ import { Observable } from 'rxjs';
 import { ResourceHttpService } from '../hal-resource/service/resource-http.service';
 import { PagedCollectionResourceHttpService } from '../hal-resource/service/paged-collection-resource-http.service';
 import { PagedCollectionResource } from '../hal-resource/model/paged-collection-resource';
-import { GetOption, HttpMethod, PagedGetOption, RequestBody, RequestParam, ValuesOption } from '../hal-resource/model/declarations';
+import { GetOption, HttpMethod, PagedGetOption, RequestBody, RequestOption, RequestParam } from '../hal-resource/model/declarations';
 import { ResourceUtils } from '../util/resource.utils';
 import { Resource } from '../ngx-hal-client.module';
 import { CollectionResource } from '../hal-resource/model/collection-resource';
 import { CollectionResourceHttpService } from '../hal-resource/service/collection-resource-http.service';
 import { CommonHttpService } from '../hal-resource/service/common-http.service';
+import { UrlUtils } from '../util/url.utils';
 
 @Injectable()
 export class HalResourceService<T extends Resource> {
@@ -31,15 +32,15 @@ export class HalResourceService<T extends Resource> {
     return this.pagedCollectionResourceHttpService.getResourcePage(resourceName, null, option);
   }
 
-  public create(resourceName: string, resource: T, valuesOption?: ValuesOption): Observable<T> {
-    const body = ResourceUtils.resolveValues({body: resource, valuesOption});
+  public create(resourceName: string, requestBody: RequestBody<T>): Observable<T> {
+    const body = ResourceUtils.resolveValues(requestBody);
 
     return this.resourceHttpService.postResource(resourceName, body);
   }
 
-  public update(entity: T, valuesOption?: ValuesOption) {
-    const resource = ResourceUtils.initResource(entity) as Resource;
-    const body = ResourceUtils.resolveValues({body: resource, valuesOption});
+  public update(requestBody: RequestBody<T>): Observable<T> {
+    const resource = ResourceUtils.initResource(requestBody.body) as Resource;
+    const body = ResourceUtils.resolveValues({body: resource, valuesOption: requestBody?.valuesOption});
 
     return this.resourceHttpService.put(resource.getSelfLinkHref(), body);
   }
@@ -48,15 +49,19 @@ export class HalResourceService<T extends Resource> {
     return this.resourceHttpService.count(resourceName, query, requestParam);
   }
 
-  public patch(entity: T, valuesOption?: ValuesOption): Observable<T> {
-    const resource = ResourceUtils.initResource(entity) as Resource;
-    const body = ResourceUtils.resolveValues({body: resource, valuesOption});
+  public patch(requestBody: RequestBody<T>): Observable<T | any> {
+    const resource = ResourceUtils.initResource(requestBody?.body) as Resource;
+    const body = ResourceUtils.resolveValues({body: resource, valuesOption: requestBody?.valuesOption});
+
     return this.resourceHttpService.patch(resource.getSelfLinkHref(), body);
   }
 
-  public delete(entity: T): Observable<any> {
+  public delete(entity: T, options?: RequestOption): Observable<T | any> {
     const resource = ResourceUtils.initResource(entity) as Resource;
-    return this.resourceHttpService.delete(resource.getSelfLinkHref());
+    const httpParams = UrlUtils.convertToHttpParams({params: options?.params});
+
+    return this.resourceHttpService.delete(resource.getSelfLinkHref(),
+      {observe: options?.observe, params: httpParams});
   }
 
   public searchCollection(resourceName: string, query: string, option?: GetOption): Observable<CollectionResource<T>> {
@@ -74,10 +79,11 @@ export class HalResourceService<T extends Resource> {
   public customQuery(resourceName: string,
                      method: HttpMethod,
                      query: string,
-                     requestBody: RequestBody,
-                     option: PagedGetOption): Observable<any | T | CollectionResource<T> | PagedCollectionResource<T>> {
+                     requestBody: RequestBody<any>,
+                     options: PagedGetOption): Observable<any | T | CollectionResource<T> | PagedCollectionResource<T>> {
     const body = ResourceUtils.resolveValues(requestBody);
 
-    return this.commonHttpService.customQuery(resourceName, method, query, body, option);
+    return this.commonHttpService.customQuery(resourceName, method, query, body, options);
   }
+
 }

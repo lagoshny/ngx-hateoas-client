@@ -1,7 +1,7 @@
 import { Observable } from 'rxjs';
 import { DependencyInjector } from '../util/dependency-injector';
 import { HalResourceService } from './hal-resource.service';
-import { PagedGetOption, GetOption, HttpMethod, RequestBody, RequestParam, ValuesOption } from '../hal-resource/model/declarations';
+import { GetOption, HttpMethod, PagedGetOption, RequestBody, RequestOption, RequestParam } from '../hal-resource/model/declarations';
 import { Resource } from '../hal-resource/model/resource';
 import { PagedCollectionResource } from '../hal-resource/model/paged-collection-resource';
 import { CollectionResource } from '../hal-resource/model/collection-resource';
@@ -29,25 +29,24 @@ export class HalResourceOperation<T extends Resource> {
     return this.halResourceService.getAllPage(this.resourceName, option);
   }
 
-  public create(entity: T, resourceOption?: ValuesOption): Observable<T> {
-    return this.halResourceService.create(this.resourceName, entity, resourceOption);
+  public create(requestBody: RequestBody<T>): Observable<T> {
+    return this.halResourceService.create(this.resourceName, requestBody);
   }
 
-  public update(entity: T, resourceOption?: ValuesOption): Observable<T> {
-    return this.halResourceService.update(entity, resourceOption);
+  public update(requestBody: RequestBody<T>): Observable<T> {
+    return this.halResourceService.update(requestBody);
   }
 
   public count(query?: string, requestParam?: RequestParam): Observable<number> {
     return this.halResourceService.count(this.resourceName, query, requestParam);
   }
 
-  public patch(entity: T, resourceOption?: ValuesOption): Observable<T> {
-    return this.halResourceService.patch(entity, resourceOption);
+  public patch(requestBody: RequestBody<T>): Observable<T> {
+    return this.halResourceService.patch(requestBody);
   }
 
-  // TODO: проверить возвращаемый объект
-  public delete(entity: T): Observable<any> {
-    return this.halResourceService.delete(entity);
+  public delete(entity: T, options?: RequestOption): Observable<T | any> {
+    return this.halResourceService.delete(entity, options);
   }
 
   public searchCollection(query: string, option?: GetOption): Observable<CollectionResource<T>> {
@@ -64,7 +63,7 @@ export class HalResourceOperation<T extends Resource> {
 
   public customQuery(method: HttpMethod,
                      query: string,
-                     requestBody: RequestBody,
+                     requestBody: RequestBody<any>,
                      option?: PagedGetOption): Observable<any | T | CollectionResource<T> | PagedCollectionResource<T>> {
     return this.halResourceService.customQuery(this.resourceName, method, query, requestBody, option);
   }

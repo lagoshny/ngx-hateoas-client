@@ -1,11 +1,14 @@
 import { Injectable } from '@angular/core';
 
 /**
- * Contains all configurations for http client.
+ * Contains all configuration params associated with HTTP.
  */
 @Injectable()
 export class HttpConfigService {
 
+  /**
+   * {@see HalConfiguration#baseApiUrl}.
+   */
   public baseApiUrl: string;
 
 }

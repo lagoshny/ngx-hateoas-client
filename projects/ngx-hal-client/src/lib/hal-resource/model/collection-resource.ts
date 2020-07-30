@@ -2,18 +2,19 @@ import { ResourceIdentifiable } from './resource-identifiable';
 import { BaseResource } from './base-resource';
 
 /**
- * Represent collection of resources without pagination.
+ * Collection of resources without pagination.
  *
- * If you need pagination, consider {@see PagedResourceCollection}.
+ * If you want to have a pagination {@see PagedResourceCollection}.
  */
 export class CollectionResource<T extends BaseResource> extends ResourceIdentifiable {
 
   public resources: Array<T> = [];
 
   /**
-   * Create collection resource.
+   * Collection resource constructor.
+   * If passed param then it used as a copy constructor.
    *
-   * @param that <b>not required</b> if present, it used as copy constructor
+   * @param that (optional) another collection resource using to copy data from to current object
    */
   constructor(that?: CollectionResource<T>) {
     super();

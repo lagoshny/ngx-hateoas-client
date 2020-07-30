@@ -1,5 +1,8 @@
 import { Resource } from './resource';
 
+/**
+ * Resource link object.
+ */
 export interface Link {
   /**
    * Link name.
@@ -19,30 +22,42 @@ export interface LinkData {
 }
 
 /**
- * Extend {@link GetOption} to adds page param.
+ * Extend {@link GetOption} with page param.
  */
 export interface PagedGetOption extends GetOption {
   page?: PageParam;
 }
 
 /**
- * Contains options that can be applied to the request.
+ * Contains options that can be applied to the GET request.
  */
 export interface GetOption {
   params?: RequestParam;
   projection?: string;
 }
 
+/**
+ * Contains options that can be applied to POST/PUT/PATCH/DELETE request.
+ */
+export interface RequestOption {
+  params?: RequestParam;
+  observe?: 'body' | 'response';
+}
+
 
 /**
  * Request params that will be applied to the result url as http request params.
+ *
+ * Should not contains params as: 'projection' and {@link PageParam} properties.
+ * If want pass this params then use suitable properties from {@link GetOption} or {@link PagedGetOption},
+ * otherwise exception will be thrown.
  */
 export interface RequestParam {
   [paramName: string]: Resource | string | number | boolean | Sort;
 }
 
 /**
- * Params allow control page settings.
+ * Page content params.
  */
 export interface PageParam {
   /**
@@ -71,7 +86,7 @@ export interface Sort {
 }
 
 /**
- * Object that returns from paged request to Spring application.
+ * Page resource response from Spring application.
  */
 export interface PageData {
   _links: {
@@ -104,7 +119,7 @@ export enum Include {
 }
 
 /**
- * Additional resource options that allow configure should include or not some specific values
+ * Include options that allow configure should include or not some specific values
  * (e.q. null values).
  */
 export interface ValuesOption {
@@ -114,20 +129,19 @@ export interface ValuesOption {
 /**
  * Request body object.
  */
-export interface RequestBody {
+export interface RequestBody<T> {
   /**
    * Any object that will be passed as request body.
    */
-  body: any;
+  body: T;
   /**
-   * When body is {@link Resource} type then this param influence on include
-   * some value types of resource or not.
+   * Use this param to influence on body values that you want include or not.
    */
   valuesOption?: ValuesOption;
 }
 
 /**
- * Supported http methods for custom query
+ * Supported http methods for custom query.
  */
 export enum HttpMethod {
   GET = 'GET', POST = 'POST', PUT = 'PUT', PATCH = 'PATCH'

@@ -14,7 +14,7 @@ import { UrlUtils } from '../../util/url.utils';
 import { DependencyInjector } from '../../util/dependency-injector';
 import { ConstantUtil } from '../../util/constant.util';
 import { PagedGetOption } from '../model/declarations';
-import { HttpService } from './http.service';
+import { HttpExecutor } from './http-executor';
 
 /**
  * Get instance of the PagedCollectionResourceHttpService by Angular DependencyInjector.
@@ -24,10 +24,10 @@ export function getPagedCollectionResourceHttpService(): PagedCollectionResource
 }
 
 /**
- * Service to work with {@link PagedCollectionResource}.
+ * Service to perform HTTP requests to get {@link PagedCollectionResource} type.
  */
 @Injectable()
-export class PagedCollectionResourceHttpService<T extends PagedCollectionResource<BaseResource>> extends HttpService<T> {
+export class PagedCollectionResourceHttpService<T extends PagedCollectionResource<BaseResource>> extends HttpExecutor<T> {
 
   constructor(httpClient: HttpClient,
               cacheService: CacheService<T>,
@@ -35,11 +35,17 @@ export class PagedCollectionResourceHttpService<T extends PagedCollectionResourc
     super(httpClient, cacheService);
   }
 
+  /**
+   * Perform GET request to retrieve paged collection of the resources.
+   *
+   * @param url to perform request
+   * @param options request options
+   * @throws error if returned resource type is not paged collection of the resources
+   */
   public get(url: string, options?: {
     headers?: {
       [header: string]: string | string[];
     };
-    observe?: 'body' | 'response';
     params?: HttpParams | {
       [param: string]: string | string[];
     }
@@ -49,7 +55,7 @@ export class PagedCollectionResourceHttpService<T extends PagedCollectionResourc
       params: options?.params
     });
 
-    return super.get(url, options).pipe(
+    return super.get(url, {...options, observe: 'body'}).pipe(
       map((data: any) => {
         ConsoleLogger.prettyInfo('GET_PAGED_COLLECTION_RESOURCE RESPONSE', {
           url,
@@ -57,65 +63,24 @@ export class PagedCollectionResourceHttpService<T extends PagedCollectionResourc
           body: JSON.stringify(data, null, 4)
         });
 
-        if (!_.isEmpty(data)) {
-          if (!isPagedCollectionResource(data)) {
-            ConsoleLogger.error('You try to get wrong resource type, expected paged collection resource type.');
-            return observableThrowError('You try to get wrong resource type, expected paged collection resource type.');
-          }
-          const resource: T = ResourceUtils.instantiatePagedCollectionResource(data);
-          this.cacheService.putResource(url, resource);
-
-          return resource;
+        if (!isPagedCollectionResource(data)) {
+          ConsoleLogger.error('You try to get wrong resource type, expected paged collection resource type.');
+          throw Error('You try to get wrong resource type, expected paged collection resource type.');
         }
+        const resource: T = ResourceUtils.instantiatePagedCollectionResource(data);
+        this.cacheService.putResource(url, resource);
 
-        return data;
+        return resource;
       }),
       catchError(error => observableThrowError(error)));
   }
 
-  public post(url: string, body: any | null, options?: {
-    headers?: {
-      [header: string]: string | string[];
-    };
-    observe?: 'body' | 'response';
-    params?: HttpParams | {
-      [param: string]: string | string[];
-    }
-  }): Observable<T> {
-    ConsoleLogger.prettyInfo('POST_PAGED_COLLECTION_RESOURCE REQUEST', {
-      url,
-      body,
-      params: options?.params
-    });
-
-    return super.post(url, body, options)
-      .pipe(
-        map((data: any) => {
-          ConsoleLogger.prettyInfo('POST_PAGED_COLLECTION_RESOURCE RESPONSE', {
-            url,
-            params: options?.params,
-            body: JSON.stringify(data, null, 4)
-          });
-
-          if (!_.isEmpty(data)) {
-            if (!isPagedCollectionResource(data)) {
-              ConsoleLogger.error('You try to get wrong resource type, expected paged collection resource type.');
-              return observableThrowError('You try to get wrong resource type, expected paged collection resource type.');
-            }
-            return ResourceUtils.instantiatePagedCollectionResource(data);
-          }
-
-          return data;
-        }),
-        catchError(error => observableThrowError(error)));
-  }
-
   /**
-   * Perform page request by resourceName with params.
+   * Perform get paged collection resource request with url built by the resource name.
    *
-   * @param resourceName resource to perform page request
-   * @param query custom query path that wii be added to result url at the end
-   * @param option hal option that contains all required params
+   * @param resourceName used to build root url to the resource
+   * @param query (optional) url path that applied to the result url at the end
+   * @param option (optional) options that applied to the request
    */
   public getResourcePage(resourceName: string, query?: string, option?: PagedGetOption): Observable<T> {
     const url = UrlUtils.removeUrlTemplateVars(UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName))
@@ -128,9 +93,16 @@ export class PagedCollectionResourceHttpService<T extends PagedCollectionResourc
     return this.get(url, {params: httpParams});
   }
 
-  public search(resourceName: string, query: string, option: PagedGetOption): Observable<T> {
+  /**
+   *  Perform search paged collection resource request with url built by the resource name.
+   *
+   * @param resourceName used to build root url to the resource
+   * @param searchQuery name of the search method
+   * @param option (optional) options that applied to the request
+   */
+  public search(resourceName: string, searchQuery: string, option: PagedGetOption): Observable<T> {
     const url = UrlUtils.removeUrlTemplateVars(
-      UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName)).concat('/search/' + query);
+      UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName)).concat('/search/' + searchQuery);
     if (_.isEmpty(option) || _.isEmpty(option.page)) {
       option.page = ConstantUtil.DEFAULT_PAGE;
     }

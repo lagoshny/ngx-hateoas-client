@@ -8,7 +8,7 @@ import { ConsoleLogger } from '../../logger/console-logger';
 import { PageData, PageParam, RequestParam } from './declarations';
 
 /**
- * A resource type that adds pagination functionality to the collection resource.
+ * Collection of resources with pagination.
  */
 export class PagedCollectionResource<T extends BaseResource> extends CollectionResource<T> {
 
@@ -24,10 +24,10 @@ export class PagedCollectionResource<T extends BaseResource> extends CollectionR
   public readonly pageSize: number;
 
   /**
-   * Create a new paged collection resource from collection resource with page data.
+   * Create a new paged collection resource from collection resource with the page data.
    *
    * @param resourceCollection collection that will be paged
-   * @param pageData holds data about count pages, page size etc.
+   * @param pageData contains data about characteristics of the page.
    */
   constructor(resourceCollection: CollectionResource<T>, pageData?: PageData) {
     super(resourceCollection);
@@ -81,7 +81,7 @@ export class PagedCollectionResource<T extends BaseResource> extends CollectionR
    * Perform query with custom page data.
    * That allows you change page size, current page or sort options.
    *
-   * @param pageParam holds data about new page param
+   * @param pageParam contains data about new characteristics of the page.
    * @throws error when passed inconsistent data
    */
   public customPage(pageParam: PageParam): Observable<PagedCollectionResource<T>> {

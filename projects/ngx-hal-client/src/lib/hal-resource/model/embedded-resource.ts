@@ -2,14 +2,18 @@ import { BaseResource } from './base-resource';
 
 /**
  * Using for model classes that it's not Resource but can hold Resources as property, for example is Embeddable entity.
- * A distinctive feature of such resources is that they do not have <b>self</b> link while {@link Resource} has.
+ * A distinctive feature of such resources is that they do not have the <b>self</b> link while {@link Resource} has.
+ * It's related with that Embeddable entity can't have an id property.
  *
- * Sample:
+ * Usage example:
+ *
+ * // Regular resource
  * class Product extends Resource {
  *   name: string;
  * }
  *
- * class CartItem extends EmbeddedResource { //it is not Resource, just embedded object
+ * // EmbeddedResource that holds Product resource.
+ * class CartItem extends EmbeddedResource {
  *   product: Product;
  * }
  */

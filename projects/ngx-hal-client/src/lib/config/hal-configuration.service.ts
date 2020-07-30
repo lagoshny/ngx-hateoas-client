@@ -10,7 +10,10 @@ import { EmbeddedResource } from '../hal-resource/model/embedded-resource';
 import { PagedCollectionResource } from '../hal-resource/model/paged-collection-resource';
 
 /**
- * Service allows pass configuration params to lib.
+ * This service for configuration library.
+ *
+ * You should inject this service in your main AppModule and pass
+ * configuration using {@link #configure()} method.
  */
 @Injectable()
 export class HalConfigurationService {
@@ -18,13 +21,18 @@ export class HalConfigurationService {
   constructor(private injector: Injector,
               private httpConfig: HttpConfigService) {
     DependencyInjector.injector = injector;
-    // Sets resource types to prevent circular dependencies
+    // Setting resource types to prevent circular dependencies
     ResourceUtils.useResourceType(Resource);
     ResourceUtils.useCollectionResourceType(CollectionResource);
     ResourceUtils.usePagedCollectionResourceType(PagedCollectionResource);
     ResourceUtils.useEmbeddedResourceType(EmbeddedResource);
   }
 
+  /**
+   * Configure library with client params.
+   *
+   * @param config suitable client properties needed to properly library work
+   */
   public configure(config: HalConfiguration): void {
     this.httpConfig.baseApiUrl = config.baseApiUrl;
     ConsoleLogger.enabled = config.verboseLogs;

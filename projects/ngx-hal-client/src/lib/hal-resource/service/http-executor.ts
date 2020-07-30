@@ -4,12 +4,22 @@ import { CacheService } from './cache.service';
 import { ResourceIdentifiable } from '../model/resource-identifiable';
 import { tap } from 'rxjs/operators';
 
-export class HttpService<T extends ResourceIdentifiable> {
+/**
+ * Base class with common logics to perform HTTP requests.
+ * TODO: should manage cache?
+ */
+export class HttpExecutor<T extends ResourceIdentifiable> {
 
   constructor(protected httpClient: HttpClient,
               protected cacheService: CacheService<T>) {
   }
 
+  /**
+   * Perform GET request.
+   *
+   * @param url to perform request
+   * @param options (optional) options that applied to the request
+   */
   public get(url: string, options?: {
     headers?: {
       [header: string]: string | string[];
@@ -29,6 +39,13 @@ export class HttpService<T extends ResourceIdentifiable> {
     }
   }
 
+  /**
+   * Perform POST request.
+   *
+   * @param url to perform request
+   * @param body to send with request
+   * @param options (optional) options that applied to the request
+   */
   public post(url: string, body: any | null, options?: {
     headers?: HttpHeaders | {
       [header: string]: string | string[];
@@ -54,6 +71,13 @@ export class HttpService<T extends ResourceIdentifiable> {
     );
   }
 
+  /**
+   * Perform PUT request.
+   *
+   * @param url to perform request
+   * @param body to send with request
+   * @param options (optional) options that applied to the request
+   */
   public put(url: string, body: any | null, options?: {
     headers?: HttpHeaders | {
       [header: string]: string | string[];
@@ -71,6 +95,13 @@ export class HttpService<T extends ResourceIdentifiable> {
     }
   }
 
+  /**
+   * Perform PATCH request.
+   *
+   * @param url to perform request
+   * @param body to send with request
+   * @param options (optional) options that applied to the request
+   */
   public patch(url: string, body: any | null, options?: {
     headers?: HttpHeaders | {
       [header: string]: string | string[];
@@ -88,6 +119,12 @@ export class HttpService<T extends ResourceIdentifiable> {
     }
   }
 
+  /**
+   * Perform DELETE request.
+   *
+   * @param url to perform request
+   * @param options (optional) options that applied to the request
+   */
   public delete(url: string, options?: {
     headers?: HttpHeaders | {
       [header: string]: string | string[];

@@ -2,7 +2,7 @@ import { BaseResource } from '../hal-resource/model/base-resource';
 import { isEmbeddedResource, isResource } from '../hal-resource/model/resource-type';
 import { CollectionResource } from '../hal-resource/model/collection-resource';
 import { PagedCollectionResource } from '../hal-resource/model/paged-collection-resource';
-import { Include, Link, PageData, RequestBody, ValuesOption } from '../hal-resource/model/declarations';
+import { Include, Link, PageData, RequestBody } from '../hal-resource/model/declarations';
 import * as _ from 'lodash';
 import { Resource } from '../hal-resource/model/resource';
 import { EmbeddedResource } from '../hal-resource/model/embedded-resource';
@@ -66,12 +66,7 @@ export class ResourceUtils {
       for (const resourceName of Object.keys(resourceCollection)) {
         const resources: Array<any> = resourceCollection[resourceName];
         resources.forEach((resource) => {
-          // Создаём новый экземпляр ресурса
-          // let instance: T = new type();
-          // Инициализируем подтипы
-          // instance = this.searchSubtypes(builder, embeddedClassName, instance);
           result.resources.push(this.instantiateResource(resource));
-          // result._embedded['resourceName'].push(this.instantiateResource(new class extends BaseResource {}(), resource));
         });
       }
     }
@@ -98,7 +93,7 @@ export class ResourceUtils {
     return Object.assign(entity, payload);
   }
 
-  public static resolveValues(requestBody: RequestBody): any {
+  public static resolveValues(requestBody: RequestBody<any>): any {
     const body = requestBody.body;
     if (!_.isObject(body)) {
       return body;
@@ -142,7 +137,6 @@ export class ResourceUtils {
   }
 
   private static findResourceName(resource: BaseResource): string {
-    // TODO: подумать как быть с embedded
     const resourceLinks = resource['_links'] as Link;
     if (_.isEmpty(resourceLinks) || _.isEmpty(resourceLinks.self) || _.isNil(resourceLinks.self.href)) {
       return undefined;

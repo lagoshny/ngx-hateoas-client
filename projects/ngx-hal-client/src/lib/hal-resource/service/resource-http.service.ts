@@ -10,16 +10,22 @@ import * as _ from 'lodash';
 import { ConsoleLogger } from '../../logger/console-logger';
 import { isEmbeddedResource, isResource } from '../model/resource-type';
 import { GetOption, RequestParam } from '../model/declarations';
-import { HttpService } from './http.service';
+import { HttpExecutor } from './http-executor';
 import { CacheService } from './cache.service';
 import { HttpConfigService } from '../../config/http-config.service';
 
+/**
+ * Get instance of the ResourceHttpService by Angular DependencyInjector.
+ */
 export function getResourceHttpService(): ResourceHttpService<BaseResource> {
   return DependencyInjector.get(ResourceHttpService);
 }
 
+/**
+ * Service to perform HTTP requests to get {@link Resource} type.
+ */
 @Injectable()
-export class ResourceHttpService<T extends BaseResource> extends HttpService<T> {
+export class ResourceHttpService<T extends BaseResource> extends HttpExecutor<T> {
 
   constructor(httpClient: HttpClient,
               cacheService: CacheService<T>,
@@ -27,11 +33,17 @@ export class ResourceHttpService<T extends BaseResource> extends HttpService<T> 
     super(httpClient, cacheService);
   }
 
+  /**
+   * Perform GET request to retrieve resource.
+   *
+   * @param url to perform request
+   * @param options request options
+   * @throws error if returned resource type is not resource
+   */
   public get(url: string, options?: {
     headers?: {
       [header: string]: string | string[];
     };
-    observe?: 'body' | 'response';
     params?: HttpParams | {
       [param: string]: string | string[];
     }
@@ -41,7 +53,7 @@ export class ResourceHttpService<T extends BaseResource> extends HttpService<T> 
       params: options?.params
     });
 
-    return super.get(url, options)
+    return super.get(url, {...options, observe: 'body'})
       .pipe(
         map((data: any) => {
           ConsoleLogger.prettyInfo('GET_RESOURCE RESPONSE', {
@@ -50,18 +62,15 @@ export class ResourceHttpService<T extends BaseResource> extends HttpService<T> 
             body: JSON.stringify(data, null, 4)
           });
 
-          if (!_.isEmpty(data)) {
-            if (!isResource(data) && !isEmbeddedResource(data)) {
-              ConsoleLogger.error('You try to get wrong resource type, expected single resource.');
-              return observableThrowError('You try to get wrong resource type, expected single resource.');
-            }
-
-            const resource: T = ResourceUtils.instantiateResource(data);
-            this.cacheService.putResource(url, resource);
-            return resource;
+          if (!isResource(data) && !isEmbeddedResource(data)) {
+            ConsoleLogger.error('You try to get wrong resource type, expected single resource.');
+            throw Error('You try to get wrong resource type, expected single resource.');
           }
 
-          return data;
+          const resource: T = ResourceUtils.instantiateResource(data);
+          this.cacheService.putResource(url, resource);
+
+          return resource;
         }),
         catchError(error => observableThrowError(error)));
   }
@@ -90,9 +99,8 @@ export class ResourceHttpService<T extends BaseResource> extends HttpService<T> 
             body: JSON.stringify(data, null, 4)
           });
 
-          // this.cacheService.evictResource(url);
-          // TODO: а надо ли тут создавать ресурс?
-          if (!_.isEmpty(data) && (isResource(data) || isEmbeddedResource(data))) {
+          this.cacheService.evictResource(url);
+          if (isResource(data) || isEmbeddedResource(data)) {
             return ResourceUtils.instantiateResource(data);
           }
           return data;
@@ -124,9 +132,7 @@ export class ResourceHttpService<T extends BaseResource> extends HttpService<T> 
             params: options?.params,
             body: JSON.stringify(data, null, 4)
           });
-
-          // TODO: а надо ли тут создавать ресурс?
-          if (!_.isEmpty(data) && (isResource(data) || isEmbeddedResource(data))) {
+          if (isResource(data) || isEmbeddedResource(data)) {
             return ResourceUtils.instantiateResource(data);
           }
           return data;
@@ -160,9 +166,7 @@ export class ResourceHttpService<T extends BaseResource> extends HttpService<T> 
           });
 
           this.cacheService.evictResource(url);
-
-          // TODO: а надо ли тут создавать ресурс?
-          if (!_.isEmpty(data) && (isResource(data) || isEmbeddedResource(data))) {
+          if (isResource(data) || isEmbeddedResource(data)) {
             return ResourceUtils.instantiateResource(data);
           }
 
@@ -196,8 +200,7 @@ export class ResourceHttpService<T extends BaseResource> extends HttpService<T> 
           });
 
           this.cacheService.evictResource(url);
-          // TODO: а надо ли тут создавать ресурс?
-          if (!_.isEmpty(data) && (isResource(data) || isEmbeddedResource(data))) {
+          if (isResource(data) || isEmbeddedResource(data)) {
             return ResourceUtils.instantiateResource(data);
           }
 
@@ -207,9 +210,16 @@ export class ResourceHttpService<T extends BaseResource> extends HttpService<T> 
       );
   }
 
-  public count(resourceName: string, query: string, params?: RequestParam): Observable<number> {
+  /**
+   * Perform GET request to get count value.
+   *
+   * @param resourceName  used to build root url to the resource
+   * @param countQuery name of the count method
+   * @param params (optional) http request params that applied to the request
+   */
+  public count(resourceName: string, countQuery?: string, params?: RequestParam): Observable<number> {
     const url = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName)
-      .concat('/search/' + (_.isNil(query) ? 'countAll' : query));
+      .concat('/search/' + (_.isNil(countQuery) ? 'countAll' : countQuery));
     const httpParams = UrlUtils.convertToHttpParams(params);
 
     ConsoleLogger.prettyInfo('COUNT REQUEST', {
@@ -217,7 +227,7 @@ export class ResourceHttpService<T extends BaseResource> extends HttpService<T> 
       params
     });
 
-    return super.get(url, {params: httpParams})
+    return super.get(url, {params: httpParams, observe: 'body'})
       .pipe(
         map((data: any) => {
           ConsoleLogger.prettyInfo('COUNT RESPONSE', {
@@ -231,20 +241,13 @@ export class ResourceHttpService<T extends BaseResource> extends HttpService<T> 
       );
   }
 
-  public getProjection(resourceName: string,
-                       id: string,
-                       projectionName: string,
-                       // expireMs: number = CacheHelper.defaultExpire,
-                       // isCacheActive: boolean = true
-  ): Observable<BaseResource> {
-    const uri = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName)
-      .concat('/', id)
-      .concat('?projection=' + projectionName);
-
-    return this.get(uri);
-  }
-
-
+  /**
+   * Perform get resource request with url built by the resource name.
+   *
+   * @param resourceName used to build root url to the resource
+   * @param id resource id
+   * @param option (optional) options that applied to the request
+   */
   public getResource(resourceName: string, id: any, option?: GetOption): Observable<T> {
     const uri = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName).concat('/', id);
     const httpParams = UrlUtils.convertToHttpParams(option);
@@ -252,26 +255,27 @@ export class ResourceHttpService<T extends BaseResource> extends HttpService<T> 
     return this.get(uri, {params: httpParams});
   }
 
-  public postResource(resourceName: string, body: any): Observable<T> {
+  /**
+   * Perform post resource request with url built by the resource name.
+   *
+   * @param resourceName used to build root url to the resource
+   * @param body resource to pass as body
+   */
+  public postResource(resourceName: string, body: BaseResource): Observable<T> {
     const uri = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName);
 
-    return this.post(uri, body);
+    return this.post(uri, body, {observe: 'body'});
   }
 
-  public putResource(resourceName: string, body: any): Observable<T> {
-    const uri = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName);
-
-    return this.put(uri, body);
-  }
-
-  public patchResource(resourceName: string, body: any): Observable<T> {
-    const uri = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName);
-
-    return this.patch(uri, body);
-  }
-
-  public search(resourceName: string, query: string, option?: GetOption): Observable<T> {
-    const url = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName).concat('/search/' + query);
+  /**
+   * Perform search single resource request with url built by the resource name.
+   *
+   * @param resourceName used to build root url to the resource
+   * @param searchQuery name of the search method
+   * @param option (optional) options that applied to the request
+   */
+  public search(resourceName: string, searchQuery: string, option?: GetOption): Observable<T> {
+    const url = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName).concat('/search/' + searchQuery);
     const httpParams = UrlUtils.convertToHttpParams(option);
 
     return this.get(url, {params: httpParams});

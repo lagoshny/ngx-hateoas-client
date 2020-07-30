@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { ResourceIdentifiable } from '../model/resource-identifiable';
 
+// TODO: should be implemented
 @Injectable()
 export class CacheService<T extends ResourceIdentifiable> {
 

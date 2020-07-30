@@ -13,7 +13,8 @@ export class ResourceUtils {
 
   private static collectionResourceType: new() => CollectionResource<BaseResource>;
 
-  private static pagedCollectionResourceType: new(collection: CollectionResource<BaseResource>, pageData?: PageData) => PagedCollectionResource<BaseResource>;
+  private static pagedCollectionResourceType: new(collection: CollectionResource<BaseResource>, pageData?: PageData)
+    => PagedCollectionResource<BaseResource>;
 
   private static embeddedResourceType: new() => EmbeddedResource;
 
@@ -25,7 +26,8 @@ export class ResourceUtils {
     this.collectionResourceType = type;
   }
 
-  public static usePagedCollectionResourceType(type: new(collection: CollectionResource<BaseResource>) => PagedCollectionResource<BaseResource>) {
+  public static usePagedCollectionResourceType(type: new(collection: CollectionResource<BaseResource>)
+    => PagedCollectionResource<BaseResource>) {
     this.pagedCollectionResourceType = type;
   }
 
@@ -48,20 +50,18 @@ export class ResourceUtils {
     }
 
     const resource = ResourceUtils.createResource(new this.resourceType() as T, payload);
-    resource['resourceName'] = this.findResourceName(resource);
+    // @ts-ignore
+    resource.resourceName = this.findResourceName(resource);
 
     return resource;
   }
 
 
-  // Type - тип ресурсов внутри коллекции, payload - ответ от сервера, result - результирующий массив, куда будем добалвять ресурсы
-  public static instantiateCollectionResource<T extends CollectionResource<BaseResource>>(payload: any,
-                                                                                          // result: ResourceArray<T>,
-                                                                                          // builder?: SubTypeBuilder
-  ): T {
+  public static instantiateCollectionResource<T extends CollectionResource<BaseResource>>(payload: any): T {
     const result = new this.collectionResourceType() as T;
-    result['_links'] = payload['_links'];
-    const resourceCollection = payload['_embedded'];
+    // @ts-ignore
+    result._links = payload._links;
+    const resourceCollection = payload._embedded;
     if (resourceCollection) {
       for (const resourceName of Object.keys(resourceCollection)) {
         const resources: Array<any> = resourceCollection[resourceName];
@@ -74,10 +74,7 @@ export class ResourceUtils {
     return result;
   }
 
-  public static instantiatePagedCollectionResource<T extends PagedCollectionResource<BaseResource>>(payload: any,
-                                                                                                    // result: ResourceArray<T>,
-                                                                                                    // builder?: SubTypeBuilder
-  ): T {
+  public static instantiatePagedCollectionResource<T extends PagedCollectionResource<BaseResource>>(payload: any): T {
     const resourceCollection = this.instantiateCollectionResource(payload);
     let result;
     if (payload.page && payload._links) {
@@ -88,11 +85,13 @@ export class ResourceUtils {
     return result as T;
   }
 
-
-  private static createResource<T extends BaseResource>(entity: T, payload: any): T {
-    return Object.assign(entity, payload);
-  }
-
+  /**
+   * Resolve request body relations.
+   * If request body has {@link Resource} value then this value will be replaced by resource self link.
+   * If request body has {@link ValuesOption} it will be applied to body values.
+   *
+   * @param requestBody that contains the body directly and optional body values option {@link ValuesOption}
+   */
   public static resolveValues(requestBody: RequestBody<any>): any {
     const body = requestBody.body;
     if (!_.isObject(body)) {
@@ -126,18 +125,30 @@ export class ResourceUtils {
     return result;
   }
 
-  public static initResource(resource: BaseResource): BaseResource {
-    if (isResource(resource)) {
-      return Object.assign(new this.resourceType(), resource);
-    } else if (isEmbeddedResource(resource)) {
-      return Object.assign(new this.embeddedResourceType(), resource);
+  /**
+   * Assign {@link Resource} or {@link EmbeddedResource} properties to passed entity.
+   *
+   * @param entity to be converter to resource
+   */
+  public static initResource(entity: any): BaseResource {
+    if (isResource(entity)) {
+      return Object.assign(new this.resourceType(), entity);
+    } else if (isEmbeddedResource(entity)) {
+      return Object.assign(new this.embeddedResourceType(), entity);
     } else {
-      return resource;
+      return entity;
     }
   }
 
+  /**
+   * Define resource name based on resource links.
+   * It will get link name that href equals to self href resource link.
+   *
+   * @param resource for which to find the name
+   */
   private static findResourceName(resource: BaseResource): string {
-    const resourceLinks = resource['_links'] as Link;
+    // @ts-ignore
+    const resourceLinks = resource._links as Link;
     if (_.isEmpty(resourceLinks) || _.isEmpty(resourceLinks.self) || _.isNil(resourceLinks.self.href)) {
       return undefined;
     }
@@ -149,4 +160,9 @@ export class ResourceUtils {
       }
     }
   }
+
+  private static createResource<T extends BaseResource>(entity: T, payload: any): T {
+    return Object.assign(entity, payload);
+  }
+
 }

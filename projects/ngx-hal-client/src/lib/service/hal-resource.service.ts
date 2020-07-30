@@ -11,6 +11,11 @@ import { CollectionResourceHttpService } from '../hal-resource/service/collectio
 import { CommonHttpService } from '../hal-resource/service/common-http.service';
 import { UrlUtils } from '../util/url.utils';
 
+/**
+ * Service to operate with {@link Resource}.
+ *
+ * Can be injected as standalone service to work with {@link Resource}.
+ */
 @Injectable()
 export class HalResourceService<T extends Resource> {
 
@@ -20,43 +25,91 @@ export class HalResourceService<T extends Resource> {
               private pagedCollectionResourceHttpService: PagedCollectionResourceHttpService<PagedCollectionResource<T>>) {
   }
 
-  public get(resourceName: string, id: any, option?: GetOption): Observable<T> {
-    return this.resourceHttpService.getResource(resourceName, id, option) as Observable<T>;
+  /**
+   * Get resource by id.
+   *
+   * @param resourceName used to build root url to the resource
+   * @param id resource id
+   * @param options (optional) options that should be applied to the request
+   */
+  public get(resourceName: string, id: any, options?: GetOption): Observable<T> {
+    return this.resourceHttpService.getResource(resourceName, id, options) as Observable<T>;
   }
 
-  public getAll(resourceName: string, option?: GetOption): Observable<CollectionResource<T>> {
-    return this.collectionResourceHttpService.getResourceCollection(resourceName, null, option);
+  /**
+   * Get collection of the resource by id.
+   *
+   * @param resourceName used to build root url to the resource
+   * @param options (optional) options that should be applied to the request
+   */
+  public getAll(resourceName: string, options?: GetOption): Observable<CollectionResource<T>> {
+    return this.collectionResourceHttpService.getResourceCollection(resourceName, null, options);
   }
 
-  public getAllPage(resourceName: string, option?: PagedGetOption): Observable<PagedCollectionResource<T>> {
-    return this.pagedCollectionResourceHttpService.getResourcePage(resourceName, null, option);
+  /**
+   * Get paged collection of the resource by id.
+   *
+   * @param resourceName used to build root url to the resource
+   * @param options (optional) options that should be applied to the request
+   */
+  public getAllPage(resourceName: string, options?: PagedGetOption): Observable<PagedCollectionResource<T>> {
+    return this.pagedCollectionResourceHttpService.getResourcePage(resourceName, null, options);
   }
 
-  public create(resourceName: string, requestBody: RequestBody<T>): Observable<T> {
+  /**
+   * Create resource.
+   *
+   * @param resourceName used to build root url to the resource
+   * @param requestBody that contains the body directly and optional body values option {@link ValuesOption}
+   */
+  public createResource(resourceName: string, requestBody: RequestBody<T>): Observable<T> {
     const body = ResourceUtils.resolveValues(requestBody);
 
     return this.resourceHttpService.postResource(resourceName, body);
   }
 
-  public update(requestBody: RequestBody<T>): Observable<T> {
+  /**
+   * Update resource.
+   *
+   * @param requestBody that contains the body directly and optional body values option {@link ValuesOption}
+   */
+  public updateResource(requestBody: RequestBody<T>): Observable<T> {
     const resource = ResourceUtils.initResource(requestBody.body) as Resource;
     const body = ResourceUtils.resolveValues({body: resource, valuesOption: requestBody?.valuesOption});
 
     return this.resourceHttpService.put(resource.getSelfLinkHref(), body);
   }
 
-  public count(resourceName: string, query: string, requestParam: RequestParam): Observable<number> {
-    return this.resourceHttpService.count(resourceName, query, requestParam);
+  /**
+   * Perform GET request to get count value.
+   *
+   * @param resourceName used to build root url to the resource
+   * @param countQuery name of the count method
+   * @param requestParam (optional) http request params that applied to the request
+   */
+  public count(resourceName: string, countQuery: string, requestParam: RequestParam): Observable<number> {
+    return this.resourceHttpService.count(resourceName, countQuery, requestParam);
   }
 
-  public patch(requestBody: RequestBody<T>): Observable<T | any> {
+  /**
+   * Patch resource.
+   *
+   * @param requestBody that contains the body directly and optional body values option {@link ValuesOption}
+   */
+  public patchResource(requestBody: RequestBody<T>): Observable<T | any> {
     const resource = ResourceUtils.initResource(requestBody?.body) as Resource;
     const body = ResourceUtils.resolveValues({body: resource, valuesOption: requestBody?.valuesOption});
 
     return this.resourceHttpService.patch(resource.getSelfLinkHref(), body);
   }
 
-  public delete(entity: T, options?: RequestOption): Observable<T | any> {
+  /**
+   * Delete resource.
+   *
+   * @param entity to delete
+   * @param options (optional) options that should be applied to the request
+   */
+  public deleteResource(entity: T, options?: RequestOption): Observable<T | any> {
     const resource = ResourceUtils.initResource(entity) as Resource;
     const httpParams = UrlUtils.convertToHttpParams({params: options?.params});
 
@@ -64,18 +117,30 @@ export class HalResourceService<T extends Resource> {
       {observe: options?.observe, params: httpParams});
   }
 
-  public searchCollection(resourceName: string, query: string, option?: GetOption): Observable<CollectionResource<T>> {
-    return this.collectionResourceHttpService.search(resourceName, query, option);
+  /**
+   * {@see CollectionResourceHttpService#search}
+   */
+  public searchCollection(resourceName: string, searchQuery: string, option?: GetOption): Observable<CollectionResource<T>> {
+    return this.collectionResourceHttpService.search(resourceName, searchQuery, option);
   }
 
-  public searchPage(resourceName: string, query: string, option?: PagedGetOption): Observable<PagedCollectionResource<T>> {
-    return this.pagedCollectionResourceHttpService.search(resourceName, query, option);
+  /**
+   * {@see PagedCollectionResource#search}
+   */
+  public searchPage(resourceName: string, searchQuery: string, option?: PagedGetOption): Observable<PagedCollectionResource<T>> {
+    return this.pagedCollectionResourceHttpService.search(resourceName, searchQuery, option);
   }
 
-  public searchSingle(resourceName: string, query: string, option?: GetOption): Observable<T> {
-    return this.resourceHttpService.search(resourceName, query, option);
+  /**
+   * {@see ResourceHttpService#search}
+   */
+  public searchSingle(resourceName: string, searchQuery: string, option?: GetOption): Observable<T> {
+    return this.resourceHttpService.search(resourceName, searchQuery, option);
   }
 
+  /**
+   * {@see CommonHttpService#customQuery}
+   */
   public customQuery(resourceName: string,
                      method: HttpMethod,
                      query: string,

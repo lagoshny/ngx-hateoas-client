@@ -12,8 +12,7 @@ import { Observable, throwError as observableThrowError } from 'rxjs';
 import { ResourceUtils } from '../../util/resource.utils';
 import { UrlUtils } from '../../util/url.utils';
 import { DependencyInjector } from '../../util/dependency-injector';
-import { ConstantUtil } from '../../util/constant.util';
-import { PagedGetOption } from '../model/declarations';
+import { PagedGetOption, PageParam } from '../model/declarations';
 import { HttpExecutor } from './http-executor';
 
 /**
@@ -28,6 +27,11 @@ export function getPagedCollectionResourceHttpService(): PagedCollectionResource
  */
 @Injectable()
 export class PagedCollectionResourceHttpService<T extends PagedCollectionResource<BaseResource>> extends HttpExecutor<T> {
+
+  private static readonly DEFAULT_PAGE: PageParam = {
+    page: 0,
+    size: 20,
+  };
 
   constructor(httpClient: HttpClient,
               cacheService: CacheService<T>,
@@ -86,7 +90,7 @@ export class PagedCollectionResourceHttpService<T extends PagedCollectionResourc
     const url = UrlUtils.removeUrlTemplateVars(UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName))
       .concat(query ? query : '');
     if (_.isEmpty(option.page)) {
-      option.page = ConstantUtil.DEFAULT_PAGE;
+      option.page = PagedCollectionResourceHttpService.DEFAULT_PAGE;
     }
     const httpParams = UrlUtils.convertToHttpParams(option);
 
@@ -104,7 +108,7 @@ export class PagedCollectionResourceHttpService<T extends PagedCollectionResourc
     const url = UrlUtils.removeUrlTemplateVars(
       UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName)).concat('/search/' + searchQuery);
     if (_.isEmpty(option) || _.isEmpty(option.page)) {
-      option.page = ConstantUtil.DEFAULT_PAGE;
+      option.page = PagedCollectionResourceHttpService.DEFAULT_PAGE;
     }
     const httpParams = UrlUtils.convertToHttpParams(option);
 

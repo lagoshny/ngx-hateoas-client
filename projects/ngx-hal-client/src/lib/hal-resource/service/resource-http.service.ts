@@ -213,18 +213,18 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor<T>
   /**
    * Perform GET request to get count value.
    *
-   * @param resourceName  used to build root url to the resource
+   * @param resourceName used to build root url to the resource
    * @param countQuery name of the count method
-   * @param params (optional) http request params that applied to the request
+   * @param requestParam (optional) http request params that applied to the request
    */
-  public count(resourceName: string, countQuery?: string, params?: RequestParam): Observable<number> {
+  public count(resourceName: string, countQuery?: string, requestParam?: RequestParam): Observable<number> {
     const url = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName)
       .concat('/search/' + (_.isNil(countQuery) ? 'countAll' : countQuery));
-    const httpParams = UrlUtils.convertToHttpParams(params);
+    const httpParams = UrlUtils.convertToHttpParams(requestParam);
 
     ConsoleLogger.prettyInfo('COUNT REQUEST', {
       url,
-      params
+      params: requestParam
     });
 
     return super.get(url, {params: httpParams, observe: 'body'})
@@ -232,7 +232,7 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor<T>
         map((data: any) => {
           ConsoleLogger.prettyInfo('COUNT RESPONSE', {
             url,
-            params,
+            params: requestParam,
             data
           });
           return data as number;

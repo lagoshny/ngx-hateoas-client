@@ -19,7 +19,7 @@ export abstract class BaseResource extends ResourceIdentifiable {
    * Get single resource by the relation name.
    *
    * @param relationName used to get the specific relation link
-   * @param options (optional) additional options that should be applied to the request
+   * @param options (optional) options that should be applied to the request
    * @throws error if no link is found by passed relation name
    */
   public getRelation<T extends BaseResource>(relationName: string,

@@ -18,33 +18,6 @@ export class ConsoleLogger {
     console.error(message, ...optionalParams);
   }
 
-
-  /**
-   * Log http request/response with pretty format.
-   *
-   * @param method method name of the http request (POST, GET)
-   * @param type request ot response
-   * @param message object with data to log
-   */
-  // public static logHttp2(method: string, type: string, message: object): void {
-  //   if (!this.enabled) {
-  //     return;
-  //   }
-  //
-  //   let msg = `%c${ method.toUpperCase() } %c${ type }\n`;
-  //   const color = [
-  //     'color: #BF3030;',
-  //     'color: #00AF64;'
-  //   ];
-  //
-  //   for (const [key, value] of Object.entries(message)) {
-  //     msg += `%c${ _.capitalize(key) }: %c${ value }\n`;
-  //     color.push('color: #3AA6D0;', 'color: default;');
-  //   }
-  //
-  //   ConsoleLogger.info(msg, ...color);
-  // }
-
   /**
    * Log info messages in pretty format.
    *

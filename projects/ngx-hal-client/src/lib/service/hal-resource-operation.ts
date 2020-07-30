@@ -29,11 +29,11 @@ export class HalResourceOperation<T extends Resource> {
     return this.halResourceService.getAllPage(this.resourceName, option);
   }
 
-  public create(requestBody: RequestBody<T>): Observable<T> {
+  public createResource(requestBody: RequestBody<T>): Observable<T> {
     return this.halResourceService.create(this.resourceName, requestBody);
   }
 
-  public update(requestBody: RequestBody<T>): Observable<T> {
+  public updateResource(requestBody: RequestBody<T>): Observable<T> {
     return this.halResourceService.update(requestBody);
   }
 
@@ -41,11 +41,11 @@ export class HalResourceOperation<T extends Resource> {
     return this.halResourceService.count(this.resourceName, query, requestParam);
   }
 
-  public patch(requestBody: RequestBody<T>): Observable<T> {
+  public patchResource(requestBody: RequestBody<T>): Observable<T> {
     return this.halResourceService.patch(requestBody);
   }
 
-  public delete(entity: T, options?: RequestOption): Observable<T | any> {
+  public deleteResource(entity: T, options?: RequestOption): Observable<T | any> {
     return this.halResourceService.delete(entity, options);
   }
 

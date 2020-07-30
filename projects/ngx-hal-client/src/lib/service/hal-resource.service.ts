@@ -3,12 +3,13 @@ import { Observable } from 'rxjs';
 import { ResourceHttpService } from '../hal-resource/service/resource-http.service';
 import { PagedCollectionResourceHttpService } from '../hal-resource/service/paged-collection-resource-http.service';
 import { PagedCollectionResource } from '../hal-resource/model/paged-collection-resource';
-import { HalOption, HalSimpleOption, HttpMethod, RequestParam, ResourceOption } from '../hal-resource/model/declarations';
+import { HalOption, HalSimpleOption, HttpMethod, RequestBody, RequestParam, ResourceOption } from '../hal-resource/model/declarations';
 import { ResourceUtils } from '../util/resource.utils';
 import { Resource } from '../ngx-hal-client.module';
 import { CollectionResource } from '../hal-resource/model/collection-resource';
 import { CollectionResourceHttpService } from '../hal-resource/service/collection-resource-http.service';
 import { CommonHttpService } from '../hal-resource/service/common-http.service';
+import { isResource } from '../hal-resource/model/resource-type';
 
 @Injectable()
 export class HalResourceService<T extends Resource> {
@@ -69,8 +70,12 @@ export class HalResourceService<T extends Resource> {
   public customQuery(resourceName: string,
                      method: HttpMethod,
                      query: string,
-                     body: any,
+                     requestBody: RequestBody,
                      option: HalOption): Observable<any | T | CollectionResource<T> | PagedCollectionResource<T>> {
-    return this.commonHttpService.customQuery(resourceName, method, query, body, option);
+    if (isResource(requestBody.body)) {
+      requestBody.body = ResourceUtils.resolveRelations(requestBody.body, requestBody.resourceRelation);
+    }
+
+    return this.commonHttpService.customQuery(resourceName, method, query, requestBody.body, option);
   }
 }

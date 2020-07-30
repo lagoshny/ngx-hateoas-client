@@ -1,7 +1,7 @@
 import { Observable } from 'rxjs';
 import { DependencyInjector } from '../util/dependency-injector';
 import { HalResourceService } from './hal-resource.service';
-import { HalOption, HalSimpleOption, HttpMethod, RequestParam, ResourceOption } from '../hal-resource/model/declarations';
+import { HalOption, HalSimpleOption, HttpMethod, RequestBody, RequestParam, ResourceOption } from '../hal-resource/model/declarations';
 import { Resource } from '../hal-resource/model/resource';
 import { PagedCollectionResource } from '../hal-resource/model/paged-collection-resource';
 import { CollectionResource } from '../hal-resource/model/collection-resource';
@@ -64,9 +64,9 @@ export class HalResourceOperation<T extends Resource> {
 
   public customQuery(method: HttpMethod,
                      query: string,
-                     body?: any,
+                     requestBody: RequestBody,
                      option?: HalOption): Observable<any | T | CollectionResource<T> | PagedCollectionResource<T>> {
-    return this.halResourceService.customQuery(this.resourceName, method, query, body, option);
+    return this.halResourceService.customQuery(this.resourceName, method, query, requestBody, option);
   }
 
 }

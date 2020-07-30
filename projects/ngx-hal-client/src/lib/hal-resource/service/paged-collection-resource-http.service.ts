@@ -13,7 +13,7 @@ import { ResourceUtils } from '../../util/resource.utils';
 import { UrlUtils } from '../../util/url.utils';
 import { DependencyInjector } from '../../util/dependency-injector';
 import { ConstantUtil } from '../../util/constant.util';
-import { HalOption } from '../model/declarations';
+import { PagedGetOption } from '../model/declarations';
 import { HttpService } from './http.service';
 
 /**
@@ -117,7 +117,7 @@ export class PagedCollectionResourceHttpService<T extends PagedCollectionResourc
    * @param query custom query path that wii be added to result url at the end
    * @param option hal option that contains all required params
    */
-  public getResourcePage(resourceName: string, query?: string, option?: HalOption): Observable<T> {
+  public getResourcePage(resourceName: string, query?: string, option?: PagedGetOption): Observable<T> {
     const url = UrlUtils.removeUrlTemplateVars(UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName))
       .concat(query ? query : '');
     if (_.isEmpty(option.page)) {
@@ -128,7 +128,7 @@ export class PagedCollectionResourceHttpService<T extends PagedCollectionResourc
     return this.get(url, {params: httpParams});
   }
 
-  public search(resourceName: string, query: string, option: HalOption): Observable<T> {
+  public search(resourceName: string, query: string, option: PagedGetOption): Observable<T> {
     const url = UrlUtils.removeUrlTemplateVars(
       UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName)).concat('/search/' + query);
     if (_.isEmpty(option) || _.isEmpty(option.page)) {

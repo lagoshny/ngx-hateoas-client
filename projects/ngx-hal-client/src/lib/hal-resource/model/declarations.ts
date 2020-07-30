@@ -19,13 +19,16 @@ export interface LinkData {
 }
 
 /**
- * Contains options that can be applied to the request.
+ * Extend {@link GetOption} to adds page param.
  */
-export interface HalOption extends HalSimpleOption {
+export interface PagedGetOption extends GetOption {
   page?: PageParam;
 }
 
-export interface HalSimpleOption {
+/**
+ * Contains options that can be applied to the request.
+ */
+export interface GetOption {
   params?: RequestParam;
   projection?: string;
 }
@@ -104,7 +107,7 @@ export enum Include {
  * Additional resource options that allow configure should include or not some specific values
  * (e.q. null values).
  */
-export interface ResourceOption {
+export interface ResourceValuesOption {
   include: Include;
 }
 
@@ -120,7 +123,7 @@ export interface RequestBody {
    * When body is {@link Resource} type then this param influence on include
    * some value types of resource or not.
    */
-  resourceRelation?: ResourceOption;
+  resourceValues?: ResourceValuesOption;
 }
 
 /**

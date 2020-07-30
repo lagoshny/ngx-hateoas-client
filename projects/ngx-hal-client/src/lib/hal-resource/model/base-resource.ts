@@ -4,7 +4,7 @@ import { UrlUtils } from '../../util/url.utils';
 import { ResourceIdentifiable } from './resource-identifiable';
 import { CollectionResource } from './collection-resource';
 import { getCollectionResourceHttpService } from '../service/collection-resource-http.service';
-import { HalOption, HalSimpleOption, RequestBody, RequestParam } from './declarations';
+import { PagedGetOption, GetOption, RequestBody, RequestParam } from './declarations';
 import { HttpResponse } from '@angular/common/http';
 import { getPagedCollectionResourceHttpService } from '../service/paged-collection-resource-http.service';
 import { PagedCollectionResource } from './paged-collection-resource';
@@ -25,7 +25,7 @@ export abstract class BaseResource extends ResourceIdentifiable {
    * @throws error when link by relation doesn't exist
    */
   public getRelation<T extends BaseResource>(relationName: string,
-                                             options?: HalSimpleOption
+                                             options?: GetOption
                                              // expireMs: number = CacheHelper.defaultExpire,
                                              // isCacheActive: boolean = true
   ): Observable<T> {
@@ -44,7 +44,7 @@ export abstract class BaseResource extends ResourceIdentifiable {
    * @throws error when link by relation doesn't exist
    */
   public getRelatedCollection<T extends CollectionResource<BaseResource>>(relationName: string,
-                                                                          options?: HalSimpleOption
+                                                                          options?: GetOption
                                                                           // embedded?: string,
                                                                           // expireMs: number = CacheHelper.defaultExpire,
                                                                           // isCacheActive: boolean = true
@@ -58,7 +58,7 @@ export abstract class BaseResource extends ResourceIdentifiable {
 
   // TODO: проверить, что будет если вернётся не page
   public getRelatedPage<T extends PagedCollectionResource<BaseResource>>(relationName: string,
-                                                                         options?: HalOption
+                                                                         options?: PagedGetOption
                                                                          // embedded?: string,
                                                                          // expireMs: number = CacheHelper.defaultExpire,
                                                                          // isCacheActive: boolean = true
@@ -85,7 +85,7 @@ export abstract class BaseResource extends ResourceIdentifiable {
     const url = relationLink.templated ? UrlUtils.removeUrlTemplateVars(relationLink.href) : relationLink.href;
     const httpParams = UrlUtils.convertToHttpParams({params});
     if (isResource(requestBody.body)) {
-      requestBody.body = ResourceUtils.resolveRelations(requestBody.body, requestBody.resourceRelation);
+      requestBody.body = ResourceUtils.resolveRelations(requestBody.body, requestBody.resourceValues);
     }
 
     return getResourceHttpService()
@@ -107,7 +107,7 @@ export abstract class BaseResource extends ResourceIdentifiable {
     const url = relationLink.templated ? UrlUtils.removeUrlTemplateVars(relationLink.href) : relationLink.href;
     const httpParams = UrlUtils.convertToHttpParams({params});
     if (isResource(requestBody.body)) {
-      requestBody.body = ResourceUtils.resolveRelations(requestBody.body, requestBody.resourceRelation);
+      requestBody.body = ResourceUtils.resolveRelations(requestBody.body, requestBody.resourceValues);
     }
 
     return getResourceHttpService()
@@ -130,7 +130,7 @@ export abstract class BaseResource extends ResourceIdentifiable {
     // TODO: подумать о логировании и о strict params и проверить template
     const httpParams = UrlUtils.convertToHttpParams({params});
     if (isResource(requestBody.body)) {
-      requestBody.body = ResourceUtils.resolveRelations(requestBody.body, requestBody.resourceRelation);
+      requestBody.body = ResourceUtils.resolveRelations(requestBody.body, requestBody.resourceValues);
     }
 
     return getResourceHttpService()

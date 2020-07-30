@@ -2,7 +2,7 @@ import { BaseResource } from '../hal-resource/model/base-resource';
 import { isEmbeddedResource, isResource } from '../hal-resource/model/resource-type';
 import { CollectionResource } from '../hal-resource/model/collection-resource';
 import { PagedCollectionResource } from '../hal-resource/model/paged-collection-resource';
-import { Include, Link, PageData, ResourceOption } from '../hal-resource/model/declarations';
+import { Include, Link, PageData, ResourceValuesOption } from '../hal-resource/model/declarations';
 import * as _ from 'lodash';
 import { Resource } from '../hal-resource/model/resource';
 import { EmbeddedResource } from '../hal-resource/model/embedded-resource';
@@ -101,7 +101,7 @@ export class ResourceUtils {
     return entity;
   }
 
-  static resolveRelations(resource: Resource, options?: ResourceOption): object {
+  static resolveRelations(resource: Resource, options?: ResourceValuesOption): object {
     const result: object = {};
     for (const key in resource) {
       if (resource[key] == null && Include.NULL_VALUES === options?.include) {

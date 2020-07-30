@@ -2,7 +2,7 @@ import { ResourceIdentifiable } from '../model/resource-identifiable';
 import { HttpService } from './http.service';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { HalOption, HttpMethod } from '../model/declarations';
+import { PagedGetOption, HttpMethod } from '../model/declarations';
 import { UrlUtils } from '../../util/url.utils';
 import { HttpClient } from '@angular/common/http';
 import { CacheService } from './cache.service';
@@ -22,7 +22,7 @@ export class CommonHttpService<T extends ResourceIdentifiable> extends HttpServi
     super(httpClient, cacheService);
   }
 
-  public customQuery(resourceName: string, method: HttpMethod, query: string, body: any, option: HalOption): any {
+  public customQuery(resourceName: string, method: HttpMethod, query: string, body: any, option: PagedGetOption): any {
     const url = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName).concat(query ? query : '');
     const httpParams = UrlUtils.convertToHttpParams(option);
     ConsoleLogger.prettyInfo(`CUSTOM_QUERY_${ method } REQUEST`, {

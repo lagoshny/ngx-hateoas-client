@@ -9,7 +9,7 @@ import { UrlUtils } from '../../util/url.utils';
 import * as _ from 'lodash';
 import { ConsoleLogger } from '../../logger/console-logger';
 import { isEmbeddedResource, isResource } from '../model/resource-type';
-import { HalSimpleOption, RequestParam } from '../model/declarations';
+import { GetOption, RequestParam } from '../model/declarations';
 import { HttpService } from './http.service';
 import { CacheService } from './cache.service';
 import { HttpConfigService } from '../../config/http-config.service';
@@ -245,7 +245,7 @@ export class ResourceHttpService<T extends BaseResource> extends HttpService<T> 
   }
 
 
-  public getResource(resourceName: string, id: any, option?: HalSimpleOption): Observable<T> {
+  public getResource(resourceName: string, id: any, option?: GetOption): Observable<T> {
     const uri = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName).concat('/', id);
     const httpParams = UrlUtils.convertToHttpParams(option);
 
@@ -270,7 +270,7 @@ export class ResourceHttpService<T extends BaseResource> extends HttpService<T> 
     return this.patch(uri, body);
   }
 
-  public search(resourceName: string, query: string, option?: HalSimpleOption): Observable<T> {
+  public search(resourceName: string, query: string, option?: GetOption): Observable<T> {
     const url = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName).concat('/search/' + query);
     const httpParams = UrlUtils.convertToHttpParams(option);
 

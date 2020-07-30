@@ -11,7 +11,7 @@ import { ResourceUtils } from '../../util/resource.utils';
 import { CollectionResource } from '../model/collection-resource';
 import { BaseResource } from '../model/base-resource';
 import { DependencyInjector } from '../../util/dependency-injector';
-import { HalSimpleOption } from '../model/declarations';
+import { GetOption } from '../model/declarations';
 import { UrlUtils } from '../../util/url.utils';
 import { HttpService } from './http.service';
 
@@ -104,14 +104,14 @@ export class CollectionResourceHttpService<T extends CollectionResource<BaseReso
         catchError(error => observableThrowError(error)));
   }
 
-  public getResourceCollection(resourceName: string, query?: string, option?: HalSimpleOption): Observable<T> {
+  public getResourceCollection(resourceName: string, query?: string, option?: GetOption): Observable<T> {
     const url = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName).concat(query ? query : '');
     const httpParams = UrlUtils.convertToHttpParams(option);
 
     return this.get(url, {params: httpParams});
   }
 
-  public search(resourceName: string, query: string, option?: HalSimpleOption): Observable<T> {
+  public search(resourceName: string, query: string, option?: GetOption): Observable<T> {
     const url = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName).concat('/search/' + query);
     const httpParams = UrlUtils.convertToHttpParams(option);
 

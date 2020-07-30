@@ -3,11 +3,11 @@ import { isResource } from '../hal-resource/model/resource-type';
 import * as _ from 'lodash';
 import { Resource } from '../hal-resource/model/resource';
 import uriTemplates from 'uri-templates';
-import { HalOption, RequestParam } from '../hal-resource/model/declarations';
+import { PagedGetOption, RequestParam } from '../hal-resource/model/declarations';
 
 export class UrlUtils {
 
-  public static convertToHttpParams(option: HalOption, httpParams?: HttpParams): HttpParams {
+  public static convertToHttpParams(option: PagedGetOption, httpParams?: HttpParams): HttpParams {
     let resultParams = httpParams ? httpParams : new HttpParams();
     if (_.isEmpty(option)) {
       return resultParams;

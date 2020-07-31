@@ -71,12 +71,22 @@ export class UrlUtils {
   }
 
   /**
-   * Clear url from template vars.
+   * Clear url from template params.
    *
    * @param url to be cleaned
    */
-  public static removeUrlTemplateVars(url: string): string {
-    return uriTemplates(url).fill({});
+  public static removeTemplateParams(url: string): string {
+    return UrlUtils.fillTemplateParams(url, {});
+  }
+
+  /**
+   * Fill url template params..
+   *
+   * @param url to be filled
+   * @param templateParams to fill url
+   */
+  public static fillTemplateParams(url: string, templateParams: object): string {
+    return uriTemplates(url).fill(_.isNil(templateParams) ? {} : templateParams);
   }
 
 }

@@ -1,5 +1,6 @@
 import { Link, LinkData } from './declarations';
 import * as _ from 'lodash';
+import { throwError } from 'rxjs';
 
 /**
  *  Identifies resource classes.
@@ -24,7 +25,7 @@ export abstract class ResourceIdentifiable {
 
     const relationLink = this._links[relationName];
     if (_.isEmpty(relationLink) || _.isEmpty(relationLink.href)) {
-      throw Error(`No resource relation found`);
+      throw Error('No resource relation found');
     }
 
     return relationLink;

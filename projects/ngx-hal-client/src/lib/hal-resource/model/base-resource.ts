@@ -28,7 +28,7 @@ export abstract class BaseResource extends ResourceIdentifiable {
                                              // isCacheActive: boolean = true
   ): Observable<T> {
     const relationLink = this.getRelationLink(relationName);
-    const url = relationLink.templated ? UrlUtils.removeUrlTemplateVars(relationLink.href) : relationLink.href;
+    const url = relationLink.templated ? UrlUtils.removeTemplateParams(relationLink.href) : relationLink.href;
     const httpParams = UrlUtils.convertToHttpParams(options);
 
     return getResourceHttpService().get(url, {params: httpParams}) as Observable<T>;
@@ -48,7 +48,7 @@ export abstract class BaseResource extends ResourceIdentifiable {
                                                                           // isCacheActive: boolean = true
   ): Observable<T> {
     const relationLink = this.getRelationLink(relationName);
-    const url = relationLink.templated ? UrlUtils.removeUrlTemplateVars(relationLink.href) : relationLink.href;
+    const url = relationLink.templated ? UrlUtils.removeTemplateParams(relationLink.href) : relationLink.href;
     const httpParams = UrlUtils.convertToHttpParams(options);
 
     return getCollectionResourceHttpService().get(url, {params: httpParams}) as Observable<T>;
@@ -62,7 +62,6 @@ export abstract class BaseResource extends ResourceIdentifiable {
    *        if options didn't contains {@link PageParam} then will be used default page params.
    * @throws error if no link is found by passed relation name
    */
-  // TODO: проверить, что будет если вернётся не page
   public getRelatedPage<T extends PagedCollectionResource<BaseResource>>(relationName: string,
                                                                          options?: PagedGetOption
                                                                          // embedded?: string,
@@ -70,7 +69,7 @@ export abstract class BaseResource extends ResourceIdentifiable {
                                                                          // isCacheActive: boolean = true
   ): Observable<T> {
     const relationLink = this.getRelationLink(relationName);
-    const uri = relationLink.templated ? UrlUtils.removeUrlTemplateVars(relationLink.href) : relationLink.href;
+    const uri = relationLink.templated ? UrlUtils.removeTemplateParams(relationLink.href) : relationLink.href;
     const httpParams = UrlUtils.convertToHttpParams(options);
 
     return getPagedCollectionResourceHttpService().get(uri, {params: httpParams}) as Observable<T>;
@@ -89,7 +88,7 @@ export abstract class BaseResource extends ResourceIdentifiable {
                       requestBody: RequestBody<any>,
                       options?: RequestOption): Observable<any> {
     const relationLink = this.getRelationLink(relationName);
-    const url = relationLink.templated ? UrlUtils.removeUrlTemplateVars(relationLink.href) : relationLink.href;
+    const url = relationLink.templated ? UrlUtils.fillTemplateParams(relationLink.href, options?.templateParams) : relationLink.href;
     const httpParams = UrlUtils.convertToHttpParams({params: options?.params});
     const body = ResourceUtils.resolveValues(requestBody);
     const observe = options?.observe ? options.observe : 'response';
@@ -111,7 +110,7 @@ export abstract class BaseResource extends ResourceIdentifiable {
                        requestBody: RequestBody<any>,
                        options?: RequestOption): Observable<any> {
     const relationLink = this.getRelationLink(relationName);
-    const url = relationLink.templated ? UrlUtils.removeUrlTemplateVars(relationLink.href) : relationLink.href;
+    const url = relationLink.templated ? UrlUtils.fillTemplateParams(relationLink.href, options?.templateParams) : relationLink.href;
     const httpParams = UrlUtils.convertToHttpParams({params: options?.params});
     const body = ResourceUtils.resolveValues(requestBody);
     const observe = options?.observe ? options.observe : 'response';
@@ -133,7 +132,7 @@ export abstract class BaseResource extends ResourceIdentifiable {
                      requestBody: RequestBody<any>,
                      options?: RequestOption): Observable<any> {
     const relationLink = this.getRelationLink(relationName);
-    const url = relationLink.templated ? UrlUtils.removeUrlTemplateVars(relationLink.href) : relationLink.href;
+    const url = relationLink.templated ? UrlUtils.fillTemplateParams(relationLink.href, options?.templateParams) : relationLink.href;
     const httpParams = UrlUtils.convertToHttpParams({params: options?.params});
     const body = ResourceUtils.resolveValues(requestBody);
     const observe = options?.observe ? options.observe : 'response';

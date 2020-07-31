@@ -87,7 +87,7 @@ export class PagedCollectionResourceHttpService<T extends PagedCollectionResourc
    * @param option (optional) options that applied to the request
    */
   public getResourcePage(resourceName: string, query?: string, option?: PagedGetOption): Observable<T> {
-    const url = UrlUtils.removeUrlTemplateVars(UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName))
+    const url = UrlUtils.removeTemplateParams(UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName))
       .concat(query ? query : '');
     if (_.isEmpty(option.page)) {
       option.page = PagedCollectionResourceHttpService.DEFAULT_PAGE;
@@ -105,7 +105,7 @@ export class PagedCollectionResourceHttpService<T extends PagedCollectionResourc
    * @param option (optional) options that applied to the request
    */
   public search(resourceName: string, searchQuery: string, option: PagedGetOption): Observable<T> {
-    const url = UrlUtils.removeUrlTemplateVars(
+    const url = UrlUtils.removeTemplateParams(
       UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName)).concat('/search/' + searchQuery);
     if (_.isEmpty(option) || _.isEmpty(option.page)) {
       option.page = PagedCollectionResourceHttpService.DEFAULT_PAGE;

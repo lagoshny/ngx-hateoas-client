@@ -3,7 +3,7 @@ import { isResource } from '../hal-resource/model/resource-type';
 import * as _ from 'lodash';
 import { Resource } from '../hal-resource/model/resource';
 import uriTemplates from 'uri-templates';
-import { PagedGetOption, RequestParam } from '../hal-resource/model/declarations';
+import { GetOption, PagedGetOption, Sort } from '../hal-resource/model/declarations';
 
 export class UrlUtils {
 
@@ -18,6 +18,7 @@ export class UrlUtils {
     if (_.isEmpty(options)) {
       return resultParams;
     }
+    UrlUtils.checkParams(options);
 
     if (_.isObject(options.params) && !_.isEmpty(options.params)) {
       for (const [key, value] of Object.entries(options.params)) {
@@ -26,12 +27,6 @@ export class UrlUtils {
             // Append resource as resource link
             resultParams = resultParams.append(key, (value as Resource).getSelfLinkHref());
           } else {
-            if (key === 'projection') {
-              throw Error('You should pass projection param in projection object key, not with request params!');
-            }
-            if (key === 'page' || key === 'size' || key === 'sort') {
-              throw Error('You should pass page params in page object key, not with request params!');
-            }
             // Else append simple param as is
             resultParams = resultParams.append(key, value.toString());
           }
@@ -42,11 +37,7 @@ export class UrlUtils {
     if (!_.isEmpty(options.page)) {
       resultParams = resultParams.append('page', _.toString(options.page.page));
       resultParams = resultParams.append('size', _.toString(options.page.size));
-      if (!_.isEmpty(options.page.sort)) {
-        for (const [sortPath, sortOrder] of Object.entries(options.page.sort)) {
-          resultParams = resultParams.append('sort', `${ sortPath },${ sortOrder }`);
-        }
-      }
+      resultParams = UrlUtils.generateSortParams(options.page.sort, resultParams);
     }
 
     if (!_.isNil(options.projection)) {
@@ -80,13 +71,51 @@ export class UrlUtils {
   }
 
   /**
-   * Fill url template params..
+   * Fill url template params.
    *
    * @param url to be filled
-   * @param templateParams to fill url
+   * @param options contains params to apply to result url
    */
-  public static fillTemplateParams(url: string, templateParams: object): string {
-    return uriTemplates(url).fill(_.isNil(templateParams) ? {} : templateParams);
+  public static fillTemplateParams(url: string, options: PagedGetOption): string {
+    UrlUtils.checkParams(options);
+
+    const paramsWithoutSortParam = {
+      ...options,
+      ...options?.params,
+      ...options?.page,
+      /* Sets sort to null because sort is object and should be applied as multi params with sort name
+         for each sort object property, but uriTemplates can't do that and we need to do it manually */
+      sort: null
+    };
+
+    const resultUrl = uriTemplates(url).fill(_.isNil(paramsWithoutSortParam) ? {} : paramsWithoutSortParam);
+    if (options?.page) {
+      const sortParams = UrlUtils.generateSortParams(options.page.sort);
+      return resultUrl.concat(resultUrl.includes('?') ? '&' : '').concat(sortParams.toString());
+    }
+    return resultUrl;
   }
 
+  private static generateSortParams(sort: Sort, httpParams?: HttpParams) {
+    let resultParams = httpParams ? httpParams : new HttpParams();
+    if (!_.isEmpty(sort)) {
+      for (const [sortPath, sortOrder] of Object.entries(sort)) {
+        resultParams = resultParams.append('sort', `${ sortPath },${ sortOrder }`);
+      }
+    }
+
+    return resultParams;
+  }
+
+  private static checkParams(options: GetOption): void {
+    if (_.isEmpty(options) || _.isEmpty(options.params)) {
+      return;
+    }
+    if ('projection' in options.params) {
+      throw Error('Please, pass projection param in projection object key, not with params object!');
+    }
+    if ('page' in options.params || 'size' in options.params || 'sort' in options.params) {
+      throw Error('Please, pass page params in page object key, not with params object!');
+    }
+  }
 }

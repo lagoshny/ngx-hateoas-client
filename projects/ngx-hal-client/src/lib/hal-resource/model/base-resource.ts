@@ -5,7 +5,7 @@ import { ResourceIdentifiable } from './resource-identifiable';
 import { CollectionResource } from './collection-resource';
 import { getCollectionResourceHttpService } from '../service/collection-resource-http.service';
 import { GetOption, PagedGetOption, RequestBody, RequestOption } from './declarations';
-import { HttpResponse } from '@angular/common/http';
+import { HttpParams, HttpResponse } from '@angular/common/http';
 import { getPagedCollectionResourceHttpService } from '../service/paged-collection-resource-http.service';
 import { PagedCollectionResource } from './paged-collection-resource';
 import { ResourceUtils } from '../../util/resource.utils';
@@ -28,10 +28,14 @@ export abstract class BaseResource extends ResourceIdentifiable {
                                              // isCacheActive: boolean = true
   ): Observable<T> {
     const relationLink = this.getRelationLink(relationName);
-    const url = relationLink.templated ? UrlUtils.removeTemplateParams(relationLink.href) : relationLink.href;
-    const httpParams = UrlUtils.convertToHttpParams(options);
+    const url = relationLink.templated
+      ? UrlUtils.fillTemplateParams(relationLink.href, options)
+      : relationLink.href;
 
-    return getResourceHttpService().get(url, {params: httpParams}) as Observable<T>;
+    return getResourceHttpService().get(url, {
+        params: relationLink.templated ? new HttpParams() : UrlUtils.convertToHttpParams(options)
+      }
+    ) as Observable<T>;
   }
 
   /**
@@ -48,10 +52,11 @@ export abstract class BaseResource extends ResourceIdentifiable {
                                                                           // isCacheActive: boolean = true
   ): Observable<T> {
     const relationLink = this.getRelationLink(relationName);
-    const url = relationLink.templated ? UrlUtils.removeTemplateParams(relationLink.href) : relationLink.href;
-    const httpParams = UrlUtils.convertToHttpParams(options);
+    const url = relationLink.templated ? UrlUtils.fillTemplateParams(relationLink.href, options) : relationLink.href;
 
-    return getCollectionResourceHttpService().get(url, {params: httpParams}) as Observable<T>;
+    return getCollectionResourceHttpService().get(url, {
+      params: relationLink.templated ? new HttpParams() : UrlUtils.convertToHttpParams(options)
+    }) as Observable<T>;
   }
 
   /**
@@ -69,14 +74,17 @@ export abstract class BaseResource extends ResourceIdentifiable {
                                                                          // isCacheActive: boolean = true
   ): Observable<T> {
     const relationLink = this.getRelationLink(relationName);
-    const uri = relationLink.templated ? UrlUtils.removeTemplateParams(relationLink.href) : relationLink.href;
-    const httpParams = UrlUtils.convertToHttpParams(options);
+    const url = relationLink.templated
+      ? UrlUtils.fillTemplateParams(relationLink.href, options)
+      : relationLink.href;
 
-    return getPagedCollectionResourceHttpService().get(uri, {params: httpParams}) as Observable<T>;
+    return getPagedCollectionResourceHttpService().get(url, {
+      params: relationLink.templated ? new HttpParams() : UrlUtils.convertToHttpParams(options)
+    }) as Observable<T>;
   }
 
   /**
-   *  Perform post request to the relation with the body and url params.
+   *  Perform POST request to the relation with the body and url params.
    *  By default return {@link HttpResponse<any>} if you want change it, pass observe type in options.
    *
    * @param relationName used to get the specific relation link
@@ -88,16 +96,17 @@ export abstract class BaseResource extends ResourceIdentifiable {
                       requestBody: RequestBody<any>,
                       options?: RequestOption): Observable<any> {
     const relationLink = this.getRelationLink(relationName);
-    const url = relationLink.templated ? UrlUtils.fillTemplateParams(relationLink.href, options?.templateParams) : relationLink.href;
-    const httpParams = UrlUtils.convertToHttpParams({params: options?.params});
-    const body = ResourceUtils.resolveValues(requestBody);
-    const observe = options?.observe ? options.observe : 'response';
+    const url = relationLink.templated ? UrlUtils.fillTemplateParams(relationLink.href, options) : relationLink.href;
 
-    return getResourceHttpService().post(url, body, {observe, params: httpParams});
+    return getResourceHttpService().post(url, ResourceUtils.resolveValues(requestBody),
+      {
+        observe: options?.observe ? options.observe : 'body',
+        params: relationLink.templated ? new HttpParams() : UrlUtils.convertToHttpParams(options)
+      });
   }
 
   /**
-   * Perform patch request to relation with body and url params.
+   * Perform PATCH request to relation with body and url params.
    * By default return {@link HttpResponse<any>} if you want change it, pass observe type in options.
    *
    * @param relationName used to get the specific relation link
@@ -110,16 +119,17 @@ export abstract class BaseResource extends ResourceIdentifiable {
                        requestBody: RequestBody<any>,
                        options?: RequestOption): Observable<any> {
     const relationLink = this.getRelationLink(relationName);
-    const url = relationLink.templated ? UrlUtils.fillTemplateParams(relationLink.href, options?.templateParams) : relationLink.href;
-    const httpParams = UrlUtils.convertToHttpParams({params: options?.params});
-    const body = ResourceUtils.resolveValues(requestBody);
-    const observe = options?.observe ? options.observe : 'response';
+    const url = relationLink.templated ? UrlUtils.fillTemplateParams(relationLink.href, options) : relationLink.href;
 
-    return getResourceHttpService().patch(url, body, {observe, params: httpParams});
+    return getResourceHttpService().patch(url, ResourceUtils.resolveValues(requestBody),
+      {
+        observe: options?.observe ? options.observe : 'body',
+        params: relationLink.templated ? new HttpParams() : UrlUtils.convertToHttpParams(options)
+      });
   }
 
   /**
-   * Perform put request to relation with body and url params.
+   * Perform PUT request to relation with body and url params.
    * By default return {@link HttpResponse<any>} if you want change it, pass observe type in options.
    *
    * @param relationName used to get the specific relation link
@@ -132,12 +142,13 @@ export abstract class BaseResource extends ResourceIdentifiable {
                      requestBody: RequestBody<any>,
                      options?: RequestOption): Observable<any> {
     const relationLink = this.getRelationLink(relationName);
-    const url = relationLink.templated ? UrlUtils.fillTemplateParams(relationLink.href, options?.templateParams) : relationLink.href;
-    const httpParams = UrlUtils.convertToHttpParams({params: options?.params});
-    const body = ResourceUtils.resolveValues(requestBody);
-    const observe = options?.observe ? options.observe : 'response';
+    const url = relationLink.templated ? UrlUtils.fillTemplateParams(relationLink.href, options) : relationLink.href;
 
-    return getResourceHttpService().put(url, body, {observe, params: httpParams});
+    return getResourceHttpService().put(url, ResourceUtils.resolveValues(requestBody),
+      {
+        observe: options?.observe ? options.observe : 'body',
+        params: relationLink.templated ? new HttpParams() : UrlUtils.convertToHttpParams(options)
+      });
   }
 
 }

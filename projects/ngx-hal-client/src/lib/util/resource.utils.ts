@@ -6,6 +6,7 @@ import { Include, Link, PageData, RequestBody } from '../hal-resource/model/decl
 import * as _ from 'lodash';
 import { Resource } from '../hal-resource/model/resource';
 import { EmbeddedResource } from '../hal-resource/model/embedded-resource';
+import { UrlUtils } from './url.utils';
 
 export class ResourceUtils {
 
@@ -93,6 +94,9 @@ export class ResourceUtils {
    * @param requestBody that contains the body directly and optional body values option {@link ValuesOption}
    */
   public static resolveValues(requestBody: RequestBody<any>): any {
+    if (_.isEmpty(requestBody)) {
+      return null;
+    }
     const body = requestBody.body;
     if (!_.isObject(body)) {
       return body;
@@ -155,7 +159,7 @@ export class ResourceUtils {
     const selfLink = resourceLinks.self.href;
 
     for (const link of Object.keys(resourceLinks)) {
-      if (link !== 'self' && resourceLinks[link].href === selfLink) {
+      if (link !== 'self' && UrlUtils.removeTemplateParams(resourceLinks[link].href) === selfLink) {
         return _.upperFirst(link);
       }
     }

@@ -4,6 +4,7 @@ import { HttpHeaders, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import * as _ from 'lodash';
 import { ResourceUtils } from '../../util/resource.utils';
+import { UrlUtils } from '../../util/url.utils';
 
 /**
  * Resource class.
@@ -42,9 +43,10 @@ export class Resource extends BaseResource {
    */
   public addRelation<T extends Resource>(relationName: string, entity: T): Observable<HttpResponse<any>> {
     const relationLink = this.getRelationLink(relationName);
+    const url = relationLink.templated ? UrlUtils.removeTemplateParams(relationLink.href) : relationLink.href;
     const resource = ResourceUtils.initResource(entity) as Resource;
 
-    return getResourceHttpService().post(relationLink.href, resource.getSelfLinkHref(), {
+    return getResourceHttpService().post(url, resource.getSelfLinkHref(), {
       observe: 'response',
       headers: new HttpHeaders({'Content-Type': 'text/uri-list'})
     });
@@ -59,9 +61,10 @@ export class Resource extends BaseResource {
    */
   public bindRelation<T extends Resource>(relationName: string, entity: T): Observable<HttpResponse<any>> {
     const relationLink = this.getRelationLink(relationName);
+    const url = relationLink.templated ? UrlUtils.removeTemplateParams(relationLink.href) : relationLink.href;
     const resource = ResourceUtils.initResource(entity) as Resource;
 
-    return getResourceHttpService().put(relationLink.href, resource.getSelfLinkHref(), {
+    return getResourceHttpService().put(url, resource.getSelfLinkHref(), {
       observe: 'response',
       headers: new HttpHeaders({'Content-Type': 'text/uri-list'})
     });
@@ -78,8 +81,9 @@ export class Resource extends BaseResource {
    */
   public clearRelation<T extends Resource>(relationName: string): Observable<HttpResponse<any>> {
     const relationLink = this.getRelationLink(relationName);
+    const url = relationLink.templated ? UrlUtils.removeTemplateParams(relationLink.href) : relationLink.href;
 
-    return getResourceHttpService().put(relationLink.href, '', {
+    return getResourceHttpService().put(url, '', {
       observe: 'response',
       headers: new HttpHeaders({'Content-Type': 'text/uri-list'})
     });
@@ -97,6 +101,7 @@ export class Resource extends BaseResource {
    */
   public deleteRelation<T extends Resource>(relationName: string, entity: T): Observable<HttpResponse<any>> {
     const relationLink = this.getRelationLink(relationName);
+    const url = relationLink.templated ? UrlUtils.removeTemplateParams(relationLink.href) : relationLink.href;
     const resource = ResourceUtils.initResource(entity) as Resource;
     const resourceId = _.last(_.split(resource.getSelfLinkHref(), '/'));
 
@@ -104,7 +109,7 @@ export class Resource extends BaseResource {
       throw Error('relation should has id');
     }
 
-    return getResourceHttpService().delete(relationLink.href + '/' + resourceId, {
+    return getResourceHttpService().delete(url + '/' + resourceId, {
       observe: 'response'
     });
   }

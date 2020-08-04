@@ -41,7 +41,6 @@ export interface GetOption {
  */
 export interface RequestOption {
   params?: RequestParam;
-  templateParams?: RequestParam;
   observe?: 'body' | 'response';
 }
 

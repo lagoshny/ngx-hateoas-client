@@ -3,9 +3,9 @@ import { BaseResource } from './base-resource';
 import { Observable, throwError as observableThrowError } from 'rxjs';
 import { getPagedCollectionResourceHttpService } from '../service/paged-collection-resource-http.service';
 import { UrlUtils } from '../../util/url.utils';
-import * as _ from 'lodash';
 import { ConsoleLogger } from '../../logger/console-logger';
-import { PageData, PageParam, RequestParam } from './declarations';
+import { PageData, PageParam } from './declarations';
+import * as _ from 'lodash';
 
 /**
  * Collection of resources with pagination.
@@ -31,18 +31,16 @@ export class PagedCollectionResource<T extends BaseResource> extends CollectionR
    */
   constructor(resourceCollection: CollectionResource<T>, pageData?: PageData) {
     super(resourceCollection);
-    if (pageData) {
-      this.totalElements = pageData.page ? pageData.page.totalElements : 0;
-      this.totalPages = pageData.page ? pageData.page.totalPages : 1;
-      this.pageNumber = pageData.page ? pageData.page.number : 0;
-      this.pageSize = pageData.page ? pageData.page.size : 20;
+    this.totalElements = _.result(pageData, 'page.totalElements', 0);
+    this.totalPages = _.result(pageData, 'page.totalPages', 1);
+    this.pageSize = _.result(pageData, 'page.size', 20);
+    this.pageNumber = _.result(pageData, 'page.number', 0);
 
-      this.selfUri = pageData._links && pageData._links.self ? pageData._links.self.href : undefined;
-      this.nextUri = pageData._links && pageData._links.next ? pageData._links.next.href : undefined;
-      this.prevUri = pageData._links && pageData._links.prev ? pageData._links.prev.href : undefined;
-      this.firstUri = pageData._links && pageData._links.first ? pageData._links.first.href : undefined;
-      this.lastUri = pageData._links && pageData._links.last ? pageData._links.last.href : undefined;
-    }
+    this.selfUri = _.result(pageData, '_links.self.href', null);
+    this.nextUri = _.result(pageData, '_links.next.href', null);
+    this.prevUri = _.result(pageData, '_links.prev.href', null);
+    this.firstUri = _.result(pageData, '_links.first.href', null);
+    this.lastUri = _.result(pageData, '_links.last.href', null);
   }
 
   public hasFirst(): boolean {
@@ -86,11 +84,11 @@ export class PagedCollectionResource<T extends BaseResource> extends CollectionR
    */
   public customPage(pageParam: PageParam): Observable<PagedCollectionResource<T>> {
     ConsoleLogger.prettyInfo('Preparing custom page request');
-    if (!_.isNumber(pageParam.page) || pageParam.page < 0) {
+    if (pageParam.page < 0) {
       pageParam.page = this.pageNumber;
       ConsoleLogger.prettyInfo('Page number is not passed will be used current value', {currentPageNumber: this.pageNumber});
     }
-    if (!_.isNumber(pageParam.size) || pageParam.size < 0) {
+    if (pageParam.size < 0) {
       pageParam.size = this.pageSize;
       ConsoleLogger.prettyInfo('Page size is not passed will be used current value', {currentPageSize: this.pageSize});
     }
@@ -125,7 +123,7 @@ function doRequest<T extends BaseResource>(uri: string, pageParams?: PageParam):
 
   let httpParams;
   if (pageParams) {
-    httpParams = UrlUtils.convertToHttpParams(pageParams as RequestParam);
+    httpParams = UrlUtils.convertToHttpParams({page: pageParams});
   }
 
   return getPagedCollectionResourceHttpService()

@@ -10,6 +10,7 @@ export abstract class ResourceIdentifiable {
   /**
    * List of links related with the resource.
    */
+    // tslint:disable-next-line:variable-name
   protected _links: Link;
 
   /**

@@ -5,6 +5,7 @@ import { Observable } from 'rxjs';
 import * as _ from 'lodash';
 import { ResourceUtils } from '../../util/resource.utils';
 import { UrlUtils } from '../../util/url.utils';
+import { LinkData } from './declarations';
 
 /**
  * Resource class.
@@ -12,7 +13,16 @@ import { UrlUtils } from '../../util/url.utils';
  *
  * If you have an embedded entity then consider to use the {@link EmbeddedResource} class.
  */
+// tslint:disable:variable-name
 export class Resource extends BaseResource {
+
+  /**
+   * Resource should has self link.
+   */
+  protected _links: {
+    self: LinkData;
+    [key: string]: LinkData;
+  };
 
   /**
    * Contains information about the resource name as it appears in the resource response in an array of the links.
@@ -105,8 +115,8 @@ export class Resource extends BaseResource {
     const resource = ResourceUtils.initResource(entity) as Resource;
     const resourceId = _.last(_.split(resource.getSelfLinkHref(), '/'));
 
-    if (_.isNil(resourceId)) {
-      throw Error('relation should has id');
+    if (_.isNil(resourceId) || resourceId === '') {
+      throw Error('passed resource self link should has id');
     }
 
     return getResourceHttpService().delete(url + '/' + resourceId, {
@@ -115,7 +125,7 @@ export class Resource extends BaseResource {
   }
 
   public getSelfLinkHref(): string {
-    return this.getRelationLink('self').href;
+    return this._links.self.href;
   }
 
 }

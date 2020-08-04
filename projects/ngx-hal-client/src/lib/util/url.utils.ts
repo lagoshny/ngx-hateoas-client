@@ -118,4 +118,5 @@ export class UrlUtils {
       throw Error('Please, pass page params in page object key, not with params object!');
     }
   }
+
 }

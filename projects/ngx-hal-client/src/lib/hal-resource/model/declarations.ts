@@ -89,7 +89,13 @@ export interface Sort {
  * Page resource response from Spring application.
  */
 export interface PageData {
-  _links: {
+  page: {
+    size: number;
+    totalElements: number;
+    totalPages: number;
+    number: number;
+  };
+  _links?: {
     first: {
       href: string
     };
@@ -105,12 +111,6 @@ export interface PageData {
     last: {
       href: string
     };
-  };
-  page: {
-    size: number;
-    totalElements: number;
-    totalPages: number;
-    number: number;
   };
 }
 

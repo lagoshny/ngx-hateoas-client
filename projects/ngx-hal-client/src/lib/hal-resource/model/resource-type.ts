@@ -10,11 +10,11 @@ export function isResource(object: any): boolean {
 }
 
 export function isCollectionResource(object: any): boolean {
-  return _.isObject(object) && ('_embedded' in object);
+  return _.isObject(object) && ('_embedded' in object) && !('page' in object);
 }
 
 export function isPagedCollectionResource(object: any): boolean {
-  return isCollectionResource(object) && ('page' in object);
+  return _.isObject(object) && ('_embedded' in object) && ('page' in object);
 }
 
 /**

@@ -4,7 +4,7 @@ import { SimpleEmbeddedResource } from './resources.test';
 
 describe('EmbeddedResource', () => {
 
-  it('should not has self resource link', () => {
+  it('should has not self resource link', () => {
     try {
       const embeddedResource = new SimpleEmbeddedResource();
       embeddedResource.getRelationLink('self');

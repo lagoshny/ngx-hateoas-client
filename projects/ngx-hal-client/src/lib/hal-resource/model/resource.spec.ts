@@ -94,33 +94,6 @@ describe('Resource ADD_RELATION', () => {
     DependencyInjector.injector = TestBed;
   });
 
-  it('should throw error when try to add relation that does not exist', () => {
-    try {
-      resource.addRelation('unknown', new TestProductResource()).subscribe(() => {
-      });
-    } catch (error) {
-      expect(error.message).toBe('No resource relation found');
-    }
-  });
-
-  it('should throw error when pass relationName as null', () => {
-    try {
-      resource.addRelation(null, new TestProductResource()).subscribe(() => {
-      });
-    } catch (error) {
-      expect(error.message).toBe('No resource relation found');
-    }
-  });
-
-  it('should throw error when pass relationName as undefined', () => {
-    try {
-      resource.addRelation(undefined, new TestProductResource()).subscribe(() => {
-      });
-    } catch (error) {
-      expect(error.message).toBe('No resource relation found');
-    }
-  });
-
   it('should clear template params in TEMPLATED relation link', () => {
     resourceHttpServiceSpy.post.and.returnValue(of(new HttpResponse()));
 
@@ -185,33 +158,6 @@ describe('Resource BIND_RELATION', () => {
     ResourceUtils.useResourceType(Resource);
     resource = new TestOrderResource();
     DependencyInjector.injector = TestBed;
-  });
-
-  it('should throw error when try to add relation that does not exist', () => {
-    try {
-      resource.bindRelation('unknown', new TestProductResource()).subscribe(() => {
-      });
-    } catch (error) {
-      expect(error.message).toBe('No resource relation found');
-    }
-  });
-
-  it('should throw error when pass relationName as null', () => {
-    try {
-      resource.bindRelation(null, new TestProductResource()).subscribe(() => {
-      });
-    } catch (error) {
-      expect(error.message).toBe('No resource relation found');
-    }
-  });
-
-  it('should throw error when pass relationName as undefined', () => {
-    try {
-      resource.bindRelation(undefined, new TestProductResource()).subscribe(() => {
-      });
-    } catch (error) {
-      expect(error.message).toBe('No resource relation found');
-    }
   });
 
   it('should clear template params in TEMPLATED relation link', () => {
@@ -280,33 +226,6 @@ describe('Resource CLEAR_RELATION', () => {
     DependencyInjector.injector = TestBed;
   });
 
-  it('should throw error when try to add relation that does not exist', () => {
-    try {
-      resource.clearRelation('unknown').subscribe(() => {
-      });
-    } catch (error) {
-      expect(error.message).toBe('No resource relation found');
-    }
-  });
-
-  it('should throw error when pass relationName as null', () => {
-    try {
-      resource.clearRelation(null).subscribe(() => {
-      });
-    } catch (error) {
-      expect(error.message).toBe('No resource relation found');
-    }
-  });
-
-  it('should throw error when pass relationName as undefined', () => {
-    try {
-      resource.clearRelation(undefined).subscribe(() => {
-      });
-    } catch (error) {
-      expect(error.message).toBe('No resource relation found');
-    }
-  });
-
   it('should clear template params in TEMPLATED relation link', () => {
     resourceHttpServiceSpy.put.and.returnValue(of(new HttpResponse()));
 
@@ -371,33 +290,6 @@ describe('Resource DELETE_RELATION', () => {
     ResourceUtils.useResourceType(Resource);
     resource = new TestOrderResource();
     DependencyInjector.injector = TestBed;
-  });
-
-  it('should throw error when try to add relation that does not exist', () => {
-    try {
-      resource.deleteRelation('unknown', new TestProductResource()).subscribe(() => {
-      });
-    } catch (error) {
-      expect(error.message).toBe('No resource relation found');
-    }
-  });
-
-  it('should throw error when pass relationName as null', () => {
-    try {
-      resource.deleteRelation(null, new TestProductResource()).subscribe(() => {
-      });
-    } catch (error) {
-      expect(error.message).toBe('No resource relation found');
-    }
-  });
-
-  it('should throw error when pass relationName as undefined', () => {
-    try {
-      resource.deleteRelation(undefined, new TestProductResource()).subscribe(() => {
-      });
-    } catch (error) {
-      expect(error.message).toBe('No resource relation found');
-    }
   });
 
   it('should generate url from relation link href and passed resource id retrieved by self link href', () => {

@@ -76,33 +76,6 @@ describe('BaseResource GET_RELATION', () => {
     DependencyInjector.injector = TestBed;
   });
 
-  it('should throw error when try to get relation that does not exist', () => {
-    try {
-      baseResource.getRelation('unknown').subscribe(() => {
-      });
-    } catch (error) {
-      expect(error.message).toBe('No resource relation found');
-    }
-  });
-
-  it('should throw error when pass relationName as null', () => {
-    try {
-      baseResource.getRelation(null).subscribe(() => {
-      });
-    } catch (error) {
-      expect(error.message).toBe('No resource relation found');
-    }
-  });
-
-  it('should throw error when pass relationName as undefined', () => {
-    try {
-      baseResource.getRelation(undefined).subscribe(() => {
-      });
-    } catch (error) {
-      expect(error.message).toBe('No resource relation found');
-    }
-  });
-
   it('should fill template params in TEMPLATED link from passed params object', () => {
     resourceHttpServiceSpy.get.and.returnValue(of(new TestOrderResource()));
 
@@ -237,33 +210,6 @@ describe('BaseResource GET_RELATED_COLLECTION', () => {
     DependencyInjector.injector = TestBed;
   });
 
-  it('should throw error when try to get relation that does not exist', () => {
-    try {
-      baseResource.getRelatedCollection('unknown').subscribe(() => {
-      });
-    } catch (error) {
-      expect(error.message).toBe('No resource relation found');
-    }
-  });
-
-  it('should throw error when pass relationName as null', () => {
-    try {
-      baseResource.getRelatedCollection(null).subscribe(() => {
-      });
-    } catch (error) {
-      expect(error.message).toBe('No resource relation found');
-    }
-  });
-
-  it('should throw error when pass relationName as undefined', () => {
-    try {
-      baseResource.getRelatedCollection(undefined).subscribe(() => {
-      });
-    } catch (error) {
-      expect(error.message).toBe('No resource relation found');
-    }
-  });
-
   it('should fill template params in TEMPLATED link from passed params object', () => {
     collectionResourceHttpServiceSpy.get.and.returnValue(of(new TestOrderResource()));
 
@@ -396,33 +342,6 @@ describe('BaseResource GET_RELATED_PAGE', () => {
   beforeEach(() => {
     baseResource = new TestOrderResource();
     DependencyInjector.injector = TestBed;
-  });
-
-  it('should throw error when try to get relation that does not exist', () => {
-    try {
-      baseResource.getRelatedPage('unknown').subscribe(() => {
-      });
-    } catch (error) {
-      expect(error.message).toBe('No resource relation found');
-    }
-  });
-
-  it('should throw error when pass relationName as null', () => {
-    try {
-      baseResource.getRelatedPage(null).subscribe(() => {
-      });
-    } catch (error) {
-      expect(error.message).toBe('No resource relation found');
-    }
-  });
-
-  it('should throw error when pass relationName as undefined', () => {
-    try {
-      baseResource.getRelatedPage(undefined).subscribe(() => {
-      });
-    } catch (error) {
-      expect(error.message).toBe('No resource relation found');
-    }
   });
 
   it('should throw error when page params passed IN PARAMS OBJECT for TEMPLATED link', () => {
@@ -607,33 +526,6 @@ describe('BaseResource POST_RELATION', () => {
     DependencyInjector.injector = TestBed;
   });
 
-  it('should throw error when try to post relation that does not exist', () => {
-    try {
-      baseResource.postRelation('unknown', {body: {}}).subscribe(() => {
-      });
-    } catch (error) {
-      expect(error.message).toBe('No resource relation found');
-    }
-  });
-
-  it('should throw error when pass relationName as null', () => {
-    try {
-      baseResource.postRelation(null, {body: {}}).subscribe(() => {
-      });
-    } catch (error) {
-      expect(error.message).toBe('No resource relation found');
-    }
-  });
-
-  it('should throw error when pass relationName as undefined', () => {
-    try {
-      baseResource.postRelation(undefined, {body: {}}).subscribe(() => {
-      });
-    } catch (error) {
-      expect(error.message).toBe('No resource relation found');
-    }
-  });
-
   it('should fill url template params when url IS templated', () => {
     resourceHttpServiceSpy.post.and.returnValue(of(new TestOrderResource()));
 
@@ -743,33 +635,6 @@ describe('BaseResource PATCH_RELATION', () => {
     DependencyInjector.injector = TestBed;
   });
 
-  it('should throw error when try to patch relation that does not exist', () => {
-    try {
-      baseResource.patchRelation('unknown', {body: {}}).subscribe(() => {
-      });
-    } catch (error) {
-      expect(error.message).toBe('No resource relation found');
-    }
-  });
-
-  it('should throw error when pass relationName as null', () => {
-    try {
-      baseResource.patchRelation(null, {body: {}}).subscribe(() => {
-      });
-    } catch (error) {
-      expect(error.message).toBe('No resource relation found');
-    }
-  });
-
-  it('should throw error when pass relationName as undefined', () => {
-    try {
-      baseResource.patchRelation(undefined, {body: {}}).subscribe(() => {
-      });
-    } catch (error) {
-      expect(error.message).toBe('No resource relation found');
-    }
-  });
-
   it('should fill url template params when url IS templated', () => {
     resourceHttpServiceSpy.patch.and.returnValue(of(new TestOrderResource()));
 
@@ -877,33 +742,6 @@ describe('BaseResource PUT_RELATION', () => {
   beforeEach(() => {
     baseResource = new TestOrderResource();
     DependencyInjector.injector = TestBed;
-  });
-
-  it('should throw error when try to put relation that does not exist', () => {
-    try {
-      baseResource.putRelation('unknown', {body: {}}).subscribe(() => {
-      });
-    } catch (error) {
-      expect(error.message).toBe('No resource relation found');
-    }
-  });
-
-  it('should throw error when pass relationName as null', () => {
-    try {
-      baseResource.putRelation(null, {body: {}}).subscribe(() => {
-      });
-    } catch (error) {
-      expect(error.message).toBe('No resource relation found');
-    }
-  });
-
-  it('should throw error when pass relationName as undefined', () => {
-    try {
-      baseResource.putRelation(undefined, {body: {}}).subscribe(() => {
-      });
-    } catch (error) {
-      expect(error.message).toBe('No resource relation found');
-    }
   });
 
   it('should fill url template params when url IS templated', () => {

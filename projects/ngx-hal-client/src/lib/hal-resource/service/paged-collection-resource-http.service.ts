@@ -8,7 +8,7 @@ import { ConsoleLogger } from '../../logger/console-logger';
 import { catchError, map } from 'rxjs/operators';
 import * as _ from 'lodash';
 import { isPagedCollectionResource } from '../model/resource-type';
-import { Observable, throwError as observableThrowError } from 'rxjs';
+import { Observable, of as observableOf, throwError as observableThrowError } from 'rxjs';
 import { ResourceUtils } from '../../util/resource.utils';
 import { UrlUtils } from '../../util/url.utils';
 import { DependencyInjector } from '../../util/dependency-injector';
@@ -54,6 +54,10 @@ export class PagedCollectionResourceHttpService<T extends PagedCollectionResourc
       [param: string]: string | string[];
     }
   }): Observable<T> {
+    if (this.cacheService.hasResource(url)) {
+      return observableOf(this.cacheService.getResource());
+    }
+
     ConsoleLogger.prettyInfo('GET_PAGED_COLLECTION_RESOURCE REQUEST', {
       url,
       params: options?.params
@@ -87,14 +91,15 @@ export class PagedCollectionResourceHttpService<T extends PagedCollectionResourc
    * @param option (optional) options that applied to the request
    */
   public getResourcePage(resourceName: string, query?: string, option?: PagedGetOption): Observable<T> {
-    const url = UrlUtils.removeTemplateParams(UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName))
-      .concat(query ? query : '');
-    if (_.isEmpty(option.page)) {
-      option.page = PagedCollectionResourceHttpService.DEFAULT_PAGE;
+    if (!resourceName) {
+      return observableThrowError(new Error('resource name should be defined'));
     }
-    const httpParams = UrlUtils.convertToHttpParams(option);
-
-    return this.get(url, {params: httpParams});
+    const url = UrlUtils.removeTemplateParams(UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName, query));
+    const pagedOption = !_.isEmpty(option) ? option : {};
+    if (_.isEmpty(pagedOption.page)) {
+      pagedOption.page = PagedCollectionResourceHttpService.DEFAULT_PAGE;
+    }
+    return this.get(url, {params: UrlUtils.convertToHttpParams(pagedOption)});
   }
 
   /**
@@ -104,15 +109,20 @@ export class PagedCollectionResourceHttpService<T extends PagedCollectionResourc
    * @param searchQuery name of the search method
    * @param option (optional) options that applied to the request
    */
-  public search(resourceName: string, searchQuery: string, option: PagedGetOption): Observable<T> {
+  public search(resourceName: string, searchQuery: string, option?: PagedGetOption): Observable<T> {
+    if (!resourceName) {
+      return observableThrowError(new Error('resource name should be defined'));
+    }
+    if (!searchQuery) {
+      return observableThrowError(new Error('search query should be defined'));
+    }
     const url = UrlUtils.removeTemplateParams(
       UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName)).concat('/search/' + searchQuery);
-    if (_.isEmpty(option) || _.isEmpty(option.page)) {
-      option.page = PagedCollectionResourceHttpService.DEFAULT_PAGE;
+    const pagedOption = !_.isEmpty(option) ? option : {};
+    if (_.isEmpty(pagedOption.page)) {
+      pagedOption.page = PagedCollectionResourceHttpService.DEFAULT_PAGE;
     }
-    const httpParams = UrlUtils.convertToHttpParams(option);
-
-    return this.get(url, {params: httpParams});
+    return this.get(url, {params: UrlUtils.convertToHttpParams(pagedOption)});
   }
 
 }

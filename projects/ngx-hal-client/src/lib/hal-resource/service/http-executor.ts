@@ -1,7 +1,5 @@
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { CacheService } from './cache.service';
-import { ResourceIdentifiable } from '../model/resource-identifiable';
 import { tap } from 'rxjs/operators';
 import { throwError as observableThrowError } from 'rxjs/internal/observable/throwError';
 
@@ -56,6 +54,10 @@ export class HttpExecutor {
       [param: string]: string | string[];
     }
   }): Observable<any> {
+    if (!url) {
+      return observableThrowError(new Error('url should be defined'));
+    }
+
     let response;
     if (options?.observe === 'response') {
       response = this.httpClient.post(url, body, {...options, observe: 'response'});
@@ -88,6 +90,10 @@ export class HttpExecutor {
       [param: string]: string | string[];
     }
   }): Observable<any> {
+    if (!url) {
+      return observableThrowError(new Error('url should be defined'));
+    }
+
     // TODO: подумать об удалении значений из кеша
     if (options?.observe === 'response') {
       return this.httpClient.put(url, body, {...options, observe: 'response'});
@@ -112,6 +118,10 @@ export class HttpExecutor {
       [param: string]: string | string[];
     }
   }): Observable<any> {
+    if (!url) {
+      return observableThrowError(new Error('url should be defined'));
+    }
+
     // TODO: подумать об удалении значений из кеша
     if (options?.observe === 'response') {
       return this.httpClient.patch(url, body, {...options, observe: 'response'});
@@ -135,6 +145,10 @@ export class HttpExecutor {
       [param: string]: string | string[];
     }
   }): Observable<any> {
+    if (!url) {
+      return observableThrowError(new Error('url should be defined'));
+    }
+
     // TODO: подумать об удалении значений из кеша
     if (options?.observe === 'response') {
       return this.httpClient.delete(url, {...options, observe: 'response'});

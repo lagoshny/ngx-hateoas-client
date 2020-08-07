@@ -19,7 +19,7 @@ import { UrlUtils } from '../util/url.utils';
 @Injectable()
 export class HalResourceService<T extends Resource> {
 
-  constructor(private commonHttpService: CommonHttpService<T | CollectionResource<T> | PagedCollectionResource<T>>,
+  constructor(private commonHttpService: CommonHttpService,
               private resourceHttpService: ResourceHttpService<T>,
               private collectionResourceHttpService: CollectionResourceHttpService<CollectionResource<T>>,
               private pagedCollectionResourceHttpService: PagedCollectionResourceHttpService<PagedCollectionResource<T>>) {

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable, throwError as observableThrowError } from 'rxjs';
+import { Observable, of as observableOf, throwError as observableThrowError } from 'rxjs';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { catchError, map } from 'rxjs/operators';
 import { ResourceUtils } from '../../util/resource.utils';
@@ -8,7 +8,7 @@ import { DependencyInjector } from '../../util/dependency-injector';
 import { UrlUtils } from '../../util/url.utils';
 import * as _ from 'lodash';
 import { ConsoleLogger } from '../../logger/console-logger';
-import { isEmbeddedResource, isResource } from '../model/resource-type';
+import { isResource } from '../model/resource-type';
 import { GetOption, RequestParam } from '../model/declarations';
 import { HttpExecutor } from './http-executor';
 import { CacheService } from './cache.service';
@@ -48,6 +48,10 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
       [param: string]: string | string[];
     }
   }): Observable<T> {
+    if (this.cacheService.hasResource(url)) {
+      return observableOf(this.cacheService.getResource());
+    }
+
     ConsoleLogger.prettyInfo('GET_RESOURCE REQUEST', {
       url,
       params: options?.params
@@ -62,7 +66,7 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
             body: JSON.stringify(data, null, 4)
           });
 
-          if (!isResource(data) && !isEmbeddedResource(data)) {
+          if (!isResource(data)) {
             ConsoleLogger.error('You try to get wrong resource type, expected single resource.');
             throw Error('You try to get wrong resource type, expected single resource.');
           }
@@ -100,7 +104,7 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
           });
 
           this.cacheService.evictResource(url);
-          if (isResource(data) || isEmbeddedResource(data)) {
+          if (isResource(data)) {
             return ResourceUtils.instantiateResource(data);
           }
           return data;
@@ -132,7 +136,9 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
             params: options?.params,
             body: JSON.stringify(data, null, 4)
           });
-          if (isResource(data) || isEmbeddedResource(data)) {
+
+          this.cacheService.evictResource(url);
+          if (isResource(data)) {
             return ResourceUtils.instantiateResource(data);
           }
           return data;
@@ -166,7 +172,7 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
           });
 
           this.cacheService.evictResource(url);
-          if (isResource(data) || isEmbeddedResource(data)) {
+          if (isResource(data)) {
             return ResourceUtils.instantiateResource(data);
           }
 
@@ -200,7 +206,7 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
           });
 
           this.cacheService.evictResource(url);
-          if (isResource(data) || isEmbeddedResource(data)) {
+          if (isResource(data)) {
             return ResourceUtils.instantiateResource(data);
           }
 
@@ -218,16 +224,18 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
    * @param requestParam (optional) http request params that applied to the request
    */
   public count(resourceName: string, countQuery?: string, requestParam?: RequestParam): Observable<number> {
+    if (!resourceName) {
+      return observableThrowError(new Error('resource name should be defined'));
+    }
     const url = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName)
       .concat('/search/' + (_.isNil(countQuery) ? 'countAll' : countQuery));
-    const httpParams = UrlUtils.convertToHttpParams(requestParam);
 
     ConsoleLogger.prettyInfo('COUNT REQUEST', {
       url,
       params: requestParam
     });
 
-    return super.get(url, {params: httpParams, observe: 'body'})
+    return super.get(url, {params: UrlUtils.convertToHttpParams({params: requestParam}), observe: 'body'})
       .pipe(
         map((data: any) => {
           ConsoleLogger.prettyInfo('COUNT RESPONSE', {
@@ -235,7 +243,13 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
             params: requestParam,
             data
           });
-          return data as number;
+
+          if (_.isNil(data) || _.isNaN(_.toNumber(data))) {
+            ConsoleLogger.error(`Returned value ${data} should be number.`);
+            throw Error(`Returned value ${data} should be number.`);
+          }
+
+          return _.toNumber(data);
         }),
         catchError(error => observableThrowError(error))
       );
@@ -248,11 +262,16 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
    * @param id resource id
    * @param option (optional) options that applied to the request
    */
-  public getResource(resourceName: string, id: any, option?: GetOption): Observable<T> {
-    const uri = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName).concat('/', id);
-    const httpParams = UrlUtils.convertToHttpParams(option);
+  public getResource(resourceName: string, id: number, option?: GetOption): Observable<T> {
+    if (!resourceName) {
+      return observableThrowError(new Error('resource name should be defined'));
+    }
+    if (_.isNil(id) || id <= 0) {
+      return observableThrowError(new Error('id should be defined and great than 0'));
+    }
+    const uri = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName).concat('/', _.toString(id));
 
-    return this.get(uri, {params: httpParams});
+    return this.get(uri, {params: UrlUtils.convertToHttpParams(option)});
   }
 
   /**
@@ -262,6 +281,12 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
    * @param body resource to pass as body
    */
   public postResource(resourceName: string, body: BaseResource): Observable<T> {
+    if (!resourceName) {
+      return observableThrowError(new Error('resource name should be defined'));
+    }
+    if (_.isEmpty(body)) {
+      return observableThrowError(new Error('body should be defined'));
+    }
     const uri = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName);
 
     return this.post(uri, body, {observe: 'body'});
@@ -275,10 +300,15 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
    * @param option (optional) options that applied to the request
    */
   public search(resourceName: string, searchQuery: string, option?: GetOption): Observable<T> {
+    if (!resourceName) {
+      return observableThrowError(new Error('resource name should be defined'));
+    }
+    if (!searchQuery) {
+      return observableThrowError(new Error('search query should be defined'));
+    }
     const url = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName).concat('/search/' + searchQuery);
-    const httpParams = UrlUtils.convertToHttpParams(option);
 
-    return this.get(url, {params: httpParams});
+    return this.get(url, {params: UrlUtils.convertToHttpParams(option)});
   }
 
 }

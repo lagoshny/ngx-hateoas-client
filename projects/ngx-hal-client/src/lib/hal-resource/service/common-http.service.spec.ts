@@ -1,14 +1,13 @@
 /* tslint:disable:no-string-literal */
 import { HttpConfigService } from '../../config/http-config.service';
 import { async } from '@angular/core/testing';
-import { Resource } from '../model/resource';
 import { CommonHttpService } from './common-http.service';
 import { HttpMethod } from '../model/declarations';
 import { of } from 'rxjs';
 import { HttpParams } from '@angular/common/http';
 
 describe('CommonHttpService', () => {
-  let commonHttpService: CommonHttpService<Resource>;
+  let commonHttpService: CommonHttpService;
   let httpClientSpy: any;
   let cacheServiceSpy: any;
   let httpConfigService: HttpConfigService;
@@ -36,7 +35,7 @@ describe('CommonHttpService', () => {
     };
 
     commonHttpService =
-      new CommonHttpService<Resource>(httpClientSpy, cacheServiceSpy, httpConfigService);
+      new CommonHttpService(httpClientSpy, cacheServiceSpy, httpConfigService);
   }));
 
   it('CUSTOM_QUERY throws error when resourceName is empty', () => {

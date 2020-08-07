@@ -25,12 +25,12 @@ export function getResourceHttpService(): ResourceHttpService<BaseResource> {
  * Service to perform HTTP requests to get {@link Resource} type.
  */
 @Injectable()
-export class ResourceHttpService<T extends BaseResource> extends HttpExecutor<T> {
+export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
 
   constructor(httpClient: HttpClient,
-              cacheService: CacheService<T>,
+              public cacheService: CacheService<T>,
               private httpConfig: HttpConfigService) {
-    super(httpClient, cacheService);
+    super(httpClient);
   }
 
   /**

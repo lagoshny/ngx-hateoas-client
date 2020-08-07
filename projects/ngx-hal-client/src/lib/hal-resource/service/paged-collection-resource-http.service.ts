@@ -26,7 +26,7 @@ export function getPagedCollectionResourceHttpService(): PagedCollectionResource
  * Service to perform HTTP requests to get {@link PagedCollectionResource} type.
  */
 @Injectable()
-export class PagedCollectionResourceHttpService<T extends PagedCollectionResource<BaseResource>> extends HttpExecutor<T> {
+export class PagedCollectionResourceHttpService<T extends PagedCollectionResource<BaseResource>> extends HttpExecutor {
 
   private static readonly DEFAULT_PAGE: PageParam = {
     page: 0,
@@ -34,9 +34,9 @@ export class PagedCollectionResourceHttpService<T extends PagedCollectionResourc
   };
 
   constructor(httpClient: HttpClient,
-              cacheService: CacheService<T>,
+              public cacheService: CacheService<T>,
               private httpConfig: HttpConfigService) {
-    super(httpClient, cacheService);
+    super(httpClient);
   }
 
   /**

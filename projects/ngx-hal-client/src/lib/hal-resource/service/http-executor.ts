@@ -9,10 +9,9 @@ import { throwError as observableThrowError } from 'rxjs/internal/observable/thr
  * Base class with common logics to perform HTTP requests.
  * TODO: should manage cache?
  */
-export class HttpExecutor<T extends ResourceIdentifiable> {
+export class HttpExecutor {
 
-  constructor(protected httpClient: HttpClient,
-              protected cacheService: CacheService<T>) {
+  constructor(protected httpClient: HttpClient) {
   }
 
   /**
@@ -67,7 +66,7 @@ export class HttpExecutor<T extends ResourceIdentifiable> {
     return response.pipe(
       tap(data => {
         // TODO: подумать можно ли так сделать или не стоит
-        this.cacheService.evictResource(url);
+        // this.cacheService.evictResource(url);
         return data;
       })
     );

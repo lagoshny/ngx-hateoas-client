@@ -22,12 +22,12 @@ export function getCollectionResourceHttpService(): CollectionResourceHttpServic
  * Service to perform HTTP requests to get {@link CollectionResource} type.
  */
 @Injectable()
-export class CollectionResourceHttpService<T extends CollectionResource<BaseResource>> extends HttpExecutor<T> {
+export class CollectionResourceHttpService<T extends CollectionResource<BaseResource>> extends HttpExecutor {
 
   constructor(httpClient: HttpClient,
-              cacheService: CacheService<T>,
+              public cacheService: CacheService<T>,
               private httpConfig: HttpConfigService) {
-    super(httpClient, cacheService);
+    super(httpClient);
   }
 
   /**

@@ -17,12 +17,12 @@ import { throwError as observableThrowError } from 'rxjs/internal/observable/thr
  * Service to perform HTTP requests to get any type of the {@link Resource}, {@link PagedCollectionResource}, {@link CollectionResource}.
  */
 @Injectable()
-export class CommonHttpService<T extends ResourceIdentifiable> extends HttpExecutor<T> {
+export class CommonHttpService extends HttpExecutor {
 
   constructor(httpClient: HttpClient,
-              cacheService: CacheService<T>,
+              public cacheService: CacheService<ResourceIdentifiable>,
               private httpConfig: HttpConfigService) {
-    super(httpClient, cacheService);
+    super(httpClient);
   }
 
   /**

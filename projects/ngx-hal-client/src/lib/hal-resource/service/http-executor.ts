@@ -1,8 +1,9 @@
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { Observable, of as observableOf } from 'rxjs';
+import { Observable } from 'rxjs';
 import { CacheService } from './cache.service';
 import { ResourceIdentifiable } from '../model/resource-identifiable';
 import { tap } from 'rxjs/operators';
+import { throwError as observableThrowError } from 'rxjs/internal/observable/throwError';
 
 /**
  * Base class with common logics to perform HTTP requests.
@@ -29,9 +30,10 @@ export class HttpExecutor<T extends ResourceIdentifiable> {
       [param: string]: string | string[];
     }
   }): Observable<any> {
-    if (this.cacheService.hasResource(url)) {
-      return observableOf(this.cacheService.getResource());
+    if (!url) {
+      return observableThrowError(new Error('url should be defined'));
     }
+
     if (options?.observe === 'response') {
       return this.httpClient.get(url, {...options, observe: 'response'});
     } else {

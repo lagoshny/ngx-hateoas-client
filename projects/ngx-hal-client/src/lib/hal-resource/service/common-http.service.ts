@@ -11,6 +11,7 @@ import { map } from 'rxjs/operators';
 import { isCollectionResource, isPagedCollectionResource, isResource } from '../model/resource-type';
 import { ResourceUtils } from '../../util/resource.utils';
 import { ConsoleLogger } from '../../logger/console-logger';
+import { throwError as observableThrowError } from 'rxjs/internal/observable/throwError';
 
 /**
  * Service to perform HTTP requests to get any type of the {@link Resource}, {@link PagedCollectionResource}, {@link CollectionResource}.
@@ -37,7 +38,14 @@ export class CommonHttpService<T extends ResourceIdentifiable> extends HttpExecu
    * @param option (optional) options that applied to the request
    */
   public customQuery(resourceName: string, method: HttpMethod, query: string, body?: any, option?: PagedGetOption): any {
-    const url = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName).concat(query ? query : '');
+    if (!resourceName) {
+      return observableThrowError(new Error('resource name should be defined'));
+    }
+    if (!query) {
+      return observableThrowError(new Error('query should be defined'));
+    }
+
+    const url = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName, query);
     const httpParams = UrlUtils.convertToHttpParams(option);
     ConsoleLogger.prettyInfo(`CUSTOM_QUERY_${ method } REQUEST`, {
       url,
@@ -59,6 +67,8 @@ export class CommonHttpService<T extends ResourceIdentifiable> extends HttpExecu
       case HttpMethod.PATCH:
         result = this.patch(url, body, {params: httpParams, observe: 'body'});
         break;
+      default:
+        return observableThrowError(new Error(`allowed ony GET/POST/PUT/PATCH http methods you pass ${ method }`));
     }
 
     return result.pipe(

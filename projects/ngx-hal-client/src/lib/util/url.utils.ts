@@ -52,13 +52,14 @@ export class UrlUtils {
    *
    * @param baseUrl will be as first part as a result url
    * @param resourceName added to the base url through slash
+   * @param query (optional) if passed then adds to end of the url
    */
-  public static generateResourceUrl(baseUrl: string, resourceName: string): string {
+  public static generateResourceUrl(baseUrl: string, resourceName: string, query?: string): string {
     let url = baseUrl;
     if (!url.endsWith('/')) {
       url = url.concat('/');
     }
-    return url.concat(resourceName);
+    return url.concat(resourceName).concat(query ? `/${ query }` : '');
   }
 
   /**

@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { CacheService } from './cache.service';
 import { HttpConfigService } from '../../config/http-config.service';
-import { Observable, throwError as observableThrowError } from 'rxjs';
+import { Observable, of as observableOf, throwError as observableThrowError } from 'rxjs';
 import { ConsoleLogger } from '../../logger/console-logger';
 import { catchError, map } from 'rxjs/operators';
 import { isCollectionResource } from '../model/resource-type';
@@ -49,6 +49,9 @@ export class CollectionResourceHttpService<T extends CollectionResource<BaseReso
       url,
       params: options?.params
     });
+    if (this.cacheService.hasResource(url)) {
+      return observableOf(this.cacheService.getResource());
+    }
 
     return super.get(url, {...options, observe: 'body'})
       .pipe(
@@ -66,7 +69,6 @@ export class CollectionResourceHttpService<T extends CollectionResource<BaseReso
 
           const resource: T = ResourceUtils.instantiateCollectionResource(data);
           this.cacheService.putResource(url, resource);
-
           return resource;
         }),
         catchError(error => observableThrowError(error)));
@@ -80,7 +82,10 @@ export class CollectionResourceHttpService<T extends CollectionResource<BaseReso
    * @param option (optional) options that applied to the request
    */
   public getResourceCollection(resourceName: string, query?: string, option?: GetOption): Observable<T> {
-    const url = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName).concat(query ? query : '');
+    if (!resourceName) {
+      return observableThrowError(new Error('resource name should be defined'));
+    }
+    const url = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName, query);
     const httpParams = UrlUtils.convertToHttpParams(option);
 
     return this.get(url, {params: httpParams});
@@ -94,6 +99,12 @@ export class CollectionResourceHttpService<T extends CollectionResource<BaseReso
    * @param option (optional) options that applied to the request
    */
   public search(resourceName: string, searchQuery: string, option?: GetOption): Observable<T> {
+    if (!resourceName) {
+      return observableThrowError(new Error('resource name should be defined'));
+    }
+    if (!searchQuery) {
+      return observableThrowError(new Error('search query should be defined'));
+    }
     const url = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName).concat('/search/' + searchQuery);
     const httpParams = UrlUtils.convertToHttpParams(option);
 

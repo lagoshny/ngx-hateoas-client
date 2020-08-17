@@ -6,17 +6,17 @@ import { BaseResource } from './base-resource';
  *
  * If you want to have a pagination {@see PagedResourceCollection}.
  */
-export class CollectionResource<T extends BaseResource> extends ResourceIdentifiable {
+export class ResourceCollection<T extends BaseResource> extends ResourceIdentifiable {
 
   public resources: Array<T> = [];
 
   /**
-   * Collection resource constructor.
+   * Resource collection constructor.
    * If passed param then it used as a copy constructor.
    *
-   * @param that (optional) another collection resource using to copy data from to current object
+   * @param that (optional) another resource collection using to copy data from to current object
    */
-  constructor(that?: CollectionResource<T>) {
+  constructor(that?: ResourceCollection<T>) {
     super();
     if (that) {
       this._links = that._links;

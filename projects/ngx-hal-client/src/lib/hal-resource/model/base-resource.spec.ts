@@ -3,11 +3,11 @@ import { async, TestBed } from '@angular/core/testing';
 import { of } from 'rxjs';
 import { ResourceHttpService } from '../service/resource-http.service';
 import { DependencyInjector } from '../../util/dependency-injector';
-import { PagedCollectionResourceHttpService } from '../service/paged-collection-resource-http.service';
-import { PagedCollectionResource } from './paged-collection-resource';
-import { CollectionResource } from './collection-resource';
+import { PagedResourceCollectionHttpService } from '../service/paged-resource-collection-http.service';
+import { PagedResourceCollection } from './paged-resource-collection';
+import { ResourceCollection } from './resource-collection';
 import { HttpParams } from '@angular/common/http';
-import { CollectionResourceHttpService } from '../service/collection-resource-http.service';
+import { ResourceCollectionHttpService } from '../service/resource-collection-http.service';
 
 class TestProductResource extends BaseResource {
   // tslint:disable-next-line:variable-name
@@ -191,16 +191,16 @@ describe('BaseResource GET_RELATION', () => {
 
 describe('BaseResource GET_RELATED_COLLECTION', () => {
   let baseResource: BaseResource;
-  let collectionResourceHttpServiceSpy: any;
+  let resourceCollectionHttpServiceSpy: any;
 
   beforeEach(async(() => {
-    collectionResourceHttpServiceSpy = {
+    resourceCollectionHttpServiceSpy = {
       get: jasmine.createSpy('get')
     };
 
     TestBed.configureTestingModule({
       providers: [
-        {provide: CollectionResourceHttpService, useValue: collectionResourceHttpServiceSpy}
+        {provide: ResourceCollectionHttpService, useValue: resourceCollectionHttpServiceSpy}
       ]
     }).compileComponents();
   }));
@@ -211,14 +211,14 @@ describe('BaseResource GET_RELATED_COLLECTION', () => {
   });
 
   it('should fill template params in TEMPLATED link from passed params object', () => {
-    collectionResourceHttpServiceSpy.get.and.returnValue(of(new TestOrderResource()));
+    resourceCollectionHttpServiceSpy.get.and.returnValue(of(new TestOrderResource()));
 
     baseResource.getRelatedCollection('paymentType', {
       params: {
         paymentId: 10
       }
     }).subscribe(() => {
-      const resultResourceUrl = collectionResourceHttpServiceSpy.get.calls.argsFor(0)[0];
+      const resultResourceUrl = resourceCollectionHttpServiceSpy.get.calls.argsFor(0)[0];
       expect(resultResourceUrl).toBe('http://localhost:8080/api/v1/order/1/payment?paymentId=10');
     });
   });
@@ -237,59 +237,59 @@ describe('BaseResource GET_RELATED_COLLECTION', () => {
   });
 
   it('should fill projection template param for TEMPLATED link', () => {
-    collectionResourceHttpServiceSpy.get.and.returnValue(of(new TestOrderResource()));
+    resourceCollectionHttpServiceSpy.get.and.returnValue(of(new TestOrderResource()));
 
     baseResource.getRelatedCollection('paymentType', {
       projection: 'paymentProjection'
     }).subscribe(() => {
-      const resultResourceUrl = collectionResourceHttpServiceSpy.get.calls.argsFor(0)[0];
+      const resultResourceUrl = resourceCollectionHttpServiceSpy.get.calls.argsFor(0)[0];
       expect(resultResourceUrl).toBe('http://localhost:8080/api/v1/order/1/payment?projection=paymentProjection');
     });
   });
 
   it('should clear template params for TEMPLATED link when passed params object IS EMPTY', () => {
-    collectionResourceHttpServiceSpy.get.and.returnValue(of(new TestOrderResource()));
+    resourceCollectionHttpServiceSpy.get.and.returnValue(of(new TestOrderResource()));
 
     baseResource.getRelatedCollection('paymentType', {}).subscribe(() => {
-      const resultResourceUrl = collectionResourceHttpServiceSpy.get.calls.argsFor(0)[0];
+      const resultResourceUrl = resourceCollectionHttpServiceSpy.get.calls.argsFor(0)[0];
       expect(resultResourceUrl).toBe('http://localhost:8080/api/v1/order/1/payment');
     });
   });
 
   it('should fill http request params for NOT TEMPLATED link from params object', () => {
-    collectionResourceHttpServiceSpy.get.and.returnValue(of(new TestOrderResource()));
+    resourceCollectionHttpServiceSpy.get.and.returnValue(of(new TestOrderResource()));
 
     baseResource.getRelatedCollection('order', {
       params: {
         orderType: 'online'
       }
     }).subscribe(() => {
-      const resultResourceUrl = collectionResourceHttpServiceSpy.get.calls.argsFor(0)[0];
+      const resultResourceUrl = resourceCollectionHttpServiceSpy.get.calls.argsFor(0)[0];
       expect(resultResourceUrl).toBe('http://localhost:8080/api/v1/order/1');
 
-      const httpParams = collectionResourceHttpServiceSpy.get.calls.argsFor(0)[1].params;
+      const httpParams = resourceCollectionHttpServiceSpy.get.calls.argsFor(0)[1].params;
       expect(httpParams.has('orderType')).toBeTrue();
       expect(httpParams.get('orderType')).toBe('online');
     });
   });
 
   it('should adds projection param in http request params for NOT TEMPLATED link', () => {
-    collectionResourceHttpServiceSpy.get.and.returnValue(of(new TestOrderResource()));
+    resourceCollectionHttpServiceSpy.get.and.returnValue(of(new TestOrderResource()));
 
     baseResource.getRelatedCollection('order', {
       projection: 'orderProjection'
     }).subscribe(() => {
-      const resultResourceUrl = collectionResourceHttpServiceSpy.get.calls.argsFor(0)[0];
+      const resultResourceUrl = resourceCollectionHttpServiceSpy.get.calls.argsFor(0)[0];
       expect(resultResourceUrl).toBe('http://localhost:8080/api/v1/order/1');
 
-      const httpParams = collectionResourceHttpServiceSpy.get.calls.argsFor(0)[1].params;
+      const httpParams = resourceCollectionHttpServiceSpy.get.calls.argsFor(0)[1].params;
       expect(httpParams.has('projection')).toBeTrue();
       expect(httpParams.get('projection')).toBe('orderProjection');
     });
   });
 
   it('should throw error when pass projection param in params object for NOT TEMPLATED link', () => {
-    collectionResourceHttpServiceSpy.get.and.returnValue(of(new TestOrderResource()));
+    resourceCollectionHttpServiceSpy.get.and.returnValue(of(new TestOrderResource()));
 
     try {
       baseResource.getRelatedCollection('order', {
@@ -304,19 +304,19 @@ describe('BaseResource GET_RELATED_COLLECTION', () => {
   });
 
   it('no errors when passed "null" value options', () => {
-    collectionResourceHttpServiceSpy.get.and.returnValue(of(new TestOrderResource()));
+    resourceCollectionHttpServiceSpy.get.and.returnValue(of(new TestOrderResource()));
 
     baseResource.getRelatedCollection('order', null).subscribe(() => {
-      const httpParams = collectionResourceHttpServiceSpy.get.calls.argsFor(0)[1].params;
+      const httpParams = resourceCollectionHttpServiceSpy.get.calls.argsFor(0)[1].params;
       expect(httpParams.keys().length).toBe(0);
     });
   });
 
   it('no errors when passed "undefined" value for options', () => {
-    collectionResourceHttpServiceSpy.get.and.returnValue(of(new TestOrderResource()));
+    resourceCollectionHttpServiceSpy.get.and.returnValue(of(new TestOrderResource()));
 
     baseResource.getRelatedCollection('order', undefined).subscribe(() => {
-      const httpParams = collectionResourceHttpServiceSpy.get.calls.argsFor(0)[1].params;
+      const httpParams = resourceCollectionHttpServiceSpy.get.calls.argsFor(0)[1].params;
       expect(httpParams.keys().length).toBe(0);
     });
   });
@@ -325,16 +325,16 @@ describe('BaseResource GET_RELATED_COLLECTION', () => {
 
 describe('BaseResource GET_RELATED_PAGE', () => {
   let baseResource: BaseResource;
-  let pagedCollectionResourceHttpServiceSpy: any;
+  let pagedResourceCollectionHttpServiceSpy: any;
 
   beforeEach(async(() => {
-    pagedCollectionResourceHttpServiceSpy = {
+    pagedResourceCollectionHttpServiceSpy = {
       get: jasmine.createSpy('get')
     };
 
     TestBed.configureTestingModule({
       providers: [
-        {provide: PagedCollectionResourceHttpService, useValue: pagedCollectionResourceHttpServiceSpy}
+        {provide: PagedResourceCollectionHttpService, useValue: pagedResourceCollectionHttpServiceSpy}
       ]
     }).compileComponents();
   }));
@@ -359,7 +359,7 @@ describe('BaseResource GET_RELATED_PAGE', () => {
   });
 
   it('should fill page params in TEMPLATED link when page params passed IN PAGE OBJECT', () => {
-    pagedCollectionResourceHttpServiceSpy.get.and.returnValue(of(new PagedCollectionResource(new CollectionResource())));
+    pagedResourceCollectionHttpServiceSpy.get.and.returnValue(of(new PagedResourceCollection(new ResourceCollection())));
 
     baseResource.getRelatedPage('product', {
       page: {
@@ -371,10 +371,10 @@ describe('BaseResource GET_RELATED_PAGE', () => {
         }
       }
     }).subscribe(() => {
-      const resultResourceUrl = pagedCollectionResourceHttpServiceSpy.get.calls.argsFor(0)[0];
+      const resultResourceUrl = pagedResourceCollectionHttpServiceSpy.get.calls.argsFor(0)[0];
       expect(resultResourceUrl).toBe('http://localhost:8080/api/v1/order/1/products?page=1&size=2&sort=abc,ASC&sort=cde,DESC');
 
-      const httpParams = pagedCollectionResourceHttpServiceSpy.get.calls.argsFor(0)[1].params;
+      const httpParams = pagedResourceCollectionHttpServiceSpy.get.calls.argsFor(0)[1].params;
       expect(httpParams.keys().length).toBe(0);
     });
   });
@@ -393,21 +393,21 @@ describe('BaseResource GET_RELATED_PAGE', () => {
   });
 
   it('should fill projection param in TEMPLATED link when it passed IN projection property', () => {
-    pagedCollectionResourceHttpServiceSpy.get.and.returnValue(of(new PagedCollectionResource(new CollectionResource())));
+    pagedResourceCollectionHttpServiceSpy.get.and.returnValue(of(new PagedResourceCollection(new ResourceCollection())));
 
     baseResource.getRelatedPage('product', {
       projection: 'productProjection'
     }).subscribe(() => {
-      const resultResourceUrl = pagedCollectionResourceHttpServiceSpy.get.calls.argsFor(0)[0];
+      const resultResourceUrl = pagedResourceCollectionHttpServiceSpy.get.calls.argsFor(0)[0];
       expect(resultResourceUrl).toBe('http://localhost:8080/api/v1/order/1/products?projection=productProjection');
 
-      const httpParams = pagedCollectionResourceHttpServiceSpy.get.calls.argsFor(0)[1].params;
+      const httpParams = pagedResourceCollectionHttpServiceSpy.get.calls.argsFor(0)[1].params;
       expect(httpParams.keys().length).toBe(0);
     });
   });
 
   it('should pass page params as http request params when link is NOT TEMPLATED', () => {
-    pagedCollectionResourceHttpServiceSpy.get.and.returnValue(of(new PagedCollectionResource(new CollectionResource())));
+    pagedResourceCollectionHttpServiceSpy.get.and.returnValue(of(new PagedResourceCollection(new ResourceCollection())));
 
     baseResource.getRelatedPage('magazine', {
       page: {
@@ -419,10 +419,10 @@ describe('BaseResource GET_RELATED_PAGE', () => {
         }
       }
     }).subscribe(() => {
-      const resultResourceUrl = pagedCollectionResourceHttpServiceSpy.get.calls.argsFor(0)[0];
+      const resultResourceUrl = pagedResourceCollectionHttpServiceSpy.get.calls.argsFor(0)[0];
       expect(resultResourceUrl).toBe('http://localhost:8080/api/v1/order/1/magazine');
 
-      const httpParams = pagedCollectionResourceHttpServiceSpy.get.calls.argsFor(0)[1].params;
+      const httpParams = pagedResourceCollectionHttpServiceSpy.get.calls.argsFor(0)[1].params;
       expect(httpParams.has('size')).toBeTrue();
       expect(httpParams.get('size')).toBe('10');
       expect(httpParams.has('page')).toBeTrue();
@@ -461,35 +461,35 @@ describe('BaseResource GET_RELATED_PAGE', () => {
   });
 
   it('should adds projection param to http request params for NOT TEMPLATED link', () => {
-    pagedCollectionResourceHttpServiceSpy.get.and.returnValue(of(new PagedCollectionResource(new CollectionResource())));
+    pagedResourceCollectionHttpServiceSpy.get.and.returnValue(of(new PagedResourceCollection(new ResourceCollection())));
 
     baseResource.getRelatedPage('magazine', {
       projection: 'magazineProjection'
     }).subscribe(() => {
-      const resultResourceUrl = pagedCollectionResourceHttpServiceSpy.get.calls.argsFor(0)[0];
+      const resultResourceUrl = pagedResourceCollectionHttpServiceSpy.get.calls.argsFor(0)[0];
       expect(resultResourceUrl).toBe('http://localhost:8080/api/v1/order/1/magazine');
 
-      const httpParams = pagedCollectionResourceHttpServiceSpy.get.calls.argsFor(0)[1].params;
+      const httpParams = pagedResourceCollectionHttpServiceSpy.get.calls.argsFor(0)[1].params;
       expect(httpParams.has('projection')).toBeTrue();
       expect(httpParams.get('projection')).toBe('magazineProjection');
     });
   });
 
   it('no errors when passed "null" value options', () => {
-    pagedCollectionResourceHttpServiceSpy.get.and.returnValue(of(new PagedCollectionResource(new CollectionResource())));
+    pagedResourceCollectionHttpServiceSpy.get.and.returnValue(of(new PagedResourceCollection(new ResourceCollection())));
 
     baseResource.getRelatedPage('updateStatus', null).subscribe(() => {
-      const options = pagedCollectionResourceHttpServiceSpy.get.calls.argsFor(0)[1];
+      const options = pagedResourceCollectionHttpServiceSpy.get.calls.argsFor(0)[1];
       expect(options).toBeDefined();
       expect((options.params as HttpParams).keys().length).toBe(0);
     });
   });
 
   it('no errors when passed "undefined" value for options', () => {
-    pagedCollectionResourceHttpServiceSpy.get.and.returnValue(of(new PagedCollectionResource(new CollectionResource())));
+    pagedResourceCollectionHttpServiceSpy.get.and.returnValue(of(new PagedResourceCollection(new ResourceCollection())));
 
     baseResource.getRelatedPage('updateStatus', undefined).subscribe(() => {
-      const options = pagedCollectionResourceHttpServiceSpy.get.calls.argsFor(0)[1];
+      const options = pagedResourceCollectionHttpServiceSpy.get.calls.argsFor(0)[1];
       expect(options).toBeDefined();
       expect((options.params as HttpParams).keys().length).toBe(0);
     });

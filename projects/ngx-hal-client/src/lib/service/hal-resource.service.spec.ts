@@ -30,8 +30,8 @@ describe('HalResourceService', () => {
   let halResourceService: HalResourceService<Resource>;
   let commonHttpServiceSpy: any;
   let resourceHttpServiceSpy: any;
-  let collectionResourceHttpServiceSpy: any;
-  let pagedCollectionResourceHttpServiceSpy: any;
+  let resourceCollectionHttpServiceSpy: any;
+  let pagedResourceCollectionHttpServiceSpy: any;
 
   beforeEach(async(() => {
     commonHttpServiceSpy = {
@@ -43,33 +43,33 @@ describe('HalResourceService', () => {
       patch: jasmine.createSpy('patch'),
       delete: jasmine.createSpy('delete')
     };
-    collectionResourceHttpServiceSpy = {
+    resourceCollectionHttpServiceSpy = {
       getResourceCollection: jasmine.createSpy('getResourceCollection')
     };
-    pagedCollectionResourceHttpServiceSpy = {
+    pagedResourceCollectionHttpServiceSpy = {
       getResourcePage: jasmine.createSpy('getResourcePage')
     };
 
     halResourceService =
       new HalResourceService<Resource>(commonHttpServiceSpy, resourceHttpServiceSpy,
-        collectionResourceHttpServiceSpy, pagedCollectionResourceHttpServiceSpy);
+        resourceCollectionHttpServiceSpy, pagedResourceCollectionHttpServiceSpy);
     ResourceUtils.useResourceType(Resource);
   }));
 
   it('GET_ALL should invoke getResourceCollection with query null param', () => {
-    collectionResourceHttpServiceSpy.getResourceCollection.and.returnValue(of(anything()));
+    resourceCollectionHttpServiceSpy.getResourceCollection.and.returnValue(of(anything()));
 
     halResourceService.getAll('test').subscribe(() => {
-      const query = collectionResourceHttpServiceSpy.getResourceCollection.calls.argsFor(0)[1];
+      const query = resourceCollectionHttpServiceSpy.getResourceCollection.calls.argsFor(0)[1];
       expect(query).toBeNull();
     });
   });
 
   it('GET_ALL_PAGE should invoke getResourcePage with query null param', () => {
-    pagedCollectionResourceHttpServiceSpy.getResourcePage.and.returnValue(of(anything()));
+    pagedResourceCollectionHttpServiceSpy.getResourcePage.and.returnValue(of(anything()));
 
     halResourceService.getAllPage('test').subscribe(() => {
-      const query = pagedCollectionResourceHttpServiceSpy.getResourcePage.calls.argsFor(0)[1];
+      const query = pagedResourceCollectionHttpServiceSpy.getResourcePage.calls.argsFor(0)[1];
       expect(query).toBeNull();
     });
   });

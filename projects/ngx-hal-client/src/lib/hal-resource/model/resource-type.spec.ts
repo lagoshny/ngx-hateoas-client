@@ -1,5 +1,5 @@
-import { isCollectionResource, isEmbeddedResource, isPagedCollectionResource, isResource } from './resource-type';
-import { rawCollectionResource, rawEmbeddedResource, rawPagedCollectionResource, rawResource } from './resources.test';
+import { isResourceCollection, isEmbeddedResource, isPagedResourceCollection, isResource } from './resource-type';
+import { rawResourceCollection, rawEmbeddedResource, rawPagedResourceCollection, rawResource } from './resources.test';
 
 describe('ResourceType', () => {
 
@@ -48,12 +48,12 @@ describe('ResourceType', () => {
     expect(isEmbeddedResource(rawResource)).toBeFalse();
   });
 
-  it('collection resource object IS NOT EMBEDDED_RESOURCE', () => {
-    expect(isEmbeddedResource(rawCollectionResource)).toBeFalse();
+  it('resource collection object IS NOT EMBEDDED_RESOURCE', () => {
+    expect(isEmbeddedResource(rawResourceCollection)).toBeFalse();
   });
 
-  it('paged collection resource object IS NOT EMBEDDED_RESOURCE', () => {
-    expect(isEmbeddedResource(rawPagedCollectionResource)).toBeFalse();
+  it('paged resource collection object IS NOT EMBEDDED_RESOURCE', () => {
+    expect(isEmbeddedResource(rawPagedResourceCollection)).toBeFalse();
   });
 
   it('object IS RESOURCE with _links object WITH self link', () => {
@@ -102,39 +102,39 @@ describe('ResourceType', () => {
     expect(isResource(rawEmbeddedResource)).toBeFalse();
   });
 
-  it('collection resource object IS NOT RESOURCE', () => {
-    expect(isResource(rawCollectionResource)).toBeFalse();
+  it('resource collection object IS NOT RESOURCE', () => {
+    expect(isResource(rawResourceCollection)).toBeFalse();
   });
 
-  it('paged collection resource object IS NOT RESOURCE', () => {
-    expect(isResource(rawPagedCollectionResource)).toBeFalse();
+  it('paged resource collection object IS NOT RESOURCE', () => {
+    expect(isResource(rawPagedResourceCollection)).toBeFalse();
   });
 
-  it('object IS COLLECTION RESOURCE with _embedded object and WITHOUT page object', () => {
-    expect(isCollectionResource(rawCollectionResource)).toBeTrue();
+  it('object IS RESOURCE COLLECTION with _embedded object and WITHOUT page object', () => {
+    expect(isResourceCollection(rawResourceCollection)).toBeTrue();
   });
 
-  it('object IS NOT COLLECTION RESOURCE with empty object', () => {
-    const result = isCollectionResource({});
+  it('object IS NOT RESOURCE COLLECTION with empty object', () => {
+    const result = isResourceCollection({});
 
     expect(result).toBeFalse();
   });
 
 
-  it('object IS NOT COLLECTION RESOURCE with null object', () => {
-    const result = isCollectionResource(null);
+  it('object IS NOT RESOURCE COLLECTION with null object', () => {
+    const result = isResourceCollection(null);
 
     expect(result).toBeFalse();
   });
 
-  it('object IS NOT COLLECTION RESOURCE with undefined object', () => {
-    const result = isCollectionResource(undefined);
+  it('object IS NOT RESOURCE COLLECTION with undefined object', () => {
+    const result = isResourceCollection(undefined);
 
     expect(result).toBeFalse();
   });
 
-  it('object IS NOT COLLECTION RESOURCE with _embedded object and WITH page object', () => {
-    const result = isCollectionResource({
+  it('object IS NOT RESOURCE COLLECTION with _embedded object and WITH page object', () => {
+    const result = isResourceCollection({
       _embedded: {},
       page: {}
     });
@@ -143,65 +143,65 @@ describe('ResourceType', () => {
   });
 
   it('embedded resource object IS NOT COLLECTION_RESOURCE', () => {
-    expect(isCollectionResource(rawEmbeddedResource)).toBeFalse();
+    expect(isResourceCollection(rawEmbeddedResource)).toBeFalse();
   });
 
   it('resource object IS NOT COLLECTION_RESOURCE', () => {
-    expect(isCollectionResource(rawResource)).toBeFalse();
+    expect(isResourceCollection(rawResource)).toBeFalse();
   });
 
-  it('paged collection resource object IS NOT COLLECTION_RESOURCE', () => {
-    expect(isCollectionResource(rawPagedCollectionResource)).toBeFalse();
+  it('paged resource collection object IS NOT COLLECTION_RESOURCE', () => {
+    expect(isResourceCollection(rawPagedResourceCollection)).toBeFalse();
   });
 
-  it('object IS PAGED COLLECTION RESOURCE with _embedded AND page object', () => {
-    expect(isPagedCollectionResource(rawPagedCollectionResource)).toBeTrue();
+  it('object IS PAGED RESOURCE COLLECTION with _embedded AND page object', () => {
+    expect(isPagedResourceCollection(rawPagedResourceCollection)).toBeTrue();
   });
 
-  it('object IS NOT PAGED COLLECTION RESOURCE with _embedded AND WITHOUT page object', () => {
-    const result = isPagedCollectionResource({
+  it('object IS NOT PAGED RESOURCE COLLECTION with _embedded AND WITHOUT page object', () => {
+    const result = isPagedResourceCollection({
       _embedded: {}
     });
 
     expect(result).toBeFalse();
   });
 
-  it('object IS NOT PAGED COLLECTION RESOURCE WITHOUT _embedded AND WITH page object', () => {
-    const result = isPagedCollectionResource({
+  it('object IS NOT PAGED RESOURCE COLLECTION WITHOUT _embedded AND WITH page object', () => {
+    const result = isPagedResourceCollection({
       page: {}
     });
 
     expect(result).toBeFalse();
   });
 
-  it('object IS NOT PAGED COLLECTION RESOURCE with empty object', () => {
-    const result = isPagedCollectionResource({});
+  it('object IS NOT PAGED RESOURCE COLLECTION with empty object', () => {
+    const result = isPagedResourceCollection({});
 
     expect(result).toBeFalse();
   });
 
-  it('object IS NOT PAGED COLLECTION RESOURCE with null object', () => {
-    const result = isPagedCollectionResource(null);
+  it('object IS NOT PAGED RESOURCE COLLECTION with null object', () => {
+    const result = isPagedResourceCollection(null);
 
     expect(result).toBeFalse();
   });
 
-  it('object IS NOT PAGED COLLECTION RESOURCE with undefined object', () => {
-    const result = isPagedCollectionResource(undefined);
+  it('object IS NOT PAGED RESOURCE COLLECTION with undefined object', () => {
+    const result = isPagedResourceCollection(undefined);
 
     expect(result).toBeFalse();
   });
 
   it('embedded resource object IS NOT PAGE_COLLECTION_RESOURCE', () => {
-    expect(isPagedCollectionResource(rawEmbeddedResource)).toBeFalse();
+    expect(isPagedResourceCollection(rawEmbeddedResource)).toBeFalse();
   });
 
   it('resource object IS NOT PAGE_COLLECTION_RESOURCE', () => {
-    expect(isPagedCollectionResource(rawResource)).toBeFalse();
+    expect(isPagedResourceCollection(rawResource)).toBeFalse();
   });
 
-  it('collection resource object IS NOT PAGE_COLLECTION_RESOURCE', () => {
-    expect(isPagedCollectionResource(rawCollectionResource)).toBeFalse();
+  it('resource collection object IS NOT PAGE_COLLECTION_RESOURCE', () => {
+    expect(isPagedResourceCollection(rawResourceCollection)).toBeFalse();
   });
 
 });

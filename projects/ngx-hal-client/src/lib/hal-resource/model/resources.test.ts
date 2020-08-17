@@ -1,4 +1,4 @@
-import { CollectionResource } from './collection-resource';
+import { ResourceCollection } from './resource-collection';
 import { EmbeddedResource } from './embedded-resource';
 import { Resource } from './resource';
 
@@ -54,7 +54,7 @@ export class SimpleEmbeddedResource extends EmbeddedResource {
 
 }
 
-export const rawCollectionResource = {
+export const rawResourceCollection = {
   _embedded: {
     tests: [
       {
@@ -82,20 +82,20 @@ export const rawCollectionResource = {
   }
 };
 
-export class SimpleCollectionResource extends CollectionResource<SimpleResource> {
+export class SimpleResourceCollection extends ResourceCollection<SimpleResource> {
 
   resources = [new SimpleResource()];
 
   // tslint:disable-next-line:variable-name
   _links = {
     self: {
-      href: 'http://localhost:8080/api/v1/collectionResource/1'
+      href: 'http://localhost:8080/api/v1/resourceCollection/1'
     }
   };
 
 }
 
-export const rawPagedCollectionResource = {
+export const rawPagedResourceCollection = {
   _embedded: {
     tests: [
       {
@@ -141,26 +141,26 @@ export const rawPagedCollectionResource = {
   }
 };
 
-export class SimplePagedCollectionResource extends SimpleCollectionResource {
+export class SimplePagedResourceCollection extends SimpleResourceCollection {
 
   resources = [new SimpleResource()];
 
   // tslint:disable-next-line:variable-name
   _links = {
     self: {
-      href: 'http://localhost:8080/api/v1/pagedCollectionResource'
+      href: 'http://localhost:8080/api/v1/pagedResourceCollection'
     },
     first: {
-      href: 'http://localhost:8080/api/v1/pagedCollectionResource?page=0&size=1'
+      href: 'http://localhost:8080/api/v1/pagedResourceCollection?page=0&size=1'
     },
     next: {
-      href: 'http://localhost:8080/api/v1/pagedCollectionResource?page=1&size=1'
+      href: 'http://localhost:8080/api/v1/pagedResourceCollection?page=1&size=1'
     },
     prev: {
-      href: 'http://localhost:8080/api/v1/pagedCollectionResource?page=0&size=1'
+      href: 'http://localhost:8080/api/v1/pagedResourceCollection?page=0&size=1'
     },
     last: {
-      href: 'http://localhost:8080/api/v1/pagedCollectionResource?page=1&size=1'
+      href: 'http://localhost:8080/api/v1/pagedResourceCollection?page=1&size=1'
     }
   };
 

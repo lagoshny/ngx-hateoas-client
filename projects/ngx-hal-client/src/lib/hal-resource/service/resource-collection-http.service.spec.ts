@@ -1,22 +1,22 @@
 import { async } from '@angular/core/testing';
 import { HttpConfigService } from '../../config/http-config.service';
-import { CollectionResourceHttpService } from './collection-resource-http.service';
-import { CollectionResource } from '../model/collection-resource';
+import { ResourceCollectionHttpService } from './resource-collection-http.service';
+import { ResourceCollection } from '../model/resource-collection';
 import { BaseResource } from '../model/base-resource';
 import { of } from 'rxjs';
 import {
-  rawCollectionResource, rawEmbeddedResource,
-  rawPagedCollectionResource,
+  rawResourceCollection, rawEmbeddedResource,
+  rawPagedResourceCollection,
   rawResource,
-  SimpleCollectionResource,
+  SimpleResourceCollection,
   SimpleResource
 } from '../model/resources.test';
 import { ResourceUtils } from '../../util/resource.utils';
 import { HttpParams } from '@angular/common/http';
 
 /* tslint:disable:no-string-literal */
-describe('CollectionResourceHttpService', () => {
-  let collectionResourceHttpService: CollectionResourceHttpService<CollectionResource<BaseResource>>;
+describe('ResourceCollectionHttpService', () => {
+  let resourceCollectionHttpServiceSpy: ResourceCollectionHttpService<ResourceCollection<BaseResource>>;
   let httpClientSpy: any;
   let cacheServiceSpy: any;
   let httpConfigService: HttpConfigService;
@@ -34,55 +34,55 @@ describe('CollectionResourceHttpService', () => {
       baseApiUrl: 'http://localhost:8080/api/v1'
     };
 
-    collectionResourceHttpService =
-      new CollectionResourceHttpService<CollectionResource<BaseResource>>(httpClientSpy, cacheServiceSpy, httpConfigService);
+    resourceCollectionHttpServiceSpy =
+      new ResourceCollectionHttpService<ResourceCollection<BaseResource>>(httpClientSpy, cacheServiceSpy, httpConfigService);
 
-    ResourceUtils.useCollectionResourceType(CollectionResource);
+    ResourceUtils.useResourceCollectionType(ResourceCollection);
   }));
 
   it('GET REQUEST should throw error when returned object is EMBEDDED_RESOURCE', () => {
     httpClientSpy.get.and.returnValue(of(rawEmbeddedResource));
 
-    collectionResourceHttpService.get('someUrl').subscribe(() => {
+    resourceCollectionHttpServiceSpy.get('someUrl').subscribe(() => {
     }, error => {
-      expect(error.message).toBe('You try to get wrong resource type, expected collection resource type.');
+      expect(error.message).toBe('You try to get wrong resource type, expected resource collection type.');
     });
   });
 
   it('GET REQUEST should throw error when returned object is RESOURCE', () => {
     httpClientSpy.get.and.returnValue(of(rawResource));
 
-    collectionResourceHttpService.get('someUrl').subscribe(() => {
+    resourceCollectionHttpServiceSpy.get('someUrl').subscribe(() => {
     }, error => {
-      expect(error.message).toBe('You try to get wrong resource type, expected collection resource type.');
+      expect(error.message).toBe('You try to get wrong resource type, expected resource collection type.');
     });
   });
 
   it('GET REQUEST should throw error when returned object is PAGED_COLLECTION_RESOURCE', () => {
-    httpClientSpy.get.and.returnValue(of(rawPagedCollectionResource));
+    httpClientSpy.get.and.returnValue(of(rawPagedResourceCollection));
 
-    collectionResourceHttpService.get('someUrl').subscribe(() => {
+    resourceCollectionHttpServiceSpy.get('someUrl').subscribe(() => {
     }, error => {
-      expect(error.message).toBe('You try to get wrong resource type, expected collection resource type.');
+      expect(error.message).toBe('You try to get wrong resource type, expected resource collection type.');
     });
   });
 
-  it('GET REQUEST should throw error when returned object is any data that not collection resource', () => {
+  it('GET REQUEST should throw error when returned object is any data that not resource collection', () => {
     httpClientSpy.get.and.returnValue(of({any: 'value'}));
 
-    collectionResourceHttpService.get('someUrl').subscribe(() => {
+    resourceCollectionHttpServiceSpy.get('someUrl').subscribe(() => {
     }, error => {
-      expect(error.message).toBe('You try to get wrong resource type, expected collection resource type.');
+      expect(error.message).toBe('You try to get wrong resource type, expected resource collection type.');
     });
   });
 
   it('GET REQUEST should return result from cache', () => {
-    const cachedResult = new SimpleCollectionResource();
+    const cachedResult = new SimpleResourceCollection();
     cachedResult.resources.push(Object.assign(new SimpleResource(), {text: 'test cache'}));
     cacheServiceSpy.getResource.and.returnValue(cachedResult);
     cacheServiceSpy.hasResource.and.returnValue(true);
 
-    collectionResourceHttpService.get('someUrl').subscribe((result) => {
+    resourceCollectionHttpServiceSpy.get('someUrl').subscribe((result) => {
       expect(httpClientSpy.get.calls.count()).toBe(0);
       expect(cacheServiceSpy.getResource.calls.count()).toBe(1);
       expect(result.resources.length).toBe(2);
@@ -91,64 +91,64 @@ describe('CollectionResourceHttpService', () => {
   });
 
   it('GET REQUEST should put result to cache', () => {
-    httpClientSpy.get.and.returnValue(of(rawCollectionResource));
+    httpClientSpy.get.and.returnValue(of(rawResourceCollection));
 
-    collectionResourceHttpService.get('someUrl').subscribe(() => {
+    resourceCollectionHttpServiceSpy.get('someUrl').subscribe(() => {
       expect(cacheServiceSpy.putResource.calls.count()).toBe(1);
     });
   });
 
   it('GET REQUEST should return collected resource', () => {
-    httpClientSpy.get.and.returnValue(of(rawCollectionResource));
+    httpClientSpy.get.and.returnValue(of(rawResourceCollection));
 
-    collectionResourceHttpService.get('someUrl').subscribe((result) => {
-      expect(result instanceof CollectionResource).toBeTrue();
+    resourceCollectionHttpServiceSpy.get('someUrl').subscribe((result) => {
+      expect(result instanceof ResourceCollection).toBeTrue();
     });
   });
 
   it('GET_RESOURCE_COLLECTION throws error when resourceName is empty', () => {
-    collectionResourceHttpService.getResourceCollection('').subscribe(() => {
+    resourceCollectionHttpServiceSpy.getResourceCollection('').subscribe(() => {
     }, (error) => {
       expect(error.message).toBe('resource name should be defined');
     });
   });
 
   it('GET_RESOURCE_COLLECTION throws error when resourceName is null', () => {
-    collectionResourceHttpService.getResourceCollection(null).subscribe(() => {
+    resourceCollectionHttpServiceSpy.getResourceCollection(null).subscribe(() => {
     }, (error) => {
       expect(error.message).toBe('resource name should be defined');
     });
   });
 
   it('GET_RESOURCE_COLLECTION throws error when resourceName is undefined', () => {
-    collectionResourceHttpService.getResourceCollection(undefined).subscribe(() => {
+    resourceCollectionHttpServiceSpy.getResourceCollection(undefined).subscribe(() => {
     }, (error) => {
       expect(error.message).toBe('resource name should be defined');
     });
   });
 
   it('GET_RESOURCE_COLLECTION should generate root resource url', () => {
-    httpClientSpy.get.and.returnValue(of(rawCollectionResource));
+    httpClientSpy.get.and.returnValue(of(rawResourceCollection));
 
-    collectionResourceHttpService.getResourceCollection('test').subscribe(() => {
+    resourceCollectionHttpServiceSpy.getResourceCollection('test').subscribe(() => {
       const url = httpClientSpy.get.calls.argsFor(0)[0];
       expect(url).toBe(`${ httpConfigService.baseApiUrl }/test`);
     });
   });
 
   it('GET_RESOURCE_COLLECTION should generate root resource url with query param', () => {
-    httpClientSpy.get.and.returnValue(of(rawCollectionResource));
+    httpClientSpy.get.and.returnValue(of(rawResourceCollection));
 
-    collectionResourceHttpService.getResourceCollection('test', 'someQuery').subscribe(() => {
+    resourceCollectionHttpServiceSpy.getResourceCollection('test', 'someQuery').subscribe(() => {
       const url = httpClientSpy.get.calls.argsFor(0)[0];
       expect(url).toBe(`${ httpConfigService.baseApiUrl }/test/someQuery`);
     });
   });
 
   it('GET_RESOURCE_COLLECTION should pass http request params when it passed', () => {
-    httpClientSpy.get.and.returnValue(of(rawCollectionResource));
+    httpClientSpy.get.and.returnValue(of(rawResourceCollection));
 
-    collectionResourceHttpService.getResourceCollection('test', null, {
+    resourceCollectionHttpServiceSpy.getResourceCollection('test', null, {
       projection: 'testProjection',
       params: {
         test: 'testParam'
@@ -163,60 +163,60 @@ describe('CollectionResourceHttpService', () => {
   });
 
   it('SEARCH throws error when resourceName is empty', () => {
-    collectionResourceHttpService.search('', 'any').subscribe(() => {
+    resourceCollectionHttpServiceSpy.search('', 'any').subscribe(() => {
     }, (error) => {
       expect(error.message).toBe('resource name should be defined');
     });
   });
 
   it('SEARCH throws error when resourceName is null', () => {
-    collectionResourceHttpService.search(null, 'any').subscribe(() => {
+    resourceCollectionHttpServiceSpy.search(null, 'any').subscribe(() => {
     }, (error) => {
       expect(error.message).toBe('resource name should be defined');
     });
   });
 
   it('SEARCH throws error when resourceName is undefined', () => {
-    collectionResourceHttpService.search(undefined, 'any').subscribe(() => {
+    resourceCollectionHttpServiceSpy.search(undefined, 'any').subscribe(() => {
     }, (error) => {
       expect(error.message).toBe('resource name should be defined');
     });
   });
 
   it('SEARCH throws error when searchQuery is empty', () => {
-    collectionResourceHttpService.search('any', '').subscribe(() => {
+    resourceCollectionHttpServiceSpy.search('any', '').subscribe(() => {
     }, (error) => {
       expect(error.message).toBe('search query should be defined');
     });
   });
 
   it('SEARCH throws error when searchQuery is null', () => {
-    collectionResourceHttpService.search('any', null).subscribe(() => {
+    resourceCollectionHttpServiceSpy.search('any', null).subscribe(() => {
     }, (error) => {
       expect(error.message).toBe('search query should be defined');
     });
   });
 
   it('SEARCH throws error when searchQuery is undefined', () => {
-    collectionResourceHttpService.search('any', undefined).subscribe(() => {
+    resourceCollectionHttpServiceSpy.search('any', undefined).subscribe(() => {
     }, (error) => {
       expect(error.message).toBe('search query should be defined');
     });
   });
 
   it('SEARCH should generate search resource url', () => {
-    httpClientSpy.get.and.returnValue(of(rawCollectionResource));
+    httpClientSpy.get.and.returnValue(of(rawResourceCollection));
 
-    collectionResourceHttpService.search('test', 'someQuery').subscribe(() => {
+    resourceCollectionHttpServiceSpy.search('test', 'someQuery').subscribe(() => {
       const url = httpClientSpy.get.calls.argsFor(0)[0];
       expect(url).toBe(`${ httpConfigService.baseApiUrl }/test/search/someQuery`);
     });
   });
 
   it('SEARCH should pass http request params when it passed', () => {
-    httpClientSpy.get.and.returnValue(of(rawCollectionResource));
+    httpClientSpy.get.and.returnValue(of(rawResourceCollection));
 
-    collectionResourceHttpService.search('test', 'someQuery', {
+    resourceCollectionHttpServiceSpy.search('test', 'someQuery', {
       projection: 'testProjection',
       params: {
         test: 'testParam'

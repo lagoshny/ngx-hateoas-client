@@ -1,7 +1,7 @@
-import { CollectionResource } from './collection-resource';
+import { ResourceCollection } from './resource-collection';
 import { BaseResource } from './base-resource';
 import { Observable, throwError as observableThrowError } from 'rxjs';
-import { getPagedCollectionResourceHttpService } from '../service/paged-collection-resource-http.service';
+import { getPagedResourceCollectionHttpService } from '../service/paged-resource-collection-http.service';
 import { UrlUtils } from '../../util/url.utils';
 import { ConsoleLogger } from '../../logger/console-logger';
 import { PageData, PageParam } from './declarations';
@@ -10,7 +10,7 @@ import * as _ from 'lodash';
 /**
  * Collection of resources with pagination.
  */
-export class PagedCollectionResource<T extends BaseResource> extends CollectionResource<T> {
+export class PagedResourceCollection<T extends BaseResource> extends ResourceCollection<T> {
 
   private readonly selfUri: string;
   private readonly nextUri: string;
@@ -24,12 +24,12 @@ export class PagedCollectionResource<T extends BaseResource> extends CollectionR
   public readonly pageSize: number;
 
   /**
-   * Create a new paged collection resource from collection resource with the page data.
+   * Create a new paged resource collection from resource collection with the page data.
    *
    * @param resourceCollection collection that will be paged
    * @param pageData contains data about characteristics of the page.
    */
-  constructor(resourceCollection: CollectionResource<T>, pageData?: PageData) {
+  constructor(resourceCollection: ResourceCollection<T>, pageData?: PageData) {
     super(resourceCollection);
     this.totalElements = _.result(pageData, 'page.totalElements', 0);
     this.totalPages = _.result(pageData, 'page.totalPages', 1);
@@ -59,19 +59,19 @@ export class PagedCollectionResource<T extends BaseResource> extends CollectionR
     return !!this.prevUri;
   }
 
-  public first(): Observable<PagedCollectionResource<T>> {
+  public first(): Observable<PagedResourceCollection<T>> {
     return doRequest(this.firstUri);
   }
 
-  public last(): Observable<PagedCollectionResource<T>> {
+  public last(): Observable<PagedResourceCollection<T>> {
     return doRequest(this.lastUri);
   }
 
-  public next(): Observable<PagedCollectionResource<T>> {
+  public next(): Observable<PagedResourceCollection<T>> {
     return doRequest(this.nextUri);
   }
 
-  public prev(): Observable<PagedCollectionResource<T>> {
+  public prev(): Observable<PagedResourceCollection<T>> {
     return doRequest(this.prevUri);
   }
 
@@ -82,7 +82,7 @@ export class PagedCollectionResource<T extends BaseResource> extends CollectionR
    * @param pageParam contains data about new characteristics of the page.
    * @throws error when passed inconsistent data
    */
-  public customPage(pageParam: PageParam): Observable<PagedCollectionResource<T>> {
+  public customPage(pageParam: PageParam): Observable<PagedResourceCollection<T>> {
     ConsoleLogger.prettyInfo('Preparing custom page request');
     if (pageParam.page < 0) {
       pageParam.page = this.pageNumber;
@@ -115,7 +115,7 @@ export class PagedCollectionResource<T extends BaseResource> extends CollectionR
 
 }
 
-function doRequest<T extends BaseResource>(uri: string, pageParams?: PageParam): Observable<PagedCollectionResource<T>> {
+function doRequest<T extends BaseResource>(uri: string, pageParams?: PageParam): Observable<PagedResourceCollection<T>> {
   if (!uri) {
     ConsoleLogger.error('During page request error occurs: url is empty');
     return observableThrowError(`During page request error occurs: url is empty`);
@@ -126,6 +126,6 @@ function doRequest<T extends BaseResource>(uri: string, pageParams?: PageParam):
     httpParams = UrlUtils.convertToHttpParams({page: pageParams});
   }
 
-  return getPagedCollectionResourceHttpService()
-    .get(UrlUtils.removeTemplateParams(uri), {params: httpParams}) as Observable<PagedCollectionResource<T>>;
+  return getPagedResourceCollectionHttpService()
+    .get(UrlUtils.removeTemplateParams(uri), {params: httpParams}) as Observable<PagedResourceCollection<T>>;
 }

@@ -7,9 +7,9 @@ import { of } from 'rxjs';
 import { HttpParams } from '@angular/common/http';
 import { ResourceUtils } from '../../util/resource.utils';
 import { Resource } from '../model/resource';
-import { CollectionResource } from '../model/collection-resource';
-import { PagedCollectionResource } from '../model/paged-collection-resource';
-import { rawPagedCollectionResource, rawResource, rawCollectionResource } from '../model/resources.test';
+import { ResourceCollection } from '../model/resource-collection';
+import { PagedResourceCollection } from '../model/paged-resource-collection';
+import { rawPagedResourceCollection, rawResource, rawResourceCollection } from '../model/resources.test';
 import anything = jasmine.anything;
 
 describe('CommonHttpService CUSTOM_QUERY', () => {
@@ -38,8 +38,8 @@ describe('CommonHttpService CUSTOM_QUERY', () => {
       new CommonHttpService(httpClientSpy, cacheServiceSpy, httpConfigService);
 
     ResourceUtils.useResourceType(Resource);
-    ResourceUtils.useCollectionResourceType(CollectionResource);
-    ResourceUtils.usePagedCollectionResourceType(PagedCollectionResource);
+    ResourceUtils.useResourceCollectionType(ResourceCollection);
+    ResourceUtils.usePagedResourceCollectionType(PagedResourceCollection);
   }));
 
   it('throws error when resourceName is empty', () => {
@@ -137,18 +137,18 @@ describe('CommonHttpService CUSTOM_QUERY', () => {
   });
 
   it('should return COLLECTION_RESOURCE object', () => {
-    httpClientSpy.get.and.returnValue(of(rawCollectionResource));
+    httpClientSpy.get.and.returnValue(of(rawResourceCollection));
 
     commonHttpService.customQuery('test', HttpMethod.GET, 'someQuery').subscribe((result) => {
-      expect(result instanceof CollectionResource).toBeTrue();
+      expect(result instanceof ResourceCollection).toBeTrue();
     });
   });
 
   it('should return PAGED_COLLECTION_RESOURCE object', () => {
-    httpClientSpy.get.and.returnValue(of(rawPagedCollectionResource));
+    httpClientSpy.get.and.returnValue(of(rawPagedResourceCollection));
 
     commonHttpService.customQuery('test', HttpMethod.GET, 'someQuery').subscribe((result) => {
-      expect(result instanceof PagedCollectionResource).toBeTrue();
+      expect(result instanceof PagedResourceCollection).toBeTrue();
     });
   });
 

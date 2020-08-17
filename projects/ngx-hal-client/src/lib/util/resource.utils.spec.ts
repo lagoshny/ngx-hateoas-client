@@ -2,9 +2,9 @@ import { Resource } from '../hal-resource/model/resource';
 import { async } from '@angular/core/testing';
 import { ResourceUtils } from './resource.utils';
 import { EmbeddedResource } from '../hal-resource/model/embedded-resource';
-import { CollectionResource } from '../hal-resource/model/collection-resource';
-import { PagedCollectionResource } from '../hal-resource/model/paged-collection-resource';
-import { rawCollectionResource, rawEmbeddedResource, rawPagedCollectionResource, rawResource } from '../hal-resource/model/resources.test';
+import { ResourceCollection } from '../hal-resource/model/resource-collection';
+import { PagedResourceCollection } from '../hal-resource/model/paged-resource-collection';
+import { rawResourceCollection, rawEmbeddedResource, rawPagedResourceCollection, rawResource } from '../hal-resource/model/resources.test';
 import { Include } from '../hal-resource/model/declarations';
 
 /* tslint:disable:no-string-literal */
@@ -13,8 +13,8 @@ describe('ResourceUtils', () => {
   beforeEach(async(() => {
     ResourceUtils.useResourceType(Resource);
     ResourceUtils.useEmbeddedResourceType(EmbeddedResource);
-    ResourceUtils.useCollectionResourceType(CollectionResource);
-    ResourceUtils.usePagedCollectionResourceType(PagedCollectionResource);
+    ResourceUtils.useResourceCollectionType(ResourceCollection);
+    ResourceUtils.usePagedResourceCollectionType(PagedResourceCollection);
   }));
 
   it('INSTANTIATE_RESOURCE should return "null" when passed payload is empty object', () => {
@@ -104,46 +104,46 @@ describe('ResourceUtils', () => {
   });
 
   it('INSTANTIATE_COLLECTION_RESOURCE should return "null" when passed payload is empty object', () => {
-    expect(ResourceUtils.instantiateCollectionResource({})).toBeNull();
+    expect(ResourceUtils.instantiateResourceCollection({})).toBeNull();
   });
 
   it('INSTANTIATE_COLLECTION_RESOURCE should return "null" when passed payload is null', () => {
-    expect(ResourceUtils.instantiateCollectionResource(null)).toBeNull();
+    expect(ResourceUtils.instantiateResourceCollection(null)).toBeNull();
   });
 
   it('INSTANTIATE_COLLECTION_RESOURCE should return "null" when passed payload is undefined', () => {
-    expect(ResourceUtils.instantiateCollectionResource(undefined)).toBeNull();
+    expect(ResourceUtils.instantiateResourceCollection(undefined)).toBeNull();
   });
 
   it('INSTANTIATE_COLLECTION_RESOURCE should return "null" when passed payload._links is null', () => {
-    expect(ResourceUtils.instantiateCollectionResource({_links: null, _embedded: {someVal: 'test'}})).toBeNull();
+    expect(ResourceUtils.instantiateResourceCollection({_links: null, _embedded: {someVal: 'test'}})).toBeNull();
   });
 
   it('INSTANTIATE_COLLECTION_RESOURCE should return "null" when passed payload._links is undefined', () => {
-    expect(ResourceUtils.instantiateCollectionResource({_links: undefined, _embedded: {someVal: 'test'}})).toBeNull();
+    expect(ResourceUtils.instantiateResourceCollection({_links: undefined, _embedded: {someVal: 'test'}})).toBeNull();
   });
 
   it('INSTANTIATE_COLLECTION_RESOURCE should return "null" when passed payload._links is not object', () => {
-    expect(ResourceUtils.instantiateCollectionResource({_links: 'not_object', _embedded: {someVal: 'test'}})).toBeNull();
+    expect(ResourceUtils.instantiateResourceCollection({_links: 'not_object', _embedded: {someVal: 'test'}})).toBeNull();
   });
 
   it('INSTANTIATE_COLLECTION_RESOURCE should return "null" when passed payload._embedded is null', () => {
-    expect(ResourceUtils.instantiateCollectionResource({_embedded: null, _links: {someVal: 'test'}})).toBeNull();
+    expect(ResourceUtils.instantiateResourceCollection({_embedded: null, _links: {someVal: 'test'}})).toBeNull();
   });
 
   it('INSTANTIATE_COLLECTION_RESOURCE should return "null" when passed payload._embedded is undefined', () => {
-    expect(ResourceUtils.instantiateCollectionResource({_embedded: undefined, _links: {someVal: 'test'}})).toBeNull();
+    expect(ResourceUtils.instantiateResourceCollection({_embedded: undefined, _links: {someVal: 'test'}})).toBeNull();
   });
 
   it('INSTANTIATE_COLLECTION_RESOURCE should return "null" when passed payload._embedded is not object', () => {
-    expect(ResourceUtils.instantiateCollectionResource({_embedded: 'not_object', _links: {someVal: 'test'}})).toBeNull();
+    expect(ResourceUtils.instantiateResourceCollection({_embedded: 'not_object', _links: {someVal: 'test'}})).toBeNull();
   });
 
-  it('INSTANTIATE_COLLECTION_RESOURCE should create collection resources with all resources from _embedded object', () => {
-    const result = ResourceUtils.instantiateCollectionResource(rawCollectionResource);
+  it('INSTANTIATE_COLLECTION_RESOURCE should create resource collections with all resources from _embedded object', () => {
+    const result = ResourceUtils.instantiateResourceCollection(rawResourceCollection);
 
     expect(result).toBeDefined();
-    expect(result instanceof CollectionResource).toBe(true);
+    expect(result instanceof ResourceCollection).toBe(true);
     expect(result.resources).toBeDefined();
     expect(result.resources.length).toBe(2);
     expect(result.resources[0] instanceof Resource).toBe(true);
@@ -153,54 +153,54 @@ describe('ResourceUtils', () => {
   });
 
   it('INSTANTIATE_COLLECTION_RESOURCE should copy root _links object', () => {
-    const result = ResourceUtils.instantiateCollectionResource(rawCollectionResource);
+    const result = ResourceUtils.instantiateResourceCollection(rawResourceCollection);
 
     expect(result).toBeDefined();
     expect(result['_links']).toBeDefined();
-    expect(result['_links']).toEqual(rawCollectionResource._links);
+    expect(result['_links']).toEqual(rawResourceCollection._links);
   });
 
   it('INSTANTIATE_PAGED_COLLECTION_RESOURCE should return "null" when passed payload is empty object', () => {
-    expect(ResourceUtils.instantiatePagedCollectionResource({})).toBeNull();
+    expect(ResourceUtils.instantiatePagedResourceCollection({})).toBeNull();
   });
 
   it('INSTANTIATE_PAGED_COLLECTION_RESOURCE should return "null" when passed payload is null', () => {
-    expect(ResourceUtils.instantiatePagedCollectionResource(null)).toBeNull();
+    expect(ResourceUtils.instantiatePagedResourceCollection(null)).toBeNull();
   });
 
   it('INSTANTIATE_PAGED_COLLECTION_RESOURCE should return "null" when passed payload is undefined', () => {
-    expect(ResourceUtils.instantiatePagedCollectionResource(undefined)).toBeNull();
+    expect(ResourceUtils.instantiatePagedResourceCollection(undefined)).toBeNull();
   });
 
   it('INSTANTIATE_PAGED_COLLECTION_RESOURCE should return "null" when passed payload._links is null', () => {
-    expect(ResourceUtils.instantiatePagedCollectionResource({_links: null, _embedded: {someVal: 'test'}})).toBeNull();
+    expect(ResourceUtils.instantiatePagedResourceCollection({_links: null, _embedded: {someVal: 'test'}})).toBeNull();
   });
 
   it('INSTANTIATE_PAGED_COLLECTION_RESOURCE should return "null" when passed payload._links is undefined', () => {
-    expect(ResourceUtils.instantiatePagedCollectionResource({_links: undefined, _embedded: {someVal: 'test'}})).toBeNull();
+    expect(ResourceUtils.instantiatePagedResourceCollection({_links: undefined, _embedded: {someVal: 'test'}})).toBeNull();
   });
 
   it('INSTANTIATE_PAGED_COLLECTION_RESOURCE should return "null" when passed payload._links is not object', () => {
-    expect(ResourceUtils.instantiatePagedCollectionResource({_links: 'not_object', _embedded: {someVal: 'test'}})).toBeNull();
+    expect(ResourceUtils.instantiatePagedResourceCollection({_links: 'not_object', _embedded: {someVal: 'test'}})).toBeNull();
   });
 
   it('INSTANTIATE_PAGED_COLLECTION_RESOURCE should return "null" when passed payload._embedded is null', () => {
-    expect(ResourceUtils.instantiatePagedCollectionResource({_embedded: null, _links: {someVal: 'test'}})).toBeNull();
+    expect(ResourceUtils.instantiatePagedResourceCollection({_embedded: null, _links: {someVal: 'test'}})).toBeNull();
   });
 
   it('INSTANTIATE_PAGED_COLLECTION_RESOURCE should return "null" when passed payload._embedded is undefined', () => {
-    expect(ResourceUtils.instantiatePagedCollectionResource({_embedded: undefined, _links: {someVal: 'test'}})).toBeNull();
+    expect(ResourceUtils.instantiatePagedResourceCollection({_embedded: undefined, _links: {someVal: 'test'}})).toBeNull();
   });
 
   it('INSTANTIATE_PAGED_COLLECTION_RESOURCE should return "null" when passed payload._embedded is not object', () => {
-    expect(ResourceUtils.instantiatePagedCollectionResource({_embedded: 'not_object', _links: {someVal: 'test'}})).toBeNull();
+    expect(ResourceUtils.instantiatePagedResourceCollection({_embedded: 'not_object', _links: {someVal: 'test'}})).toBeNull();
   });
 
-  it('INSTANTIATE_PAGED_COLLECTION_RESOURCE should create paged collection resources with default page options', () => {
-    const result = ResourceUtils.instantiatePagedCollectionResource({...rawPagedCollectionResource, page: null});
+  it('INSTANTIATE_PAGED_COLLECTION_RESOURCE should create paged resource collections with default page options', () => {
+    const result = ResourceUtils.instantiatePagedResourceCollection({...rawPagedResourceCollection, page: null});
 
     expect(result).toBeDefined();
-    expect(result instanceof PagedCollectionResource).toBe(true);
+    expect(result instanceof PagedResourceCollection).toBe(true);
     expect(result.pageNumber).toBe(0);
     expect(result.pageSize).toBe(20);
     expect(result.totalElements).toBe(0);
@@ -218,15 +218,15 @@ describe('ResourceUtils', () => {
     expect(result.resources[1]['text']).toBe('Second object');
   });
 
-  it('INSTANTIATE_PAGED_COLLECTION_RESOURCE should create paged collection resources with passed page options', () => {
-    const result = ResourceUtils.instantiatePagedCollectionResource(rawPagedCollectionResource);
+  it('INSTANTIATE_PAGED_COLLECTION_RESOURCE should create paged resource collections with passed page options', () => {
+    const result = ResourceUtils.instantiatePagedResourceCollection(rawPagedResourceCollection);
 
     expect(result).toBeDefined();
-    expect(result instanceof PagedCollectionResource).toBe(true);
-    expect(result.pageNumber).toBe(rawPagedCollectionResource.page.number);
-    expect(result.pageSize).toBe(rawPagedCollectionResource.page.size);
-    expect(result.totalElements).toBe(rawPagedCollectionResource.page.totalElements);
-    expect(result.totalPages).toBe(rawPagedCollectionResource.page.totalPages);
+    expect(result instanceof PagedResourceCollection).toBe(true);
+    expect(result.pageNumber).toBe(rawPagedResourceCollection.page.number);
+    expect(result.pageSize).toBe(rawPagedResourceCollection.page.size);
+    expect(result.totalElements).toBe(rawPagedResourceCollection.page.totalElements);
+    expect(result.totalPages).toBe(rawPagedResourceCollection.page.totalPages);
     expect(result.hasFirst()).toBeTrue();
     expect(result.hasNext()).toBeTrue();
     expect(result.hasPrev()).toBeTrue();
@@ -241,11 +241,11 @@ describe('ResourceUtils', () => {
   });
 
   it('INSTANTIATE_PAGED_COLLECTION_RESOURCE should copy root _links object', () => {
-    const result = ResourceUtils.instantiatePagedCollectionResource(rawPagedCollectionResource);
+    const result = ResourceUtils.instantiatePagedResourceCollection(rawPagedResourceCollection);
 
     expect(result).toBeDefined();
     expect(result['_links']).toBeDefined();
-    expect(result['_links']).toEqual(rawPagedCollectionResource._links);
+    expect(result['_links']).toEqual(rawPagedResourceCollection._links);
   });
 
   it('RESOLVE_VALUES should return "null" when passed requestBody is null', () => {

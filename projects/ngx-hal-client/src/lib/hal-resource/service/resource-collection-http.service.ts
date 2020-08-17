@@ -5,24 +5,24 @@ import { HttpConfigService } from '../../config/http-config.service';
 import { Observable, of as observableOf, throwError as observableThrowError } from 'rxjs';
 import { ConsoleLogger } from '../../logger/console-logger';
 import { catchError, map } from 'rxjs/operators';
-import { isCollectionResource } from '../model/resource-type';
+import { isResourceCollection } from '../model/resource-type';
 import { ResourceUtils } from '../../util/resource.utils';
-import { CollectionResource } from '../model/collection-resource';
+import { ResourceCollection } from '../model/resource-collection';
 import { BaseResource } from '../model/base-resource';
 import { DependencyInjector } from '../../util/dependency-injector';
 import { GetOption } from '../model/declarations';
 import { UrlUtils } from '../../util/url.utils';
 import { HttpExecutor } from './http-executor';
 
-export function getCollectionResourceHttpService(): CollectionResourceHttpService<CollectionResource<BaseResource>> {
-  return DependencyInjector.get(CollectionResourceHttpService);
+export function getResourceCollectionHttpService(): ResourceCollectionHttpService<ResourceCollection<BaseResource>> {
+  return DependencyInjector.get(ResourceCollectionHttpService);
 }
 
 /**
- * Service to perform HTTP requests to get {@link CollectionResource} type.
+ * Service to perform HTTP requests to get {@link ResourceCollection} type.
  */
 @Injectable()
-export class CollectionResourceHttpService<T extends CollectionResource<BaseResource>> extends HttpExecutor {
+export class ResourceCollectionHttpService<T extends ResourceCollection<BaseResource>> extends HttpExecutor {
 
   constructor(httpClient: HttpClient,
               public cacheService: CacheService<T>,
@@ -62,12 +62,12 @@ export class CollectionResourceHttpService<T extends CollectionResource<BaseReso
             body: JSON.stringify(data, null, 4)
           });
 
-          if (!isCollectionResource(data)) {
-            ConsoleLogger.error('You try to get wrong resource type, expected collection resource type.');
-            throw new Error('You try to get wrong resource type, expected collection resource type.');
+          if (!isResourceCollection(data)) {
+            ConsoleLogger.error('You try to get wrong resource type, expected resource collection type.');
+            throw new Error('You try to get wrong resource type, expected resource collection type.');
           }
 
-          const resource: T = ResourceUtils.instantiateCollectionResource(data);
+          const resource: T = ResourceUtils.instantiateResourceCollection(data);
           this.cacheService.putResource(url, resource);
           return resource;
         }),
@@ -75,7 +75,7 @@ export class CollectionResourceHttpService<T extends CollectionResource<BaseReso
   }
 
   /**
-   * Perform get collection resource request with url built by the resource name.
+   * Perform get resource collection request with url built by the resource name.
    *
    * @param resourceName used to build root url to the resource
    * @param query (optional) url path that applied to the result url at the end
@@ -92,7 +92,7 @@ export class CollectionResourceHttpService<T extends CollectionResource<BaseReso
   }
 
   /**
-   *  Perform search collection resource request with url built by the resource name.
+   *  Perform search resource collection request with url built by the resource name.
    *
    * @param resourceName used to build root url to the resource
    * @param searchQuery name of the search method

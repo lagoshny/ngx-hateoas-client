@@ -6,7 +6,7 @@ import { ResourceUtils } from '../../util/resource.utils';
 import { ResourceHttpService } from './resource-http.service';
 import { Resource } from '../model/resource';
 import { of } from 'rxjs';
-import { rawCollectionResource, rawPagedCollectionResource, rawResource, SimpleResource } from '../model/resources.test';
+import { rawResourceCollection, rawPagedResourceCollection, rawResource, SimpleResource } from '../model/resources.test';
 import { HttpParams } from '@angular/common/http';
 
 describe('ResourceHttpService', () => {
@@ -40,7 +40,7 @@ describe('ResourceHttpService', () => {
   }));
 
   it('GET REQUEST should throw error when returned object is COLLECTION_RESOURCE', () => {
-    httpClientSpy.get.and.returnValue(of(rawCollectionResource));
+    httpClientSpy.get.and.returnValue(of(rawResourceCollection));
 
     resourceHttpService.get('someUrl').subscribe(() => {
     }, error => {
@@ -49,7 +49,7 @@ describe('ResourceHttpService', () => {
   });
 
   it('GET REQUEST should throw error when returned object is PAGED_COLLECTION_RESOURCE', () => {
-    httpClientSpy.get.and.returnValue(of(rawPagedCollectionResource));
+    httpClientSpy.get.and.returnValue(of(rawPagedResourceCollection));
 
     resourceHttpService.get('someUrl').subscribe(() => {
     }, error => {

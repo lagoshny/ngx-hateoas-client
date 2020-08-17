@@ -1,7 +1,7 @@
 import { BaseResource } from '../hal-resource/model/base-resource';
 import { isEmbeddedResource, isResource } from '../hal-resource/model/resource-type';
-import { CollectionResource } from '../hal-resource/model/collection-resource';
-import { PagedCollectionResource } from '../hal-resource/model/paged-collection-resource';
+import { ResourceCollection } from '../hal-resource/model/resource-collection';
+import { PagedResourceCollection } from '../hal-resource/model/paged-resource-collection';
 import { Include, Link, PageData, RequestBody } from '../hal-resource/model/declarations';
 import * as _ from 'lodash';
 import { Resource } from '../hal-resource/model/resource';
@@ -13,10 +13,10 @@ export class ResourceUtils {
 
   private static resourceType: new() => BaseResource;
 
-  private static collectionResourceType: new() => CollectionResource<BaseResource>;
+  private static resourceCollectionType: new() => ResourceCollection<BaseResource>;
 
-  private static pagedCollectionResourceType: new(collection: CollectionResource<BaseResource>, pageData?: PageData)
-    => PagedCollectionResource<BaseResource>;
+  private static pagedResourceCollectionType: new(collection: ResourceCollection<BaseResource>, pageData?: PageData)
+    => PagedResourceCollection<BaseResource>;
 
   private static embeddedResourceType: new() => EmbeddedResource;
 
@@ -24,13 +24,13 @@ export class ResourceUtils {
     this.resourceType = type;
   }
 
-  public static useCollectionResourceType(type: new() => CollectionResource<BaseResource>) {
-    this.collectionResourceType = type;
+  public static useResourceCollectionType(type: new() => ResourceCollection<BaseResource>) {
+    this.resourceCollectionType = type;
   }
 
-  public static usePagedCollectionResourceType(type: new(collection: CollectionResource<BaseResource>)
-    => PagedCollectionResource<BaseResource>) {
-    this.pagedCollectionResourceType = type;
+  public static usePagedResourceCollectionType(type: new(collection: ResourceCollection<BaseResource>)
+    => PagedResourceCollection<BaseResource>) {
+    this.pagedResourceCollectionType = type;
   }
 
   public static useEmbeddedResourceType(type: new() => EmbeddedResource) {
@@ -68,13 +68,13 @@ export class ResourceUtils {
   }
 
 
-  public static instantiateCollectionResource<T extends CollectionResource<BaseResource>>(payload: object): T {
+  public static instantiateResourceCollection<T extends ResourceCollection<BaseResource>>(payload: object): T {
     if (_.isEmpty(payload)
       || (!_.isObject(payload['_links']) || _.isEmpty(payload['_links']))
       || (!_.isObject(payload['_embedded']) || _.isEmpty(payload['_embedded']))) {
       return null;
     }
-    const result = new this.collectionResourceType() as T;
+    const result = new this.resourceCollectionType() as T;
     for (const resourceName of Object.keys(payload['_embedded'])) {
       payload['_embedded'][resourceName].forEach((resource) => {
         result.resources.push(this.instantiateResource(resource));
@@ -85,17 +85,17 @@ export class ResourceUtils {
     return result;
   }
 
-  public static instantiatePagedCollectionResource<T extends PagedCollectionResource<BaseResource>>(payload: object): T {
-    const resourceCollection = this.instantiateCollectionResource(payload);
+  public static instantiatePagedResourceCollection<T extends PagedResourceCollection<BaseResource>>(payload: object): T {
+    const resourceCollection = this.instantiateResourceCollection(payload);
     if (resourceCollection == null) {
       return null;
     }
 
     let result;
     if (payload['page']) {
-      result = new this.pagedCollectionResourceType(resourceCollection, payload as PageData);
+      result = new this.pagedResourceCollectionType(resourceCollection, payload as PageData);
     } else {
-      result = new this.pagedCollectionResourceType(resourceCollection);
+      result = new this.pagedResourceCollectionType(resourceCollection);
     }
     return result as T;
   }

@@ -3,11 +3,11 @@ import { BaseResource } from '../model/base-resource';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { CacheService } from './cache.service';
 import { HttpConfigService } from '../../config/http-config.service';
-import { PagedCollectionResource } from '../model/paged-collection-resource';
+import { PagedResourceCollection } from '../model/paged-resource-collection';
 import { ConsoleLogger } from '../../logger/console-logger';
 import { catchError, map } from 'rxjs/operators';
 import * as _ from 'lodash';
-import { isPagedCollectionResource } from '../model/resource-type';
+import { isPagedResourceCollection } from '../model/resource-type';
 import { Observable, of as observableOf, throwError as observableThrowError } from 'rxjs';
 import { ResourceUtils } from '../../util/resource.utils';
 import { UrlUtils } from '../../util/url.utils';
@@ -16,17 +16,17 @@ import { PagedGetOption, PageParam } from '../model/declarations';
 import { HttpExecutor } from './http-executor';
 
 /**
- * Get instance of the PagedCollectionResourceHttpService by Angular DependencyInjector.
+ * Get instance of the PagedResourceCollectionHttpService by Angular DependencyInjector.
  */
-export function getPagedCollectionResourceHttpService(): PagedCollectionResourceHttpService<PagedCollectionResource<BaseResource>> {
-  return DependencyInjector.get(PagedCollectionResourceHttpService);
+export function getPagedResourceCollectionHttpService(): PagedResourceCollectionHttpService<PagedResourceCollection<BaseResource>> {
+  return DependencyInjector.get(PagedResourceCollectionHttpService);
 }
 
 /**
- * Service to perform HTTP requests to get {@link PagedCollectionResource} type.
+ * Service to perform HTTP requests to get {@link PagedResourceCollection} type.
  */
 @Injectable()
-export class PagedCollectionResourceHttpService<T extends PagedCollectionResource<BaseResource>> extends HttpExecutor {
+export class PagedResourceCollectionHttpService<T extends PagedResourceCollection<BaseResource>> extends HttpExecutor {
 
   private static readonly DEFAULT_PAGE: PageParam = {
     page: 0,
@@ -71,11 +71,11 @@ export class PagedCollectionResourceHttpService<T extends PagedCollectionResourc
           body: JSON.stringify(data, null, 4)
         });
 
-        if (!isPagedCollectionResource(data)) {
-          ConsoleLogger.error('You try to get wrong resource type, expected paged collection resource type.');
-          throw Error('You try to get wrong resource type, expected paged collection resource type.');
+        if (!isPagedResourceCollection(data)) {
+          ConsoleLogger.error('You try to get wrong resource type, expected paged resource collection type.');
+          throw Error('You try to get wrong resource type, expected paged resource collection type.');
         }
-        const resource: T = ResourceUtils.instantiatePagedCollectionResource(data);
+        const resource: T = ResourceUtils.instantiatePagedResourceCollection(data);
         this.cacheService.putResource(url, resource);
 
         return resource;
@@ -84,7 +84,7 @@ export class PagedCollectionResourceHttpService<T extends PagedCollectionResourc
   }
 
   /**
-   * Perform get paged collection resource request with url built by the resource name.
+   * Perform get paged resource collection request with url built by the resource name.
    *
    * @param resourceName used to build root url to the resource
    * @param query (optional) url path that applied to the result url at the end
@@ -97,13 +97,13 @@ export class PagedCollectionResourceHttpService<T extends PagedCollectionResourc
     const url = UrlUtils.removeTemplateParams(UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName, query));
     const pagedOption = !_.isEmpty(option) ? option : {};
     if (_.isEmpty(pagedOption.page)) {
-      pagedOption.page = PagedCollectionResourceHttpService.DEFAULT_PAGE;
+      pagedOption.page = PagedResourceCollectionHttpService.DEFAULT_PAGE;
     }
     return this.get(url, {params: UrlUtils.convertToHttpParams(pagedOption)});
   }
 
   /**
-   *  Perform search paged collection resource request with url built by the resource name.
+   *  Perform search paged resource collection request with url built by the resource name.
    *
    * @param resourceName used to build root url to the resource
    * @param searchQuery name of the search method
@@ -120,7 +120,7 @@ export class PagedCollectionResourceHttpService<T extends PagedCollectionResourc
       UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName)).concat('/search/' + searchQuery);
     const pagedOption = !_.isEmpty(option) ? option : {};
     if (_.isEmpty(pagedOption.page)) {
-      pagedOption.page = PagedCollectionResourceHttpService.DEFAULT_PAGE;
+      pagedOption.page = PagedResourceCollectionHttpService.DEFAULT_PAGE;
     }
     return this.get(url, {params: UrlUtils.convertToHttpParams(pagedOption)});
   }

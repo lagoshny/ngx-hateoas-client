@@ -6,15 +6,7 @@ describe('UrlUtils', () => {
 
   const baseUrl = 'http://localhost:8080/api/v1';
   const notTemplatedUrl = 'http://localhost:8080/api/v1/resource/1';
-  const templatedUrl = 'http://localhost:8080/api/v1/pagedCollectionResource{?page,size,sort,projection,any}';
-
-  beforeEach(async(() => {
-    // ResourceUtils.useResourceType(Resource);
-    // ResourceUtils.useEmbeddedResourceType(EmbeddedResource);
-    // ResourceUtils.useCollectionResourceType(CollectionResource);
-    // ResourceUtils.usePagedCollectionResourceType(PagedCollectionResource);
-  }));
-
+  const templatedUrl = 'http://localhost:8080/api/v1/pagedResourceCollection{?page,size,sort,projection,any}';
 
   it('CONVERT_TO_HTTP_PARAMS should return empty http request params when passed options is null', () => {
     expect(UrlUtils.convertToHttpParams(null).keys().length).toBe(0);
@@ -198,7 +190,7 @@ describe('UrlUtils', () => {
   });
 
   it('REMOVE_TEMPLATE_PARAMS should remove template param from url', () => {
-    expect(UrlUtils.removeTemplateParams(templatedUrl)).toBe('http://localhost:8080/api/v1/pagedCollectionResource');
+    expect(UrlUtils.removeTemplateParams(templatedUrl)).toBe('http://localhost:8080/api/v1/pagedResourceCollection');
   });
 
   it('FILL_TEMPLATE_PARAMS should throw error when url is null', () => {
@@ -226,11 +218,11 @@ describe('UrlUtils', () => {
   });
 
   it('FILL_TEMPLATE_PARAMS should clear template params when options is null', () => {
-    expect(UrlUtils.fillTemplateParams(templatedUrl, null)).toBe('http://localhost:8080/api/v1/pagedCollectionResource');
+    expect(UrlUtils.fillTemplateParams(templatedUrl, null)).toBe('http://localhost:8080/api/v1/pagedResourceCollection');
   });
 
   it('FILL_TEMPLATE_PARAMS should clear template params when options is undefined', () => {
-    expect(UrlUtils.fillTemplateParams(templatedUrl, undefined)).toBe('http://localhost:8080/api/v1/pagedCollectionResource');
+    expect(UrlUtils.fillTemplateParams(templatedUrl, undefined)).toBe('http://localhost:8080/api/v1/pagedResourceCollection');
   });
 
   it('FILL_TEMPLATE_PARAMS should fill ALL template params', () => {
@@ -248,7 +240,7 @@ describe('UrlUtils', () => {
         }
       }
     }))
-      .toBe('http://localhost:8080/api/v1/pagedCollectionResource?page=2&size=30&projection=testProjection&any=123&sort=first,ASC&sort=second,DESC');
+      .toBe('http://localhost:8080/api/v1/pagedResourceCollection?page=2&size=30&projection=testProjection&any=123&sort=first,ASC&sort=second,DESC');
   });
 
   it('FILL_TEMPLATE_PARAMS should fill passed template params other clear', () => {
@@ -261,7 +253,7 @@ describe('UrlUtils', () => {
         size: 30,
       }
     }))
-      .toBe('http://localhost:8080/api/v1/pagedCollectionResource?page=2&size=30&any=123');
+      .toBe('http://localhost:8080/api/v1/pagedResourceCollection?page=2&size=30&any=123');
   });
 
 });

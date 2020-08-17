@@ -8,13 +8,13 @@ import { HttpClient } from '@angular/common/http';
 import { CacheService } from './cache.service';
 import { HttpConfigService } from '../../config/http-config.service';
 import { map } from 'rxjs/operators';
-import { isCollectionResource, isPagedCollectionResource, isResource } from '../model/resource-type';
+import { isResourceCollection, isPagedResourceCollection, isResource } from '../model/resource-type';
 import { ResourceUtils } from '../../util/resource.utils';
 import { ConsoleLogger } from '../../logger/console-logger';
 import { throwError as observableThrowError } from 'rxjs/internal/observable/throwError';
 
 /**
- * Service to perform HTTP requests to get any type of the {@link Resource}, {@link PagedCollectionResource}, {@link CollectionResource}.
+ * Service to perform HTTP requests to get any type of the {@link Resource}, {@link PagedResourceCollection}, {@link ResourceCollection}.
  */
 @Injectable()
 export class CommonHttpService extends HttpExecutor {
@@ -28,8 +28,8 @@ export class CommonHttpService extends HttpExecutor {
   /**
    * Perform custom HTTP request.
    *
-   * Return type depends on result data it can be {@link Resource}, {@link CollectionResource},
-   * {@link PagedCollectionResource} or any data.
+   * Return type depends on result data it can be {@link Resource}, {@link ResourceCollection},
+   * {@link PagedResourceCollection} or any data.
    *
    * @param resourceName used to build root url to the resource
    * @param method HTTP method that will be perform {@link HttpMethod}
@@ -79,10 +79,10 @@ export class CommonHttpService extends HttpExecutor {
           body: JSON.stringify(data, null, 4)
         });
 
-        if (isPagedCollectionResource(data)) {
-          return ResourceUtils.instantiatePagedCollectionResource(data);
-        } else if (isCollectionResource(data)) {
-          return ResourceUtils.instantiateCollectionResource(data);
+        if (isPagedResourceCollection(data)) {
+          return ResourceUtils.instantiatePagedResourceCollection(data);
+        } else if (isResourceCollection(data)) {
+          return ResourceUtils.instantiateResourceCollection(data);
         } else if (isResource(data)) {
           return ResourceUtils.instantiateResource(data);
         } else {

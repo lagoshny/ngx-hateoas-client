@@ -2,12 +2,12 @@ import { Observable } from 'rxjs';
 import { getResourceHttpService } from '../service/resource-http.service';
 import { UrlUtils } from '../../util/url.utils';
 import { ResourceIdentifiable } from './resource-identifiable';
-import { CollectionResource } from './collection-resource';
-import { getCollectionResourceHttpService } from '../service/collection-resource-http.service';
+import { ResourceCollection } from './resource-collection';
+import { getResourceCollectionHttpService } from '../service/resource-collection-http.service';
 import { GetOption, PagedGetOption, RequestBody, RequestOption } from './declarations';
 import { HttpParams, HttpResponse } from '@angular/common/http';
-import { getPagedCollectionResourceHttpService } from '../service/paged-collection-resource-http.service';
-import { PagedCollectionResource } from './paged-collection-resource';
+import { getPagedResourceCollectionHttpService } from '../service/paged-resource-collection-http.service';
+import { PagedResourceCollection } from './paged-resource-collection';
 import { ResourceUtils } from '../../util/resource.utils';
 
 /**
@@ -45,7 +45,7 @@ export abstract class BaseResource extends ResourceIdentifiable {
    * @param options (optional) options that will be applied to the request
    * @throws error if no link is found by passed relation name
    */
-  public getRelatedCollection<T extends CollectionResource<BaseResource>>(relationName: string,
+  public getRelatedCollection<T extends ResourceCollection<BaseResource>>(relationName: string,
                                                                           options?: GetOption
                                                                           // embedded?: string,
                                                                           // expireMs: number = CacheHelper.defaultExpire,
@@ -54,7 +54,7 @@ export abstract class BaseResource extends ResourceIdentifiable {
     const relationLink = this.getRelationLink(relationName);
     const url = relationLink.templated ? UrlUtils.fillTemplateParams(relationLink.href, options) : relationLink.href;
 
-    return getCollectionResourceHttpService().get(url, {
+    return getResourceCollectionHttpService().get(url, {
       params: relationLink.templated ? new HttpParams() : UrlUtils.convertToHttpParams(options)
     }) as Observable<T>;
   }
@@ -67,7 +67,7 @@ export abstract class BaseResource extends ResourceIdentifiable {
    *        if options didn't contains {@link PageParam} then will be used default page params.
    * @throws error if no link is found by passed relation name
    */
-  public getRelatedPage<T extends PagedCollectionResource<BaseResource>>(relationName: string,
+  public getRelatedPage<T extends PagedResourceCollection<BaseResource>>(relationName: string,
                                                                          options?: PagedGetOption
                                                                          // embedded?: string,
                                                                          // expireMs: number = CacheHelper.defaultExpire,
@@ -78,7 +78,7 @@ export abstract class BaseResource extends ResourceIdentifiable {
       ? UrlUtils.fillTemplateParams(relationLink.href, options)
       : relationLink.href;
 
-    return getPagedCollectionResourceHttpService().get(url, {
+    return getPagedResourceCollectionHttpService().get(url, {
       params: relationLink.templated ? new HttpParams() : UrlUtils.convertToHttpParams(options)
     }) as Observable<T>;
   }

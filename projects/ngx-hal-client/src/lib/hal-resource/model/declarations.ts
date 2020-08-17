@@ -53,7 +53,7 @@ export interface RequestOption {
  * otherwise exception will be thrown.
  */
 export interface RequestParam {
-  [paramName: string]: Resource | string | number | boolean | Sort;
+  [paramName: string]: Resource | string | number | boolean;
 }
 
 /**

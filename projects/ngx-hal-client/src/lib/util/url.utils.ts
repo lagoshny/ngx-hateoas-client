@@ -15,7 +15,7 @@ export class UrlUtils {
    */
   public static convertToHttpParams(options: PagedGetOption, httpParams?: HttpParams): HttpParams {
     let resultParams = httpParams ? httpParams : new HttpParams();
-    if (_.isEmpty(options)) {
+    if (_.isEmpty(options) || _.isNil(options)) {
       return resultParams;
     }
     UrlUtils.checkParams(options);
@@ -55,6 +55,9 @@ export class UrlUtils {
    * @param query (optional) if passed then adds to end of the url
    */
   public static generateResourceUrl(baseUrl: string, resourceName: string, query?: string): string {
+    if (!baseUrl || !resourceName) {
+      throw Error('Base url and resource name should be defined');
+    }
     let url = baseUrl;
     if (!url.endsWith('/')) {
       url = url.concat('/');
@@ -68,6 +71,10 @@ export class UrlUtils {
    * @param url to be cleaned
    */
   public static removeTemplateParams(url: string): string {
+    if (!url) {
+      throw Error('Url should be defined');
+    }
+
     return UrlUtils.fillTemplateParams(url, {});
   }
 
@@ -75,9 +82,12 @@ export class UrlUtils {
    * Fill url template params.
    *
    * @param url to be filled
-   * @param options contains params to apply to result url
+   * @param options contains params to apply to result url, if empty then template params will be cleared
    */
   public static fillTemplateParams(url: string, options: PagedGetOption): string {
+    if (!url) {
+      throw Error('Url should be defined');
+    }
     UrlUtils.checkParams(options);
 
     const paramsWithoutSortParam = {
@@ -92,12 +102,14 @@ export class UrlUtils {
     const resultUrl = uriTemplates(url).fill(_.isNil(paramsWithoutSortParam) ? {} : paramsWithoutSortParam);
     if (options?.page) {
       const sortParams = UrlUtils.generateSortParams(options.page.sort);
-      return resultUrl.concat(resultUrl.includes('?') ? '&' : '').concat(sortParams.toString());
+      if (sortParams.keys().length > 0) {
+        return resultUrl.concat(resultUrl.includes('?') ? '&' : '').concat(sortParams.toString());
+      }
     }
     return resultUrl;
   }
 
-  private static generateSortParams(sort: Sort, httpParams?: HttpParams) {
+  private static generateSortParams(sort: Sort, httpParams?: HttpParams): HttpParams {
     let resultParams = httpParams ? httpParams : new HttpParams();
     if (!_.isEmpty(sort)) {
       for (const [sortPath, sortOrder] of Object.entries(sort)) {

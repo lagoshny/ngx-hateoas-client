@@ -349,11 +349,7 @@ describe('BaseResource GET_RELATED_PAGE', () => {
       baseResource.getRelatedPage('product', {
         params: {
           page: 1,
-          size: 2,
-          sort: {
-            abc: 'ASC',
-            cde: 'DESC'
-          }
+          size: 2
         }
       }).subscribe(() => {
       });
@@ -442,11 +438,7 @@ describe('BaseResource GET_RELATED_PAGE', () => {
       baseResource.getRelatedPage('magazine', {
         params: {
           page: 1,
-          size: 2,
-          sort: {
-            abc: 'ASC',
-            cde: 'DESC'
-          }
+          size: 2
         }
       }).subscribe(() => {
       });

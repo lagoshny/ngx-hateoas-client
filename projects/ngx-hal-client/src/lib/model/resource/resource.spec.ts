@@ -1,5 +1,5 @@
 import { async, TestBed } from '@angular/core/testing';
-import { ResourceHttpService } from '../service/resource-http.service';
+import { ResourceHttpService } from '../../service/internal/resource-http.service';
 import { DependencyInjector } from '../../util/dependency-injector';
 import { Resource } from './resource';
 import { of } from 'rxjs';

@@ -1,13 +1,13 @@
 import { BaseResource } from './base-resource';
 import { async, TestBed } from '@angular/core/testing';
 import { of } from 'rxjs';
-import { ResourceHttpService } from '../service/resource-http.service';
+import { ResourceHttpService } from '../../service/internal/resource-http.service';
 import { DependencyInjector } from '../../util/dependency-injector';
-import { PagedResourceCollectionHttpService } from '../service/paged-resource-collection-http.service';
+import { PagedResourceCollectionHttpService } from '../../service/internal/paged-resource-collection-http.service';
 import { PagedResourceCollection } from './paged-resource-collection';
 import { ResourceCollection } from './resource-collection';
 import { HttpParams } from '@angular/common/http';
-import { ResourceCollectionHttpService } from '../service/resource-collection-http.service';
+import { ResourceCollectionHttpService } from '../../service/internal/resource-collection-http.service';
 
 class TestProductResource extends BaseResource {
   // tslint:disable-next-line:variable-name

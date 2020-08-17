@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { ResourceIdentifiable } from '../model/resource-identifiable';
+import { ResourceIdentifiable } from '../model/resource/resource-identifiable';
 
 // TODO: should be implemented
 @Injectable()

@@ -1,10 +1,10 @@
 import { Observable } from 'rxjs';
-import { DependencyInjector } from '../util/dependency-injector';
+import { DependencyInjector } from '../../util/dependency-injector';
 import { HalResourceService } from './hal-resource.service';
-import { GetOption, HttpMethod, PagedGetOption, RequestBody, RequestOption, RequestParam } from '../hal-resource/model/declarations';
-import { Resource } from '../hal-resource/model/resource';
-import { PagedResourceCollection } from '../hal-resource/model/paged-resource-collection';
-import { ResourceCollection } from '../hal-resource/model/resource-collection';
+import { GetOption, HttpMethod, PagedGetOption, RequestBody, RequestOption, RequestParam } from '../../model/declarations';
+import { Resource } from '../../model/resource/resource';
+import { PagedResourceCollection } from '../../model/resource/paged-resource-collection';
+import { ResourceCollection } from '../../model/resource/resource-collection';
 
 /**
  * Main resource operation class.

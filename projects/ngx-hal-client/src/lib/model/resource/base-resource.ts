@@ -1,12 +1,12 @@
 import { Observable } from 'rxjs';
-import { getResourceHttpService } from '../service/resource-http.service';
+import { getResourceHttpService } from '../../service/internal/resource-http.service';
 import { UrlUtils } from '../../util/url.utils';
 import { ResourceIdentifiable } from './resource-identifiable';
 import { ResourceCollection } from './resource-collection';
-import { getResourceCollectionHttpService } from '../service/resource-collection-http.service';
-import { GetOption, PagedGetOption, RequestBody, RequestOption } from './declarations';
+import { getResourceCollectionHttpService } from '../../service/internal/resource-collection-http.service';
+import { GetOption, PagedGetOption, RequestBody, RequestOption } from '../declarations';
 import { HttpParams, HttpResponse } from '@angular/common/http';
-import { getPagedResourceCollectionHttpService } from '../service/paged-resource-collection-http.service';
+import { getPagedResourceCollectionHttpService } from '../../service/internal/paged-resource-collection-http.service';
 import { PagedResourceCollection } from './paged-resource-collection';
 import { ResourceUtils } from '../../util/resource.utils';
 

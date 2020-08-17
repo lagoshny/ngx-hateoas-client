@@ -1,19 +1,19 @@
 import { Injectable } from '@angular/core';
-import { BaseResource } from '../model/base-resource';
+import { BaseResource } from '../../model/resource/base-resource';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { CacheService } from './cache.service';
+import { CacheService } from '../cache.service';
 import { HttpConfigService } from '../../config/http-config.service';
-import { PagedResourceCollection } from '../model/paged-resource-collection';
+import { PagedResourceCollection } from '../../model/resource/paged-resource-collection';
 import { ConsoleLogger } from '../../logger/console-logger';
 import { catchError, map } from 'rxjs/operators';
 import * as _ from 'lodash';
-import { isPagedResourceCollection } from '../model/resource-type';
+import { isPagedResourceCollection } from '../../model/resource-type';
 import { Observable, of as observableOf, throwError as observableThrowError } from 'rxjs';
 import { ResourceUtils } from '../../util/resource.utils';
 import { UrlUtils } from '../../util/url.utils';
 import { DependencyInjector } from '../../util/dependency-injector';
-import { PagedGetOption, PageParam } from '../model/declarations';
-import { HttpExecutor } from './http-executor';
+import { PagedGetOption, PageParam } from '../../model/declarations';
+import { HttpExecutor } from '../http-executor';
 
 /**
  * Get instance of the PagedResourceCollectionHttpService by Angular DependencyInjector.

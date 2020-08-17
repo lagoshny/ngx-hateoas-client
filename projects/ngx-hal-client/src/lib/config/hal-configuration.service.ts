@@ -4,10 +4,10 @@ import { HttpConfigService } from './http-config.service';
 import { HalConfiguration } from './hal-configuration.interface';
 import { ConsoleLogger } from '../logger/console-logger';
 import { ResourceUtils } from '../util/resource.utils';
-import { Resource } from '../hal-resource/model/resource';
-import { ResourceCollection } from '../hal-resource/model/resource-collection';
-import { EmbeddedResource } from '../hal-resource/model/embedded-resource';
-import { PagedResourceCollection } from '../hal-resource/model/paged-resource-collection';
+import { Resource } from '../model/resource/resource';
+import { ResourceCollection } from '../model/resource/resource-collection';
+import { EmbeddedResource } from '../model/resource/embedded-resource';
+import { PagedResourceCollection } from '../model/resource/paged-resource-collection';
 
 /**
  * This service for configuration library.

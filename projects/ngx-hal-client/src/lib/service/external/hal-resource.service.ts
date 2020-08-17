@@ -1,15 +1,15 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { ResourceHttpService } from '../hal-resource/service/resource-http.service';
-import { PagedResourceCollectionHttpService } from '../hal-resource/service/paged-resource-collection-http.service';
-import { PagedResourceCollection } from '../hal-resource/model/paged-resource-collection';
-import { GetOption, HttpMethod, PagedGetOption, RequestBody, RequestOption, RequestParam } from '../hal-resource/model/declarations';
-import { ResourceUtils } from '../util/resource.utils';
-import { Resource } from '../ngx-hal-client.module';
-import { ResourceCollection } from '../hal-resource/model/resource-collection';
-import { ResourceCollectionHttpService } from '../hal-resource/service/resource-collection-http.service';
-import { CommonHttpService } from '../hal-resource/service/common-http.service';
-import { UrlUtils } from '../util/url.utils';
+import { ResourceHttpService } from '../internal/resource-http.service';
+import { PagedResourceCollectionHttpService } from '../internal/paged-resource-collection-http.service';
+import { PagedResourceCollection } from '../../model/resource/paged-resource-collection';
+import { GetOption, HttpMethod, PagedGetOption, RequestBody, RequestOption, RequestParam } from '../../model/declarations';
+import { ResourceUtils } from '../../util/resource.utils';
+import { Resource } from '../../ngx-hal-client.module';
+import { ResourceCollection } from '../../model/resource/resource-collection';
+import { ResourceCollectionHttpService } from '../internal/resource-collection-http.service';
+import { CommonResourceHttpService } from '../internal/common-resource-http.service';
+import { UrlUtils } from '../../util/url.utils';
 
 /**
  * Service to operate with {@link Resource}.
@@ -19,7 +19,7 @@ import { UrlUtils } from '../util/url.utils';
 @Injectable()
 export class HalResourceService<T extends Resource> {
 
-  constructor(private commonHttpService: CommonHttpService,
+  constructor(private commonHttpService: CommonResourceHttpService,
               private resourceHttpService: ResourceHttpService<T>,
               private resourceCollectionHttpServiceSpy: ResourceCollectionHttpService<ResourceCollection<T>>,
               private pagedResourceCollectionHttpService: PagedResourceCollectionHttpService<PagedResourceCollection<T>>) {
@@ -139,7 +139,7 @@ export class HalResourceService<T extends Resource> {
   }
 
   /**
-   * {@see CommonHttpService#customQuery}
+   * {@see CommonResourceHttpService#customQuery}
    */
   public customQuery(resourceName: string,
                      method: HttpMethod,

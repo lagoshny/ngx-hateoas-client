@@ -1,8 +1,8 @@
 import { async } from '@angular/core/testing';
 import { HttpConfigService } from '../../config/http-config.service';
 import { ResourceCollectionHttpService } from './resource-collection-http.service';
-import { ResourceCollection } from '../model/resource-collection';
-import { BaseResource } from '../model/base-resource';
+import { ResourceCollection } from '../../model/resource/resource-collection';
+import { BaseResource } from '../../model/resource/base-resource';
 import { of } from 'rxjs';
 import {
   rawResourceCollection, rawEmbeddedResource,
@@ -10,7 +10,7 @@ import {
   rawResource,
   SimpleResourceCollection,
   SimpleResource
-} from '../model/resources.test';
+} from '../../model/resource/resources.test';
 import { ResourceUtils } from '../../util/resource.utils';
 import { HttpParams } from '@angular/common/http';
 

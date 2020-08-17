@@ -1,4 +1,4 @@
-import { Link, LinkData } from './declarations';
+import { Link, LinkData } from '../declarations';
 import * as _ from 'lodash';
 import { throwError } from 'rxjs';
 

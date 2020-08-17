@@ -1,11 +1,11 @@
-import { Resource } from '../hal-resource/model/resource';
+import { Resource } from '../model/resource/resource';
 import { async } from '@angular/core/testing';
 import { ResourceUtils } from './resource.utils';
-import { EmbeddedResource } from '../hal-resource/model/embedded-resource';
-import { ResourceCollection } from '../hal-resource/model/resource-collection';
-import { PagedResourceCollection } from '../hal-resource/model/paged-resource-collection';
-import { rawResourceCollection, rawEmbeddedResource, rawPagedResourceCollection, rawResource } from '../hal-resource/model/resources.test';
-import { Include } from '../hal-resource/model/declarations';
+import { EmbeddedResource } from '../model/resource/embedded-resource';
+import { ResourceCollection } from '../model/resource/resource-collection';
+import { PagedResourceCollection } from '../model/resource/paged-resource-collection';
+import { rawResourceCollection, rawEmbeddedResource, rawPagedResourceCollection, rawResource } from '../model/resource/resources.test';
+import { Include } from '../model/declarations';
 
 /* tslint:disable:no-string-literal */
 describe('ResourceUtils', () => {

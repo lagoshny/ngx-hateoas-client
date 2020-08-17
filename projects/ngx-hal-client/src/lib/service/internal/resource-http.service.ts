@@ -3,15 +3,15 @@ import { Observable, of as observableOf, throwError as observableThrowError } fr
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { catchError, map } from 'rxjs/operators';
 import { ResourceUtils } from '../../util/resource.utils';
-import { BaseResource } from '../model/base-resource';
+import { BaseResource } from '../../model/resource/base-resource';
 import { DependencyInjector } from '../../util/dependency-injector';
 import { UrlUtils } from '../../util/url.utils';
 import * as _ from 'lodash';
 import { ConsoleLogger } from '../../logger/console-logger';
-import { isResource } from '../model/resource-type';
-import { GetOption, RequestParam } from '../model/declarations';
-import { HttpExecutor } from './http-executor';
-import { CacheService } from './cache.service';
+import { isResource } from '../../model/resource-type';
+import { GetOption, RequestParam } from '../../model/declarations';
+import { HttpExecutor } from '../http-executor';
+import { CacheService } from '../cache.service';
 import { HttpConfigService } from '../../config/http-config.service';
 
 /**

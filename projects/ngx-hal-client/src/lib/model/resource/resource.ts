@@ -1,11 +1,11 @@
 import { BaseResource } from './base-resource';
-import { getResourceHttpService } from '../service/resource-http.service';
+import { getResourceHttpService } from '../../service/internal/resource-http.service';
 import { HttpHeaders, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import * as _ from 'lodash';
 import { ResourceUtils } from '../../util/resource.utils';
 import { UrlUtils } from '../../util/url.utils';
-import { LinkData } from './declarations';
+import { LinkData } from '../declarations';
 
 /**
  * Resource class.

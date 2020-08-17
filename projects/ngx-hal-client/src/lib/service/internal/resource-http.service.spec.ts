@@ -1,12 +1,12 @@
 /* tslint:disable:no-string-literal */
-import { BaseResource } from '../model/base-resource';
+import { BaseResource } from '../../model/resource/base-resource';
 import { HttpConfigService } from '../../config/http-config.service';
 import { async } from '@angular/core/testing';
 import { ResourceUtils } from '../../util/resource.utils';
 import { ResourceHttpService } from './resource-http.service';
-import { Resource } from '../model/resource';
+import { Resource } from '../../model/resource/resource';
 import { of } from 'rxjs';
-import { rawResourceCollection, rawPagedResourceCollection, rawResource, SimpleResource } from '../model/resources.test';
+import { rawResourceCollection, rawPagedResourceCollection, rawResource, SimpleResource } from '../../model/resource/resources.test';
 import { HttpParams } from '@angular/common/http';
 
 describe('ResourceHttpService', () => {

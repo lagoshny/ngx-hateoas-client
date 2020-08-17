@@ -1,10 +1,10 @@
 /* tslint:disable:no-string-literal */
 import { async } from '@angular/core/testing';
 import { HalResourceService } from './hal-resource.service';
-import { HttpMethod, Include, Resource } from '../ngx-hal-client.module';
+import { HttpMethod, Include, Resource } from '../../ngx-hal-client.module';
 import { of } from 'rxjs';
-import { SimpleResource } from '../hal-resource/model/resources.test';
-import { ResourceUtils } from '../util/resource.utils';
+import { SimpleResource } from '../../model/resource/resources.test';
+import { ResourceUtils } from '../../util/resource.utils';
 import { HttpParams } from '@angular/common/http';
 import anything = jasmine.anything;
 

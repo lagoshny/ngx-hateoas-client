@@ -1,11 +1,11 @@
-import { BaseResource } from '../hal-resource/model/base-resource';
-import { isEmbeddedResource, isResource } from '../hal-resource/model/resource-type';
-import { ResourceCollection } from '../hal-resource/model/resource-collection';
-import { PagedResourceCollection } from '../hal-resource/model/paged-resource-collection';
-import { Include, Link, PageData, RequestBody } from '../hal-resource/model/declarations';
+import { BaseResource } from '../model/resource/base-resource';
+import { isEmbeddedResource, isResource } from '../model/resource-type';
+import { ResourceCollection } from '../model/resource/resource-collection';
+import { PagedResourceCollection } from '../model/resource/paged-resource-collection';
+import { Include, Link, PageData, RequestBody } from '../model/declarations';
 import * as _ from 'lodash';
-import { Resource } from '../hal-resource/model/resource';
-import { EmbeddedResource } from '../hal-resource/model/embedded-resource';
+import { Resource } from '../model/resource/resource';
+import { EmbeddedResource } from '../model/resource/embedded-resource';
 import { UrlUtils } from './url.utils';
 
 /* tslint:disable:no-string-literal */

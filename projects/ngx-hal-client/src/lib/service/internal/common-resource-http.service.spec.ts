@@ -1,19 +1,19 @@
 /* tslint:disable:no-string-literal */
 import { HttpConfigService } from '../../config/http-config.service';
 import { async } from '@angular/core/testing';
-import { CommonHttpService } from './common-http.service';
-import { HttpMethod } from '../model/declarations';
+import { CommonResourceHttpService } from './common-resource-http.service';
+import { HttpMethod } from '../../model/declarations';
 import { of } from 'rxjs';
 import { HttpParams } from '@angular/common/http';
 import { ResourceUtils } from '../../util/resource.utils';
-import { Resource } from '../model/resource';
-import { ResourceCollection } from '../model/resource-collection';
-import { PagedResourceCollection } from '../model/paged-resource-collection';
-import { rawPagedResourceCollection, rawResource, rawResourceCollection } from '../model/resources.test';
+import { Resource } from '../../model/resource/resource';
+import { ResourceCollection } from '../../model/resource/resource-collection';
+import { PagedResourceCollection } from '../../model/resource/paged-resource-collection';
+import { rawPagedResourceCollection, rawResource, rawResourceCollection } from '../../model/resource/resources.test';
 import anything = jasmine.anything;
 
-describe('CommonHttpService CUSTOM_QUERY', () => {
-  let commonHttpService: CommonHttpService;
+describe('CommonResourceHttpService CUSTOM_QUERY', () => {
+  let commonHttpService: CommonResourceHttpService;
   let httpClientSpy: any;
   let cacheServiceSpy: any;
   let httpConfigService: HttpConfigService;
@@ -35,7 +35,7 @@ describe('CommonHttpService CUSTOM_QUERY', () => {
     };
 
     commonHttpService =
-      new CommonHttpService(httpClientSpy, cacheServiceSpy, httpConfigService);
+      new CommonResourceHttpService(httpClientSpy, cacheServiceSpy, httpConfigService);
 
     ResourceUtils.useResourceType(Resource);
     ResourceUtils.useResourceCollectionType(ResourceCollection);

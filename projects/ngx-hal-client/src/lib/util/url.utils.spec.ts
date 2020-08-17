@@ -1,6 +1,6 @@
 import { async } from '@angular/core/testing';
 import { UrlUtils } from './url.utils';
-import { SimpleResource } from '../hal-resource/model/resources.test';
+import { SimpleResource } from '../model/resource/resources.test';
 
 describe('UrlUtils', () => {
 

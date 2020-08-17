@@ -1,18 +1,18 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { CacheService } from './cache.service';
+import { CacheService } from '../cache.service';
 import { HttpConfigService } from '../../config/http-config.service';
 import { Observable, of as observableOf, throwError as observableThrowError } from 'rxjs';
 import { ConsoleLogger } from '../../logger/console-logger';
 import { catchError, map } from 'rxjs/operators';
-import { isResourceCollection } from '../model/resource-type';
+import { isResourceCollection } from '../../model/resource-type';
 import { ResourceUtils } from '../../util/resource.utils';
-import { ResourceCollection } from '../model/resource-collection';
-import { BaseResource } from '../model/base-resource';
+import { ResourceCollection } from '../../model/resource/resource-collection';
+import { BaseResource } from '../../model/resource/base-resource';
 import { DependencyInjector } from '../../util/dependency-injector';
-import { GetOption } from '../model/declarations';
+import { GetOption } from '../../model/declarations';
 import { UrlUtils } from '../../util/url.utils';
-import { HttpExecutor } from './http-executor';
+import { HttpExecutor } from '../http-executor';
 
 export function getResourceCollectionHttpService(): ResourceCollectionHttpService<ResourceCollection<BaseResource>> {
   return DependencyInjector.get(ResourceCollectionHttpService);

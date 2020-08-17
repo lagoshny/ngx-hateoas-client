@@ -1,10 +1,10 @@
 import { ResourceCollection } from './resource-collection';
 import { BaseResource } from './base-resource';
 import { Observable, throwError as observableThrowError } from 'rxjs';
-import { getPagedResourceCollectionHttpService } from '../service/paged-resource-collection-http.service';
+import { getPagedResourceCollectionHttpService } from '../../service/internal/paged-resource-collection-http.service';
 import { UrlUtils } from '../../util/url.utils';
 import { ConsoleLogger } from '../../logger/console-logger';
-import { PageData, PageParam } from './declarations';
+import { PageData, PageParam } from '../declarations';
 import * as _ from 'lodash';
 
 /**

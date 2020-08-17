@@ -1,9 +1,9 @@
 import { HttpParams } from '@angular/common/http';
-import { isResource } from '../hal-resource/model/resource-type';
+import { isResource } from '../model/resource-type';
 import * as _ from 'lodash';
-import { Resource } from '../hal-resource/model/resource';
+import { Resource } from '../model/resource/resource';
 import uriTemplates from 'uri-templates';
-import { GetOption, PagedGetOption, Sort } from '../hal-resource/model/declarations';
+import { GetOption, PagedGetOption, Sort } from '../model/declarations';
 
 export class UrlUtils {
 

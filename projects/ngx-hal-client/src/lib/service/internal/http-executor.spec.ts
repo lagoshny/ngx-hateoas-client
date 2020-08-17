@@ -1,5 +1,5 @@
 import { async } from '@angular/core/testing';
-import { HttpExecutor } from './http-executor';
+import { HttpExecutor } from '../http-executor';
 import { of } from 'rxjs';
 import anything = jasmine.anything;
 

@@ -3,7 +3,7 @@
 import { PagedResourceCollection } from './paged-resource-collection';
 import { SimpleResourceCollection } from './resources.test';
 import { async, TestBed } from '@angular/core/testing';
-import { PagedResourceCollectionHttpService } from '../service/paged-resource-collection-http.service';
+import { PagedResourceCollectionHttpService } from '../../service/internal/paged-resource-collection-http.service';
 import { DependencyInjector } from '../../util/dependency-injector';
 import { of } from 'rxjs';
 import { ResourceCollection } from './resource-collection';

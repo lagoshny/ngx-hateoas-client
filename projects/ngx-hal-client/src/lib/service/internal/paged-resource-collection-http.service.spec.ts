@@ -1,7 +1,7 @@
 import { async } from '@angular/core/testing';
 import { HttpConfigService } from '../../config/http-config.service';
-import { ResourceCollection } from '../model/resource-collection';
-import { BaseResource } from '../model/base-resource';
+import { ResourceCollection } from '../../model/resource/resource-collection';
+import { BaseResource } from '../../model/resource/base-resource';
 import { of } from 'rxjs';
 import {
   rawResourceCollection, rawEmbeddedResource,
@@ -9,12 +9,12 @@ import {
   rawResource,
   SimplePagedResourceCollection,
   SimpleResource
-} from '../model/resources.test';
+} from '../../model/resource/resources.test';
 import { ResourceUtils } from '../../util/resource.utils';
 import { HttpParams } from '@angular/common/http';
 import { PagedResourceCollectionHttpService } from './paged-resource-collection-http.service';
-import { PagedResourceCollection } from '../model/paged-resource-collection';
-import { Resource } from '../model/resource';
+import { PagedResourceCollection } from '../../model/resource/paged-resource-collection';
+import { Resource } from '../../model/resource/resource';
 
 /* tslint:disable:no-string-literal */
 describe('PagedpagedResourceCollectionHttpService', () => {

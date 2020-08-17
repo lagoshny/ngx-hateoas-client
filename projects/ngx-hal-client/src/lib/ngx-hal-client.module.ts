@@ -2,22 +2,22 @@ import { ModuleWithProviders, NgModule } from '@angular/core';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { HalConfigurationService } from './config/hal-configuration.service';
 import { HttpConfigService } from './config/http-config.service';
-import { CacheService } from './hal-resource/service/cache.service';
-import { HalResourceService } from './service/hal-resource.service';
-import { ResourceHttpService } from './hal-resource/service/resource-http.service';
-import { PagedResourceCollectionHttpService } from './hal-resource/service/paged-resource-collection-http.service';
-import { ResourceCollectionHttpService } from './hal-resource/service/resource-collection-http.service';
-import { CommonHttpService } from './hal-resource/service/common-http.service';
+import { CacheService } from './service/cache.service';
+import { HalResourceService } from './service/external/hal-resource.service';
+import { ResourceHttpService } from './service/internal/resource-http.service';
+import { PagedResourceCollectionHttpService } from './service/internal/paged-resource-collection-http.service';
+import { ResourceCollectionHttpService } from './service/internal/resource-collection-http.service';
+import { CommonResourceHttpService } from './service/internal/common-resource-http.service';
 
 export { HalConfiguration } from './config/hal-configuration.interface';
 export { HalConfigurationService } from './config/hal-configuration.service';
-export { Resource } from './hal-resource/model/resource';
-export { EmbeddedResource } from './hal-resource/model/embedded-resource';
-export { ResourceCollection } from './hal-resource/model/resource-collection';
-export { PagedResourceCollection } from './hal-resource/model/paged-resource-collection';
-export { SortOrder, Include, HttpMethod } from './hal-resource/model/declarations';
-export { HalResourceOperation } from './service/hal-resource-operation';
-export { HalResourceService } from './service/hal-resource.service';
+export { Resource } from './model/resource/resource';
+export { EmbeddedResource } from './model/resource/embedded-resource';
+export { ResourceCollection } from './model/resource/resource-collection';
+export { PagedResourceCollection } from './model/resource/paged-resource-collection';
+export { SortOrder, Include, HttpMethod } from './model/declarations';
+export { HalResourceOperation } from './service/external/hal-resource-operation';
+export { HalResourceService } from './service/external/hal-resource.service';
 
 @NgModule({
   imports: [
@@ -29,7 +29,7 @@ export { HalResourceService } from './service/hal-resource.service';
     HttpConfigService,
     CacheService,
     HalResourceService,
-    CommonHttpService,
+    CommonResourceHttpService,
     ResourceHttpService,
     ResourceCollectionHttpService,
     PagedResourceCollectionHttpService

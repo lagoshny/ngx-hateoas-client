@@ -3,6 +3,7 @@ import { Injector, Type } from '@angular/core';
 /**
  * Holds dependency injector to allow use ше in internal the lib classes.
  */
+/* tslint:disable:variable-name */
 export class DependencyInjector {
 
   private static _injector: Injector = null;

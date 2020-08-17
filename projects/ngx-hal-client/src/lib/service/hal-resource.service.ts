@@ -144,8 +144,8 @@ export class HalResourceService<T extends Resource> {
   public customQuery(resourceName: string,
                      method: HttpMethod,
                      query: string,
-                     requestBody: RequestBody<any>,
-                     options: PagedGetOption): Observable<any | T | CollectionResource<T> | PagedCollectionResource<T>> {
+                     requestBody?: RequestBody<any>,
+                     options?: PagedGetOption): Observable<any | T | CollectionResource<T> | PagedCollectionResource<T>> {
     const body = ResourceUtils.resolveValues(requestBody);
 
     return this.commonHttpService.customQuery(resourceName, method, query, body, options);

@@ -1,5 +1,6 @@
 import * as _ from 'lodash';
 
+/* tslint:disable:variable-name no-console */
 export class ConsoleLogger {
 
   private static _enabled = false;

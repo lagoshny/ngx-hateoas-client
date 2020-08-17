@@ -8,6 +8,7 @@ import { Resource } from '../hal-resource/model/resource';
 import { EmbeddedResource } from '../hal-resource/model/embedded-resource';
 import { UrlUtils } from './url.utils';
 
+/* tslint:disable:no-string-literal */
 export class ResourceUtils {
 
   private static resourceType: new() => BaseResource;
@@ -32,53 +33,66 @@ export class ResourceUtils {
     this.pagedCollectionResourceType = type;
   }
 
-  public static useEmbeddedResourceType(type: new() => BaseResource) {
+  public static useEmbeddedResourceType(type: new() => EmbeddedResource) {
     this.embeddedResourceType = type;
   }
 
-  public static instantiateResource<T extends BaseResource>(payload: any): T {
-    // TODO: Все эти проверки используются для embedded ресурсов, типа коллекций, подумать как их упроситить
+  public static instantiateResource<T extends BaseResource>(payload: object): T {
+    // @ts-ignore
+    if (_.isEmpty(payload)
+      || (!_.isObject(payload['_links']) || _.isEmpty(payload['_links']))) {
+      return null;
+    }
     for (const key of Object.keys(payload)) {
       if (_.isArray(payload[key])) {
         for (let i = 0; i < payload[key].length; i++) {
-          if (isEmbeddedResource(payload[key][i]) && this.embeddedResourceType) {
+          if (isEmbeddedResource(payload[key][i])) {
             payload[key][i] = ResourceUtils.createResource(new this.embeddedResourceType(), payload[key][i]);
+          } else if (isResource(payload[key][i])) {
+            payload[key][i] = ResourceUtils.createResource(new this.resourceType(), payload[key][i]);
+            payload[key][i]['resourceName'] = this.findResourceName(payload[key][i]);
           }
         }
-      } else if (isEmbeddedResource(payload[key]) && this.embeddedResourceType) {
+      } else if (isEmbeddedResource(payload[key])) {
         payload[key] = ResourceUtils.createResource(new this.embeddedResourceType(), payload[key]);
+      } else if (isResource(payload[key])) {
+        payload[key] = ResourceUtils.createResource(new this.resourceType(), payload[key]);
+        payload[key]['resourceName'] = this.findResourceName(payload[key]);
       }
     }
 
-    const resource = ResourceUtils.createResource(new this.resourceType() as T, payload);
-    // @ts-ignore
-    resource.resourceName = this.findResourceName(resource);
+    const resource = Object.assign(new this.resourceType() as T, payload);
+    resource['resourceName'] = this.findResourceName(resource);
 
     return resource;
   }
 
 
-  public static instantiateCollectionResource<T extends CollectionResource<BaseResource>>(payload: any): T {
-    const result = new this.collectionResourceType() as T;
-    // @ts-ignore
-    result._links = payload._links;
-    const resourceCollection = payload._embedded;
-    if (resourceCollection) {
-      for (const resourceName of Object.keys(resourceCollection)) {
-        const resources: Array<any> = resourceCollection[resourceName];
-        resources.forEach((resource) => {
-          result.resources.push(this.instantiateResource(resource));
-        });
-      }
+  public static instantiateCollectionResource<T extends CollectionResource<BaseResource>>(payload: object): T {
+    if (_.isEmpty(payload)
+      || (!_.isObject(payload['_links']) || _.isEmpty(payload['_links']))
+      || (!_.isObject(payload['_embedded']) || _.isEmpty(payload['_embedded']))) {
+      return null;
     }
+    const result = new this.collectionResourceType() as T;
+    for (const resourceName of Object.keys(payload['_embedded'])) {
+      payload['_embedded'][resourceName].forEach((resource) => {
+        result.resources.push(this.instantiateResource(resource));
+      });
+    }
+    result['_links'] = {...payload['_links']};
 
     return result;
   }
 
-  public static instantiatePagedCollectionResource<T extends PagedCollectionResource<BaseResource>>(payload: any): T {
+  public static instantiatePagedCollectionResource<T extends PagedCollectionResource<BaseResource>>(payload: object): T {
     const resourceCollection = this.instantiateCollectionResource(payload);
+    if (resourceCollection == null) {
+      return null;
+    }
+
     let result;
-    if (payload.page && payload._links) {
+    if (payload['page']) {
       result = new this.pagedCollectionResourceType(resourceCollection, payload as PageData);
     } else {
       result = new this.pagedCollectionResourceType(resourceCollection);
@@ -94,11 +108,12 @@ export class ResourceUtils {
    * @param requestBody that contains the body directly and optional body values option {@link ValuesOption}
    */
   public static resolveValues(requestBody: RequestBody<any>): any {
-    if (_.isEmpty(requestBody)) {
+    if (_.isEmpty(requestBody) || _.isNil(requestBody.body)
+      || (_.isObject(requestBody.body) && _.isEmpty(requestBody.body))) {
       return null;
     }
     const body = requestBody.body;
-    if (!_.isObject(body)) {
+    if (!_.isObject(body) || _.isArray(body)) {
       return body;
     }
 
@@ -118,7 +133,11 @@ export class ResourceUtils {
         const array: any[] = body[key];
         result[key] = [];
         array.forEach((element) => {
-          result[key].push(this.resolveValues({body: element, valuesOption: requestBody?.valuesOption}));
+          if (isResource(element)) {
+            result[key].push(element?._links?.self?.href);
+          } else {
+            result[key].push(this.resolveValues({body: element, valuesOption: requestBody?.valuesOption}));
+          }
         });
       } else if (isResource(body[key])) {
         result[key] = body[key]._links?.self?.href;
@@ -134,7 +153,7 @@ export class ResourceUtils {
    *
    * @param entity to be converter to resource
    */
-  public static initResource(entity: any): BaseResource {
+  public static initResource(entity: any): BaseResource | any {
     if (isResource(entity)) {
       return Object.assign(new this.resourceType(), entity);
     } else if (isEmbeddedResource(entity)) {

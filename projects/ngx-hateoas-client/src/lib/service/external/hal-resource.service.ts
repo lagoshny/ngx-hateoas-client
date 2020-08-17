@@ -5,7 +5,7 @@ import { PagedResourceCollectionHttpService } from '../internal/paged-resource-c
 import { PagedResourceCollection } from '../../model/resource/paged-resource-collection';
 import { GetOption, HttpMethod, PagedGetOption, RequestBody, RequestOption, RequestParam } from '../../model/declarations';
 import { ResourceUtils } from '../../util/resource.utils';
-import { Resource } from '../../ngx-hal-client.module';
+import { Resource } from '../../ngx-hateoas-client.module';
 import { ResourceCollection } from '../../model/resource/resource-collection';
 import { ResourceCollectionHttpService } from '../internal/resource-collection-http.service';
 import { CommonResourceHttpService } from '../internal/common-resource-http.service';

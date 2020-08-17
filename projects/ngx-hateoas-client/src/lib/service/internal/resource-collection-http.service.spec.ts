@@ -5,11 +5,12 @@ import { ResourceCollection } from '../../model/resource/resource-collection';
 import { BaseResource } from '../../model/resource/base-resource';
 import { of } from 'rxjs';
 import {
-  rawResourceCollection, rawEmbeddedResource,
+  rawEmbeddedResource,
   rawPagedResourceCollection,
   rawResource,
-  SimpleResourceCollection,
-  SimpleResource
+  rawResourceCollection,
+  SimpleResource,
+  SimpleResourceCollection
 } from '../../model/resource/resources.test';
 import { ResourceUtils } from '../../util/resource.utils';
 import { HttpParams } from '@angular/common/http';

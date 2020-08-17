@@ -1,5 +1,5 @@
-import { isResourceCollection, isEmbeddedResource, isPagedResourceCollection, isResource } from './resource-type';
-import { rawResourceCollection, rawEmbeddedResource, rawPagedResourceCollection, rawResource } from './resource/resources.test';
+import { isEmbeddedResource, isPagedResourceCollection, isResource, isResourceCollection } from './resource-type';
+import { rawEmbeddedResource, rawPagedResourceCollection, rawResource, rawResourceCollection } from './resource/resources.test';
 
 describe('ResourceType', () => {
 

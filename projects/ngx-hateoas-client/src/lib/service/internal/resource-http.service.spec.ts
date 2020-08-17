@@ -6,7 +6,7 @@ import { ResourceUtils } from '../../util/resource.utils';
 import { ResourceHttpService } from './resource-http.service';
 import { Resource } from '../../model/resource/resource';
 import { of } from 'rxjs';
-import { rawResourceCollection, rawPagedResourceCollection, rawResource, SimpleResource } from '../../model/resource/resources.test';
+import { rawPagedResourceCollection, rawResource, rawResourceCollection, SimpleResource } from '../../model/resource/resources.test';
 import { HttpParams } from '@angular/common/http';
 
 describe('ResourceHttpService', () => {

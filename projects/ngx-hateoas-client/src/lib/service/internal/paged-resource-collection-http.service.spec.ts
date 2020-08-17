@@ -4,9 +4,10 @@ import { ResourceCollection } from '../../model/resource/resource-collection';
 import { BaseResource } from '../../model/resource/base-resource';
 import { of } from 'rxjs';
 import {
-  rawResourceCollection, rawEmbeddedResource,
+  rawEmbeddedResource,
   rawPagedResourceCollection,
   rawResource,
+  rawResourceCollection,
   SimplePagedResourceCollection,
   SimpleResource
 } from '../../model/resource/resources.test';

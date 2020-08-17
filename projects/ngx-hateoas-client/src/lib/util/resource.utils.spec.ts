@@ -4,7 +4,7 @@ import { ResourceUtils } from './resource.utils';
 import { EmbeddedResource } from '../model/resource/embedded-resource';
 import { ResourceCollection } from '../model/resource/resource-collection';
 import { PagedResourceCollection } from '../model/resource/paged-resource-collection';
-import { rawResourceCollection, rawEmbeddedResource, rawPagedResourceCollection, rawResource } from '../model/resource/resources.test';
+import { rawEmbeddedResource, rawPagedResourceCollection, rawResource, rawResourceCollection } from '../model/resource/resources.test';
 import { Include } from '../model/declarations';
 
 /* tslint:disable:no-string-literal */

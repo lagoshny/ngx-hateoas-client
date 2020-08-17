@@ -1,7 +1,6 @@
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, throwError as observableThrowError } from 'rxjs';
 import { tap } from 'rxjs/operators';
-import { throwError as observableThrowError } from 'rxjs';
 
 /**
  * Base class with common logics to perform HTTP requests.

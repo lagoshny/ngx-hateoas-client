@@ -1,5 +1,5 @@
 {
-  "name": "@lagoshny/ngx-hal-client",
+  "name": "@lagoshny/ngx-hateoas-client",
   "version": "2.0.0",
   "peerDependencies": {
     "@angular/common": "^9.1.12",

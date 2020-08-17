@@ -16,9 +16,9 @@
       "dom"
     ],
     "paths": {
-      "ngx-hal-client": [
-        "dist/ngx-hal-client/ngx-hal-client",
-        "dist/ngx-hal-client"
+      "ngx-hateoas-client": [
+        "dist/ngx-hateoas-client/ngx-hateoas-client",
+        "dist/ngx-hateoas-client"
       ]
     }
   },

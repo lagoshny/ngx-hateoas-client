@@ -36,10 +36,10 @@ export { HalResourceService } from './service/external/hal-resource.service';
   ],
   exports: [HttpClientModule]
 })
-export class NgxHalClientModule {
-  static forRoot(): ModuleWithProviders<NgxHalClientModule> {
+export class NgxHateoasClientModule {
+  static forRoot(): ModuleWithProviders<NgxHateoasClientModule> {
     return {
-      ngModule: NgxHalClientModule,
+      ngModule: NgxHateoasClientModule,
       providers: [
         HttpClient,
         HalConfigurationService

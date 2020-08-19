@@ -362,7 +362,7 @@ describe('BaseResource GET_RELATED_PAGE', () => {
     pagedResourceCollectionHttpServiceSpy.get.and.returnValue(of(new PagedResourceCollection(new ResourceCollection())));
 
     baseResource.getRelatedPage('product', {
-      page: {
+      pageParam: {
         page: 1,
         size: 2,
         sort: {
@@ -410,7 +410,7 @@ describe('BaseResource GET_RELATED_PAGE', () => {
     pagedResourceCollectionHttpServiceSpy.get.and.returnValue(of(new PagedResourceCollection(new ResourceCollection())));
 
     baseResource.getRelatedPage('magazine', {
-      page: {
+      pageParam: {
         size: 10,
         page: 1,
         sort: {

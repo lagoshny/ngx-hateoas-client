@@ -96,8 +96,8 @@ export class PagedResourceCollectionHttpService<T extends PagedResourceCollectio
     }
     const url = UrlUtils.removeTemplateParams(UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName, query));
     const pagedOption = !_.isEmpty(option) ? option : {};
-    if (_.isEmpty(pagedOption.page)) {
-      pagedOption.page = PagedResourceCollectionHttpService.DEFAULT_PAGE;
+    if (_.isEmpty(pagedOption.pageParam)) {
+      pagedOption.pageParam = PagedResourceCollectionHttpService.DEFAULT_PAGE;
     }
     return this.get(url, {params: UrlUtils.convertToHttpParams(pagedOption)});
   }
@@ -119,8 +119,8 @@ export class PagedResourceCollectionHttpService<T extends PagedResourceCollectio
     const url = UrlUtils.removeTemplateParams(
       UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName)).concat('/search/' + searchQuery);
     const pagedOption = !_.isEmpty(option) ? option : {};
-    if (_.isEmpty(pagedOption.page)) {
-      pagedOption.page = PagedResourceCollectionHttpService.DEFAULT_PAGE;
+    if (_.isEmpty(pagedOption.pageParam)) {
+      pagedOption.pageParam = PagedResourceCollectionHttpService.DEFAULT_PAGE;
     }
     return this.get(url, {params: UrlUtils.convertToHttpParams(pagedOption)});
   }

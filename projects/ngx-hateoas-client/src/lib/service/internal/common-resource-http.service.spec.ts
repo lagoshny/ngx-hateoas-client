@@ -98,7 +98,7 @@ describe('CommonResourceHttpService CUSTOM_QUERY', () => {
 
     commonHttpService.customQuery('test', HttpMethod.GET, 'someQuery', null, {
       projection: 'testProjection',
-      page: {
+      pageParam: {
         sort: {
           prop1: 'ASC',
           prop2: 'DESC'

@@ -11,6 +11,7 @@ import { map } from 'rxjs/operators';
 import { isPagedResourceCollection, isResource, isResourceCollection } from '../../model/resource-type';
 import { ResourceUtils } from '../../util/resource.utils';
 import { ConsoleLogger } from '../../logger/console-logger';
+import { Stage } from '../../logger/stage.enum';
 
 /**
  * Service to perform HTTP requests to get any type of the {@link Resource}, {@link PagedResourceCollection}, {@link ResourceCollection}.
@@ -46,7 +47,14 @@ export class CommonResourceHttpService extends HttpExecutor {
 
     const url = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName, query);
     const httpParams = UrlUtils.convertToHttpParams(option);
-    ConsoleLogger.prettyInfo(`CUSTOM_QUERY_${ method } REQUEST`, {
+
+    ConsoleLogger.prettyInfo(`STAGE ${ Stage.PREPARE_URL }`, {
+      result: url,
+      urlParts: `baseUrl: '${ this.httpConfig.baseApiUrl }', resource: '${ resourceName }', query: '${ query }'`,
+    });
+
+    ConsoleLogger.prettyInfo(`STAGE ${ Stage.HTTP_REQUEST }`, {
+      method,
       url,
       params: httpParams,
       body: body ? JSON.stringify(body, null, 4) : ''
@@ -55,16 +63,16 @@ export class CommonResourceHttpService extends HttpExecutor {
     let result: Observable<any>;
     switch (method) {
       case HttpMethod.GET:
-        result = this.get(url, {params: httpParams, observe: 'body'});
+        result = super.get(url, {params: httpParams, observe: 'body'});
         break;
       case HttpMethod.POST:
-        result = this.post(url, body, {params: httpParams, observe: 'body'});
+        result = super.post(url, body, {params: httpParams, observe: 'body'});
         break;
       case HttpMethod.PUT:
-        result = this.put(url, body, {params: httpParams, observe: 'body'});
+        result = super.put(url, body, {params: httpParams, observe: 'body'});
         break;
       case HttpMethod.PATCH:
-        result = this.patch(url, body, {params: httpParams, observe: 'body'});
+        result = super.patch(url, body, {params: httpParams, observe: 'body'});
         break;
       default:
         return observableThrowError(new Error(`allowed ony GET/POST/PUT/PATCH http methods you pass ${ method }`));
@@ -72,10 +80,10 @@ export class CommonResourceHttpService extends HttpExecutor {
 
     return result.pipe(
       map(data => {
-        ConsoleLogger.prettyInfo(`CUSTOM_QUERY_${ method } RESPONSE`, {
+        ConsoleLogger.prettyInfo(`STAGE ${ Stage.HTTP_RESPONSE }`, {
           url,
           params: httpParams,
-          body: JSON.stringify(data, null, 4)
+          result: JSON.stringify(data, null, 4)
         });
 
         if (isPagedResourceCollection(data)) {

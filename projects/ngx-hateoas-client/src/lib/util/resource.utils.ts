@@ -7,6 +7,8 @@ import * as _ from 'lodash';
 import { Resource } from '../model/resource/resource';
 import { EmbeddedResource } from '../model/resource/embedded-resource';
 import { UrlUtils } from './url.utils';
+import { ConsoleLogger } from '../logger/console-logger';
+import { Stage } from '../logger/stage.enum';
 
 /* tslint:disable:no-string-literal */
 export class ResourceUtils {
@@ -110,10 +112,16 @@ export class ResourceUtils {
   public static resolveValues(requestBody: RequestBody<any>): any {
     if (_.isEmpty(requestBody) || _.isNil(requestBody.body)
       || (_.isObject(requestBody.body) && _.isEmpty(requestBody.body))) {
+      ConsoleLogger.prettyInfo(`STAGE ${ Stage.RESOLVE_VALUES }`, {
+        result: 'body is empty return null'
+      });
       return null;
     }
     const body = requestBody.body;
     if (!_.isObject(body) || _.isArray(body)) {
+      ConsoleLogger.prettyInfo(`STAGE ${ Stage.RESOLVE_VALUES }`, {
+        result: 'body is not object or array return as is'
+      });
       return body;
     }
 
@@ -145,6 +153,11 @@ export class ResourceUtils {
         result[key] = body[key];
       }
     }
+
+    ConsoleLogger.prettyInfo(`STAGE ${ Stage.RESOLVE_VALUES }`, {
+      result: JSON.stringify(result, null, 2)
+    });
+
     return result;
   }
 
@@ -155,11 +168,26 @@ export class ResourceUtils {
    */
   public static initResource(entity: any): BaseResource | any {
     if (isResource(entity)) {
+
+      ConsoleLogger.prettyInfo(`STAGE ${ Stage.INIT_RESOURCE }`, {
+        result: 'entity initialized as Resource'
+      });
       return Object.assign(new this.resourceType(), entity);
+
     } else if (isEmbeddedResource(entity)) {
+
+      ConsoleLogger.prettyInfo(`STAGE ${ Stage.INIT_RESOURCE }`, {
+        result: 'entity initialized as EmbeddedResource'
+      });
       return Object.assign(new this.embeddedResourceType(), entity);
+
     } else {
+
+      ConsoleLogger.prettyInfo(`STAGE ${ Stage.INIT_RESOURCE }`, {
+        result: 'entity did not initialize will be used raw entity'
+      });
       return entity;
+
     }
   }
 

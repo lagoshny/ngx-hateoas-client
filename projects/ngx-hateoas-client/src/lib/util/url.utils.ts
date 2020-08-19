@@ -34,10 +34,10 @@ export class UrlUtils {
       }
     }
 
-    if (!_.isEmpty(options.page)) {
-      resultParams = resultParams.append('page', _.toString(options.page.page));
-      resultParams = resultParams.append('size', _.toString(options.page.size));
-      resultParams = UrlUtils.generateSortParams(options.page.sort, resultParams);
+    if (!_.isEmpty(options.pageParam)) {
+      resultParams = resultParams.append('page', _.toString(options.pageParam.page));
+      resultParams = resultParams.append('size', _.toString(options.pageParam.size));
+      resultParams = UrlUtils.generateSortParams(options.pageParam.sort, resultParams);
     }
 
     if (!_.isNil(options.projection)) {
@@ -86,6 +86,11 @@ export class UrlUtils {
    */
   public static fillTemplateParams(url: string, options: PagedGetOption): string {
     if (!url) {
+      // ConsoleLogger.prettyError(`STAGE ${ Stage.PREPARE_URL }`, {
+      //   step: 'FillTemplateParams',
+      //   error: 'Url should be defined',
+      //   srcUrl: url
+      // });
       throw Error('Url should be defined');
     }
     UrlUtils.checkParams(options);
@@ -93,19 +98,27 @@ export class UrlUtils {
     const paramsWithoutSortParam = {
       ...options,
       ...options?.params,
-      ...options?.page,
+      ...options?.pageParam,
       /* Sets sort to null because sort is object and should be applied as multi params with sort name
          for each sort object property, but uriTemplates can't do that and we need to do it manually */
       sort: null
     };
 
     const resultUrl = uriTemplates(url).fill(_.isNil(paramsWithoutSortParam) ? {} : paramsWithoutSortParam);
-    if (options?.page) {
-      const sortParams = UrlUtils.generateSortParams(options.page.sort);
+    if (options?.pageParam) {
+      const sortParams = UrlUtils.generateSortParams(options.pageParam.sort);
       if (sortParams.keys().length > 0) {
         return resultUrl.concat(resultUrl.includes('?') ? '&' : '').concat(sortParams.toString());
       }
     }
+
+    // ConsoleLogger.prettyInfo(`STAGE ${ Stage.PREPARE_URL }`, {
+    //   step: 'FillTemplateParams',
+    //   srcUrl: url,
+    //   options: JSON.stringify(options, null, 2),
+    //   result: `successful, result url is ${ resultUrl }`,
+    // });
+
     return resultUrl;
   }
 
@@ -122,14 +135,33 @@ export class UrlUtils {
 
   private static checkParams(options: GetOption): void {
     if (_.isEmpty(options) || _.isEmpty(options.params)) {
+      // ConsoleLogger.prettyInfo(`STAGE ${ Stage.PREPARE_URL }`, {
+      //   step: 'CheckParams',
+      //   result: 'successful',
+      //   options: 'no passed options'
+      // });
       return;
     }
     if ('projection' in options.params) {
+      // ConsoleLogger.prettyError(`STAGE ${ Stage.PREPARE_URL }`, {
+      //   step: 'CheckParams',
+      //   error: 'Please, pass projection param in projection object key, not with params object!',
+      // });
       throw Error('Please, pass projection param in projection object key, not with params object!');
     }
     if ('page' in options.params || 'size' in options.params || 'sort' in options.params) {
+      // ConsoleLogger.prettyError(`STAGE ${ Stage.PREPARE_URL }`, {
+      //   step: 'CheckParams',
+      //   error: 'Please, pass page params in page object key, not with params object!',
+      // });
       throw Error('Please, pass page params in page object key, not with params object!');
     }
+
+    // ConsoleLogger.prettyInfo(`STAGE ${ Stage.PREPARE_URL }`, {
+    //   step: 'CheckParams',
+    //   result: 'successful',
+    //   options: JSON.stringify(options, null, 2),
+    // });
   }
 
 }

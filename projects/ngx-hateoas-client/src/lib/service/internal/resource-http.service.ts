@@ -13,6 +13,7 @@ import { GetOption, RequestParam } from '../../model/declarations';
 import { HttpExecutor } from '../http-executor';
 import { CacheService } from '../cache.service';
 import { HttpConfigService } from '../../config/http-config.service';
+import { Stage } from '../../logger/stage.enum';
 
 /**
  * Get instance of the ResourceHttpService by Angular DependencyInjector.
@@ -52,7 +53,8 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
       return observableOf(this.cacheService.getResource());
     }
 
-    ConsoleLogger.prettyInfo('GET_RESOURCE REQUEST', {
+    ConsoleLogger.prettyInfo(`STAGE ${ Stage.HTTP_REQUEST }`, {
+      method: 'GET',
       url,
       params: options?.params
     });
@@ -60,10 +62,11 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
     return super.get(url, {...options, observe: 'body'})
       .pipe(
         map((data: any) => {
-          ConsoleLogger.prettyInfo('GET_RESOURCE RESPONSE', {
+          ConsoleLogger.prettyInfo(`STAGE ${ Stage.HTTP_RESPONSE }`, {
+            method: 'GET',
             url,
             params: options?.params,
-            body: JSON.stringify(data, null, 4)
+            result: JSON.stringify(data, null, 4)
           });
 
           if (!isResource(data)) {
@@ -88,7 +91,8 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
       [param: string]: string | string[];
     }
   }): Observable<any> {
-    ConsoleLogger.prettyInfo('POST_RESOURCE REQUEST', {
+    ConsoleLogger.prettyInfo(`STAGE ${ Stage.HTTP_REQUEST }`, {
+      method: 'POST',
       url,
       params: options?.params,
       body: JSON.stringify(body, null, 4)
@@ -97,10 +101,11 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
     return super.post(url, body, options)
       .pipe(
         map((data: any) => {
-          ConsoleLogger.prettyInfo('POST_RESOURCE RESPONSE', {
+          ConsoleLogger.prettyInfo(`STAGE ${ Stage.HTTP_RESPONSE }`, {
+            method: 'POST',
             url,
             params: options?.params,
-            body: JSON.stringify(data, null, 4)
+            result: JSON.stringify(data, null, 4)
           });
 
           this.cacheService.evictResource(url);
@@ -122,7 +127,8 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
       [param: string]: string | string[];
     }
   }): Observable<any> {
-    ConsoleLogger.prettyInfo('PUT_RESOURCE REQUEST', {
+    ConsoleLogger.prettyInfo(`STAGE ${ Stage.HTTP_REQUEST }`, {
+      method: 'PUT',
       url,
       params: options?.params,
       body: JSON.stringify(body, null, 4)
@@ -131,10 +137,11 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
     return super.put(url, body, options)
       .pipe(
         map((data: any) => {
-          ConsoleLogger.prettyInfo('PUT_RESOURCE RESPONSE', {
+          ConsoleLogger.prettyInfo(`STAGE ${ Stage.HTTP_RESPONSE }`, {
+            method: 'PUT',
             url,
             params: options?.params,
-            body: JSON.stringify(data, null, 4)
+            result: JSON.stringify(data, null, 4)
           });
 
           this.cacheService.evictResource(url);
@@ -156,7 +163,8 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
       [param: string]: string | string[];
     }
   }): Observable<any> {
-    ConsoleLogger.prettyInfo('PATH_RESOURCE REQUEST', {
+    ConsoleLogger.prettyInfo(`STAGE ${ Stage.HTTP_REQUEST }`, {
+      method: 'PATCH',
       url,
       params: options?.params,
       body: JSON.stringify(body, null, 4)
@@ -165,10 +173,11 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
     return super.patch(url, body, options)
       .pipe(
         map((data: any) => {
-          ConsoleLogger.prettyInfo('PATH_RESOURCE RESPONSE', {
+          ConsoleLogger.prettyInfo(`STAGE ${ Stage.HTTP_RESPONSE }`, {
+            method: 'PATCH',
             url,
             params: options?.params,
-            body: JSON.stringify(data, null, 4)
+            result: JSON.stringify(data, null, 4)
           });
 
           this.cacheService.evictResource(url);
@@ -191,7 +200,8 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
       [param: string]: string | string[];
     }
   }): Observable<any> {
-    ConsoleLogger.prettyInfo('DELETE_RESOURCE REQUEST', {
+    ConsoleLogger.prettyInfo(`STAGE ${ Stage.HTTP_REQUEST }`, {
+      method: 'DELETE',
       url,
       params: options?.params
     });
@@ -199,10 +209,11 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
     return super.delete(url, options)
       .pipe(
         map((data: any) => {
-          ConsoleLogger.prettyInfo('DELETE_RESOURCE RESPONSE', {
+          ConsoleLogger.prettyInfo(`STAGE ${ Stage.HTTP_RESPONSE }`, {
+            method: 'DELETE',
             url,
             params: options?.params,
-            body: JSON.stringify(data, null, 4)
+            result: JSON.stringify(data, null, 4)
           });
 
           this.cacheService.evictResource(url);
@@ -230,7 +241,13 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
     const url = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName)
       .concat('/search/' + (_.isNil(countQuery) ? 'countAll' : countQuery));
 
-    ConsoleLogger.prettyInfo('COUNT REQUEST', {
+    ConsoleLogger.prettyInfo(`STAGE ${ Stage.PREPARE_URL }`, {
+      result: url,
+      urlParts: `baseUrl: '${ this.httpConfig.baseApiUrl }', resource: '${ resourceName }', countQuery: '${ countQuery ? countQuery : 'countAll' }'`,
+      requestParam: JSON.stringify(requestParam, null, 2)
+    });
+
+    ConsoleLogger.prettyInfo(`STAGE ${ Stage.HTTP_REQUEST }`, {
       url,
       params: requestParam
     });
@@ -238,15 +255,15 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
     return super.get(url, {params: UrlUtils.convertToHttpParams({params: requestParam}), observe: 'body'})
       .pipe(
         map((data: any) => {
-          ConsoleLogger.prettyInfo('COUNT RESPONSE', {
+          ConsoleLogger.prettyInfo(`STAGE ${ Stage.HTTP_RESPONSE }`, {
             url,
             params: requestParam,
-            data
+            result: data
           });
 
           if (_.isNil(data) || _.isNaN(_.toNumber(data))) {
-            ConsoleLogger.error(`Returned value ${data} should be number.`);
-            throw Error(`Returned value ${data} should be number.`);
+            ConsoleLogger.error(`Returned value ${ data } should be number.`);
+            throw Error(`Returned value ${ data } should be number.`);
           }
 
           return _.toNumber(data);
@@ -269,9 +286,15 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
     if (_.isNil(id) || id <= 0) {
       return observableThrowError(new Error('id should be defined and great than 0'));
     }
-    const uri = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName).concat('/', _.toString(id));
+    const url = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName).concat('/', _.toString(id));
 
-    return this.get(uri, {params: UrlUtils.convertToHttpParams(option)});
+    ConsoleLogger.prettyInfo(`STAGE ${ Stage.PREPARE_URL }`, {
+      result: url,
+      urlParts: `baseUrl: '${ this.httpConfig.baseApiUrl }', resource: '${ resourceName }', id: '${ id }'`,
+      options: JSON.stringify(option, null, 2)
+    });
+
+    return this.get(url, {params: UrlUtils.convertToHttpParams(option)});
   }
 
   /**
@@ -287,9 +310,14 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
     if (_.isEmpty(body)) {
       return observableThrowError(new Error('body should be defined'));
     }
-    const uri = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName);
+    const url = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName);
 
-    return this.post(uri, body, {observe: 'body'});
+    ConsoleLogger.prettyInfo(`STAGE ${ Stage.PREPARE_URL }`, {
+      result: url,
+      urlParts: `baseUrl: '${ this.httpConfig.baseApiUrl }', resource: '${ resourceName }'`,
+    });
+
+    return this.post(url, body, {observe: 'body'});
   }
 
   /**
@@ -307,6 +335,11 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
       return observableThrowError(new Error('search query should be defined'));
     }
     const url = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName).concat('/search/' + searchQuery);
+
+    ConsoleLogger.prettyInfo(`STAGE ${ Stage.PREPARE_URL }`, {
+      result: url,
+      urlParts: `baseUrl: '${ this.httpConfig.baseApiUrl }', resource: '${ resourceName }', searchQuery: '${ searchQuery }'`,
+    });
 
     return this.get(url, {params: UrlUtils.convertToHttpParams(option)});
   }

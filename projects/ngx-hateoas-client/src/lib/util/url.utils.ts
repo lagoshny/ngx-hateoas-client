@@ -86,11 +86,6 @@ export class UrlUtils {
    */
   public static fillTemplateParams(url: string, options: PagedGetOption): string {
     if (!url) {
-      // ConsoleLogger.prettyError(`STAGE ${ Stage.PREPARE_URL }`, {
-      //   step: 'FillTemplateParams',
-      //   error: 'Url should be defined',
-      //   srcUrl: url
-      // });
       throw Error('Url should be defined');
     }
     UrlUtils.checkParams(options);
@@ -112,13 +107,6 @@ export class UrlUtils {
       }
     }
 
-    // ConsoleLogger.prettyInfo(`STAGE ${ Stage.PREPARE_URL }`, {
-    //   step: 'FillTemplateParams',
-    //   srcUrl: url,
-    //   options: JSON.stringify(options, null, 2),
-    //   result: `successful, result url is ${ resultUrl }`,
-    // });
-
     return resultUrl;
   }
 
@@ -135,33 +123,14 @@ export class UrlUtils {
 
   private static checkParams(options: GetOption): void {
     if (_.isEmpty(options) || _.isEmpty(options.params)) {
-      // ConsoleLogger.prettyInfo(`STAGE ${ Stage.PREPARE_URL }`, {
-      //   step: 'CheckParams',
-      //   result: 'successful',
-      //   options: 'no passed options'
-      // });
       return;
     }
     if ('projection' in options.params) {
-      // ConsoleLogger.prettyError(`STAGE ${ Stage.PREPARE_URL }`, {
-      //   step: 'CheckParams',
-      //   error: 'Please, pass projection param in projection object key, not with params object!',
-      // });
       throw Error('Please, pass projection param in projection object key, not with params object!');
     }
     if ('page' in options.params || 'size' in options.params || 'sort' in options.params) {
-      // ConsoleLogger.prettyError(`STAGE ${ Stage.PREPARE_URL }`, {
-      //   step: 'CheckParams',
-      //   error: 'Please, pass page params in page object key, not with params object!',
-      // });
       throw Error('Please, pass page params in page object key, not with params object!');
     }
-
-    // ConsoleLogger.prettyInfo(`STAGE ${ Stage.PREPARE_URL }`, {
-    //   step: 'CheckParams',
-    //   result: 'successful',
-    //   options: JSON.stringify(options, null, 2),
-    // });
   }
 
 }

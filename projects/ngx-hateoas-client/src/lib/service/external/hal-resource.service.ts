@@ -9,10 +9,9 @@ import { ResourceCollection } from '../../model/resource/resource-collection';
 import { ResourceCollectionHttpService } from '../internal/resource-collection-http.service';
 import { CommonResourceHttpService } from '../internal/common-resource-http.service';
 import { UrlUtils } from '../../util/url.utils';
-import { ConsoleLogger } from '../../logger/console-logger';
-import { Stage } from '../../logger/stage.enum';
 import { tap } from 'rxjs/operators';
 import { Resource } from '../../model/resource/resource';
+import { StageLogger } from '../../logger/stage-logger';
 
 /**
  * Service to operate with {@link Resource}.
@@ -38,16 +37,12 @@ export class HalResourceService<T extends Resource> {
    * @param options (optional) options that should be applied to the request
    */
   public get(resourceName: string, id: any, options?: GetOption): Observable<T> {
-    ConsoleLogger.resourcePrettyInfo(`ResourceService GET_RESOURCE '${ resourceName }'`, `STAGE ${ Stage.BEGIN }`, {
-      id,
-      options: JSON.stringify(options, null, 2)
-    });
+    StageLogger.resourceBeginLog(resourceName, 'ResourceService GET_RESOURCE', {id, options});
 
     return this.resourceHttpService.getResource(resourceName, id, options)
       .pipe(tap(() => {
-        ConsoleLogger.resourcePrettyInfo(`ResourceService GET_RESOURCE '${ resourceName }'`, `STAGE ${ Stage.END }`, {
-          result: `get '${ resourceName }' resource successful`
-        });
+        StageLogger.resourceEndLog(resourceName, 'ResourceService GET_RESOURCE',
+          {result: `get resource '${ resourceName }' was successful`});
       })) as Observable<T>;
   }
 
@@ -58,15 +53,12 @@ export class HalResourceService<T extends Resource> {
    * @param options (optional) options that should be applied to the request
    */
   public getAll(resourceName: string, options?: GetOption): Observable<ResourceCollection<T>> {
-    ConsoleLogger.resourcePrettyInfo(`ResourceService GET_ALL '${ resourceName }'`, `STAGE ${ Stage.BEGIN }`, {
-      options: JSON.stringify(options, null, 2)
-    });
+    StageLogger.resourceBeginLog(resourceName, 'ResourceService GET_ALL', {options});
 
     return this.resourceCollectionHttpServiceSpy.getResourceCollection(resourceName, null, options)
       .pipe(tap(() => {
-        ConsoleLogger.resourcePrettyInfo(`ResourceService GET_ALL '${ resourceName }'`, `STAGE ${ Stage.END }`, {
-          result: `get all resources by  '${ resourceName }' successful`
-        });
+        StageLogger.resourceEndLog(resourceName, 'ResourceService GET_ALL',
+          {result: `get all resources by '${ resourceName }' was successful`});
       }));
   }
 
@@ -77,15 +69,12 @@ export class HalResourceService<T extends Resource> {
    * @param options (optional) options that should be applied to the request
    */
   public getAllPage(resourceName: string, options?: PagedGetOption): Observable<PagedResourceCollection<T>> {
-    ConsoleLogger.resourcePrettyInfo(`ResourceService GET_ALL_PAGE '${ resourceName }'`, `STAGE ${ Stage.BEGIN }`, {
-      options: JSON.stringify(options, null, 2)
-    });
+    StageLogger.resourceBeginLog(resourceName, 'ResourceService GET_ALL_PAGE', {options});
 
     return this.pagedResourceCollectionHttpService.getResourcePage(resourceName, null, options)
       .pipe(tap(() => {
-        ConsoleLogger.resourcePrettyInfo(`ResourceService GET_ALL_PAGE '${ resourceName }'`, `STAGE ${ Stage.END }`, {
-          result: `get all page resources by  '${ resourceName }' successful`
-        });
+        StageLogger.resourceEndLog(resourceName, 'ResourceService GET_ALL_PAGE',
+          {result: `get all page resources by '${ resourceName }' was successful`});
       }));
   }
 
@@ -96,17 +85,14 @@ export class HalResourceService<T extends Resource> {
    * @param requestBody that contains the body directly and optional body values option {@link ValuesOption}
    */
   public createResource(resourceName: string, requestBody: RequestBody<T>): Observable<T> {
-    ConsoleLogger.resourcePrettyInfo(`ResourceService CREATE_RESOURCE '${ resourceName }'`, `STAGE ${ Stage.BEGIN }`, {
-      requestBody: JSON.stringify(requestBody, null, 2)
-    });
+    StageLogger.resourceBeginLog(resourceName, 'ResourceService CREATE_RESOURCE', {requestBody});
 
     const body = ResourceUtils.resolveValues(requestBody);
 
     return this.resourceHttpService.postResource(resourceName, body)
       .pipe(tap(() => {
-        ConsoleLogger.resourcePrettyInfo(`ResourceService CREATE_RESOURCE '${ resourceName }'`, `STAGE ${ Stage.END }`, {
-          result: `resource  '${ resourceName }' was created successful`
-        });
+        StageLogger.resourceEndLog(resourceName, 'ResourceService CREATE_RESOURCE',
+          {result: `resource '${ resourceName }' was created successful`});
       }));
   }
 
@@ -116,18 +102,15 @@ export class HalResourceService<T extends Resource> {
    * @param requestBody that contains the body directly and optional body values option {@link ValuesOption}
    */
   public updateResource(requestBody: RequestBody<T>): Observable<T> {
-    ConsoleLogger.resourcePrettyInfo(`ResourceService UPDATE_RESOURCE ${ requestBody?.body['resourceName'] }`, `STAGE ${ Stage.BEGIN }`, {
-      requestBody: JSON.stringify(requestBody, null, 2)
-    });
+    StageLogger.resourceBeginLog(requestBody?.body, 'ResourceService UPDATE_RESOURCE', {requestBody});
 
     const resource = ResourceUtils.initResource(requestBody.body) as Resource;
     const body = ResourceUtils.resolveValues({body: resource, valuesOption: requestBody?.valuesOption});
 
     return this.resourceHttpService.put(resource.getSelfLinkHref(), body)
       .pipe(tap(() => {
-        ConsoleLogger.resourcePrettyInfo(`ResourceService UPDATE_RESOURCE ${ requestBody?.body['resourceName'] }`, `STAGE ${ Stage.END }`, {
-          result: `resource  '${ resource['resourceName'] }' was updated successful`
-        });
+        StageLogger.resourceEndLog(requestBody?.body, 'ResourceService CREATE_RESOURCE',
+          {result: `resource '${ resource['resourceName'] }' was updated successful`});
       }));
   }
 
@@ -139,16 +122,12 @@ export class HalResourceService<T extends Resource> {
    * @param requestParam (optional) http request params that applied to the request
    */
   public count(resourceName: string, countQuery: string, requestParam: RequestParam): Observable<number> {
-    ConsoleLogger.resourcePrettyInfo(`ResourceService COUNT '${ resourceName }'`, `STAGE ${ Stage.BEGIN }`, {
-      query: countQuery,
-      requestParam: JSON.stringify(requestParam, null, 2)
-    });
+    StageLogger.resourceBeginLog(resourceName, 'ResourceService COUNT', {query: countQuery, requestParam});
 
     return this.resourceHttpService.count(resourceName, countQuery, requestParam)
       .pipe(tap(() => {
-        ConsoleLogger.resourcePrettyInfo(`ResourceService COUNT '${ resourceName }'`, `STAGE ${ Stage.END }`, {
-          result: `count for resource  '${ resourceName }' was performed successful`
-        });
+        StageLogger.resourceEndLog(resourceName, 'ResourceService COUNT',
+          {result: `count resource '${ resourceName }' was performed successful`});
       }));
   }
 
@@ -158,18 +137,15 @@ export class HalResourceService<T extends Resource> {
    * @param requestBody that contains the body directly and optional body values option {@link ValuesOption}
    */
   public patchResource(requestBody: RequestBody<T>): Observable<T | any> {
-    ConsoleLogger.resourcePrettyInfo(`ResourceService PATCH_RESOURCE ${ requestBody?.body['resourceName'] }`, `STAGE ${ Stage.BEGIN }`, {
-      requestBody: JSON.stringify(requestBody, null, 2)
-    });
+    StageLogger.resourceBeginLog(requestBody?.body, 'ResourceService PATCH_RESOURCE', {requestBody});
 
     const resource = ResourceUtils.initResource(requestBody?.body) as Resource;
     const body = ResourceUtils.resolveValues({body: resource, valuesOption: requestBody?.valuesOption});
 
     return this.resourceHttpService.patch(resource.getSelfLinkHref(), body)
       .pipe(tap(() => {
-        ConsoleLogger.resourcePrettyInfo(`ResourceService PATCH_RESOURCE ${ requestBody?.body['resourceName'] }`, `STAGE ${ Stage.END }`, {
-          result: `resource  '${ resource['resourceName'] }' was patched successful`
-        });
+        StageLogger.resourceEndLog(requestBody?.body, 'ResourceService PATCH_RESOURCE',
+          {result: `resource '${ resource['resourceName'] }' was patched successful`});
       }));
   }
 
@@ -180,9 +156,7 @@ export class HalResourceService<T extends Resource> {
    * @param options (optional) options that should be applied to the request
    */
   public deleteResource(entity: T, options?: RequestOption): Observable<T | any> {
-    ConsoleLogger.resourcePrettyInfo(`ResourceService DELETE_RESOURCE ${ entity['resourceName'] }`, `STAGE ${ Stage.BEGIN }`, {
-      options: JSON.stringify(options, null, 2)
-    });
+    StageLogger.resourceBeginLog(entity, 'ResourceService DELETE_RESOURCE', {options});
 
     const resource = ResourceUtils.initResource(entity) as Resource;
     const httpParams = UrlUtils.convertToHttpParams({params: options?.params});
@@ -190,60 +164,47 @@ export class HalResourceService<T extends Resource> {
     return this.resourceHttpService.delete(resource.getSelfLinkHref(),
       {observe: options?.observe, params: httpParams})
       .pipe(tap(() => {
-        ConsoleLogger.resourcePrettyInfo(`ResourceService DELETE_RESOURCE ${ resource['resourceName'] }`, `STAGE ${ Stage.END }`, {
-          result: `resource  '${ resource['resourceName'] }' was deleted successful`
-        });
+        StageLogger.resourceEndLog(entity, 'ResourceService DELETE_RESOURCE',
+          {result: `resource '${ resource['resourceName'] }' was deleted successful`});
       }));
   }
 
   /**
    * {@see ResourceCollectionHttpService#search}
    */
-  public searchCollection(resourceName: string, searchQuery: string, option?: GetOption): Observable<ResourceCollection<T>> {
-    ConsoleLogger.resourcePrettyInfo(`ResourceService SEARCH_COLLECTION '${ resourceName }'`, `STAGE ${ Stage.BEGIN }`, {
-      query: searchQuery,
-      option: JSON.stringify(option, null, 2)
-    });
+  public searchCollection(resourceName: string, searchQuery: string, options?: GetOption): Observable<ResourceCollection<T>> {
+    StageLogger.resourceBeginLog(resourceName, 'ResourceService SEARCH_COLLECTION', {query: searchQuery, options});
 
-    return this.resourceCollectionHttpServiceSpy.search(resourceName, searchQuery, option)
+    return this.resourceCollectionHttpServiceSpy.search(resourceName, searchQuery, options)
       .pipe(tap(() => {
-        ConsoleLogger.resourcePrettyInfo(`ResourceService SEARCH_COLLECTION '${ resourceName }'`, `STAGE ${ Stage.END }`, {
-          result: `search collection by  '${ resourceName }' was successful`
-        });
+        StageLogger.resourceEndLog(resourceName, 'ResourceService SEARCH_COLLECTION',
+          {result: `search collection by '${ resourceName }' was performed successful`});
       }));
   }
 
   /**
    * {@see PagedResourceCollection#search}
    */
-  public searchPage(resourceName: string, searchQuery: string, option?: PagedGetOption): Observable<PagedResourceCollection<T>> {
-    ConsoleLogger.resourcePrettyInfo(`ResourceService SEARCH_PAGE '${ resourceName }'`, `STAGE ${ Stage.BEGIN }`, {
-      query: searchQuery,
-      option: JSON.stringify(option, null, 2)
-    });
+  public searchPage(resourceName: string, searchQuery: string, options?: PagedGetOption): Observable<PagedResourceCollection<T>> {
+    StageLogger.resourceBeginLog(resourceName, 'ResourceService SEARCH_PAGE', {query: searchQuery, options});
 
-    return this.pagedResourceCollectionHttpService.search(resourceName, searchQuery, option)
+    return this.pagedResourceCollectionHttpService.search(resourceName, searchQuery, options)
       .pipe(tap(() => {
-        ConsoleLogger.resourcePrettyInfo(`ResourceService SEARCH_PAGE '${ resourceName }'`, `STAGE ${ Stage.END }`, {
-          result: `search page by '${ resourceName }' was successful`
-        });
+        StageLogger.resourceEndLog(resourceName, 'ResourceService SEARCH_PAGE',
+          {result: `search page by '${ resourceName }' was performed successful`});
       }));
   }
 
   /**
    * {@see ResourceHttpService#search}
    */
-  public searchSingle(resourceName: string, searchQuery: string, option?: GetOption): Observable<T> {
-    ConsoleLogger.resourcePrettyInfo(`ResourceService SEARCH_SINGLE '${ resourceName }'`, `STAGE ${ Stage.BEGIN }`, {
-      query: searchQuery,
-      option: JSON.stringify(option, null, 2)
-    });
+  public searchSingle(resourceName: string, searchQuery: string, options?: GetOption): Observable<T> {
+    StageLogger.resourceBeginLog(resourceName, 'ResourceService SEARCH_SINGLE', {query: searchQuery, options});
 
-    return this.resourceHttpService.search(resourceName, searchQuery, option)
+    return this.resourceHttpService.search(resourceName, searchQuery, options)
       .pipe(tap(() => {
-        ConsoleLogger.resourcePrettyInfo(`ResourceService SEARCH_SINGLE '${ resourceName }'`, `STAGE ${ Stage.END }`, {
-          result: `search single by '${ resourceName }' was successful`
-        });
+        StageLogger.resourceEndLog(resourceName, 'ResourceService SEARCH_SINGLE',
+          {result: `search single by '${ resourceName }' was performed successful`});
       }));
   }
 
@@ -254,21 +215,15 @@ export class HalResourceService<T extends Resource> {
                      method: HttpMethod,
                      query: string,
                      requestBody?: RequestBody<any>,
-                     option?: PagedGetOption): Observable<any | T | ResourceCollection<T> | PagedResourceCollection<T>> {
-    ConsoleLogger.resourcePrettyInfo(`ResourceService CUSTOM_QUERY '${ resourceName }'`, `STAGE ${ Stage.BEGIN }`, {
-      method: HttpMethod,
-      query,
-      requestBody: JSON.stringify(requestBody, null, 2),
-      options: JSON.stringify(option, null, 2)
-    });
+                     options?: PagedGetOption): Observable<any | T | ResourceCollection<T> | PagedResourceCollection<T>> {
+    StageLogger.resourceBeginLog(resourceName, 'ResourceService CUSTOM_QUERY', {method: HttpMethod, query, requestBody, options});
 
     const body = ResourceUtils.resolveValues(requestBody);
 
-    return this.commonHttpService.customQuery(resourceName, method, query, body, option)
+    return this.commonHttpService.customQuery(resourceName, method, query, body, options)
       .pipe(tap(() => {
-        ConsoleLogger.resourcePrettyInfo(`ResourceService CUSTOM_QUERY '${ resourceName }'`, `STAGE ${ Stage.END }`, {
-          result: `search custom query by '${ resourceName }' was successful`
-        });
+        StageLogger.resourceEndLog(resourceName, 'ResourceService CUSTOM_QUERY',
+          {result: `custom query by '${ resourceName }' was performed successful`});
       }));
   }
 

@@ -10,8 +10,8 @@ import { HttpConfigService } from '../../config/http-config.service';
 import { map } from 'rxjs/operators';
 import { isPagedResourceCollection, isResource, isResourceCollection } from '../../model/resource-type';
 import { ResourceUtils } from '../../util/resource.utils';
-import { ConsoleLogger } from '../../logger/console-logger';
 import { Stage } from '../../logger/stage.enum';
+import { StageLogger } from '../../logger/stage-logger';
 
 /**
  * Service to perform HTTP requests to get any type of the {@link Resource}, {@link PagedResourceCollection}, {@link ResourceCollection}.
@@ -48,16 +48,9 @@ export class CommonResourceHttpService extends HttpExecutor {
     const url = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName, query);
     const httpParams = UrlUtils.convertToHttpParams(option);
 
-    ConsoleLogger.prettyInfo(`STAGE ${ Stage.PREPARE_URL }`, {
+    StageLogger.stageLog(Stage.PREPARE_URL, {
       result: url,
-      urlParts: `baseUrl: '${ this.httpConfig.baseApiUrl }', resource: '${ resourceName }', query: '${ query }'`,
-    });
-
-    ConsoleLogger.prettyInfo(`STAGE ${ Stage.HTTP_REQUEST }`, {
-      method,
-      url,
-      params: httpParams,
-      body: body ? JSON.stringify(body, null, 4) : ''
+      urlParts: `baseUrl: '${ this.httpConfig.baseApiUrl }', resource: '${ resourceName }', query: '${ query }'`
     });
 
     let result: Observable<any>;
@@ -75,17 +68,13 @@ export class CommonResourceHttpService extends HttpExecutor {
         result = super.patch(url, body, {params: httpParams, observe: 'body'});
         break;
       default:
-        return observableThrowError(new Error(`allowed ony GET/POST/PUT/PATCH http methods you pass ${ method }`));
+        const errMsg = `allowed ony GET/POST/PUT/PATCH http methods you pass ${ method }`;
+        StageLogger.stageErrorLog(Stage.HTTP_REQUEST, {error: errMsg});
+        return observableThrowError(new Error(errMsg));
     }
 
     return result.pipe(
       map(data => {
-        ConsoleLogger.prettyInfo(`STAGE ${ Stage.HTTP_RESPONSE }`, {
-          url,
-          params: httpParams,
-          result: JSON.stringify(data, null, 4)
-        });
-
         if (isPagedResourceCollection(data)) {
           return ResourceUtils.instantiatePagedResourceCollection(data);
         } else if (isResourceCollection(data)) {

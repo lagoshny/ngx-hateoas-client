@@ -9,15 +9,12 @@ import { HttpParams, HttpResponse } from '@angular/common/http';
 import { getPagedResourceCollectionHttpService } from '../../service/internal/paged-resource-collection-http.service';
 import { PagedResourceCollection } from './paged-resource-collection';
 import { ResourceUtils } from '../../util/resource.utils';
-import { ConsoleLogger } from '../../logger/console-logger';
-import { Stage } from '../../logger/stage.enum';
 import { tap } from 'rxjs/operators';
+import { StageLogger } from '../../logger/stage-logger';
 
 /**
  * Common resource class.
  */
-
-/* tslint:disable:no-string-literal */
 export abstract class BaseResource extends ResourceIdentifiable {
 
   /**
@@ -30,10 +27,7 @@ export abstract class BaseResource extends ResourceIdentifiable {
   public getRelation<T extends BaseResource>(relationName: string,
                                              options?: GetOption
   ): Observable<T> {
-    ConsoleLogger.resourcePrettyInfo(`${ 'resourceName' in this ? this['resourceName'] : 'EmbeddedResource' } GET_RELATION`, `STAGE ${ Stage.BEGIN }`, {
-      relationName,
-      options: JSON.stringify(options),
-    });
+    StageLogger.resourceBeginLog(this, 'GET_RELATION', {relationName, options});
 
     const relationLink = this.getRelationLink(relationName);
     const url = relationLink.templated
@@ -45,9 +39,7 @@ export abstract class BaseResource extends ResourceIdentifiable {
       }
     ).pipe(
       tap(() => {
-        ConsoleLogger.resourcePrettyInfo(`${ 'resourceName' in this ? this['resourceName'] : 'EmbeddedResource' } GET_RELATION`, `STAGE ${ Stage.END }`, {
-          result: `get relation ${ relationName } successful`
-        });
+        StageLogger.resourceEndLog(this, 'GET_RELATION', {result: `relation ${ relationName } was got successful`});
       })
     ) as Observable<T>;
   }
@@ -62,10 +54,7 @@ export abstract class BaseResource extends ResourceIdentifiable {
   public getRelatedCollection<T extends ResourceCollection<BaseResource>>(relationName: string,
                                                                           options?: GetOption
   ): Observable<T> {
-    ConsoleLogger.resourcePrettyInfo(`${ 'resourceName' in this ? this['resourceName'] : 'EmbeddedResource' } GET_RELATED_COLLECTION`, `STAGE ${ Stage.BEGIN }`, {
-      relationName,
-      options: JSON.stringify(options),
-    });
+    StageLogger.resourceBeginLog(this, 'GET_RELATED_COLLECTION', {relationName, options});
 
     const relationLink = this.getRelationLink(relationName);
     const url = relationLink.templated ? UrlUtils.fillTemplateParams(relationLink.href, options) : relationLink.href;
@@ -74,9 +63,7 @@ export abstract class BaseResource extends ResourceIdentifiable {
       params: relationLink.templated ? new HttpParams() : UrlUtils.convertToHttpParams(options)
     }).pipe(
       tap(() => {
-        ConsoleLogger.resourcePrettyInfo(`${ 'resourceName' in this ? this['resourceName'] : 'EmbeddedResource' } GET_RELATED_COLLECTION`, `STAGE ${ Stage.END }`, {
-          result: `get related collection ${ relationName } successful`
-        });
+        StageLogger.resourceEndLog(this, 'GET_RELATED_COLLECTION', {result: `related collection ${ relationName } was got successful`});
       })
     ) as Observable<T>;
   }
@@ -91,10 +78,7 @@ export abstract class BaseResource extends ResourceIdentifiable {
    */
   public getRelatedPage<T extends PagedResourceCollection<BaseResource>>(relationName: string,
                                                                          options?: PagedGetOption): Observable<T> {
-    ConsoleLogger.resourcePrettyInfo(`${ 'resourceName' in this ? this['resourceName'] : 'EmbeddedResource' } GET_RELATED_PAGE`, `STAGE ${ Stage.BEGIN }`, {
-      relationName,
-      options: JSON.stringify(options),
-    });
+    StageLogger.resourceBeginLog(this, 'GET_RELATED_PAGE', {relationName, options});
 
     const relationLink = this.getRelationLink(relationName);
     const url = relationLink.templated
@@ -105,9 +89,7 @@ export abstract class BaseResource extends ResourceIdentifiable {
       params: relationLink.templated ? new HttpParams() : UrlUtils.convertToHttpParams(options)
     }).pipe(
       tap(() => {
-        ConsoleLogger.resourcePrettyInfo(`${ 'resourceName' in this ? this['resourceName'] : 'EmbeddedResource' } GET_RELATED_PAGE`, `STAGE ${ Stage.END }`, {
-          result: `get related page ${ relationName } successful`
-        });
+        StageLogger.resourceEndLog(this, 'GET_RELATED_PAGE', {result: `related page ${ relationName } was got successful`});
       })
     ) as Observable<T>;
   }
@@ -124,11 +106,7 @@ export abstract class BaseResource extends ResourceIdentifiable {
   public postRelation(relationName: string,
                       requestBody: RequestBody<any>,
                       options?: RequestOption): Observable<any> {
-    ConsoleLogger.resourcePrettyInfo(`${ 'resourceName' in this ? this['resourceName'] : 'EmbeddedResource' } POST_RELATION`, `STAGE ${ Stage.BEGIN }`, {
-      relationName,
-      requestBody: JSON.stringify(requestBody),
-      options: JSON.stringify(options),
-    });
+    StageLogger.resourceBeginLog(this, 'POST_RELATION', {relationName, requestBody, options});
 
     const relationLink = this.getRelationLink(relationName);
     const url = relationLink.templated ? UrlUtils.fillTemplateParams(relationLink.href, options) : relationLink.href;
@@ -139,9 +117,7 @@ export abstract class BaseResource extends ResourceIdentifiable {
         params: relationLink.templated ? new HttpParams() : UrlUtils.convertToHttpParams(options)
       }).pipe(
       tap(() => {
-        ConsoleLogger.resourcePrettyInfo(`${ 'resourceName' in this ? this['resourceName'] : 'EmbeddedResource' } POST_RELATION`, `STAGE ${ Stage.END }`, {
-          result: `post relation ${ relationName } successful`
-        });
+        StageLogger.resourceEndLog(this, 'POST_RELATION', {result: `relation ${ relationName } was posted successful`});
       })
     );
   }
@@ -159,11 +135,7 @@ export abstract class BaseResource extends ResourceIdentifiable {
   public patchRelation(relationName: string,
                        requestBody: RequestBody<any>,
                        options?: RequestOption): Observable<any> {
-    ConsoleLogger.resourcePrettyInfo(`${ 'resourceName' in this ? this['resourceName'] : 'EmbeddedResource' } PATCH_RELATION`, `STAGE ${ Stage.BEGIN }`, {
-      relationName,
-      requestBody: JSON.stringify(requestBody),
-      options: JSON.stringify(options),
-    });
+    StageLogger.resourceBeginLog(this, 'PATCH_RELATION', {relationName, requestBody, options});
 
     const relationLink = this.getRelationLink(relationName);
     const url = relationLink.templated ? UrlUtils.fillTemplateParams(relationLink.href, options) : relationLink.href;
@@ -174,9 +146,7 @@ export abstract class BaseResource extends ResourceIdentifiable {
         params: relationLink.templated ? new HttpParams() : UrlUtils.convertToHttpParams(options)
       }).pipe(
       tap(() => {
-        ConsoleLogger.resourcePrettyInfo(`${ 'resourceName' in this ? this['resourceName'] : 'EmbeddedResource' } PATCH_RELATION`, `STAGE ${ Stage.END }`, {
-          result: `patch relation ${ relationName } successful`
-        });
+        StageLogger.resourceEndLog(this, 'PATCH_RELATION', {result: `relation ${ relationName } was patched successful`});
       })
     );
   }
@@ -194,11 +164,7 @@ export abstract class BaseResource extends ResourceIdentifiable {
   public putRelation(relationName: string,
                      requestBody: RequestBody<any>,
                      options?: RequestOption): Observable<any> {
-    ConsoleLogger.resourcePrettyInfo(`${ 'resourceName' in this ? this['resourceName'] : 'EmbeddedResource' } PUT_RELATION`, `STAGE ${ Stage.BEGIN }`, {
-      relationName,
-      requestBody: JSON.stringify(requestBody),
-      options: JSON.stringify(options),
-    });
+    StageLogger.resourceBeginLog(this, 'PUT_RELATION', {relationName, requestBody, options});
 
     const relationLink = this.getRelationLink(relationName);
     const url = relationLink.templated ? UrlUtils.fillTemplateParams(relationLink.href, options) : relationLink.href;
@@ -209,9 +175,7 @@ export abstract class BaseResource extends ResourceIdentifiable {
         params: relationLink.templated ? new HttpParams() : UrlUtils.convertToHttpParams(options)
       }).pipe(
       tap(() => {
-        ConsoleLogger.resourcePrettyInfo(`${ 'resourceName' in this ? this['resourceName'] : 'EmbeddedResource' } PUT_RELATION`, `STAGE ${ Stage.END }`, {
-          result: `put relation ${ relationName } successful`
-        });
+        StageLogger.resourceEndLog(this, 'PUT_RELATION', {result: `relation ${ relationName } was put successful`});
       })
     );
   }

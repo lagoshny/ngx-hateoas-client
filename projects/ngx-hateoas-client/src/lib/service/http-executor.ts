@@ -1,6 +1,8 @@
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable, throwError as observableThrowError } from 'rxjs';
 import { tap } from 'rxjs/operators';
+import { StageLogger } from '../logger/stage-logger';
+import { Stage } from '../logger/stage.enum';
 
 /**
  * Base class with common logics to perform HTTP requests.
@@ -9,6 +11,36 @@ import { tap } from 'rxjs/operators';
 export class HttpExecutor {
 
   constructor(protected httpClient: HttpClient) {
+  }
+
+  private static logRequest(method: string,
+                            url: string,
+                            options: {
+                              headers?: HttpHeaders | { [p: string]: string | string[] };
+                              observe?: 'body' | 'response';
+                              params?: HttpParams
+                            }) {
+    StageLogger.stageLog(Stage.HTTP_REQUEST, {
+      method,
+      url,
+      params: options?.params?.keys().length > 0 ? options?.params.toString() : ''
+    });
+  }
+
+  private static logResponse(method: string,
+                             url: string,
+                             options: {
+                               headers?: HttpHeaders | { [p: string]: string | string[] };
+                               observe?: 'body' | 'response';
+                               params?: HttpParams
+                             },
+                             data: any) {
+    StageLogger.stageLog(Stage.HTTP_RESPONSE, {
+      method,
+      url,
+      params: options?.params?.keys().length > 0 ? options?.params.toString() : '',
+      result: data
+    });
   }
 
   /**
@@ -22,19 +54,27 @@ export class HttpExecutor {
       [header: string]: string | string[];
     };
     observe?: 'body' | 'response';
-    params?: HttpParams | {
-      [param: string]: string | string[];
-    }
+    params?: HttpParams
   }): Observable<any> {
+    HttpExecutor.logRequest('GET', url, options);
     if (!url) {
-      return observableThrowError(new Error('url should be defined'));
+      const errMsg = 'url should be defined';
+      StageLogger.stageErrorLog(Stage.HTTP_REQUEST, {error: errMsg});
+      return observableThrowError(new Error(errMsg));
     }
 
+    let response;
     if (options?.observe === 'response') {
-      return this.httpClient.get(url, {...options, observe: 'response'});
+      response = this.httpClient.get(url, {...options, observe: 'response'});
     } else {
-      return this.httpClient.get(url, {...options, observe: 'body'});
+      response = this.httpClient.get(url, {...options, observe: 'body'});
     }
+
+    return response.pipe(
+      tap((data) => {
+        HttpExecutor.logResponse('GET', url, options, data);
+      })
+    );
   }
 
   /**
@@ -49,12 +89,13 @@ export class HttpExecutor {
       [header: string]: string | string[];
     };
     observe?: 'body' | 'response';
-    params?: HttpParams | {
-      [param: string]: string | string[];
-    }
+    params?: HttpParams
   }): Observable<any> {
+    HttpExecutor.logRequest('POST', url, options);
     if (!url) {
-      return observableThrowError(new Error('url should be defined'));
+      const errMsg = 'url should be defined';
+      StageLogger.stageErrorLog(Stage.HTTP_REQUEST, {error: errMsg});
+      return observableThrowError(new Error(errMsg));
     }
 
     let response;
@@ -65,10 +106,8 @@ export class HttpExecutor {
     }
 
     return response.pipe(
-      tap(data => {
-        // TODO: подумать можно ли так сделать или не стоит
-        // this.cacheService.evictResource(url);
-        return data;
+      tap((data) => {
+        HttpExecutor.logResponse('POST', url, options, data);
       })
     );
   }
@@ -85,20 +124,27 @@ export class HttpExecutor {
       [header: string]: string | string[];
     };
     observe?: 'body' | 'response';
-    params?: HttpParams | {
-      [param: string]: string | string[];
-    }
+    params?: HttpParams
   }): Observable<any> {
+    HttpExecutor.logRequest('PUT', url, options);
     if (!url) {
-      return observableThrowError(new Error('url should be defined'));
+      const errMsg = 'url should be defined';
+      StageLogger.stageErrorLog(Stage.HTTP_REQUEST, {error: errMsg});
+      return observableThrowError(new Error(errMsg));
     }
 
-    // TODO: подумать об удалении значений из кеша
+    let response;
     if (options?.observe === 'response') {
-      return this.httpClient.put(url, body, {...options, observe: 'response'});
+      response = this.httpClient.put(url, body, {...options, observe: 'response'});
     } else {
-      return this.httpClient.put(url, body, {...options, observe: 'body'});
+      response = this.httpClient.put(url, body, {...options, observe: 'body'});
     }
+
+    return response.pipe(
+      tap((data) => {
+        HttpExecutor.logResponse('PUT', url, options, data);
+      })
+    );
   }
 
   /**
@@ -113,20 +159,27 @@ export class HttpExecutor {
       [header: string]: string | string[];
     };
     observe?: 'body' | 'response';
-    params?: HttpParams | {
-      [param: string]: string | string[];
-    }
+    params?: HttpParams
   }): Observable<any> {
+    HttpExecutor.logRequest('PATCH', url, options);
     if (!url) {
-      return observableThrowError(new Error('url should be defined'));
+      const errMsg = 'url should be defined';
+      StageLogger.stageErrorLog(Stage.HTTP_REQUEST, {error: errMsg});
+      return observableThrowError(new Error(errMsg));
     }
 
-    // TODO: подумать об удалении значений из кеша
+    let response;
     if (options?.observe === 'response') {
-      return this.httpClient.patch(url, body, {...options, observe: 'response'});
+      response = this.httpClient.patch(url, body, {...options, observe: 'response'});
     } else {
-      return this.httpClient.patch(url, body, {...options, observe: 'body'});
+      response = this.httpClient.patch(url, body, {...options, observe: 'body'});
     }
+
+    return response.pipe(
+      tap((data) => {
+        HttpExecutor.logResponse('PATCH', url, options, data);
+      })
+    );
   }
 
   /**
@@ -140,20 +193,27 @@ export class HttpExecutor {
       [header: string]: string | string[];
     };
     observe?: 'body' | 'response';
-    params?: HttpParams | {
-      [param: string]: string | string[];
-    }
+    params?: HttpParams
   }): Observable<any> {
+    HttpExecutor.logRequest('DELETE', url, options);
     if (!url) {
-      return observableThrowError(new Error('url should be defined'));
+      const errMsg = 'url should be defined';
+      StageLogger.stageErrorLog(Stage.HTTP_REQUEST, {error: errMsg});
+      return observableThrowError(new Error(errMsg));
     }
 
-    // TODO: подумать об удалении значений из кеша
+    let response;
     if (options?.observe === 'response') {
-      return this.httpClient.delete(url, {...options, observe: 'response'});
+      response = this.httpClient.delete(url, {...options, observe: 'response'});
     } else {
-      return this.httpClient.delete(url, {...options, observe: 'body'});
+      response = this.httpClient.delete(url, {...options, observe: 'body'});
     }
+
+    return response.pipe(
+      tap((data) => {
+        HttpExecutor.logResponse('DELETE', url, options, data);
+      })
+    );
   }
 
 }

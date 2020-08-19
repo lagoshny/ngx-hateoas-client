@@ -6,9 +6,9 @@ import * as _ from 'lodash';
 import { ResourceUtils } from '../../util/resource.utils';
 import { UrlUtils } from '../../util/url.utils';
 import { LinkData } from '../declarations';
-import { ConsoleLogger } from '../../logger/console-logger';
 import { tap } from 'rxjs/operators';
 import { Stage } from '../../logger/stage.enum';
+import { StageLogger } from '../../logger/stage-logger';
 
 /**
  * Resource class.
@@ -41,30 +41,9 @@ export class Resource extends BaseResource {
   public isResourceOf<T extends Resource>(typeOrName: (new() => T) | string): boolean {
     if (_.isObject(typeOrName)) {
       const that = new typeOrName() as T;
-
-      const result = _.eq(_.toLower(this.resourceName), _.toLower(that.constructor.name));
-
-      ConsoleLogger.prettyInfo('IS_RESOURCE_OF', {
-        result,
-        isType: true,
-        type: typeOrName,
-        constructorTypeName: that.constructor.name,
-        thisResourceName: this.resourceName
-      });
-
-      return result;
+      return  _.eq(_.toLower(this.resourceName), _.toLower(that.constructor.name));
     } else {
-
-      const result = _.eq(_.toLower(this.resourceName), _.toLower(typeOrName));
-
-      ConsoleLogger.prettyInfo('IS_RESOURCE_OF', {
-        result,
-        isType: false,
-        name: typeOrName,
-        thisResourceName: this.resourceName
-      });
-
-      return result;
+      return  _.eq(_.toLower(this.resourceName), _.toLower(typeOrName));
     }
   }
 
@@ -76,10 +55,7 @@ export class Resource extends BaseResource {
    * @throws error if no link is found by passed relation name
    */
   public addRelation<T extends Resource>(relationName: string, entity: T): Observable<HttpResponse<any>> {
-    ConsoleLogger.resourcePrettyInfo(`${ this.resourceName } ADD_RELATION`, `STAGE ${ Stage.BEGIN }`, {
-      relationName,
-      entity: JSON.stringify(entity, null, 2)
-    });
+    StageLogger.resourceBeginLog(this, 'ADD_RELATION', {relationName, entity});
 
     const relationLink = this.getRelationLink(relationName);
     const url = relationLink.templated ? UrlUtils.removeTemplateParams(relationLink.href) : relationLink.href;
@@ -90,9 +66,7 @@ export class Resource extends BaseResource {
       headers: new HttpHeaders({'Content-Type': 'text/uri-list'})
     }).pipe(
       tap(() => {
-        ConsoleLogger.resourcePrettyInfo(`${ this.resourceName } ADD_RELATION`, `STAGE ${ Stage.END }`, {
-          result: `relation ${ relationName } added successful`
-        });
+        StageLogger.resourceEndLog(this, 'ADD_RELATION', {result: `relation ${ relationName } was added successful`});
       })
     );
   }
@@ -105,10 +79,7 @@ export class Resource extends BaseResource {
    * @throws error if no link is found by passed relation name
    */
   public bindRelation<T extends Resource>(relationName: string, entity: T): Observable<HttpResponse<any>> {
-    ConsoleLogger.resourcePrettyInfo(`${ this.resourceName } BIND_RELATION`, `STAGE ${ Stage.BEGIN }`, {
-      relationName,
-      entity: JSON.stringify(entity, null, 2)
-    });
+    StageLogger.resourceBeginLog(this, 'BIND_RELATION', {relationName, entity});
 
     const relationLink = this.getRelationLink(relationName);
     const url = relationLink.templated ? UrlUtils.removeTemplateParams(relationLink.href) : relationLink.href;
@@ -119,9 +90,7 @@ export class Resource extends BaseResource {
       headers: new HttpHeaders({'Content-Type': 'text/uri-list'})
     }).pipe(
       tap(() => {
-        ConsoleLogger.resourcePrettyInfo(`${ this.resourceName } BIND_RELATION`, `STAGE ${ Stage.END }`, {
-          result: `relation ${ relationName } bind successful`
-        });
+        StageLogger.resourceEndLog(this, 'BIND_RELATION', {result: `relation ${ relationName } was bind successful`});
       })
     );
   }
@@ -136,9 +105,7 @@ export class Resource extends BaseResource {
    * @throws error if no link is found by passed relation name
    */
   public clearRelation<T extends Resource>(relationName: string): Observable<HttpResponse<any>> {
-    ConsoleLogger.resourcePrettyInfo(`${ this.resourceName } CLEAR_RELATION`, `STAGE ${ Stage.BEGIN }`, {
-      relationName,
-    });
+    StageLogger.resourceBeginLog(this, 'CLEAR_RELATION', {relationName});
 
     const relationLink = this.getRelationLink(relationName);
     const url = relationLink.templated ? UrlUtils.removeTemplateParams(relationLink.href) : relationLink.href;
@@ -148,9 +115,7 @@ export class Resource extends BaseResource {
       headers: new HttpHeaders({'Content-Type': 'text/uri-list'})
     }).pipe(
       tap(() => {
-        ConsoleLogger.resourcePrettyInfo(`${ this.resourceName } CLEAR_RELATION`, `STAGE ${ Stage.END }`, {
-          result: `relation ${ relationName } will be cleared successful`
-        });
+        StageLogger.resourceEndLog(this, 'CLEAR_RELATION', {result: `relation ${ relationName } was cleared successful`});
       })
     );
   }
@@ -166,10 +131,7 @@ export class Resource extends BaseResource {
    * @throws error if no link is found by passed relation name
    */
   public deleteRelation<T extends Resource>(relationName: string, entity: T): Observable<HttpResponse<any>> {
-    ConsoleLogger.resourcePrettyInfo(`${ this.resourceName } DELETE_RELATION`, `STAGE ${ Stage.BEGIN }`, {
-      relationName,
-      entity: JSON.stringify(entity, null, 2)
-    });
+    StageLogger.resourceBeginLog(this, 'DELETE_RELATION', {relationName, entity});
 
     const relationLink = this.getRelationLink(relationName);
     const url = relationLink.templated ? UrlUtils.removeTemplateParams(relationLink.href) : relationLink.href;
@@ -177,7 +139,7 @@ export class Resource extends BaseResource {
     const resourceId = _.last(_.split(resource.getSelfLinkHref(), '/'));
 
     if (_.isNil(resourceId) || resourceId === '') {
-      ConsoleLogger.prettyError(`STAGE ${ Stage.PREPARE_URL }`, {
+      StageLogger.stageErrorLog(Stage.PREPARE_URL, {
         step: 'ResolveResourceId',
         error: 'Passed resource self link should has id',
         selfLink: resource.getSelfLinkHref()
@@ -185,18 +147,16 @@ export class Resource extends BaseResource {
       throw Error('Passed resource self link should has id');
     }
 
-    ConsoleLogger.prettyInfo(`STAGE ${ Stage.PREPARE_URL }`, {
+    StageLogger.stageLog(Stage.PREPARE_URL, {
       step: 'ResolveResourceId',
-      result: resourceId,
+      result: resourceId
     });
 
     return getResourceHttpService().delete(url + '/' + resourceId, {
       observe: 'response'
     }).pipe(
       tap(() => {
-        ConsoleLogger.resourcePrettyInfo(`${ this.resourceName } DELETE_RELATION`, `STAGE ${ Stage.END }`, {
-          result: `relation ${ relationName } was deleted successful`
-        });
+        StageLogger.resourceEndLog(this, 'DELETE_RELATION', {result: `relation ${ relationName } was deleted successful`});
       })
     );
   }

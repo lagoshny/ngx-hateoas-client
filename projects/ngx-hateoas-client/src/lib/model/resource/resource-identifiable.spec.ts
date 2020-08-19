@@ -31,7 +31,7 @@ describe('ResourceIdentifiable', () => {
       resourceIdentifiable['_links'] = {};
       resourceIdentifiable.getRelationLink('any');
     } catch (error) {
-      expect(error.message).toBe('Resource links is empty, can\'t to get relation: any');
+      expect(error.message).toBe('Resource links is empty, can\'t to get relation \'any\'');
     }
   });
 
@@ -40,7 +40,7 @@ describe('ResourceIdentifiable', () => {
       resourceIdentifiable['_links'] = null;
       resourceIdentifiable.getRelationLink('any');
     } catch (error) {
-      expect(error.message).toBe('Resource links is empty, can\'t to get relation: any');
+      expect(error.message).toBe('Resource links is empty, can\'t to get relation \'any\'');
     }
   });
 
@@ -49,7 +49,7 @@ describe('ResourceIdentifiable', () => {
       resourceIdentifiable['_links'] = undefined;
       resourceIdentifiable.getRelationLink('any');
     } catch (error) {
-      expect(error.message).toBe('Resource links is empty, can\'t to get relation: any');
+      expect(error.message).toBe('Resource links is empty, can\'t to get relation \'any\'');
     }
   });
 
@@ -57,7 +57,7 @@ describe('ResourceIdentifiable', () => {
     try {
       resourceIdentifiable.getRelationLink('unknown');
     } catch (error) {
-      expect(error.message).toBe('No resource relation found');
+      expect(error.message).toBe('Resource relation with name \'unknown\' not found');
     }
   });
 
@@ -65,7 +65,7 @@ describe('ResourceIdentifiable', () => {
     try {
       resourceIdentifiable.getRelationLink(null);
     } catch (error) {
-      expect(error.message).toBe('No resource relation found');
+      expect(error.message).toBe('Resource relation with name \'null\' not found');
     }
   });
 
@@ -73,7 +73,7 @@ describe('ResourceIdentifiable', () => {
     try {
       resourceIdentifiable.getRelationLink(undefined);
     } catch (error) {
-      expect(error.message).toBe('No resource relation found');
+      expect(error.message).toBe('Resource relation with name \'undefined\' not found');
     }
   });
 
@@ -81,7 +81,7 @@ describe('ResourceIdentifiable', () => {
     try {
       resourceIdentifiable.getRelationLink('badEmptyRelation');
     } catch (error) {
-      expect(error.message).toBe('No resource relation found');
+      expect(error.message).toBe('Resource relation with name \'badEmptyRelation\' not found');
     }
   });
 
@@ -89,7 +89,7 @@ describe('ResourceIdentifiable', () => {
     try {
       resourceIdentifiable.getRelationLink('badNullRelation');
     } catch (error) {
-      expect(error.message).toBe('No resource relation found');
+      expect(error.message).toBe('Resource relation with name \'badNullRelation\' not found');
     }
   });
 
@@ -97,7 +97,7 @@ describe('ResourceIdentifiable', () => {
     try {
       resourceIdentifiable.getRelationLink('badUndefinedRelation');
     } catch (error) {
-      expect(error.message).toBe('No resource relation found');
+      expect(error.message).toBe('Resource relation with name \'badUndefinedRelation\' not found');
     }
   });
 

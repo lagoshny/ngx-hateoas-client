@@ -308,7 +308,7 @@ describe('Resource DELETE_RELATION', () => {
         .subscribe(() => {
         });
     } catch (e) {
-      expect(e.message).toBe('passed resource self link should has id');
+      expect(e.message).toBe('Passed resource self link should has id');
     }
   });
 

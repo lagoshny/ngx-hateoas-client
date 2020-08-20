@@ -36,6 +36,10 @@ export class HalConfigurationService {
   public configure(config: HalConfiguration): void {
     this.httpConfig.baseApiUrl = config.baseApiUrl;
     ConsoleLogger.enabled = config.verboseLogs;
+
+    ConsoleLogger.prettyInfo('HateoasClient was configured with options', {
+      baseApiUrl: config.baseApiUrl
+    });
   }
 
 }

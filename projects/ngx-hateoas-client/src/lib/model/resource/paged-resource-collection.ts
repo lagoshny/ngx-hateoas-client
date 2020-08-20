@@ -3,9 +3,11 @@ import { BaseResource } from './base-resource';
 import { Observable, throwError as observableThrowError } from 'rxjs';
 import { getPagedResourceCollectionHttpService } from '../../service/internal/paged-resource-collection-http.service';
 import { UrlUtils } from '../../util/url.utils';
-import { ConsoleLogger } from '../../logger/console-logger';
 import { PageData, PageParam } from '../declarations';
 import * as _ from 'lodash';
+import { StageLogger } from '../../logger/stage-logger';
+import { Stage } from '../../logger/stage.enum';
+import { tap } from 'rxjs/operators';
 
 /**
  * Collection of resources with pagination.
@@ -60,19 +62,39 @@ export class PagedResourceCollection<T extends BaseResource> extends ResourceCol
   }
 
   public first(): Observable<PagedResourceCollection<T>> {
-    return doRequest(this.firstUri);
+    StageLogger.resourceBeginLog(this.resources[0], 'GET_FIRST_PAGE');
+    return doRequest<T>(this.firstUri).pipe(
+      tap(() => {
+        StageLogger.resourceEndLog(this.resources[0], 'GET_FIRST_PAGE', {result: 'get first page was performed successful'});
+      })
+    );
   }
 
   public last(): Observable<PagedResourceCollection<T>> {
-    return doRequest(this.lastUri);
+    StageLogger.resourceBeginLog(this.resources[0], 'GET_LAST_PAGE');
+    return doRequest<T>(this.lastUri).pipe(
+      tap(() => {
+        StageLogger.resourceEndLog(this.resources[0], 'GET_LAST_PAGE', {result: 'get last page was performed successful'});
+      })
+    );
   }
 
   public next(): Observable<PagedResourceCollection<T>> {
-    return doRequest(this.nextUri);
+    StageLogger.resourceBeginLog(this.resources[0], 'GET_NEXT_PAGE');
+    return doRequest<T>(this.nextUri).pipe(
+      tap(() => {
+        StageLogger.resourceEndLog(this.resources[0], 'GET_NEXT_PAGE', {result: 'get next page was performed successful'});
+      })
+    );
   }
 
   public prev(): Observable<PagedResourceCollection<T>> {
-    return doRequest(this.prevUri);
+    StageLogger.resourceBeginLog(this.resources[0], 'GET_PREV_PAGE');
+    return doRequest<T>(this.prevUri).pipe(
+      tap(() => {
+        StageLogger.resourceEndLog(this.resources[0], 'GET_PREV_PAGE', {result: 'get prev page was performed successful'});
+      })
+    );
   }
 
   /**
@@ -83,49 +105,62 @@ export class PagedResourceCollection<T extends BaseResource> extends ResourceCol
    * @throws error when passed inconsistent data
    */
   public customPage(pageParam: PageParam): Observable<PagedResourceCollection<T>> {
-    ConsoleLogger.prettyInfo('Preparing custom page request');
+    StageLogger.resourceBeginLog(this.resources[0], 'CustomPage', {pageParam});
+
     if (pageParam.page < 0) {
       pageParam.page = this.pageNumber;
-      ConsoleLogger.prettyInfo('Page number is not passed will be used current value', {currentPageNumber: this.pageNumber});
+      StageLogger.stageLog(Stage.PREPARE_PARAMS, {
+        message: 'Page number is not passed will be used current value',
+        currentPageNumber: this.pageNumber
+      });
     }
     if (pageParam.size < 0) {
       pageParam.size = this.pageSize;
-      ConsoleLogger.prettyInfo('Page size is not passed will be used current value', {currentPageSize: this.pageSize});
+      StageLogger.stageLog(Stage.PREPARE_PARAMS, {
+        message: 'Page size is not passed will be used current value',
+        currentPageSize: this.pageSize
+      });
     }
 
     const maxPageNumber = (this.totalElements / this.pageSize) - 1;
     if (pageParam.page > maxPageNumber) {
-      ConsoleLogger.error(`Error page number. Max page number is ${ maxPageNumber }`);
-      return observableThrowError(`Error page number. Max page number is ${ maxPageNumber }`);
+      const errMsg = `Error page number. Max page number is ${ maxPageNumber }`;
+      StageLogger.stageErrorLog(Stage.PREPARE_PARAMS, {error: errMsg});
+      return observableThrowError(errMsg);
     }
     const maxPageSize = this.totalElements / (this.pageSize + 1);
     if (pageParam.page !== 0 && pageParam.size > maxPageSize) {
-      ConsoleLogger.error(`Error page size. Max page size is ${ maxPageSize }`);
-      return observableThrowError(`Error page size. Max page size is ${ maxPageSize }`);
+      const errMsg = `Error page size. Max page size is ${ maxPageSize }`;
+      StageLogger.stageErrorLog(Stage.PREPARE_PARAMS, {error: errMsg});
+      return observableThrowError(errMsg);
     }
 
-    ConsoleLogger.prettyInfo('Custom page request prepared with params', {
-      rawUrl: this.selfUri,
-      sort: JSON.stringify(pageParam.sort, null, 4),
-      page: pageParam.page,
-      size: pageParam.size
-    });
-    return doRequest(this.selfUri, pageParam);
+    return doRequest<T>(this.selfUri, pageParam).pipe(
+      tap(() => {
+        StageLogger.resourceEndLog(this.resources[0], 'CustomPage', {result: 'custom page was performed successful'});
+      })
+    );
   }
 
 }
 
-function doRequest<T extends BaseResource>(uri: string, pageParams?: PageParam): Observable<PagedResourceCollection<T>> {
-  if (!uri) {
-    ConsoleLogger.error('During page request error occurs: url is empty');
-    return observableThrowError(`During page request error occurs: url is empty`);
+function doRequest<T extends BaseResource>(url: string, pageParams?: PageParam): Observable<PagedResourceCollection<T>> {
+  StageLogger.stageLog(Stage.HTTP_REQUEST, {method: 'GET', url, pageParams});
+  if (!url) {
+    const errMsg = 'During page request error occurs: url is empty';
+    StageLogger.stageErrorLog(Stage.HTTP_REQUEST, {error: errMsg});
+    return observableThrowError(errMsg);
   }
 
   let httpParams;
   if (pageParams) {
-    httpParams = UrlUtils.convertToHttpParams({page: pageParams});
+    httpParams = UrlUtils.convertToHttpParams({pageParam: pageParams});
   }
 
   return getPagedResourceCollectionHttpService()
-    .get(UrlUtils.removeTemplateParams(uri), {params: httpParams}) as Observable<PagedResourceCollection<T>>;
+    .get(UrlUtils.removeTemplateParams(url), {params: httpParams}).pipe(
+      tap((data) => {
+        StageLogger.stageLog(Stage.HTTP_RESPONSE, {method: 'GET', url, httpParams, result: data});
+      })
+    ) as Observable<PagedResourceCollection<T>>;
 }

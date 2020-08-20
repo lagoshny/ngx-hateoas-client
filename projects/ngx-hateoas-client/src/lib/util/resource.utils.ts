@@ -7,6 +7,8 @@ import * as _ from 'lodash';
 import { Resource } from '../model/resource/resource';
 import { EmbeddedResource } from '../model/resource/embedded-resource';
 import { UrlUtils } from './url.utils';
+import { Stage } from '../logger/stage.enum';
+import { StageLogger } from '../logger/stage-logger';
 
 /* tslint:disable:no-string-literal */
 export class ResourceUtils {
@@ -110,10 +112,12 @@ export class ResourceUtils {
   public static resolveValues(requestBody: RequestBody<any>): any {
     if (_.isEmpty(requestBody) || _.isNil(requestBody.body)
       || (_.isObject(requestBody.body) && _.isEmpty(requestBody.body))) {
+      StageLogger.stageLog(Stage.RESOLVE_VALUES, {result: 'body is empty return null'});
       return null;
     }
     const body = requestBody.body;
     if (!_.isObject(body) || _.isArray(body)) {
+      StageLogger.stageLog(Stage.RESOLVE_VALUES, {result: 'body is not object or array return as is'});
       return body;
     }
 
@@ -145,6 +149,8 @@ export class ResourceUtils {
         result[key] = body[key];
       }
     }
+    StageLogger.stageLog(Stage.RESOLVE_VALUES, {result});
+
     return result;
   }
 
@@ -155,10 +161,13 @@ export class ResourceUtils {
    */
   public static initResource(entity: any): BaseResource | any {
     if (isResource(entity)) {
+      StageLogger.stageLog(Stage.INIT_RESOURCE, {result: 'entity initialized as Resource'});
       return Object.assign(new this.resourceType(), entity);
     } else if (isEmbeddedResource(entity)) {
+      StageLogger.stageLog(Stage.INIT_RESOURCE, {result: 'entity initialized as EmbeddedResource'});
       return Object.assign(new this.embeddedResourceType(), entity);
     } else {
+      StageLogger.stageLog(Stage.INIT_RESOURCE, {result: 'entity did not initialize will be used raw entity'});
       return entity;
     }
   }

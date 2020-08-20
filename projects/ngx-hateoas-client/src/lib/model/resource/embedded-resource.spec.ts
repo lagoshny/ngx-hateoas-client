@@ -9,7 +9,7 @@ describe('EmbeddedResource', () => {
       const embeddedResource = new SimpleEmbeddedResource();
       embeddedResource.getRelationLink('self');
     } catch (e) {
-      expect(e.message).toBe('No resource relation found');
+      expect(e.message).toBe('Resource relation with name \'self\' not found');
     }
   });
 

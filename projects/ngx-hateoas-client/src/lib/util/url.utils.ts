@@ -34,10 +34,10 @@ export class UrlUtils {
       }
     }
 
-    if (!_.isEmpty(options.page)) {
-      resultParams = resultParams.append('page', _.toString(options.page.page));
-      resultParams = resultParams.append('size', _.toString(options.page.size));
-      resultParams = UrlUtils.generateSortParams(options.page.sort, resultParams);
+    if (!_.isEmpty(options.pageParam)) {
+      resultParams = resultParams.append('page', _.toString(options.pageParam.page));
+      resultParams = resultParams.append('size', _.toString(options.pageParam.size));
+      resultParams = UrlUtils.generateSortParams(options.pageParam.sort, resultParams);
     }
 
     if (!_.isNil(options.projection)) {
@@ -93,19 +93,20 @@ export class UrlUtils {
     const paramsWithoutSortParam = {
       ...options,
       ...options?.params,
-      ...options?.page,
+      ...options?.pageParam,
       /* Sets sort to null because sort is object and should be applied as multi params with sort name
          for each sort object property, but uriTemplates can't do that and we need to do it manually */
       sort: null
     };
 
     const resultUrl = uriTemplates(url).fill(_.isNil(paramsWithoutSortParam) ? {} : paramsWithoutSortParam);
-    if (options?.page) {
-      const sortParams = UrlUtils.generateSortParams(options.page.sort);
+    if (options?.pageParam) {
+      const sortParams = UrlUtils.generateSortParams(options.pageParam.sort);
       if (sortParams.keys().length > 0) {
         return resultUrl.concat(resultUrl.includes('?') ? '&' : '').concat(sortParams.toString());
       }
     }
+
     return resultUrl;
   }
 

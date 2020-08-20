@@ -25,7 +25,7 @@ export interface LinkData {
  * Extend {@link GetOption} with page param.
  */
 export interface PagedGetOption extends GetOption {
-  page?: PageParam;
+  pageParam?: PageParam;
 }
 
 /**

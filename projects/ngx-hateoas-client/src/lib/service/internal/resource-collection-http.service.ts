@@ -3,7 +3,6 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { CacheService } from '../cache.service';
 import { HttpConfigService } from '../../config/http-config.service';
 import { Observable, of as observableOf, throwError as observableThrowError } from 'rxjs';
-import { ConsoleLogger } from '../../logger/console-logger';
 import { catchError, map } from 'rxjs/operators';
 import { isResourceCollection } from '../../model/resource-type';
 import { ResourceUtils } from '../../util/resource.utils';
@@ -13,6 +12,8 @@ import { DependencyInjector } from '../../util/dependency-injector';
 import { GetOption } from '../../model/declarations';
 import { UrlUtils } from '../../util/url.utils';
 import { HttpExecutor } from '../http-executor';
+import { StageLogger } from '../../logger/stage-logger';
+import { Stage } from '../../logger/stage.enum';
 
 export function getResourceCollectionHttpService(): ResourceCollectionHttpService<ResourceCollection<BaseResource>> {
   return DependencyInjector.get(ResourceCollectionHttpService);
@@ -41,14 +42,8 @@ export class ResourceCollectionHttpService<T extends ResourceCollection<BaseReso
     headers?: {
       [header: string]: string | string[];
     };
-    params?: HttpParams | {
-      [param: string]: string | string[];
-    }
+    params?: HttpParams
   }): Observable<T> {
-    ConsoleLogger.prettyInfo('GET_COLLECTION_RESOURCE REQUEST', {
-      url,
-      params: options?.params
-    });
     if (this.cacheService.hasResource(url)) {
       return observableOf(this.cacheService.getResource());
     }
@@ -56,15 +51,10 @@ export class ResourceCollectionHttpService<T extends ResourceCollection<BaseReso
     return super.get(url, {...options, observe: 'body'})
       .pipe(
         map((data: any) => {
-          ConsoleLogger.prettyInfo('GET_COLLECTION_RESOURCE RESPONSE', {
-            url,
-            params: options?.params,
-            body: JSON.stringify(data, null, 4)
-          });
-
           if (!isResourceCollection(data)) {
-            ConsoleLogger.error('You try to get wrong resource type, expected resource collection type.');
-            throw new Error('You try to get wrong resource type, expected resource collection type.');
+            const errMsg = 'You try to get wrong resource type, expected resource collection type.';
+            StageLogger.stageErrorLog(Stage.INIT_RESOURCE, {error: errMsg});
+            throw new Error(errMsg);
           }
 
           const resource: T = ResourceUtils.instantiateResourceCollection(data);

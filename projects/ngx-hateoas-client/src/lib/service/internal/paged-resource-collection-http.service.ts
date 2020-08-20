@@ -4,7 +4,6 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { CacheService } from '../cache.service';
 import { HttpConfigService } from '../../config/http-config.service';
 import { PagedResourceCollection } from '../../model/resource/paged-resource-collection';
-import { ConsoleLogger } from '../../logger/console-logger';
 import { catchError, map } from 'rxjs/operators';
 import * as _ from 'lodash';
 import { isPagedResourceCollection } from '../../model/resource-type';
@@ -14,6 +13,8 @@ import { UrlUtils } from '../../util/url.utils';
 import { DependencyInjector } from '../../util/dependency-injector';
 import { PagedGetOption, PageParam } from '../../model/declarations';
 import { HttpExecutor } from '../http-executor';
+import { StageLogger } from '../../logger/stage-logger';
+import { Stage } from '../../logger/stage.enum';
 
 /**
  * Get instance of the PagedResourceCollectionHttpService by Angular DependencyInjector.
@@ -50,30 +51,18 @@ export class PagedResourceCollectionHttpService<T extends PagedResourceCollectio
     headers?: {
       [header: string]: string | string[];
     };
-    params?: HttpParams | {
-      [param: string]: string | string[];
-    }
+    params?: HttpParams
   }): Observable<T> {
     if (this.cacheService.hasResource(url)) {
       return observableOf(this.cacheService.getResource());
     }
 
-    ConsoleLogger.prettyInfo('GET_PAGED_COLLECTION_RESOURCE REQUEST', {
-      url,
-      params: options?.params
-    });
-
     return super.get(url, {...options, observe: 'body'}).pipe(
       map((data: any) => {
-        ConsoleLogger.prettyInfo('GET_PAGED_COLLECTION_RESOURCE RESPONSE', {
-          url,
-          params: options?.params,
-          body: JSON.stringify(data, null, 4)
-        });
-
         if (!isPagedResourceCollection(data)) {
-          ConsoleLogger.error('You try to get wrong resource type, expected paged resource collection type.');
-          throw Error('You try to get wrong resource type, expected paged resource collection type.');
+          const errMsg = 'You try to get wrong resource type, expected paged resource collection type.';
+          StageLogger.stageErrorLog(Stage.INIT_RESOURCE, {error: errMsg});
+          throw Error(errMsg);
         }
         const resource: T = ResourceUtils.instantiatePagedResourceCollection(data);
         this.cacheService.putResource(url, resource);
@@ -96,8 +85,8 @@ export class PagedResourceCollectionHttpService<T extends PagedResourceCollectio
     }
     const url = UrlUtils.removeTemplateParams(UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName, query));
     const pagedOption = !_.isEmpty(option) ? option : {};
-    if (_.isEmpty(pagedOption.page)) {
-      pagedOption.page = PagedResourceCollectionHttpService.DEFAULT_PAGE;
+    if (_.isEmpty(pagedOption.pageParam)) {
+      pagedOption.pageParam = PagedResourceCollectionHttpService.DEFAULT_PAGE;
     }
     return this.get(url, {params: UrlUtils.convertToHttpParams(pagedOption)});
   }
@@ -119,8 +108,8 @@ export class PagedResourceCollectionHttpService<T extends PagedResourceCollectio
     const url = UrlUtils.removeTemplateParams(
       UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName)).concat('/search/' + searchQuery);
     const pagedOption = !_.isEmpty(option) ? option : {};
-    if (_.isEmpty(pagedOption.page)) {
-      pagedOption.page = PagedResourceCollectionHttpService.DEFAULT_PAGE;
+    if (_.isEmpty(pagedOption.pageParam)) {
+      pagedOption.pageParam = PagedResourceCollectionHttpService.DEFAULT_PAGE;
     }
     return this.get(url, {params: UrlUtils.convertToHttpParams(pagedOption)});
   }

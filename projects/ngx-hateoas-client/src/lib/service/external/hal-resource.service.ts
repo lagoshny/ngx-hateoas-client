@@ -5,17 +5,21 @@ import { PagedResourceCollectionHttpService } from '../internal/paged-resource-c
 import { PagedResourceCollection } from '../../model/resource/paged-resource-collection';
 import { GetOption, HttpMethod, PagedGetOption, RequestBody, RequestOption, RequestParam } from '../../model/declarations';
 import { ResourceUtils } from '../../util/resource.utils';
-import { Resource } from '../../ngx-hateoas-client.module';
 import { ResourceCollection } from '../../model/resource/resource-collection';
 import { ResourceCollectionHttpService } from '../internal/resource-collection-http.service';
 import { CommonResourceHttpService } from '../internal/common-resource-http.service';
 import { UrlUtils } from '../../util/url.utils';
+import { tap } from 'rxjs/operators';
+import { Resource } from '../../model/resource/resource';
+import { StageLogger } from '../../logger/stage-logger';
 
 /**
  * Service to operate with {@link Resource}.
  *
  * Can be injected as standalone service to work with {@link Resource}.
  */
+
+/* tslint:disable:no-string-literal */
 @Injectable()
 export class HalResourceService<T extends Resource> {
 
@@ -33,7 +37,13 @@ export class HalResourceService<T extends Resource> {
    * @param options (optional) options that should be applied to the request
    */
   public get(resourceName: string, id: any, options?: GetOption): Observable<T> {
-    return this.resourceHttpService.getResource(resourceName, id, options) as Observable<T>;
+    StageLogger.resourceBeginLog(resourceName, 'ResourceService GET_RESOURCE', {id, options});
+
+    return this.resourceHttpService.getResource(resourceName, id, options)
+      .pipe(tap(() => {
+        StageLogger.resourceEndLog(resourceName, 'ResourceService GET_RESOURCE',
+          {result: `get resource '${ resourceName }' was successful`});
+      })) as Observable<T>;
   }
 
   /**
@@ -43,7 +53,13 @@ export class HalResourceService<T extends Resource> {
    * @param options (optional) options that should be applied to the request
    */
   public getAll(resourceName: string, options?: GetOption): Observable<ResourceCollection<T>> {
-    return this.resourceCollectionHttpServiceSpy.getResourceCollection(resourceName, null, options);
+    StageLogger.resourceBeginLog(resourceName, 'ResourceService GET_ALL', {options});
+
+    return this.resourceCollectionHttpServiceSpy.getResourceCollection(resourceName, null, options)
+      .pipe(tap(() => {
+        StageLogger.resourceEndLog(resourceName, 'ResourceService GET_ALL',
+          {result: `get all resources by '${ resourceName }' was successful`});
+      }));
   }
 
   /**
@@ -53,7 +69,13 @@ export class HalResourceService<T extends Resource> {
    * @param options (optional) options that should be applied to the request
    */
   public getAllPage(resourceName: string, options?: PagedGetOption): Observable<PagedResourceCollection<T>> {
-    return this.pagedResourceCollectionHttpService.getResourcePage(resourceName, null, options);
+    StageLogger.resourceBeginLog(resourceName, 'ResourceService GET_ALL_PAGE', {options});
+
+    return this.pagedResourceCollectionHttpService.getResourcePage(resourceName, null, options)
+      .pipe(tap(() => {
+        StageLogger.resourceEndLog(resourceName, 'ResourceService GET_ALL_PAGE',
+          {result: `get all page resources by '${ resourceName }' was successful`});
+      }));
   }
 
   /**
@@ -63,9 +85,15 @@ export class HalResourceService<T extends Resource> {
    * @param requestBody that contains the body directly and optional body values option {@link ValuesOption}
    */
   public createResource(resourceName: string, requestBody: RequestBody<T>): Observable<T> {
+    StageLogger.resourceBeginLog(resourceName, 'ResourceService CREATE_RESOURCE', {requestBody});
+
     const body = ResourceUtils.resolveValues(requestBody);
 
-    return this.resourceHttpService.postResource(resourceName, body);
+    return this.resourceHttpService.postResource(resourceName, body)
+      .pipe(tap(() => {
+        StageLogger.resourceEndLog(resourceName, 'ResourceService CREATE_RESOURCE',
+          {result: `resource '${ resourceName }' was created successful`});
+      }));
   }
 
   /**
@@ -74,10 +102,16 @@ export class HalResourceService<T extends Resource> {
    * @param requestBody that contains the body directly and optional body values option {@link ValuesOption}
    */
   public updateResource(requestBody: RequestBody<T>): Observable<T> {
+    StageLogger.resourceBeginLog(requestBody?.body, 'ResourceService UPDATE_RESOURCE', {requestBody});
+
     const resource = ResourceUtils.initResource(requestBody.body) as Resource;
     const body = ResourceUtils.resolveValues({body: resource, valuesOption: requestBody?.valuesOption});
 
-    return this.resourceHttpService.put(resource.getSelfLinkHref(), body);
+    return this.resourceHttpService.put(resource.getSelfLinkHref(), body)
+      .pipe(tap(() => {
+        StageLogger.resourceEndLog(requestBody?.body, 'ResourceService CREATE_RESOURCE',
+          {result: `resource '${ resource['resourceName'] }' was updated successful`});
+      }));
   }
 
   /**
@@ -88,7 +122,13 @@ export class HalResourceService<T extends Resource> {
    * @param requestParam (optional) http request params that applied to the request
    */
   public count(resourceName: string, countQuery: string, requestParam: RequestParam): Observable<number> {
-    return this.resourceHttpService.count(resourceName, countQuery, requestParam);
+    StageLogger.resourceBeginLog(resourceName, 'ResourceService COUNT', {query: countQuery, requestParam});
+
+    return this.resourceHttpService.count(resourceName, countQuery, requestParam)
+      .pipe(tap(() => {
+        StageLogger.resourceEndLog(resourceName, 'ResourceService COUNT',
+          {result: `count resource '${ resourceName }' was performed successful`});
+      }));
   }
 
   /**
@@ -97,10 +137,16 @@ export class HalResourceService<T extends Resource> {
    * @param requestBody that contains the body directly and optional body values option {@link ValuesOption}
    */
   public patchResource(requestBody: RequestBody<T>): Observable<T | any> {
+    StageLogger.resourceBeginLog(requestBody?.body, 'ResourceService PATCH_RESOURCE', {requestBody});
+
     const resource = ResourceUtils.initResource(requestBody?.body) as Resource;
     const body = ResourceUtils.resolveValues({body: resource, valuesOption: requestBody?.valuesOption});
 
-    return this.resourceHttpService.patch(resource.getSelfLinkHref(), body);
+    return this.resourceHttpService.patch(resource.getSelfLinkHref(), body)
+      .pipe(tap(() => {
+        StageLogger.resourceEndLog(requestBody?.body, 'ResourceService PATCH_RESOURCE',
+          {result: `resource '${ resource['resourceName'] }' was patched successful`});
+      }));
   }
 
   /**
@@ -110,32 +156,56 @@ export class HalResourceService<T extends Resource> {
    * @param options (optional) options that should be applied to the request
    */
   public deleteResource(entity: T, options?: RequestOption): Observable<T | any> {
+    StageLogger.resourceBeginLog(entity, 'ResourceService DELETE_RESOURCE', {options});
+
     const resource = ResourceUtils.initResource(entity) as Resource;
     const httpParams = UrlUtils.convertToHttpParams({params: options?.params});
 
     return this.resourceHttpService.delete(resource.getSelfLinkHref(),
-      {observe: options?.observe, params: httpParams});
+      {observe: options?.observe, params: httpParams})
+      .pipe(tap(() => {
+        StageLogger.resourceEndLog(entity, 'ResourceService DELETE_RESOURCE',
+          {result: `resource '${ resource['resourceName'] }' was deleted successful`});
+      }));
   }
 
   /**
    * {@see ResourceCollectionHttpService#search}
    */
-  public searchCollection(resourceName: string, searchQuery: string, option?: GetOption): Observable<ResourceCollection<T>> {
-    return this.resourceCollectionHttpServiceSpy.search(resourceName, searchQuery, option);
+  public searchCollection(resourceName: string, searchQuery: string, options?: GetOption): Observable<ResourceCollection<T>> {
+    StageLogger.resourceBeginLog(resourceName, 'ResourceService SEARCH_COLLECTION', {query: searchQuery, options});
+
+    return this.resourceCollectionHttpServiceSpy.search(resourceName, searchQuery, options)
+      .pipe(tap(() => {
+        StageLogger.resourceEndLog(resourceName, 'ResourceService SEARCH_COLLECTION',
+          {result: `search collection by '${ resourceName }' was performed successful`});
+      }));
   }
 
   /**
    * {@see PagedResourceCollection#search}
    */
-  public searchPage(resourceName: string, searchQuery: string, option?: PagedGetOption): Observable<PagedResourceCollection<T>> {
-    return this.pagedResourceCollectionHttpService.search(resourceName, searchQuery, option);
+  public searchPage(resourceName: string, searchQuery: string, options?: PagedGetOption): Observable<PagedResourceCollection<T>> {
+    StageLogger.resourceBeginLog(resourceName, 'ResourceService SEARCH_PAGE', {query: searchQuery, options});
+
+    return this.pagedResourceCollectionHttpService.search(resourceName, searchQuery, options)
+      .pipe(tap(() => {
+        StageLogger.resourceEndLog(resourceName, 'ResourceService SEARCH_PAGE',
+          {result: `search page by '${ resourceName }' was performed successful`});
+      }));
   }
 
   /**
    * {@see ResourceHttpService#search}
    */
-  public searchSingle(resourceName: string, searchQuery: string, option?: GetOption): Observable<T> {
-    return this.resourceHttpService.search(resourceName, searchQuery, option);
+  public searchSingle(resourceName: string, searchQuery: string, options?: GetOption): Observable<T> {
+    StageLogger.resourceBeginLog(resourceName, 'ResourceService SEARCH_SINGLE', {query: searchQuery, options});
+
+    return this.resourceHttpService.search(resourceName, searchQuery, options)
+      .pipe(tap(() => {
+        StageLogger.resourceEndLog(resourceName, 'ResourceService SEARCH_SINGLE',
+          {result: `search single by '${ resourceName }' was performed successful`});
+      }));
   }
 
   /**
@@ -146,9 +216,15 @@ export class HalResourceService<T extends Resource> {
                      query: string,
                      requestBody?: RequestBody<any>,
                      options?: PagedGetOption): Observable<any | T | ResourceCollection<T> | PagedResourceCollection<T>> {
+    StageLogger.resourceBeginLog(resourceName, 'ResourceService CUSTOM_QUERY', {method: HttpMethod, query, requestBody, options});
+
     const body = ResourceUtils.resolveValues(requestBody);
 
-    return this.commonHttpService.customQuery(resourceName, method, query, body, options);
+    return this.commonHttpService.customQuery(resourceName, method, query, body, options)
+      .pipe(tap(() => {
+        StageLogger.resourceEndLog(resourceName, 'ResourceService CUSTOM_QUERY',
+          {result: `custom query by '${ resourceName }' was performed successful`});
+      }));
   }
 
 }

@@ -27,78 +27,54 @@ describe('ResourceIdentifiable', () => {
   });
 
   it('should throw error when _links object is empty', () => {
-    try {
+    expect(() => {
       resourceIdentifiable['_links'] = {};
       resourceIdentifiable.getRelationLink('any');
-    } catch (error) {
-      expect(error.message).toBe('Resource links is empty, can\'t to get relation \'any\'');
-    }
+    }).toThrowError(`Resource links is empty, can't to get relation 'any'`);
   });
 
   it('should throw error when _links object is null', () => {
-    try {
+    expect(() => {
       resourceIdentifiable['_links'] = null;
       resourceIdentifiable.getRelationLink('any');
-    } catch (error) {
-      expect(error.message).toBe('Resource links is empty, can\'t to get relation \'any\'');
-    }
+    }).toThrowError(`Resource links is empty, can't to get relation 'any'`);
   });
 
   it('should throw error when _links object is undefined', () => {
-    try {
+    expect(() => {
       resourceIdentifiable['_links'] = undefined;
       resourceIdentifiable.getRelationLink('any');
-    } catch (error) {
-      expect(error.message).toBe('Resource links is empty, can\'t to get relation \'any\'');
-    }
+    }).toThrowError(`Resource links is empty, can't to get relation 'any'`);
   });
 
   it('should throw error when try to add relation that does not exist', () => {
-    try {
-      resourceIdentifiable.getRelationLink('unknown');
-    } catch (error) {
-      expect(error.message).toBe('Resource relation with name \'unknown\' not found');
-    }
+    expect(() => resourceIdentifiable.getRelationLink('unknown'))
+      .toThrowError(`Resource relation with name 'unknown' not found`);
   });
 
   it('should throw error when pass relationName as null', () => {
-    try {
-      resourceIdentifiable.getRelationLink(null);
-    } catch (error) {
-      expect(error.message).toBe('Resource relation with name \'null\' not found');
-    }
+    expect(() => resourceIdentifiable.getRelationLink(null))
+      .toThrowError(`Resource relation with name 'null' not found`);
   });
 
   it('should throw error when pass relationName as undefined', () => {
-    try {
-      resourceIdentifiable.getRelationLink(undefined);
-    } catch (error) {
-      expect(error.message).toBe('Resource relation with name \'undefined\' not found');
-    }
+    expect(() => resourceIdentifiable.getRelationLink(undefined))
+      .toThrowError(`Resource relation with name 'undefined' not found`);
   });
 
   it('should throw error when passed relation link href is empty', () => {
-    try {
-      resourceIdentifiable.getRelationLink('badEmptyRelation');
-    } catch (error) {
-      expect(error.message).toBe('Resource relation with name \'badEmptyRelation\' not found');
-    }
+    expect(() => resourceIdentifiable.getRelationLink('badEmptyRelation'))
+      .toThrowError(`Resource relation with name 'badEmptyRelation' not found`);
   });
 
   it('should throw error when passed relation link href is null', () => {
-    try {
-      resourceIdentifiable.getRelationLink('badNullRelation');
-    } catch (error) {
-      expect(error.message).toBe('Resource relation with name \'badNullRelation\' not found');
-    }
+    expect(() => resourceIdentifiable.getRelationLink('badNullRelation'))
+      .toThrowError(`Resource relation with name 'badNullRelation' not found`);
   });
 
   it('should throw error when passed relation link href is undefined', () => {
-    try {
-      resourceIdentifiable.getRelationLink('badUndefinedRelation');
-    } catch (error) {
-      expect(error.message).toBe('Resource relation with name \'badUndefinedRelation\' not found');
-    }
+    expect(() => resourceIdentifiable.getRelationLink('badUndefinedRelation'))
+      .toThrowError(`Resource relation with name 'badUndefinedRelation' not found`);
   });
 
   it('should return relation link by relationName', () => {

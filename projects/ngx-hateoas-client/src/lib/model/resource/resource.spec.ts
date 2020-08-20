@@ -95,35 +95,23 @@ describe('Resource ADD_RELATION', () => {
   });
 
   it('should throw error when passed relationName is empty', () => {
-    try {
-      resource.addRelation('', [new TestProductResource()]).subscribe();
-    } catch (e) {
-      expect(e.message).toBe(`Passed param(s) 'relationName = ' is not valid`);
-    }
+    expect(() => resource.addRelation('', [new TestProductResource()]))
+      .toThrowError(`Passed param(s) 'relationName = ' is not valid`);
   });
 
   it('should throw error when passed entities is empty', () => {
-    try {
-      resource.addRelation('any', []).subscribe();
-    } catch (e) {
-      expect(e.message).toBe(`Passed param(s) 'entities = []' is not valid`);
-    }
+    expect(() => resource.addRelation('any', []))
+      .toThrowError(`Passed param(s) 'entities = []' is not valid`);
   });
 
   it('should throw error when passed relationName and/or entities are undefined', () => {
-    try {
-      resource.addRelation(undefined, undefined).subscribe();
-    } catch (e) {
-      expect(e.message).toBe(`Passed param(s) 'relationName = undefined', 'entities = undefined' is not valid`);
-    }
+    expect(() => resource.addRelation(undefined, undefined))
+      .toThrowError(`Passed param(s) 'relationName = undefined', 'entities = undefined' is not valid`);
   });
 
   it('should throw error when passed relationName and/or entities are null', () => {
-    try {
-      resource.addRelation(null, null).subscribe();
-    } catch (e) {
-      expect(e.message).toBe(`Passed param(s) 'relationName = null', 'entities = null' is not valid`);
-    }
+    expect(() => resource.addRelation(null, null))
+      .toThrowError(`Passed param(s) 'relationName = null', 'entities = null' is not valid`);
   });
 
   it('should clear template params in TEMPLATED relation link', () => {
@@ -193,27 +181,18 @@ describe('Resource BIND_RELATION', () => {
   });
 
   it('should throw error when passed relationName is empty', () => {
-    try {
-      resource.bindRelation('', new TestProductResource()).subscribe();
-    } catch (e) {
-      expect(e.message).toBe(`Passed param(s) 'relationName = ' is not valid`);
-    }
+    expect(() => resource.bindRelation('', new TestProductResource()))
+      .toThrowError(`Passed param(s) 'relationName = ' is not valid`);
   });
 
   it('should throw error when passed relationName and/or entity are undefined', () => {
-    try {
-      resource.bindRelation(undefined, undefined).subscribe();
-    } catch (e) {
-      expect(e.message).toBe(`Passed param(s) 'relationName = undefined', 'entity = undefined' is not valid`);
-    }
+    expect(() => resource.bindRelation(undefined, undefined))
+      .toThrowError(`Passed param(s) 'relationName = undefined', 'entity = undefined' is not valid`);
   });
 
   it('should throw error when passed relationName and/or entity are null', () => {
-    try {
-      resource.bindRelation(null, null).subscribe();
-    } catch (e) {
-      expect(e.message).toBe(`Passed param(s) 'relationName = null', 'entity = null' is not valid`);
-    }
+    expect(() => resource.bindRelation(null, null))
+      .toThrowError(`Passed param(s) 'relationName = null', 'entity = null' is not valid`);
   });
 
   it('should clear template params in TEMPLATED relation link', () => {
@@ -283,27 +262,18 @@ describe('Resource CLEAR_RELATION', () => {
   });
 
   it('should throw error when passed relationName is empty', () => {
-    try {
-      resource.clearRelation('').subscribe();
-    } catch (e) {
-      expect(e.message).toBe(`Passed param(s) 'relationName = ' is not valid`);
-    }
+    expect(() => resource.clearRelation(''))
+      .toThrowError(`Passed param(s) 'relationName = ' is not valid`);
   });
 
   it('should throw error when passed relationName is undefined', () => {
-    try {
-      resource.clearRelation(undefined).subscribe();
-    } catch (e) {
-      expect(e.message).toBe(`Passed param(s) 'relationName = undefined' is not valid`);
-    }
+    expect(() => resource.clearRelation(undefined))
+      .toThrowError(`Passed param(s) 'relationName = undefined' is not valid`);
   });
 
   it('should throw error when passed relationName is null', () => {
-    try {
-      resource.clearRelation(null).subscribe();
-    } catch (e) {
-      expect(e.message).toBe(`Passed param(s) 'relationName = null' is not valid`);
-    }
+    expect(() => resource.clearRelation(null))
+      .toThrowError(`Passed param(s) 'relationName = null' is not valid`);
   });
 
   it('should clear template params in TEMPLATED relation link', () => {
@@ -373,27 +343,18 @@ describe('Resource DELETE_RELATION', () => {
   });
 
   it('should throw error when passed relationName is empty', () => {
-    try {
-      resource.deleteRelation('', new TestProductResource()).subscribe();
-    } catch (e) {
-      expect(e.message).toBe(`Passed param(s) 'relationName = ' is not valid`);
-    }
+    expect(() => resource.deleteRelation('', new TestProductResource()))
+      .toThrowError(`Passed param(s) 'relationName = ' is not valid`);
   });
 
   it('should throw error when passed relationName and/or entity are undefined', () => {
-    try {
-      resource.deleteRelation(undefined, undefined).subscribe();
-    } catch (e) {
-      expect(e.message).toBe(`Passed param(s) 'relationName = undefined', 'entity = undefined' is not valid`);
-    }
+    expect(() => resource.deleteRelation(undefined, undefined))
+      .toThrowError(`Passed param(s) 'relationName = undefined', 'entity = undefined' is not valid`);
   });
 
   it('should throw error when passed relationName and/or entity are null', () => {
-    try {
-      resource.deleteRelation(null, null).subscribe();
-    } catch (e) {
-      expect(e.message).toBe(`Passed param(s) 'relationName = null', 'entity = null' is not valid`);
-    }
+    expect(() => resource.deleteRelation(null, null))
+      .toThrowError(`Passed param(s) 'relationName = null', 'entity = null' is not valid`);
   });
 
   it('should generate url from relation link href and passed resource id retrieved by self link href', () => {
@@ -407,13 +368,8 @@ describe('Resource DELETE_RELATION', () => {
   });
 
   it('should throw error when passed resource self link href has not id', () => {
-    try {
-      resource.deleteRelation('product', new BadTestProductResource())
-        .subscribe(() => {
-        });
-    } catch (e) {
-      expect(e.message).toBe('Passed resource self link should has id');
-    }
+    expect(() => resource.deleteRelation('product', new BadTestProductResource()))
+      .toThrowError('Passed resource self link should has id');
   });
 
   it('should pass observe "response" value', () => {

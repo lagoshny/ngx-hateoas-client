@@ -20,35 +20,23 @@ describe('UrlUtils', () => {
   });
 
   it('CONVERT_TO_HTTP_PARAMS should throw error when option.params has projection param', () => {
-    try {
-      UrlUtils.convertToHttpParams({params: {projection: 'test'}});
-    } catch (e) {
-      expect(e.message).toBe('Please, pass projection param in projection object key, not with params object!');
-    }
+    expect(() => UrlUtils.convertToHttpParams({params: {projection: 'test'}}))
+      .toThrowError('Please, pass projection param in projection object key, not with params object!');
   });
 
   it('CONVERT_TO_HTTP_PARAMS should throw error when option.params has page param', () => {
-    try {
-      UrlUtils.convertToHttpParams({params: {page: 'test'}});
-    } catch (e) {
-      expect(e.message).toBe('Please, pass page params in page object key, not with params object!');
-    }
+    expect(() => UrlUtils.convertToHttpParams({params: {page: 'test'}}))
+      .toThrowError('Please, pass page params in page object key, not with params object!');
   });
 
   it('CONVERT_TO_HTTP_PARAMS should throw error when option.params has size param', () => {
-    try {
-      UrlUtils.convertToHttpParams({params: {size: 'test'}});
-    } catch (e) {
-      expect(e.message).toBe('Please, pass page params in page object key, not with params object!');
-    }
+    expect(() => UrlUtils.convertToHttpParams({params: {size: 'test'}}))
+      .toThrowError('Please, pass page params in page object key, not with params object!');
   });
 
   it('CONVERT_TO_HTTP_PARAMS should throw error when option.params has sort param', () => {
-    try {
-      UrlUtils.convertToHttpParams({params: {sort: 'test'}});
-    } catch (e) {
-      expect(e.message).toBe('Please, pass page params in page object key, not with params object!');
-    }
+    expect(() => UrlUtils.convertToHttpParams({params: {sort: 'test'}}))
+      .toThrowError('Please, pass page params in page object key, not with params object!');
   });
 
   it('CONVERT_TO_HTTP_PARAMS should adds resource param as self href link', () => {
@@ -105,51 +93,33 @@ describe('UrlUtils', () => {
   });
 
   it('GENERATE_RESOURCE_URL should throw error when base url is null', () => {
-    try {
-      UrlUtils.generateResourceUrl(null, 'any');
-    } catch (e) {
-      expect(e.message).toBe('Base url and resource name should be defined');
-    }
+    expect(() => UrlUtils.generateResourceUrl(null, 'any'))
+      .toThrowError('Base url and resource name should be defined');
   });
 
   it('GENERATE_RESOURCE_URL should throw error when base url is undefined', () => {
-    try {
-      UrlUtils.generateResourceUrl(undefined, 'any');
-    } catch (e) {
-      expect(e.message).toBe('Base url and resource name should be defined');
-    }
+    expect(() => UrlUtils.generateResourceUrl(undefined, 'any'))
+      .toThrowError('Base url and resource name should be defined');
   });
 
   it('GENERATE_RESOURCE_URL should throw error when base url is empty', () => {
-    try {
-      UrlUtils.generateResourceUrl('', 'any');
-    } catch (e) {
-      expect(e.message).toBe('Base url and resource name should be defined');
-    }
+    expect(() => UrlUtils.generateResourceUrl('', 'any'))
+      .toThrowError('Base url and resource name should be defined');
   });
 
   it('GENERATE_RESOURCE_URL should throw error when resourceName is null', () => {
-    try {
-      UrlUtils.generateResourceUrl('any', null);
-    } catch (e) {
-      expect(e.message).toBe('Base url and resource name should be defined');
-    }
+    expect(() => UrlUtils.generateResourceUrl('any', null))
+      .toThrowError('Base url and resource name should be defined');
   });
 
   it('GENERATE_RESOURCE_URL should throw error when resourceName is undefined', () => {
-    try {
-      UrlUtils.generateResourceUrl('any', undefined);
-    } catch (e) {
-      expect(e.message).toBe('Base url and resource name should be defined');
-    }
+    expect(() => UrlUtils.generateResourceUrl('any', undefined))
+      .toThrowError('Base url and resource name should be defined');
   });
 
   it('GENERATE_RESOURCE_URL should throw error when resourceName is empty', () => {
-    try {
-      UrlUtils.generateResourceUrl('any', '');
-    } catch (e) {
-      expect(e.message).toBe('Base url and resource name should be defined');
-    }
+    expect(() => UrlUtils.generateResourceUrl('any', ''))
+      .toThrowError('Base url and resource name should be defined');
   });
 
   it('GENERATE_RESOURCE_URL should return url with base url and resourceName', () => {
@@ -161,27 +131,18 @@ describe('UrlUtils', () => {
   });
 
   it('REMOVE_TEMPLATE_PARAMS should throw error when url is null', () => {
-    try {
-      UrlUtils.removeTemplateParams(null);
-    } catch (e) {
-      expect(e.message).toBe('Url should be defined');
-    }
+    expect(() => UrlUtils.removeTemplateParams(null))
+      .toThrowError('Url should be defined');
   });
 
   it('REMOVE_TEMPLATE_PARAMS should throw error when url is undefined', () => {
-    try {
-      UrlUtils.removeTemplateParams(undefined);
-    } catch (e) {
-      expect(e.message).toBe('Url should be defined');
-    }
+    expect(() => UrlUtils.removeTemplateParams(undefined))
+      .toThrowError('Url should be defined');
   });
 
   it('REMOVE_TEMPLATE_PARAMS should throw error when url is empty', () => {
-    try {
-      UrlUtils.removeTemplateParams('');
-    } catch (e) {
-      expect(e.message).toBe('Url should be defined');
-    }
+    expect(() => UrlUtils.removeTemplateParams(''))
+      .toThrowError('Url should be defined');
   });
 
   it('REMOVE_TEMPLATE_PARAMS should do nothing when url is not templated', () => {
@@ -193,27 +154,18 @@ describe('UrlUtils', () => {
   });
 
   it('FILL_TEMPLATE_PARAMS should throw error when url is null', () => {
-    try {
-      UrlUtils.fillTemplateParams(null, {params: {test: ''}});
-    } catch (e) {
-      expect(e.message).toBe('Url should be defined');
-    }
+    expect(() => UrlUtils.fillTemplateParams(null, {params: {test: ''}}))
+      .toThrowError('Url should be defined');
   });
 
   it('FILL_TEMPLATE_PARAMS should throw error when url is undefined', () => {
-    try {
-      UrlUtils.fillTemplateParams(undefined, {params: {test: ''}});
-    } catch (e) {
-      expect(e.message).toBe('Url should be defined');
-    }
+    expect(() => UrlUtils.fillTemplateParams(undefined, {params: {test: ''}}))
+      .toThrowError('Url should be defined');
   });
 
   it('FILL_TEMPLATE_PARAMS should throw error when url is empty', () => {
-    try {
-      UrlUtils.fillTemplateParams('', {params: {test: ''}});
-    } catch (e) {
-      expect(e.message).toBe('Url should be defined');
-    }
+    expect(() => UrlUtils.fillTemplateParams('', {params: {test: ''}}))
+      .toThrowError('Url should be defined');
   });
 
   it('FILL_TEMPLATE_PARAMS should clear template params when options is null', () => {

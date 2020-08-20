@@ -106,17 +106,13 @@ export class Resource extends BaseResource {
   }
 
   /**
-   * TODO: погуглить как удалить 1 запись, а не коллекцию, видимо так нельзя делать
-   * Unbind all/single resource(s) by the relation name.
-   *
-   * If behind relation name is link to collection of the resources then it means
-   * that all resources will be unbind.
+   * Unbind all resources from collection by the relation name.
    *
    * @param relationName used to get relation link to unbind
    * @throws error when required params are not valid or no link is found by passed relation name
    */
-  public clearRelation<T extends Resource>(relationName: string): Observable<HttpResponse<any>> {
-    StageLogger.resourceBeginLog(this, 'CLEAR_RELATION', {relationName, resourceLinks: this._links});
+  public clearCollectionRelation<T extends Resource>(relationName: string): Observable<HttpResponse<any>> {
+    StageLogger.resourceBeginLog(this, 'CLEAR_COLLECTION_RELATION', {relationName, resourceLinks: this._links});
     ValidationUtils.validateInputParams({relationName});
 
     const relationLink = this.getRelationLink(relationName);
@@ -127,7 +123,7 @@ export class Resource extends BaseResource {
       headers: new HttpHeaders({'Content-Type': 'text/uri-list'})
     }).pipe(
       tap(() => {
-        StageLogger.resourceEndLog(this, 'CLEAR_RELATION', {result: `relation ${ relationName } was cleared successful`});
+        StageLogger.resourceEndLog(this, 'CLEAR_COLLECTION_RELATION', {result: `relation ${ relationName } was cleared successful`});
       })
     );
   }

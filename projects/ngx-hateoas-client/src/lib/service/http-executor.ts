@@ -55,6 +55,7 @@ export class HttpExecutor {
    *
    * @param url to perform request
    * @param options (optional) options that applied to the request
+   * @throws error when required params are not valid
    */
   public get(url: string, options?: {
     headers?: {
@@ -86,6 +87,7 @@ export class HttpExecutor {
    * @param url to perform request
    * @param body to send with request
    * @param options (optional) options that applied to the request
+   * @throws error when required params are not valid
    */
   public post(url: string, body: any | null, options?: {
     headers?: HttpHeaders | {
@@ -117,6 +119,7 @@ export class HttpExecutor {
    * @param url to perform request
    * @param body to send with request
    * @param options (optional) options that applied to the request
+   * @throws error when required params are not valid
    */
   public put(url: string, body: any | null, options?: {
     headers?: HttpHeaders | {
@@ -148,6 +151,7 @@ export class HttpExecutor {
    * @param url to perform request
    * @param body to send with request
    * @param options (optional) options that applied to the request
+   * @throws error when required params are not valid
    */
   public patch(url: string, body: any | null, options?: {
     headers?: HttpHeaders | {
@@ -178,6 +182,7 @@ export class HttpExecutor {
    *
    * @param url to perform request
    * @param options (optional) options that applied to the request
+   * @throws error when required params are not valid
    */
   public delete(url: string, options?: {
     headers?: HttpHeaders | {

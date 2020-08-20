@@ -40,7 +40,7 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
    *
    * @param url to perform request
    * @param options request options
-   * @throws error if returned resource type is not resource
+   * @throws error when required params are not valid or returned resource type is not resource
    */
   public get(url: string, options?: {
     headers?: {
@@ -71,6 +71,14 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
         catchError(error => observableThrowError(error)));
   }
 
+  /**
+   * Perform POST request.
+   *
+   * @param url to perform request
+   * @param body request body
+   * @param options request options
+   * @throws error when required params are not valid
+   */
   public post(url: string, body: any | null, options?: {
     headers?: HttpHeaders | {
       [header: string]: string | string[];
@@ -91,6 +99,14 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
       );
   }
 
+  /**
+   * Perform PUT request.
+   *
+   * @param url to perform request
+   * @param body request body
+   * @param options request options
+   * @throws error when required params are not valid
+   */
   public put(url: string, body: any | null, options?: {
     headers?: HttpHeaders | {
       [header: string]: string | string[];
@@ -111,6 +127,14 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
       );
   }
 
+  /**
+   * Perform PATCH request.
+   *
+   * @param url to perform request
+   * @param body request body
+   * @param options request options
+   * @throws error when required params are not valid
+   */
   public patch(url: string, body: any | null, options?: {
     headers?: HttpHeaders | {
       [header: string]: string | string[];
@@ -132,6 +156,13 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
       );
   }
 
+  /**
+   * Perform DELETE request.
+   *
+   * @param url to perform request
+   * @param options request options
+   * @throws error when required params are not valid
+   */
   public delete(url: string, options?: {
     headers?: HttpHeaders | {
       [header: string]: string | string[];
@@ -158,6 +189,7 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
    * @param resourceName used to build root url to the resource
    * @param countQuery name of the count method
    * @param requestParam (optional) http request params that applied to the request
+   * @throws error when required params are not valid
    */
   public count(resourceName: string, countQuery?: string, requestParam?: RequestParam): Observable<number> {
     ValidationUtils.validateInputParams({resourceName});
@@ -192,6 +224,7 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
    * @param resourceName used to build root url to the resource
    * @param id resource id
    * @param option (optional) options that applied to the request
+   * @throws error when required params are not valid
    */
   public getResource(resourceName: string, id: number, option?: GetOption): Observable<T> {
     ValidationUtils.validateInputParams({resourceName, id});
@@ -212,6 +245,7 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
    *
    * @param resourceName used to build root url to the resource
    * @param body resource to pass as body
+   * @throws error when required params are not valid
    */
   public postResource(resourceName: string, body: BaseResource): Observable<T> {
     ValidationUtils.validateInputParams({resourceName, body});
@@ -232,6 +266,7 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
    * @param resourceName used to build root url to the resource
    * @param searchQuery name of the search method
    * @param option (optional) options that applied to the request
+   * @throws error when required params are not valid
    */
   public search(resourceName: string, searchQuery: string, option?: GetOption): Observable<T> {
     ValidationUtils.validateInputParams({resourceName, searchQuery});

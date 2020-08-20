@@ -37,7 +37,7 @@ export class ResourceCollectionHttpService<T extends ResourceCollection<BaseReso
    *
    * @param url to perform request
    * @param options request options
-   * @throws error if returned resource type is not collection of the resources
+   * @throws error when required params are not valid or returned resource type is not collection of the resources
    */
   public get(url: string, options?: {
     headers?: {
@@ -71,6 +71,7 @@ export class ResourceCollectionHttpService<T extends ResourceCollection<BaseReso
    * @param resourceName used to build root url to the resource
    * @param query (optional) url path that applied to the result url at the end
    * @param option (optional) options that applied to the request
+   * @throws error when required params are not valid
    */
   public getResourceCollection(resourceName: string, query?: string, option?: GetOption): Observable<T> {
     ValidationUtils.validateInputParams({resourceName});
@@ -87,6 +88,7 @@ export class ResourceCollectionHttpService<T extends ResourceCollection<BaseReso
    * @param resourceName used to build root url to the resource
    * @param searchQuery name of the search method
    * @param option (optional) options that applied to the request
+   * @throws error when required params are not valid
    */
   public search(resourceName: string, searchQuery: string, option?: GetOption): Observable<T> {
     ValidationUtils.validateInputParams({resourceName, searchQuery});

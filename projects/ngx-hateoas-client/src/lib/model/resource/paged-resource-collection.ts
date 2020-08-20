@@ -103,7 +103,7 @@ export class PagedResourceCollection<T extends BaseResource> extends ResourceCol
    * That allows you change page size, current page or sort options.
    *
    * @param pageParam contains data about new characteristics of the page.
-   * @throws error when passed inconsistent data
+   * @throws error when required params are not valid or when passed inconsistent data
    */
   public customPage(pageParam: PageParam): Observable<PagedResourceCollection<T>> {
     StageLogger.resourceBeginLog(this.resources[0], 'CustomPage', {pageParam});
@@ -148,11 +148,7 @@ export class PagedResourceCollection<T extends BaseResource> extends ResourceCol
 
 function doRequest<T extends BaseResource>(url: string, pageParams?: PageParam): Observable<PagedResourceCollection<T>> {
   StageLogger.stageLog(Stage.HTTP_REQUEST, {method: 'GET', url, pageParams});
-  if (!url) {
-    const errMsg = 'During page request error occurs: url is empty';
-    StageLogger.stageErrorLog(Stage.HTTP_REQUEST, {error: errMsg});
-    return observableThrowError(errMsg);
-  }
+  ValidationUtils.validateInputParams({url});
 
   let httpParams;
   if (pageParams) {

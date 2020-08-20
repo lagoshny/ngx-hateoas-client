@@ -36,6 +36,7 @@ export class HalResourceService<T extends Resource> {
    * @param resourceName used to build root url to the resource
    * @param id resource id
    * @param options (optional) options that should be applied to the request
+   * @throws error when required params are not valid
    */
   public get(resourceName: string, id: any, options?: GetOption): Observable<T> {
     StageLogger.resourceBeginLog(resourceName, 'ResourceService GET_RESOURCE', {id, options});
@@ -53,6 +54,7 @@ export class HalResourceService<T extends Resource> {
    *
    * @param resourceName used to build root url to the resource
    * @param options (optional) options that should be applied to the request
+   * @throws error when required params are not valid
    */
   public getAll(resourceName: string, options?: GetOption): Observable<ResourceCollection<T>> {
     StageLogger.resourceBeginLog(resourceName, 'ResourceService GET_ALL', {options});
@@ -70,6 +72,7 @@ export class HalResourceService<T extends Resource> {
    *
    * @param resourceName used to build root url to the resource
    * @param options (optional) options that should be applied to the request
+   * @throws error when required params are not valid
    */
   public getAllPage(resourceName: string, options?: PagedGetOption): Observable<PagedResourceCollection<T>> {
     StageLogger.resourceBeginLog(resourceName, 'ResourceService GET_ALL_PAGE', {options});
@@ -87,6 +90,7 @@ export class HalResourceService<T extends Resource> {
    *
    * @param resourceName used to build root url to the resource
    * @param requestBody that contains the body directly and optional body values option {@link ValuesOption}
+   * @throws error when required params are not valid
    */
   public createResource(resourceName: string, requestBody: RequestBody<T>): Observable<T> {
     StageLogger.resourceBeginLog(resourceName, 'ResourceService CREATE_RESOURCE', {requestBody});
@@ -105,6 +109,7 @@ export class HalResourceService<T extends Resource> {
    * Update resource.
    *
    * @param requestBody that contains the body directly and optional body values option {@link ValuesOption}
+   * @throws error when required params are not valid
    */
   public updateResource(requestBody: RequestBody<T>): Observable<T> {
     StageLogger.resourceBeginLog(requestBody?.body, 'ResourceService UPDATE_RESOURCE', {requestBody});
@@ -126,6 +131,7 @@ export class HalResourceService<T extends Resource> {
    * @param resourceName used to build root url to the resource
    * @param countQuery name of the count method
    * @param requestParam (optional) http request params that applied to the request
+   * @throws error when required params are not valid
    */
   public count(resourceName: string, countQuery?: string, requestParam?: RequestParam): Observable<number> {
     StageLogger.resourceBeginLog(resourceName, 'ResourceService COUNT', {query: countQuery, requestParam});
@@ -142,6 +148,7 @@ export class HalResourceService<T extends Resource> {
    * Patch resource.
    *
    * @param requestBody that contains the body directly and optional body values option {@link ValuesOption}
+   * @throws error when required params are not valid
    */
   public patchResource(requestBody: RequestBody<T>): Observable<T | any> {
     StageLogger.resourceBeginLog(requestBody?.body, 'ResourceService PATCH_RESOURCE', {requestBody});
@@ -162,6 +169,7 @@ export class HalResourceService<T extends Resource> {
    *
    * @param entity to delete
    * @param options (optional) options that should be applied to the request
+   * @throws error when required params are not valid
    */
   public deleteResource(entity: T, options?: RequestOption): Observable<T | any> {
     StageLogger.resourceBeginLog(entity, 'ResourceService DELETE_RESOURCE', {options});

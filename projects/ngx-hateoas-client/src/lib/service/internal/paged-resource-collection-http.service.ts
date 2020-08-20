@@ -46,7 +46,7 @@ export class PagedResourceCollectionHttpService<T extends PagedResourceCollectio
    *
    * @param url to perform request
    * @param options request options
-   * @throws error if returned resource type is not paged collection of the resources
+   * @throws error when required params are not valid or returned resource type is not paged collection of the resources
    */
   public get(url: string, options?: {
     headers?: {
@@ -79,6 +79,7 @@ export class PagedResourceCollectionHttpService<T extends PagedResourceCollectio
    * @param resourceName used to build root url to the resource
    * @param query (optional) url path that applied to the result url at the end
    * @param option (optional) options that applied to the request
+   * @throws error when required params are not valid
    */
   public getResourcePage(resourceName: string, query?: string, option?: PagedGetOption): Observable<T> {
     ValidationUtils.validateInputParams({resourceName});
@@ -97,6 +98,7 @@ export class PagedResourceCollectionHttpService<T extends PagedResourceCollectio
    * @param resourceName used to build root url to the resource
    * @param searchQuery name of the search method
    * @param option (optional) options that applied to the request
+   * @throws error when required params are not valid
    */
   public search(resourceName: string, searchQuery: string, option?: PagedGetOption): Observable<T> {
     ValidationUtils.validateInputParams({resourceName, searchQuery});

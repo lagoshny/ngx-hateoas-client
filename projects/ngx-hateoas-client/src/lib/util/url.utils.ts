@@ -54,6 +54,7 @@ export class UrlUtils {
    * @param baseUrl will be as first part as a result url
    * @param resourceName added to the base url through slash
    * @param query (optional) if passed then adds to end of the url
+   * @throws error when required params are not valid
    */
   public static generateResourceUrl(baseUrl: string, resourceName: string, query?: string): string {
     ValidationUtils.validateInputParams({baseUrl, resourceName});
@@ -69,6 +70,7 @@ export class UrlUtils {
    * Clear url from template params.
    *
    * @param url to be cleaned
+   * @throws error when required params are not valid
    */
   public static removeTemplateParams(url: string): string {
     ValidationUtils.validateInputParams({url});
@@ -81,6 +83,7 @@ export class UrlUtils {
    *
    * @param url to be filled
    * @param options contains params to apply to result url, if empty then template params will be cleared
+   * @throws error when required params are not valid
    */
   public static fillTemplateParams(url: string, options: PagedGetOption): string {
     ValidationUtils.validateInputParams({url});

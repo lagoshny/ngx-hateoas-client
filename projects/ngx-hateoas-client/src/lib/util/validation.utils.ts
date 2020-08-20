@@ -5,10 +5,11 @@ import { Stage } from '../logger/stage.enum';
 export class ValidationUtils {
 
   /**
-   * Checks that passed object with params has all defined params.
+   * Checks that passed object with params has all valid params.
+   * Params should not has null, undefined, empty object, empty string values.
    *
    * @param params object with params to check
-   * @throws Error if any params is not defined
+   * @throws error if any params are not defined
    */
   public static validateInputParams(params: object): void {
     if (_.isNil(params)) {

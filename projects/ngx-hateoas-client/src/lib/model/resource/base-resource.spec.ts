@@ -76,6 +76,30 @@ describe('BaseResource GET_RELATION', () => {
     DependencyInjector.injector = TestBed;
   });
 
+  it('should throw error when passed relationName is empty', () => {
+    try {
+      baseResource.getRelation('').subscribe();
+    } catch (e) {
+      expect(e.message).toBe(`Passed param(s) 'relationName = ' is not valid`);
+    }
+  });
+
+  it('should throw error when passed relationName is undefined', () => {
+    try {
+      baseResource.getRelation(undefined).subscribe();
+    } catch (e) {
+      expect(e.message).toBe(`Passed param(s) 'relationName = undefined' is not valid`);
+    }
+  });
+
+  it('should throw error when passed relationName is null', () => {
+    try {
+      baseResource.getRelation(null).subscribe();
+    } catch (e) {
+      expect(e.message).toBe(`Passed param(s) 'relationName = null' is not valid`);
+    }
+  });
+
   it('should fill template params in TEMPLATED link from passed params object', () => {
     resourceHttpServiceSpy.get.and.returnValue(of(new TestOrderResource()));
 
@@ -210,6 +234,30 @@ describe('BaseResource GET_RELATED_COLLECTION', () => {
     DependencyInjector.injector = TestBed;
   });
 
+  it('should throw error when passed relationName is empty', () => {
+    try {
+      baseResource.getRelatedCollection('').subscribe();
+    } catch (e) {
+      expect(e.message).toBe(`Passed param(s) 'relationName = ' is not valid`);
+    }
+  });
+
+  it('should throw error when passed relationName is undefined', () => {
+    try {
+      baseResource.getRelatedCollection(undefined).subscribe();
+    } catch (e) {
+      expect(e.message).toBe(`Passed param(s) 'relationName = undefined' is not valid`);
+    }
+  });
+
+  it('should throw error when passed relationName is null', () => {
+    try {
+      baseResource.getRelatedCollection(null).subscribe();
+    } catch (e) {
+      expect(e.message).toBe(`Passed param(s) 'relationName = null' is not valid`);
+    }
+  });
+
   it('should fill template params in TEMPLATED link from passed params object', () => {
     resourceCollectionHttpServiceSpy.get.and.returnValue(of(new TestOrderResource()));
 
@@ -342,6 +390,30 @@ describe('BaseResource GET_RELATED_PAGE', () => {
   beforeEach(() => {
     baseResource = new TestOrderResource();
     DependencyInjector.injector = TestBed;
+  });
+
+  it('should throw error when passed relationName is empty', () => {
+    try {
+      baseResource.getRelatedPage('').subscribe();
+    } catch (e) {
+      expect(e.message).toBe(`Passed param(s) 'relationName = ' is not valid`);
+    }
+  });
+
+  it('should throw error when passed relationName is undefined', () => {
+    try {
+      baseResource.getRelatedPage(undefined).subscribe();
+    } catch (e) {
+      expect(e.message).toBe(`Passed param(s) 'relationName = undefined' is not valid`);
+    }
+  });
+
+  it('should throw error when passed relationName is null', () => {
+    try {
+      baseResource.getRelatedPage(null).subscribe();
+    } catch (e) {
+      expect(e.message).toBe(`Passed param(s) 'relationName = null' is not valid`);
+    }
   });
 
   it('should throw error when page params passed IN PARAMS OBJECT for TEMPLATED link', () => {
@@ -518,6 +590,30 @@ describe('BaseResource POST_RELATION', () => {
     DependencyInjector.injector = TestBed;
   });
 
+  it('should throw error when passed relationName is empty', () => {
+    try {
+      baseResource.postRelation('', {body: {test: 'value'}}).subscribe();
+    } catch (e) {
+      expect(e.message).toBe(`Passed param(s) 'relationName = ' is not valid`);
+    }
+  });
+
+  it('should throw error when passed relationName and/or requestBody are undefined', () => {
+    try {
+      baseResource.postRelation(undefined, undefined).subscribe();
+    } catch (e) {
+      expect(e.message).toBe(`Passed param(s) 'relationName = undefined', 'requestBody = undefined' is not valid`);
+    }
+  });
+
+  it('should throw error when passed relationName and/or requestBody are null', () => {
+    try {
+      baseResource.postRelation(null, null).subscribe();
+    } catch (e) {
+      expect(e.message).toBe(`Passed param(s) 'relationName = null', 'requestBody = null' is not valid`);
+    }
+  });
+
   it('should fill url template params when url IS templated', () => {
     resourceHttpServiceSpy.post.and.returnValue(of(new TestOrderResource()));
 
@@ -574,12 +670,12 @@ describe('BaseResource POST_RELATION', () => {
     });
   });
 
-  it('no errors when passed "null" values for body and options', () => {
+  it('no errors when passed "null" value for options', () => {
     const orderResource = new TestOrderResource();
     orderResource.product = new TestProductResource();
     resourceHttpServiceSpy.post.and.returnValue(of(orderResource));
 
-    baseResource.postRelation('updateStatus', null, null).subscribe(() => {
+    baseResource.postRelation('updateStatus', {body: {}}, null).subscribe(() => {
       const body = resourceHttpServiceSpy.post.calls.argsFor(0)[1];
       expect(body).toBe(null);
 
@@ -589,12 +685,12 @@ describe('BaseResource POST_RELATION', () => {
     });
   });
 
-  it('no errors when passed "undefined" values for body and options', () => {
+  it('no errors when passed "undefined" value for options', () => {
     const orderResource = new TestOrderResource();
     orderResource.product = new TestProductResource();
     resourceHttpServiceSpy.post.and.returnValue(of(orderResource));
 
-    baseResource.postRelation('updateStatus', undefined, undefined).subscribe(() => {
+    baseResource.postRelation('updateStatus', {body: {}}, undefined).subscribe(() => {
       const body = resourceHttpServiceSpy.post.calls.argsFor(0)[1];
       expect(body).toBe(null);
 
@@ -625,6 +721,30 @@ describe('BaseResource PATCH_RELATION', () => {
   beforeEach(() => {
     baseResource = new TestOrderResource();
     DependencyInjector.injector = TestBed;
+  });
+
+  it('should throw error when passed relationName is empty', () => {
+    try {
+      baseResource.patchRelation('', {body: {test: 'value'}}).subscribe();
+    } catch (e) {
+      expect(e.message).toBe(`Passed param(s) 'relationName = ' is not valid`);
+    }
+  });
+
+  it('should throw error when passed relationName and/or requestBody are undefined', () => {
+    try {
+      baseResource.patchRelation(undefined, undefined).subscribe();
+    } catch (e) {
+      expect(e.message).toBe(`Passed param(s) 'relationName = undefined', 'requestBody = undefined' is not valid`);
+    }
+  });
+
+  it('should throw error when passed relationName and/or requestBody are null', () => {
+    try {
+      baseResource.patchRelation(null, null).subscribe();
+    } catch (e) {
+      expect(e.message).toBe(`Passed param(s) 'relationName = null', 'requestBody = null' is not valid`);
+    }
   });
 
   it('should fill url template params when url IS templated', () => {
@@ -683,12 +803,12 @@ describe('BaseResource PATCH_RELATION', () => {
     });
   });
 
-  it('no errors when passed "null" values for body and options', () => {
+  it('no errors when passed "null" value for options', () => {
     const orderResource = new TestOrderResource();
     orderResource.product = new TestProductResource();
     resourceHttpServiceSpy.patch.and.returnValue(of(orderResource));
 
-    baseResource.patchRelation('updateStatus', null, null).subscribe(() => {
+    baseResource.patchRelation('updateStatus', {body: {}}, null).subscribe(() => {
       const body = resourceHttpServiceSpy.patch.calls.argsFor(0)[1];
       expect(body).toBe(null);
 
@@ -698,12 +818,12 @@ describe('BaseResource PATCH_RELATION', () => {
     });
   });
 
-  it('no errors when passed "undefined" values for body and options', () => {
+  it('no errors when passed "undefined" value for options', () => {
     const orderResource = new TestOrderResource();
     orderResource.product = new TestProductResource();
     resourceHttpServiceSpy.patch.and.returnValue(of(orderResource));
 
-    baseResource.patchRelation('updateStatus', undefined, undefined).subscribe(() => {
+    baseResource.patchRelation('updateStatus', {body: {}}, undefined).subscribe(() => {
       const body = resourceHttpServiceSpy.patch.calls.argsFor(0)[1];
       expect(body).toBe(null);
 
@@ -734,6 +854,30 @@ describe('BaseResource PUT_RELATION', () => {
   beforeEach(() => {
     baseResource = new TestOrderResource();
     DependencyInjector.injector = TestBed;
+  });
+
+  it('should throw error when passed relationName is empty', () => {
+    try {
+      baseResource.putRelation('', {body: {test: 'value'}}).subscribe();
+    } catch (e) {
+      expect(e.message).toBe(`Passed param(s) 'relationName = ' is not valid`);
+    }
+  });
+
+  it('should throw error when passed relationName and/or requestBody are undefined', () => {
+    try {
+      baseResource.putRelation(undefined, undefined).subscribe();
+    } catch (e) {
+      expect(e.message).toBe(`Passed param(s) 'relationName = undefined', 'requestBody = undefined' is not valid`);
+    }
+  });
+
+  it('should throw error when passed relationName and/or requestBody are null', () => {
+    try {
+      baseResource.putRelation(null, null).subscribe();
+    } catch (e) {
+      expect(e.message).toBe(`Passed param(s) 'relationName = null', 'requestBody = null' is not valid`);
+    }
   });
 
   it('should fill url template params when url IS templated', () => {
@@ -792,12 +936,12 @@ describe('BaseResource PUT_RELATION', () => {
     });
   });
 
-  it('no errors when passed "null" values for body and options', () => {
+  it('no errors when passed "null" value for options', () => {
     const orderResource = new TestOrderResource();
     orderResource.product = new TestProductResource();
     resourceHttpServiceSpy.put.and.returnValue(of(orderResource));
 
-    baseResource.putRelation('updateStatus', null, null).subscribe(() => {
+    baseResource.putRelation('updateStatus', {body: {}}, null).subscribe(() => {
       const body = resourceHttpServiceSpy.put.calls.argsFor(0)[1];
       expect(body).toBe(null);
 
@@ -807,12 +951,12 @@ describe('BaseResource PUT_RELATION', () => {
     });
   });
 
-  it('no errors when passed "undefined" values for body and options', () => {
+  it('no errors when passed "undefined" value for options', () => {
     const orderResource = new TestOrderResource();
     orderResource.product = new TestProductResource();
     resourceHttpServiceSpy.put.and.returnValue(of(orderResource));
 
-    baseResource.putRelation('updateStatus', undefined, undefined).subscribe(() => {
+    baseResource.putRelation('updateStatus', {body: {}}, undefined).subscribe(() => {
       const body = resourceHttpServiceSpy.put.calls.argsFor(0)[1];
       expect(body).toBe(null);
 

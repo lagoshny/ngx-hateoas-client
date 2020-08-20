@@ -94,10 +94,42 @@ describe('Resource ADD_RELATION', () => {
     DependencyInjector.injector = TestBed;
   });
 
+  it('should throw error when passed relationName is empty', () => {
+    try {
+      resource.addRelation('', [new TestProductResource()]).subscribe();
+    } catch (e) {
+      expect(e.message).toBe(`Passed param(s) 'relationName = ' is not valid`);
+    }
+  });
+
+  it('should throw error when passed entities is empty', () => {
+    try {
+      resource.addRelation('any', []).subscribe();
+    } catch (e) {
+      expect(e.message).toBe(`Passed param(s) 'entities = []' is not valid`);
+    }
+  });
+
+  it('should throw error when passed relationName and/or entities are undefined', () => {
+    try {
+      resource.addRelation(undefined, undefined).subscribe();
+    } catch (e) {
+      expect(e.message).toBe(`Passed param(s) 'relationName = undefined', 'entities = undefined' is not valid`);
+    }
+  });
+
+  it('should throw error when passed relationName and/or entities are null', () => {
+    try {
+      resource.addRelation(null, null).subscribe();
+    } catch (e) {
+      expect(e.message).toBe(`Passed param(s) 'relationName = null', 'entities = null' is not valid`);
+    }
+  });
+
   it('should clear template params in TEMPLATED relation link', () => {
     resourceHttpServiceSpy.post.and.returnValue(of(new HttpResponse()));
 
-    resource.addRelation('product', new TestProductResource())
+    resource.addRelation('product', [new TestProductResource()])
       .subscribe(() => {
         const resultResourceUrl = resourceHttpServiceSpy.post.calls.argsFor(0)[0];
         expect(resultResourceUrl).toBe('http://localhost:8080/api/v1/order/1/products');
@@ -107,7 +139,7 @@ describe('Resource ADD_RELATION', () => {
   it('should pass relation self link as body', () => {
     resourceHttpServiceSpy.post.and.returnValue(of(new HttpResponse()));
 
-    resource.addRelation('product', new TestProductResource())
+    resource.addRelation('product', [new TestProductResource()])
       .subscribe(() => {
         const body = resourceHttpServiceSpy.post.calls.argsFor(0)[1];
         expect(body).toBe('http://localhost:8080/api/v1/product/1');
@@ -117,7 +149,7 @@ describe('Resource ADD_RELATION', () => {
   it('should pass content-type: text/uri-list', () => {
     resourceHttpServiceSpy.post.and.returnValue(of(new HttpResponse()));
 
-    resource.addRelation('product', new TestProductResource())
+    resource.addRelation('product', [new TestProductResource()])
       .subscribe(() => {
         const headers = resourceHttpServiceSpy.post.calls.argsFor(0)[2].headers as HttpHeaders;
         expect(headers.has('Content-Type')).toBeTrue();
@@ -128,7 +160,7 @@ describe('Resource ADD_RELATION', () => {
   it('should pass observe "response" value', () => {
     resourceHttpServiceSpy.post.and.returnValue(of(new HttpResponse()));
 
-    resource.addRelation('product', new TestProductResource())
+    resource.addRelation('product', [new TestProductResource()])
       .subscribe(() => {
         const observe = resourceHttpServiceSpy.post.calls.argsFor(0)[2].observe;
         expect(observe).toBeDefined();
@@ -158,6 +190,30 @@ describe('Resource BIND_RELATION', () => {
     ResourceUtils.useResourceType(Resource);
     resource = new TestOrderResource();
     DependencyInjector.injector = TestBed;
+  });
+
+  it('should throw error when passed relationName is empty', () => {
+    try {
+      resource.bindRelation('', new TestProductResource()).subscribe();
+    } catch (e) {
+      expect(e.message).toBe(`Passed param(s) 'relationName = ' is not valid`);
+    }
+  });
+
+  it('should throw error when passed relationName and/or entity are undefined', () => {
+    try {
+      resource.bindRelation(undefined, undefined).subscribe();
+    } catch (e) {
+      expect(e.message).toBe(`Passed param(s) 'relationName = undefined', 'entity = undefined' is not valid`);
+    }
+  });
+
+  it('should throw error when passed relationName and/or entity are null', () => {
+    try {
+      resource.bindRelation(null, null).subscribe();
+    } catch (e) {
+      expect(e.message).toBe(`Passed param(s) 'relationName = null', 'entity = null' is not valid`);
+    }
   });
 
   it('should clear template params in TEMPLATED relation link', () => {
@@ -226,6 +282,30 @@ describe('Resource CLEAR_RELATION', () => {
     DependencyInjector.injector = TestBed;
   });
 
+  it('should throw error when passed relationName is empty', () => {
+    try {
+      resource.clearRelation('').subscribe();
+    } catch (e) {
+      expect(e.message).toBe(`Passed param(s) 'relationName = ' is not valid`);
+    }
+  });
+
+  it('should throw error when passed relationName is undefined', () => {
+    try {
+      resource.clearRelation(undefined).subscribe();
+    } catch (e) {
+      expect(e.message).toBe(`Passed param(s) 'relationName = undefined' is not valid`);
+    }
+  });
+
+  it('should throw error when passed relationName is null', () => {
+    try {
+      resource.clearRelation(null).subscribe();
+    } catch (e) {
+      expect(e.message).toBe(`Passed param(s) 'relationName = null' is not valid`);
+    }
+  });
+
   it('should clear template params in TEMPLATED relation link', () => {
     resourceHttpServiceSpy.put.and.returnValue(of(new HttpResponse()));
 
@@ -290,6 +370,30 @@ describe('Resource DELETE_RELATION', () => {
     ResourceUtils.useResourceType(Resource);
     resource = new TestOrderResource();
     DependencyInjector.injector = TestBed;
+  });
+
+  it('should throw error when passed relationName is empty', () => {
+    try {
+      resource.deleteRelation('', new TestProductResource()).subscribe();
+    } catch (e) {
+      expect(e.message).toBe(`Passed param(s) 'relationName = ' is not valid`);
+    }
+  });
+
+  it('should throw error when passed relationName and/or entity are undefined', () => {
+    try {
+      resource.deleteRelation(undefined, undefined).subscribe();
+    } catch (e) {
+      expect(e.message).toBe(`Passed param(s) 'relationName = undefined', 'entity = undefined' is not valid`);
+    }
+  });
+
+  it('should throw error when passed relationName and/or entity are null', () => {
+    try {
+      resource.deleteRelation(null, null).subscribe();
+    } catch (e) {
+      expect(e.message).toBe(`Passed param(s) 'relationName = null', 'entity = null' is not valid`);
+    }
   });
 
   it('should generate url from relation link href and passed resource id retrieved by self link href', () => {

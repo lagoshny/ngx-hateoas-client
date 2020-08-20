@@ -29,7 +29,7 @@ export abstract class BaseResource extends ResourceIdentifiable {
                                              options?: GetOption
   ): Observable<T> {
     StageLogger.resourceBeginLog(this, 'GET_RELATION', {relationName, options});
-    ValidationUtils.checkInputParams({relationName});
+    ValidationUtils.validateInputParams({relationName});
 
     const relationLink = this.getRelationLink(relationName);
     const url = relationLink.templated
@@ -57,7 +57,7 @@ export abstract class BaseResource extends ResourceIdentifiable {
                                                                           options?: GetOption
   ): Observable<T> {
     StageLogger.resourceBeginLog(this, 'GET_RELATED_COLLECTION', {relationName, options});
-    ValidationUtils.checkInputParams({relationName});
+    ValidationUtils.validateInputParams({relationName});
 
     const relationLink = this.getRelationLink(relationName);
     const url = relationLink.templated ? UrlUtils.fillTemplateParams(relationLink.href, options) : relationLink.href;
@@ -82,7 +82,7 @@ export abstract class BaseResource extends ResourceIdentifiable {
   public getRelatedPage<T extends PagedResourceCollection<BaseResource>>(relationName: string,
                                                                          options?: PagedGetOption): Observable<T> {
     StageLogger.resourceBeginLog(this, 'GET_RELATED_PAGE', {relationName, options});
-    ValidationUtils.checkInputParams({relationName});
+    ValidationUtils.validateInputParams({relationName});
 
     const relationLink = this.getRelationLink(relationName);
     const url = relationLink.templated
@@ -111,7 +111,7 @@ export abstract class BaseResource extends ResourceIdentifiable {
                       requestBody: RequestBody<any>,
                       options?: RequestOption): Observable<any> {
     StageLogger.resourceBeginLog(this, 'POST_RELATION', {relationName, requestBody, options});
-    ValidationUtils.checkInputParams({relationName, requestBody});
+    ValidationUtils.validateInputParams({relationName, requestBody});
 
     const relationLink = this.getRelationLink(relationName);
     const url = relationLink.templated ? UrlUtils.fillTemplateParams(relationLink.href, options) : relationLink.href;
@@ -141,7 +141,7 @@ export abstract class BaseResource extends ResourceIdentifiable {
                        requestBody: RequestBody<any>,
                        options?: RequestOption): Observable<any> {
     StageLogger.resourceBeginLog(this, 'PATCH_RELATION', {relationName, requestBody, options});
-    ValidationUtils.checkInputParams({relationName, requestBody});
+    ValidationUtils.validateInputParams({relationName, requestBody});
 
     const relationLink = this.getRelationLink(relationName);
     const url = relationLink.templated ? UrlUtils.fillTemplateParams(relationLink.href, options) : relationLink.href;
@@ -171,7 +171,7 @@ export abstract class BaseResource extends ResourceIdentifiable {
                      requestBody: RequestBody<any>,
                      options?: RequestOption): Observable<any> {
     StageLogger.resourceBeginLog(this, 'PUT_RELATION', {relationName, requestBody, options});
-    ValidationUtils.checkInputParams({relationName, requestBody});
+    ValidationUtils.validateInputParams({relationName, requestBody});
 
     const relationLink = this.getRelationLink(relationName);
     const url = relationLink.templated ? UrlUtils.fillTemplateParams(relationLink.href, options) : relationLink.href;

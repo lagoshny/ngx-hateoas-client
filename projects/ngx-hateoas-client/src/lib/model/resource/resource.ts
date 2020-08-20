@@ -40,7 +40,7 @@ export class Resource extends BaseResource {
    *        else comparing passed name with resource name
    */
   public isResourceOf<T extends Resource>(typeOrName: (new() => T) | string): boolean {
-    ValidationUtils.checkInputParams({typeOrName});
+    ValidationUtils.validateInputParams({typeOrName});
     if (_.isObject(typeOrName)) {
       const that = new typeOrName() as T;
       return _.eq(_.toLower(this.resourceName), _.toLower(that.constructor.name));
@@ -58,7 +58,7 @@ export class Resource extends BaseResource {
    */
   public addRelation<T extends Resource>(relationName: string, entities: Array<T>): Observable<HttpResponse<any>> {
     StageLogger.resourceBeginLog(this, 'ADD_RELATION', {relationName, resourceLinks: this._links, entities});
-    ValidationUtils.checkInputParams({relationName, entities});
+    ValidationUtils.validateInputParams({relationName, entities});
 
     const relationLink = this.getRelationLink(relationName);
     const url = relationLink.templated ? UrlUtils.removeTemplateParams(relationLink.href) : relationLink.href;
@@ -88,7 +88,7 @@ export class Resource extends BaseResource {
    */
   public bindRelation<T extends Resource>(relationName: string, entity: T): Observable<HttpResponse<any>> {
     StageLogger.resourceBeginLog(this, 'BIND_RELATION', {relationName, resourceLinks: this._links, entity});
-    ValidationUtils.checkInputParams({relationName, entity});
+    ValidationUtils.validateInputParams({relationName, entity});
 
     const relationLink = this.getRelationLink(relationName);
     const url = relationLink.templated ? UrlUtils.removeTemplateParams(relationLink.href) : relationLink.href;
@@ -116,7 +116,7 @@ export class Resource extends BaseResource {
    */
   public clearRelation<T extends Resource>(relationName: string): Observable<HttpResponse<any>> {
     StageLogger.resourceBeginLog(this, 'CLEAR_RELATION', {relationName, resourceLinks: this._links});
-    ValidationUtils.checkInputParams({relationName});
+    ValidationUtils.validateInputParams({relationName});
 
     const relationLink = this.getRelationLink(relationName);
     const url = relationLink.templated ? UrlUtils.removeTemplateParams(relationLink.href) : relationLink.href;
@@ -143,7 +143,7 @@ export class Resource extends BaseResource {
    */
   public deleteRelation<T extends Resource>(relationName: string, entity: T): Observable<HttpResponse<any>> {
     StageLogger.resourceBeginLog(this, 'DELETE_RELATION', {relationName, resourceLinks: this._links, entity});
-    ValidationUtils.checkInputParams({relationName, entity});
+    ValidationUtils.validateInputParams({relationName, entity});
 
     const relationLink = this.getRelationLink(relationName);
     const url = relationLink.templated ? UrlUtils.removeTemplateParams(relationLink.href) : relationLink.href;

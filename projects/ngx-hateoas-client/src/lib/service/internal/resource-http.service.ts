@@ -14,6 +14,7 @@ import { CacheService } from '../cache.service';
 import { HttpConfigService } from '../../config/http-config.service';
 import { Stage } from '../../logger/stage.enum';
 import { StageLogger } from '../../logger/stage-logger';
+import { ValidationUtils } from '../../util/validation.utils';
 
 /**
  * Get instance of the ResourceHttpService by Angular DependencyInjector.
@@ -159,9 +160,8 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
    * @param requestParam (optional) http request params that applied to the request
    */
   public count(resourceName: string, countQuery?: string, requestParam?: RequestParam): Observable<number> {
-    if (!resourceName) {
-      return observableThrowError(new Error('resource name should be defined'));
-    }
+    ValidationUtils.validateInputParams({resourceName});
+
     const url = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName)
       .concat('/search/' + (_.isNil(countQuery) ? 'countAll' : countQuery));
 
@@ -194,12 +194,8 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
    * @param option (optional) options that applied to the request
    */
   public getResource(resourceName: string, id: number, option?: GetOption): Observable<T> {
-    if (!resourceName) {
-      return observableThrowError(new Error('resource name should be defined'));
-    }
-    if (_.isNil(id) || id <= 0) {
-      return observableThrowError(new Error('id should be defined and great than 0'));
-    }
+    ValidationUtils.validateInputParams({resourceName, id});
+
     const url = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName).concat('/', _.toString(id));
 
     StageLogger.stageLog(Stage.PREPARE_URL, {
@@ -218,12 +214,8 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
    * @param body resource to pass as body
    */
   public postResource(resourceName: string, body: BaseResource): Observable<T> {
-    if (!resourceName) {
-      return observableThrowError(new Error('resource name should be defined'));
-    }
-    if (_.isEmpty(body)) {
-      return observableThrowError(new Error('body should be defined'));
-    }
+    ValidationUtils.validateInputParams({resourceName, body});
+
     const url = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName);
 
     StageLogger.stageLog(Stage.PREPARE_URL, {
@@ -242,12 +234,8 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
    * @param option (optional) options that applied to the request
    */
   public search(resourceName: string, searchQuery: string, option?: GetOption): Observable<T> {
-    if (!resourceName) {
-      return observableThrowError(new Error('resource name should be defined'));
-    }
-    if (!searchQuery) {
-      return observableThrowError(new Error('search query should be defined'));
-    }
+    ValidationUtils.validateInputParams({resourceName, searchQuery});
+
     const url = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName).concat('/search/' + searchQuery);
 
     StageLogger.stageLog(Stage.PREPARE_URL, {

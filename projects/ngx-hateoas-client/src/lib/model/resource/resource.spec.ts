@@ -104,12 +104,12 @@ describe('Resource ADD_RELATION', () => {
       .toThrowError(`Passed param(s) 'entities = []' is not valid`);
   });
 
-  it('should throw error when passed relationName and/or entities are undefined', () => {
+  it('should throw error when passed relationName,entities are undefined', () => {
     expect(() => resource.addRelation(undefined, undefined))
       .toThrowError(`Passed param(s) 'relationName = undefined', 'entities = undefined' is not valid`);
   });
 
-  it('should throw error when passed relationName and/or entities are null', () => {
+  it('should throw error when passed relationName,entities are null', () => {
     expect(() => resource.addRelation(null, null))
       .toThrowError(`Passed param(s) 'relationName = null', 'entities = null' is not valid`);
   });
@@ -185,12 +185,12 @@ describe('Resource BIND_RELATION', () => {
       .toThrowError(`Passed param(s) 'relationName = ' is not valid`);
   });
 
-  it('should throw error when passed relationName and/or entity are undefined', () => {
+  it('should throw error when passed relationName,entity are undefined', () => {
     expect(() => resource.bindRelation(undefined, undefined))
       .toThrowError(`Passed param(s) 'relationName = undefined', 'entity = undefined' is not valid`);
   });
 
-  it('should throw error when passed relationName and/or entity are null', () => {
+  it('should throw error when passed relationName,entity are null', () => {
     expect(() => resource.bindRelation(null, null))
       .toThrowError(`Passed param(s) 'relationName = null', 'entity = null' is not valid`);
   });
@@ -347,12 +347,12 @@ describe('Resource DELETE_RELATION', () => {
       .toThrowError(`Passed param(s) 'relationName = ' is not valid`);
   });
 
-  it('should throw error when passed relationName and/or entity are undefined', () => {
+  it('should throw error when passed relationName,entity are undefined', () => {
     expect(() => resource.deleteRelation(undefined, undefined))
       .toThrowError(`Passed param(s) 'relationName = undefined', 'entity = undefined' is not valid`);
   });
 
-  it('should throw error when passed relationName and/or entity are null', () => {
+  it('should throw error when passed relationName,entity are null', () => {
     expect(() => resource.deleteRelation(null, null))
       .toThrowError(`Passed param(s) 'relationName = null', 'entity = null' is not valid`);
   });

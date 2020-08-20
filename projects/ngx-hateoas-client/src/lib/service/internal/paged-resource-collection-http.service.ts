@@ -15,6 +15,7 @@ import { PagedGetOption, PageParam } from '../../model/declarations';
 import { HttpExecutor } from '../http-executor';
 import { StageLogger } from '../../logger/stage-logger';
 import { Stage } from '../../logger/stage.enum';
+import { ValidationUtils } from '../../util/validation.utils';
 
 /**
  * Get instance of the PagedResourceCollectionHttpService by Angular DependencyInjector.
@@ -80,9 +81,8 @@ export class PagedResourceCollectionHttpService<T extends PagedResourceCollectio
    * @param option (optional) options that applied to the request
    */
   public getResourcePage(resourceName: string, query?: string, option?: PagedGetOption): Observable<T> {
-    if (!resourceName) {
-      return observableThrowError(new Error('resource name should be defined'));
-    }
+    ValidationUtils.validateInputParams({resourceName});
+
     const url = UrlUtils.removeTemplateParams(UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName, query));
     const pagedOption = !_.isEmpty(option) ? option : {};
     if (_.isEmpty(pagedOption.pageParam)) {
@@ -99,12 +99,8 @@ export class PagedResourceCollectionHttpService<T extends PagedResourceCollectio
    * @param option (optional) options that applied to the request
    */
   public search(resourceName: string, searchQuery: string, option?: PagedGetOption): Observable<T> {
-    if (!resourceName) {
-      return observableThrowError(new Error('resource name should be defined'));
-    }
-    if (!searchQuery) {
-      return observableThrowError(new Error('search query should be defined'));
-    }
+    ValidationUtils.validateInputParams({resourceName, searchQuery});
+
     const url = UrlUtils.removeTemplateParams(
       UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName)).concat('/search/' + searchQuery);
     const pagedOption = !_.isEmpty(option) ? option : {};

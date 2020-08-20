@@ -107,7 +107,7 @@ export class PagedResourceCollection<T extends BaseResource> extends ResourceCol
    */
   public customPage(pageParam: PageParam): Observable<PagedResourceCollection<T>> {
     StageLogger.resourceBeginLog(this.resources[0], 'CustomPage', {pageParam});
-    ValidationUtils.checkInputParams({pageParam});
+    ValidationUtils.validateInputParams({pageParam});
 
     if (pageParam.page < 0) {
       pageParam.page = this.pageNumber;

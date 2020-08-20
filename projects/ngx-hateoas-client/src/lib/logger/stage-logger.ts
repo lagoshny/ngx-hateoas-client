@@ -15,8 +15,10 @@ export class StageLogger {
     let resourceName;
     if (_.isString(resource)) {
       resourceName = resource;
-    } else {
+    } else if (!_.isNil(resource)) {
       resourceName = 'resourceName' in resource ? resource['resourceName'] : 'EmbeddedResource';
+    } else {
+      resourceName = 'NOT_DEFINED_RESOURCE_NAME';
     }
     ConsoleLogger.resourcePrettyInfo(`${ _.capitalize(resourceName) } ${ method }`,
       `STAGE ${ Stage.BEGIN }`, paramToLog);

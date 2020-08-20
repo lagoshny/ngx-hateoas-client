@@ -108,24 +108,18 @@ describe('ResourceCollectionHttpService', () => {
   });
 
   it('GET_RESOURCE_COLLECTION throws error when resourceName is empty', () => {
-    resourceCollectionHttpServiceSpy.getResourceCollection('').subscribe(() => {
-    }, (error) => {
-      expect(error.message).toBe('resource name should be defined');
-    });
+    expect(() => resourceCollectionHttpServiceSpy.getResourceCollection(''))
+      .toThrowError(`Passed param(s) 'resourceName = ' is not valid`);
   });
 
   it('GET_RESOURCE_COLLECTION throws error when resourceName is null', () => {
-    resourceCollectionHttpServiceSpy.getResourceCollection(null).subscribe(() => {
-    }, (error) => {
-      expect(error.message).toBe('resource name should be defined');
-    });
+    expect(() => resourceCollectionHttpServiceSpy.getResourceCollection(null))
+      .toThrowError(`Passed param(s) 'resourceName = null' is not valid`);
   });
 
   it('GET_RESOURCE_COLLECTION throws error when resourceName is undefined', () => {
-    resourceCollectionHttpServiceSpy.getResourceCollection(undefined).subscribe(() => {
-    }, (error) => {
-      expect(error.message).toBe('resource name should be defined');
-    });
+    expect(() => resourceCollectionHttpServiceSpy.getResourceCollection(undefined))
+      .toThrowError(`Passed param(s) 'resourceName = undefined' is not valid`);
   });
 
   it('GET_RESOURCE_COLLECTION should generate root resource url', () => {
@@ -164,45 +158,23 @@ describe('ResourceCollectionHttpService', () => {
   });
 
   it('SEARCH throws error when resourceName is empty', () => {
-    resourceCollectionHttpServiceSpy.search('', 'any').subscribe(() => {
-    }, (error) => {
-      expect(error.message).toBe('resource name should be defined');
-    });
-  });
-
-  it('SEARCH throws error when resourceName is null', () => {
-    resourceCollectionHttpServiceSpy.search(null, 'any').subscribe(() => {
-    }, (error) => {
-      expect(error.message).toBe('resource name should be defined');
-    });
-  });
-
-  it('SEARCH throws error when resourceName is undefined', () => {
-    resourceCollectionHttpServiceSpy.search(undefined, 'any').subscribe(() => {
-    }, (error) => {
-      expect(error.message).toBe('resource name should be defined');
-    });
+    expect(() => resourceCollectionHttpServiceSpy.search('', 'any'))
+      .toThrowError(`Passed param(s) 'resourceName = ' is not valid`);
   });
 
   it('SEARCH throws error when searchQuery is empty', () => {
-    resourceCollectionHttpServiceSpy.search('any', '').subscribe(() => {
-    }, (error) => {
-      expect(error.message).toBe('search query should be defined');
-    });
+    expect(() => resourceCollectionHttpServiceSpy.search('any', ''))
+      .toThrowError(`Passed param(s) 'searchQuery = ' is not valid`);
   });
 
-  it('SEARCH throws error when searchQuery is null', () => {
-    resourceCollectionHttpServiceSpy.search('any', null).subscribe(() => {
-    }, (error) => {
-      expect(error.message).toBe('search query should be defined');
-    });
+  it('SEARCH throws error when resourceName,searchQuery are null', () => {
+    expect(() => resourceCollectionHttpServiceSpy.search(null, null))
+      .toThrowError(`Passed param(s) 'resourceName = null', 'searchQuery = null' is not valid`);
   });
 
-  it('SEARCH throws error when searchQuery is undefined', () => {
-    resourceCollectionHttpServiceSpy.search('any', undefined).subscribe(() => {
-    }, (error) => {
-      expect(error.message).toBe('search query should be defined');
-    });
+  it('SEARCH throws error when resourceName,searchQuery are undefined', () => {
+    expect(() => resourceCollectionHttpServiceSpy.search(undefined, undefined))
+      .toThrowError(`Passed param(s) 'resourceName = undefined', 'searchQuery = undefined' is not valid`);
   });
 
   it('SEARCH should generate search resource url', () => {

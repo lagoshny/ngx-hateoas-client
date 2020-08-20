@@ -544,12 +544,12 @@ describe('BaseResource POST_RELATION', () => {
       .toThrowError(`Passed param(s) 'relationName = ' is not valid`);
   });
 
-  it('should throw error when passed relationName and/or requestBody are undefined', () => {
+  it('should throw error when passed relationName,requestBody are undefined', () => {
     expect(() => baseResource.postRelation(undefined, undefined))
       .toThrowError(`Passed param(s) 'relationName = undefined', 'requestBody = undefined' is not valid`);
   });
 
-  it('should throw error when passed relationName and/or requestBody are null', () => {
+  it('should throw error when passed relationName,requestBody are null', () => {
     expect(() => baseResource.postRelation(null, null))
       .toThrowError(`Passed param(s) 'relationName = null', 'requestBody = null' is not valid`);
   });
@@ -668,12 +668,12 @@ describe('BaseResource PATCH_RELATION', () => {
       .toThrowError(`Passed param(s) 'relationName = ' is not valid`);
   });
 
-  it('should throw error when passed relationName and/or requestBody are undefined', () => {
+  it('should throw error when passed relationName,requestBody are undefined', () => {
     expect(() => baseResource.patchRelation(undefined, undefined))
       .toThrowError(`Passed param(s) 'relationName = undefined', 'requestBody = undefined' is not valid`);
   });
 
-  it('should throw error when passed relationName and/or requestBody are null', () => {
+  it('should throw error when passed relationName,requestBody are null', () => {
     expect(() => baseResource.patchRelation(null, null))
       .toThrowError(`Passed param(s) 'relationName = null', 'requestBody = null' is not valid`);
   });
@@ -792,12 +792,12 @@ describe('BaseResource PUT_RELATION', () => {
       .toThrowError(`Passed param(s) 'relationName = ' is not valid`);
   });
 
-  it('should throw error when passed relationName and/or requestBody are undefined', () => {
+  it('should throw error when passed relationName,requestBody are undefined', () => {
     expect(() => baseResource.putRelation(undefined, undefined))
       .toThrowError(`Passed param(s) 'relationName = undefined', 'requestBody = undefined' is not valid`);
   });
 
-  it('should throw error when passed relationName and/or requestBody are null', () => {
+  it('should throw error when passed relationName,requestBody are null', () => {
     expect(() => baseResource.putRelation(null, null))
       .toThrowError(`Passed param(s) 'relationName = null', 'requestBody = null' is not valid`);
   });

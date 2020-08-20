@@ -1,8 +1,9 @@
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { Observable, throwError as observableThrowError } from 'rxjs';
+import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { StageLogger } from '../logger/stage-logger';
 import { Stage } from '../logger/stage.enum';
+import { ValidationUtils } from '../util/validation.utils';
 
 /**
  * Base class with common logics to perform HTTP requests.
@@ -63,11 +64,7 @@ export class HttpExecutor {
     params?: HttpParams
   }): Observable<any> {
     HttpExecutor.logRequest('GET', url, options);
-    if (!url) {
-      const errMsg = 'url should be defined';
-      StageLogger.stageErrorLog(Stage.HTTP_REQUEST, {error: errMsg});
-      return observableThrowError(new Error(errMsg));
-    }
+    ValidationUtils.validateInputParams({url});
 
     let response;
     if (options?.observe === 'response') {
@@ -98,11 +95,7 @@ export class HttpExecutor {
     params?: HttpParams
   }): Observable<any> {
     HttpExecutor.logRequest('POST', url, options, body);
-    if (!url) {
-      const errMsg = 'url should be defined';
-      StageLogger.stageErrorLog(Stage.HTTP_REQUEST, {error: errMsg});
-      return observableThrowError(new Error(errMsg));
-    }
+    ValidationUtils.validateInputParams({url});
 
     let response;
     if (options?.observe === 'response') {
@@ -133,11 +126,7 @@ export class HttpExecutor {
     params?: HttpParams
   }): Observable<any> {
     HttpExecutor.logRequest('PUT', url, options, body);
-    if (!url) {
-      const errMsg = 'url should be defined';
-      StageLogger.stageErrorLog(Stage.HTTP_REQUEST, {error: errMsg});
-      return observableThrowError(new Error(errMsg));
-    }
+    ValidationUtils.validateInputParams({url});
 
     let response;
     if (options?.observe === 'response') {
@@ -168,11 +157,7 @@ export class HttpExecutor {
     params?: HttpParams
   }): Observable<any> {
     HttpExecutor.logRequest('PATCH', url, options, body);
-    if (!url) {
-      const errMsg = 'url should be defined';
-      StageLogger.stageErrorLog(Stage.HTTP_REQUEST, {error: errMsg});
-      return observableThrowError(new Error(errMsg));
-    }
+    ValidationUtils.validateInputParams({url});
 
     let response;
     if (options?.observe === 'response') {
@@ -202,11 +187,7 @@ export class HttpExecutor {
     params?: HttpParams
   }): Observable<any> {
     HttpExecutor.logRequest('DELETE', url, options);
-    if (!url) {
-      const errMsg = 'url should be defined';
-      StageLogger.stageErrorLog(Stage.HTTP_REQUEST, {error: errMsg});
-      return observableThrowError(new Error(errMsg));
-    }
+    ValidationUtils.validateInputParams({url});
 
     let response;
     if (options?.observe === 'response') {

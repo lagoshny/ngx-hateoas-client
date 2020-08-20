@@ -10,7 +10,7 @@ export class ValidationUtils {
    * @param params object with params to check
    * @throws Error if any params is not defined
    */
-  public static checkInputParams(params: object): void {
+  public static validateInputParams(params: object): void {
     if (_.isNil(params)) {
       const errMsg = 'Passed params object is not valid';
       StageLogger.stageErrorLog(Stage.CHECK_PARAMS, {error: errMsg});

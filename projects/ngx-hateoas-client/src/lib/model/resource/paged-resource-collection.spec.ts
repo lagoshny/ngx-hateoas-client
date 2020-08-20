@@ -104,7 +104,7 @@ describe('PagedResourceCollection', () => {
     expect(pagedResourceCollection.hasLast()).toBeTrue();
   });
 
-  it('should apply page params when perform custom page query', () => {
+  it('CUSTOM_PAGE should apply page params when perform custom page query', () => {
     pagedResourceCollectionHttpServiceSpy.get.and.returnValue(of(new PagedResourceCollection(new ResourceCollection())));
 
     const pagedResourceCollection = new PagedResourceCollection(new SimpleResourceCollection(), pageDataWithLinks);
@@ -122,6 +122,14 @@ describe('PagedResourceCollection', () => {
         expect(httpParams.get('size')).toBe('8');
       });
   });
+
+  it('CUSTOM_PAGE should throw exception when passed pageParam is empty', () => {
+    const pagedResourceCollection = new PagedResourceCollection(new SimpleResourceCollection(), pageDataWithLinks);
+
+    expect(() => pagedResourceCollection.customPage({}))
+      .toThrowError(`Passed param(s) 'pageParam = {}' is not valid`);
+  });
+
 
 });
 

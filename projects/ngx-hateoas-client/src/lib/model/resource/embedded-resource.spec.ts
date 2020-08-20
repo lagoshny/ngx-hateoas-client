@@ -5,12 +5,10 @@ import { SimpleEmbeddedResource } from './resources.test';
 describe('EmbeddedResource', () => {
 
   it('should has not self resource link', () => {
-    try {
+    expect(() => {
       const embeddedResource = new SimpleEmbeddedResource();
       embeddedResource.getRelationLink('self');
-    } catch (e) {
-      expect(e.message).toBe('Resource relation with name \'self\' not found');
-    }
+    }).toThrowError(`Resource relation with name 'self' not found`);
   });
 
 });

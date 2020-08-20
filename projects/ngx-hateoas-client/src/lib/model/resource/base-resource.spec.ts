@@ -76,6 +76,21 @@ describe('BaseResource GET_RELATION', () => {
     DependencyInjector.injector = TestBed;
   });
 
+  it('should throw error when passed relationName is empty', () => {
+    expect(() => baseResource.getRelation(''))
+      .toThrowError(`Passed param(s) 'relationName = ' is not valid`);
+  });
+
+  it('should throw error when passed relationName is undefined', () => {
+    expect(() => baseResource.getRelation(undefined))
+      .toThrowError(`Passed param(s) 'relationName = undefined' is not valid`);
+  });
+
+  it('should throw error when passed relationName is null', () => {
+    expect(() => baseResource.getRelation(null))
+      .toThrowError(`Passed param(s) 'relationName = null' is not valid`);
+  });
+
   it('should fill template params in TEMPLATED link from passed params object', () => {
     resourceHttpServiceSpy.get.and.returnValue(of(new TestOrderResource()));
 
@@ -90,16 +105,13 @@ describe('BaseResource GET_RELATION', () => {
   });
 
   it('should throw error when pass projection param in params object for TEMPLATED link', () => {
-    try {
+    expect(() => {
       baseResource.getRelation('paymentType', {
         params: {
           projection: 'paymentProjection'
         }
-      }).subscribe(() => {
-      });
-    } catch (error) {
-      expect(error.message).toBe('Please, pass projection param in projection object key, not with params object!');
-    }
+      }).subscribe();
+    }).toThrowError('Please, pass projection param in projection object key, not with params object!');
   });
 
   it('should fill projection template param for TEMPLATED link', () => {
@@ -157,16 +169,13 @@ describe('BaseResource GET_RELATION', () => {
   it('should throw error when pass projection param in params object for NOT TEMPLATED link', () => {
     resourceHttpServiceSpy.get.and.returnValue(of(new TestOrderResource()));
 
-    try {
+    expect(() => {
       baseResource.getRelation('order', {
         params: {
           projection: 'orderProjection'
         }
-      }).subscribe(() => {
-      });
-    } catch (error) {
-      expect(error.message).toBe('Please, pass projection param in projection object key, not with params object!');
-    }
+      }).subscribe();
+    }).toThrowError('Please, pass projection param in projection object key, not with params object!');
   });
 
   it('no errors when passed "null" value options', () => {
@@ -210,6 +219,21 @@ describe('BaseResource GET_RELATED_COLLECTION', () => {
     DependencyInjector.injector = TestBed;
   });
 
+  it('should throw error when passed relationName is empty', () => {
+    expect(() => baseResource.getRelatedCollection(''))
+      .toThrowError(`Passed param(s) 'relationName = ' is not valid`);
+  });
+
+  it('should throw error when passed relationName is undefined', () => {
+    expect(() => baseResource.getRelatedCollection(undefined))
+      .toThrowError(`Passed param(s) 'relationName = undefined' is not valid`);
+  });
+
+  it('should throw error when passed relationName is null', () => {
+    expect(() => baseResource.getRelatedCollection(null))
+      .toThrowError(`Passed param(s) 'relationName = null' is not valid`);
+  });
+
   it('should fill template params in TEMPLATED link from passed params object', () => {
     resourceCollectionHttpServiceSpy.get.and.returnValue(of(new TestOrderResource()));
 
@@ -224,16 +248,13 @@ describe('BaseResource GET_RELATED_COLLECTION', () => {
   });
 
   it('should throw error when pass projection param in params object for TEMPLATED link', () => {
-    try {
+    expect(() => {
       baseResource.getRelatedCollection('paymentType', {
         params: {
           projection: 'paymentProjection'
         }
-      }).subscribe(() => {
-      });
-    } catch (error) {
-      expect(error.message).toBe('Please, pass projection param in projection object key, not with params object!');
-    }
+      }).subscribe();
+    }).toThrowError('Please, pass projection param in projection object key, not with params object!');
   });
 
   it('should fill projection template param for TEMPLATED link', () => {
@@ -291,16 +312,13 @@ describe('BaseResource GET_RELATED_COLLECTION', () => {
   it('should throw error when pass projection param in params object for NOT TEMPLATED link', () => {
     resourceCollectionHttpServiceSpy.get.and.returnValue(of(new TestOrderResource()));
 
-    try {
+    expect(() => {
       baseResource.getRelatedCollection('order', {
         params: {
           projection: 'orderProjection'
         }
-      }).subscribe(() => {
-      });
-    } catch (error) {
-      expect(error.message).toBe('Please, pass projection param in projection object key, not with params object!');
-    }
+      }).subscribe();
+    }).toThrowError('Please, pass projection param in projection object key, not with params object!');
   });
 
   it('no errors when passed "null" value options', () => {
@@ -344,18 +362,30 @@ describe('BaseResource GET_RELATED_PAGE', () => {
     DependencyInjector.injector = TestBed;
   });
 
+  it('should throw error when passed relationName is empty', () => {
+    expect(() => baseResource.getRelatedPage(''))
+      .toThrowError(`Passed param(s) 'relationName = ' is not valid`);
+  });
+
+  it('should throw error when passed relationName is undefined', () => {
+    expect(() => baseResource.getRelatedPage(undefined))
+      .toThrowError(`Passed param(s) 'relationName = undefined' is not valid`);
+  });
+
+  it('should throw error when passed relationName is null', () => {
+    expect(() => baseResource.getRelatedPage(null))
+      .toThrowError(`Passed param(s) 'relationName = null' is not valid`);
+  });
+
   it('should throw error when page params passed IN PARAMS OBJECT for TEMPLATED link', () => {
-    try {
+    expect(() => {
       baseResource.getRelatedPage('product', {
         params: {
           page: 1,
           size: 2
         }
-      }).subscribe(() => {
-      });
-    } catch (error) {
-      expect(error.message).toBe('Please, pass page params in page object key, not with params object!');
-    }
+      }).subscribe();
+    }).toThrowError('Please, pass page params in page object key, not with params object!');
   });
 
   it('should fill page params in TEMPLATED link when page params passed IN PAGE OBJECT', () => {
@@ -380,16 +410,13 @@ describe('BaseResource GET_RELATED_PAGE', () => {
   });
 
   it('should throw error when projection param passed IN PARAMS OBJECT for TEMPLATED link', () => {
-    try {
+    expect(() => {
       baseResource.getRelatedPage('product', {
         params: {
           projection: 'productProjection'
         }
-      }).subscribe(() => {
-      });
-    } catch (error) {
-      expect(error.message).toBe('Please, pass projection param in projection object key, not with params object!');
-    }
+      }).subscribe();
+    }).toThrowError('Please, pass projection param in projection object key, not with params object!');
   });
 
   it('should fill projection param in TEMPLATED link when it passed IN projection property', () => {
@@ -434,30 +461,24 @@ describe('BaseResource GET_RELATED_PAGE', () => {
   });
 
   it('should throw error when page params passed IN PARAMS OBJECT for NOT TEMPLATED link', () => {
-    try {
+    expect(() => {
       baseResource.getRelatedPage('magazine', {
         params: {
           page: 1,
           size: 2
         }
-      }).subscribe(() => {
-      });
-    } catch (error) {
-      expect(error.message).toBe('Please, pass page params in page object key, not with params object!');
-    }
+      }).subscribe();
+    }).toThrowError('Please, pass page params in page object key, not with params object!');
   });
 
   it('should throw error when projection param passed IN PARAMS OBJECT for NOT TEMPLATED link', () => {
-    try {
+    expect(() => {
       baseResource.getRelatedPage('magazine', {
         params: {
           projection: 'magazineProjection'
         }
-      }).subscribe(() => {
-      });
-    } catch (error) {
-      expect(error.message).toBe('Please, pass projection param in projection object key, not with params object!');
-    }
+      }).subscribe();
+    }).toThrowError('Please, pass projection param in projection object key, not with params object!');
   });
 
   it('should adds projection param to http request params for NOT TEMPLATED link', () => {
@@ -518,6 +539,21 @@ describe('BaseResource POST_RELATION', () => {
     DependencyInjector.injector = TestBed;
   });
 
+  it('should throw error when passed relationName is empty', () => {
+    expect(() => baseResource.postRelation('', {body: {test: 'value'}}))
+      .toThrowError(`Passed param(s) 'relationName = ' is not valid`);
+  });
+
+  it('should throw error when passed relationName,requestBody are undefined', () => {
+    expect(() => baseResource.postRelation(undefined, undefined))
+      .toThrowError(`Passed param(s) 'relationName = undefined', 'requestBody = undefined' is not valid`);
+  });
+
+  it('should throw error when passed relationName,requestBody are null', () => {
+    expect(() => baseResource.postRelation(null, null))
+      .toThrowError(`Passed param(s) 'relationName = null', 'requestBody = null' is not valid`);
+  });
+
   it('should fill url template params when url IS templated', () => {
     resourceHttpServiceSpy.post.and.returnValue(of(new TestOrderResource()));
 
@@ -574,12 +610,12 @@ describe('BaseResource POST_RELATION', () => {
     });
   });
 
-  it('no errors when passed "null" values for body and options', () => {
+  it('no errors when passed "null" value for options', () => {
     const orderResource = new TestOrderResource();
     orderResource.product = new TestProductResource();
     resourceHttpServiceSpy.post.and.returnValue(of(orderResource));
 
-    baseResource.postRelation('updateStatus', null, null).subscribe(() => {
+    baseResource.postRelation('updateStatus', {body: {}}, null).subscribe(() => {
       const body = resourceHttpServiceSpy.post.calls.argsFor(0)[1];
       expect(body).toBe(null);
 
@@ -589,12 +625,12 @@ describe('BaseResource POST_RELATION', () => {
     });
   });
 
-  it('no errors when passed "undefined" values for body and options', () => {
+  it('no errors when passed "undefined" value for options', () => {
     const orderResource = new TestOrderResource();
     orderResource.product = new TestProductResource();
     resourceHttpServiceSpy.post.and.returnValue(of(orderResource));
 
-    baseResource.postRelation('updateStatus', undefined, undefined).subscribe(() => {
+    baseResource.postRelation('updateStatus', {body: {}}, undefined).subscribe(() => {
       const body = resourceHttpServiceSpy.post.calls.argsFor(0)[1];
       expect(body).toBe(null);
 
@@ -625,6 +661,21 @@ describe('BaseResource PATCH_RELATION', () => {
   beforeEach(() => {
     baseResource = new TestOrderResource();
     DependencyInjector.injector = TestBed;
+  });
+
+  it('should throw error when passed relationName is empty', () => {
+    expect(() => baseResource.patchRelation('', {body: {test: 'value'}}))
+      .toThrowError(`Passed param(s) 'relationName = ' is not valid`);
+  });
+
+  it('should throw error when passed relationName,requestBody are undefined', () => {
+    expect(() => baseResource.patchRelation(undefined, undefined))
+      .toThrowError(`Passed param(s) 'relationName = undefined', 'requestBody = undefined' is not valid`);
+  });
+
+  it('should throw error when passed relationName,requestBody are null', () => {
+    expect(() => baseResource.patchRelation(null, null))
+      .toThrowError(`Passed param(s) 'relationName = null', 'requestBody = null' is not valid`);
   });
 
   it('should fill url template params when url IS templated', () => {
@@ -683,12 +734,12 @@ describe('BaseResource PATCH_RELATION', () => {
     });
   });
 
-  it('no errors when passed "null" values for body and options', () => {
+  it('no errors when passed "null" value for options', () => {
     const orderResource = new TestOrderResource();
     orderResource.product = new TestProductResource();
     resourceHttpServiceSpy.patch.and.returnValue(of(orderResource));
 
-    baseResource.patchRelation('updateStatus', null, null).subscribe(() => {
+    baseResource.patchRelation('updateStatus', {body: {}}, null).subscribe(() => {
       const body = resourceHttpServiceSpy.patch.calls.argsFor(0)[1];
       expect(body).toBe(null);
 
@@ -698,12 +749,12 @@ describe('BaseResource PATCH_RELATION', () => {
     });
   });
 
-  it('no errors when passed "undefined" values for body and options', () => {
+  it('no errors when passed "undefined" value for options', () => {
     const orderResource = new TestOrderResource();
     orderResource.product = new TestProductResource();
     resourceHttpServiceSpy.patch.and.returnValue(of(orderResource));
 
-    baseResource.patchRelation('updateStatus', undefined, undefined).subscribe(() => {
+    baseResource.patchRelation('updateStatus', {body: {}}, undefined).subscribe(() => {
       const body = resourceHttpServiceSpy.patch.calls.argsFor(0)[1];
       expect(body).toBe(null);
 
@@ -734,6 +785,21 @@ describe('BaseResource PUT_RELATION', () => {
   beforeEach(() => {
     baseResource = new TestOrderResource();
     DependencyInjector.injector = TestBed;
+  });
+
+  it('should throw error when passed relationName is empty', () => {
+    expect(() => baseResource.putRelation('', {body: {test: 'value'}}))
+      .toThrowError(`Passed param(s) 'relationName = ' is not valid`);
+  });
+
+  it('should throw error when passed relationName,requestBody are undefined', () => {
+    expect(() => baseResource.putRelation(undefined, undefined))
+      .toThrowError(`Passed param(s) 'relationName = undefined', 'requestBody = undefined' is not valid`);
+  });
+
+  it('should throw error when passed relationName,requestBody are null', () => {
+    expect(() => baseResource.putRelation(null, null))
+      .toThrowError(`Passed param(s) 'relationName = null', 'requestBody = null' is not valid`);
   });
 
   it('should fill url template params when url IS templated', () => {
@@ -792,12 +858,12 @@ describe('BaseResource PUT_RELATION', () => {
     });
   });
 
-  it('no errors when passed "null" values for body and options', () => {
+  it('no errors when passed "null" value for options', () => {
     const orderResource = new TestOrderResource();
     orderResource.product = new TestProductResource();
     resourceHttpServiceSpy.put.and.returnValue(of(orderResource));
 
-    baseResource.putRelation('updateStatus', null, null).subscribe(() => {
+    baseResource.putRelation('updateStatus', {body: {}}, null).subscribe(() => {
       const body = resourceHttpServiceSpy.put.calls.argsFor(0)[1];
       expect(body).toBe(null);
 
@@ -807,12 +873,12 @@ describe('BaseResource PUT_RELATION', () => {
     });
   });
 
-  it('no errors when passed "undefined" values for body and options', () => {
+  it('no errors when passed "undefined" value for options', () => {
     const orderResource = new TestOrderResource();
     orderResource.product = new TestProductResource();
     resourceHttpServiceSpy.put.and.returnValue(of(orderResource));
 
-    baseResource.putRelation('updateStatus', undefined, undefined).subscribe(() => {
+    baseResource.putRelation('updateStatus', {body: {}}, undefined).subscribe(() => {
       const body = resourceHttpServiceSpy.put.calls.argsFor(0)[1];
       expect(body).toBe(null);
 

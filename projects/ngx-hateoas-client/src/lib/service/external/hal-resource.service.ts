@@ -12,6 +12,7 @@ import { UrlUtils } from '../../util/url.utils';
 import { tap } from 'rxjs/operators';
 import { Resource } from '../../model/resource/resource';
 import { StageLogger } from '../../logger/stage-logger';
+import { ValidationUtils } from '../../util/validation.utils';
 
 /**
  * Service to operate with {@link Resource}.
@@ -35,9 +36,11 @@ export class HalResourceService<T extends Resource> {
    * @param resourceName used to build root url to the resource
    * @param id resource id
    * @param options (optional) options that should be applied to the request
+   * @throws error when required params are not valid
    */
   public get(resourceName: string, id: any, options?: GetOption): Observable<T> {
     StageLogger.resourceBeginLog(resourceName, 'ResourceService GET_RESOURCE', {id, options});
+    ValidationUtils.validateInputParams({resourceName, id});
 
     return this.resourceHttpService.getResource(resourceName, id, options)
       .pipe(tap(() => {
@@ -51,9 +54,11 @@ export class HalResourceService<T extends Resource> {
    *
    * @param resourceName used to build root url to the resource
    * @param options (optional) options that should be applied to the request
+   * @throws error when required params are not valid
    */
   public getAll(resourceName: string, options?: GetOption): Observable<ResourceCollection<T>> {
     StageLogger.resourceBeginLog(resourceName, 'ResourceService GET_ALL', {options});
+    ValidationUtils.validateInputParams({resourceName});
 
     return this.resourceCollectionHttpServiceSpy.getResourceCollection(resourceName, null, options)
       .pipe(tap(() => {
@@ -67,9 +72,11 @@ export class HalResourceService<T extends Resource> {
    *
    * @param resourceName used to build root url to the resource
    * @param options (optional) options that should be applied to the request
+   * @throws error when required params are not valid
    */
   public getAllPage(resourceName: string, options?: PagedGetOption): Observable<PagedResourceCollection<T>> {
     StageLogger.resourceBeginLog(resourceName, 'ResourceService GET_ALL_PAGE', {options});
+    ValidationUtils.validateInputParams({resourceName});
 
     return this.pagedResourceCollectionHttpService.getResourcePage(resourceName, null, options)
       .pipe(tap(() => {
@@ -83,9 +90,11 @@ export class HalResourceService<T extends Resource> {
    *
    * @param resourceName used to build root url to the resource
    * @param requestBody that contains the body directly and optional body values option {@link ValuesOption}
+   * @throws error when required params are not valid
    */
   public createResource(resourceName: string, requestBody: RequestBody<T>): Observable<T> {
     StageLogger.resourceBeginLog(resourceName, 'ResourceService CREATE_RESOURCE', {requestBody});
+    ValidationUtils.validateInputParams({resourceName, requestBody});
 
     const body = ResourceUtils.resolveValues(requestBody);
 
@@ -100,9 +109,11 @@ export class HalResourceService<T extends Resource> {
    * Update resource.
    *
    * @param requestBody that contains the body directly and optional body values option {@link ValuesOption}
+   * @throws error when required params are not valid
    */
   public updateResource(requestBody: RequestBody<T>): Observable<T> {
     StageLogger.resourceBeginLog(requestBody?.body, 'ResourceService UPDATE_RESOURCE', {requestBody});
+    ValidationUtils.validateInputParams({requestBody});
 
     const resource = ResourceUtils.initResource(requestBody.body) as Resource;
     const body = ResourceUtils.resolveValues({body: resource, valuesOption: requestBody?.valuesOption});
@@ -120,9 +131,11 @@ export class HalResourceService<T extends Resource> {
    * @param resourceName used to build root url to the resource
    * @param countQuery name of the count method
    * @param requestParam (optional) http request params that applied to the request
+   * @throws error when required params are not valid
    */
-  public count(resourceName: string, countQuery: string, requestParam: RequestParam): Observable<number> {
+  public count(resourceName: string, countQuery?: string, requestParam?: RequestParam): Observable<number> {
     StageLogger.resourceBeginLog(resourceName, 'ResourceService COUNT', {query: countQuery, requestParam});
+    ValidationUtils.validateInputParams({resourceName});
 
     return this.resourceHttpService.count(resourceName, countQuery, requestParam)
       .pipe(tap(() => {
@@ -135,9 +148,11 @@ export class HalResourceService<T extends Resource> {
    * Patch resource.
    *
    * @param requestBody that contains the body directly and optional body values option {@link ValuesOption}
+   * @throws error when required params are not valid
    */
   public patchResource(requestBody: RequestBody<T>): Observable<T | any> {
     StageLogger.resourceBeginLog(requestBody?.body, 'ResourceService PATCH_RESOURCE', {requestBody});
+    ValidationUtils.validateInputParams({requestBody});
 
     const resource = ResourceUtils.initResource(requestBody?.body) as Resource;
     const body = ResourceUtils.resolveValues({body: resource, valuesOption: requestBody?.valuesOption});
@@ -154,9 +169,11 @@ export class HalResourceService<T extends Resource> {
    *
    * @param entity to delete
    * @param options (optional) options that should be applied to the request
+   * @throws error when required params are not valid
    */
   public deleteResource(entity: T, options?: RequestOption): Observable<T | any> {
     StageLogger.resourceBeginLog(entity, 'ResourceService DELETE_RESOURCE', {options});
+    ValidationUtils.validateInputParams({entity});
 
     const resource = ResourceUtils.initResource(entity) as Resource;
     const httpParams = UrlUtils.convertToHttpParams({params: options?.params});
@@ -174,6 +191,7 @@ export class HalResourceService<T extends Resource> {
    */
   public searchCollection(resourceName: string, searchQuery: string, options?: GetOption): Observable<ResourceCollection<T>> {
     StageLogger.resourceBeginLog(resourceName, 'ResourceService SEARCH_COLLECTION', {query: searchQuery, options});
+    ValidationUtils.validateInputParams({resourceName, searchQuery});
 
     return this.resourceCollectionHttpServiceSpy.search(resourceName, searchQuery, options)
       .pipe(tap(() => {
@@ -187,6 +205,7 @@ export class HalResourceService<T extends Resource> {
    */
   public searchPage(resourceName: string, searchQuery: string, options?: PagedGetOption): Observable<PagedResourceCollection<T>> {
     StageLogger.resourceBeginLog(resourceName, 'ResourceService SEARCH_PAGE', {query: searchQuery, options});
+    ValidationUtils.validateInputParams({resourceName, searchQuery});
 
     return this.pagedResourceCollectionHttpService.search(resourceName, searchQuery, options)
       .pipe(tap(() => {
@@ -200,6 +219,7 @@ export class HalResourceService<T extends Resource> {
    */
   public searchSingle(resourceName: string, searchQuery: string, options?: GetOption): Observable<T> {
     StageLogger.resourceBeginLog(resourceName, 'ResourceService SEARCH_SINGLE', {query: searchQuery, options});
+    ValidationUtils.validateInputParams({resourceName, searchQuery});
 
     return this.resourceHttpService.search(resourceName, searchQuery, options)
       .pipe(tap(() => {
@@ -217,6 +237,7 @@ export class HalResourceService<T extends Resource> {
                      requestBody?: RequestBody<any>,
                      options?: PagedGetOption): Observable<any | T | ResourceCollection<T> | PagedResourceCollection<T>> {
     StageLogger.resourceBeginLog(resourceName, 'ResourceService CUSTOM_QUERY', {method: HttpMethod, query, requestBody, options});
+    ValidationUtils.validateInputParams({resourceName, method, query});
 
     const body = ResourceUtils.resolveValues(requestBody);
 

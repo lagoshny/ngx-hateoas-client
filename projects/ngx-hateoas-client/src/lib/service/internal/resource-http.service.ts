@@ -14,6 +14,7 @@ import { CacheService } from '../cache.service';
 import { HttpConfigService } from '../../config/http-config.service';
 import { Stage } from '../../logger/stage.enum';
 import { StageLogger } from '../../logger/stage-logger';
+import { ValidationUtils } from '../../util/validation.utils';
 
 /**
  * Get instance of the ResourceHttpService by Angular DependencyInjector.
@@ -39,7 +40,7 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
    *
    * @param url to perform request
    * @param options request options
-   * @throws error if returned resource type is not resource
+   * @throws error when required params are not valid or returned resource type is not resource
    */
   public get(url: string, options?: {
     headers?: {
@@ -70,6 +71,14 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
         catchError(error => observableThrowError(error)));
   }
 
+  /**
+   * Perform POST request.
+   *
+   * @param url to perform request
+   * @param body request body
+   * @param options request options
+   * @throws error when required params are not valid
+   */
   public post(url: string, body: any | null, options?: {
     headers?: HttpHeaders | {
       [header: string]: string | string[];
@@ -90,6 +99,14 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
       );
   }
 
+  /**
+   * Perform PUT request.
+   *
+   * @param url to perform request
+   * @param body request body
+   * @param options request options
+   * @throws error when required params are not valid
+   */
   public put(url: string, body: any | null, options?: {
     headers?: HttpHeaders | {
       [header: string]: string | string[];
@@ -110,6 +127,14 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
       );
   }
 
+  /**
+   * Perform PATCH request.
+   *
+   * @param url to perform request
+   * @param body request body
+   * @param options request options
+   * @throws error when required params are not valid
+   */
   public patch(url: string, body: any | null, options?: {
     headers?: HttpHeaders | {
       [header: string]: string | string[];
@@ -131,6 +156,13 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
       );
   }
 
+  /**
+   * Perform DELETE request.
+   *
+   * @param url to perform request
+   * @param options request options
+   * @throws error when required params are not valid
+   */
   public delete(url: string, options?: {
     headers?: HttpHeaders | {
       [header: string]: string | string[];
@@ -157,11 +189,11 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
    * @param resourceName used to build root url to the resource
    * @param countQuery name of the count method
    * @param requestParam (optional) http request params that applied to the request
+   * @throws error when required params are not valid
    */
   public count(resourceName: string, countQuery?: string, requestParam?: RequestParam): Observable<number> {
-    if (!resourceName) {
-      return observableThrowError(new Error('resource name should be defined'));
-    }
+    ValidationUtils.validateInputParams({resourceName});
+
     const url = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName)
       .concat('/search/' + (_.isNil(countQuery) ? 'countAll' : countQuery));
 
@@ -192,14 +224,11 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
    * @param resourceName used to build root url to the resource
    * @param id resource id
    * @param option (optional) options that applied to the request
+   * @throws error when required params are not valid
    */
   public getResource(resourceName: string, id: number, option?: GetOption): Observable<T> {
-    if (!resourceName) {
-      return observableThrowError(new Error('resource name should be defined'));
-    }
-    if (_.isNil(id) || id <= 0) {
-      return observableThrowError(new Error('id should be defined and great than 0'));
-    }
+    ValidationUtils.validateInputParams({resourceName, id});
+
     const url = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName).concat('/', _.toString(id));
 
     StageLogger.stageLog(Stage.PREPARE_URL, {
@@ -216,14 +245,11 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
    *
    * @param resourceName used to build root url to the resource
    * @param body resource to pass as body
+   * @throws error when required params are not valid
    */
   public postResource(resourceName: string, body: BaseResource): Observable<T> {
-    if (!resourceName) {
-      return observableThrowError(new Error('resource name should be defined'));
-    }
-    if (_.isEmpty(body)) {
-      return observableThrowError(new Error('body should be defined'));
-    }
+    ValidationUtils.validateInputParams({resourceName, body});
+
     const url = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName);
 
     StageLogger.stageLog(Stage.PREPARE_URL, {
@@ -240,14 +266,11 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
    * @param resourceName used to build root url to the resource
    * @param searchQuery name of the search method
    * @param option (optional) options that applied to the request
+   * @throws error when required params are not valid
    */
   public search(resourceName: string, searchQuery: string, option?: GetOption): Observable<T> {
-    if (!resourceName) {
-      return observableThrowError(new Error('resource name should be defined'));
-    }
-    if (!searchQuery) {
-      return observableThrowError(new Error('search query should be defined'));
-    }
+    ValidationUtils.validateInputParams({resourceName, searchQuery});
+
     const url = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName).concat('/search/' + searchQuery);
 
     StageLogger.stageLog(Stage.PREPARE_URL, {

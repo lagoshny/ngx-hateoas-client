@@ -94,10 +94,30 @@ describe('Resource ADD_RELATION', () => {
     DependencyInjector.injector = TestBed;
   });
 
+  it('should throw error when passed relationName is empty', () => {
+    expect(() => resource.addRelation('', [new TestProductResource()]))
+      .toThrowError(`Passed param(s) 'relationName = ' is not valid`);
+  });
+
+  it('should throw error when passed entities is empty', () => {
+    expect(() => resource.addRelation('any', []))
+      .toThrowError(`Passed param(s) 'entities = []' is not valid`);
+  });
+
+  it('should throw error when passed relationName,entities are undefined', () => {
+    expect(() => resource.addRelation(undefined, undefined))
+      .toThrowError(`Passed param(s) 'relationName = undefined', 'entities = undefined' is not valid`);
+  });
+
+  it('should throw error when passed relationName,entities are null', () => {
+    expect(() => resource.addRelation(null, null))
+      .toThrowError(`Passed param(s) 'relationName = null', 'entities = null' is not valid`);
+  });
+
   it('should clear template params in TEMPLATED relation link', () => {
     resourceHttpServiceSpy.post.and.returnValue(of(new HttpResponse()));
 
-    resource.addRelation('product', new TestProductResource())
+    resource.addRelation('product', [new TestProductResource()])
       .subscribe(() => {
         const resultResourceUrl = resourceHttpServiceSpy.post.calls.argsFor(0)[0];
         expect(resultResourceUrl).toBe('http://localhost:8080/api/v1/order/1/products');
@@ -107,7 +127,7 @@ describe('Resource ADD_RELATION', () => {
   it('should pass relation self link as body', () => {
     resourceHttpServiceSpy.post.and.returnValue(of(new HttpResponse()));
 
-    resource.addRelation('product', new TestProductResource())
+    resource.addRelation('product', [new TestProductResource()])
       .subscribe(() => {
         const body = resourceHttpServiceSpy.post.calls.argsFor(0)[1];
         expect(body).toBe('http://localhost:8080/api/v1/product/1');
@@ -117,7 +137,7 @@ describe('Resource ADD_RELATION', () => {
   it('should pass content-type: text/uri-list', () => {
     resourceHttpServiceSpy.post.and.returnValue(of(new HttpResponse()));
 
-    resource.addRelation('product', new TestProductResource())
+    resource.addRelation('product', [new TestProductResource()])
       .subscribe(() => {
         const headers = resourceHttpServiceSpy.post.calls.argsFor(0)[2].headers as HttpHeaders;
         expect(headers.has('Content-Type')).toBeTrue();
@@ -128,7 +148,7 @@ describe('Resource ADD_RELATION', () => {
   it('should pass observe "response" value', () => {
     resourceHttpServiceSpy.post.and.returnValue(of(new HttpResponse()));
 
-    resource.addRelation('product', new TestProductResource())
+    resource.addRelation('product', [new TestProductResource()])
       .subscribe(() => {
         const observe = resourceHttpServiceSpy.post.calls.argsFor(0)[2].observe;
         expect(observe).toBeDefined();
@@ -160,6 +180,21 @@ describe('Resource BIND_RELATION', () => {
     DependencyInjector.injector = TestBed;
   });
 
+  it('should throw error when passed relationName is empty', () => {
+    expect(() => resource.bindRelation('', new TestProductResource()))
+      .toThrowError(`Passed param(s) 'relationName = ' is not valid`);
+  });
+
+  it('should throw error when passed relationName,entity are undefined', () => {
+    expect(() => resource.bindRelation(undefined, undefined))
+      .toThrowError(`Passed param(s) 'relationName = undefined', 'entity = undefined' is not valid`);
+  });
+
+  it('should throw error when passed relationName,entity are null', () => {
+    expect(() => resource.bindRelation(null, null))
+      .toThrowError(`Passed param(s) 'relationName = null', 'entity = null' is not valid`);
+  });
+
   it('should clear template params in TEMPLATED relation link', () => {
     resourceHttpServiceSpy.put.and.returnValue(of(new HttpResponse()));
 
@@ -204,7 +239,7 @@ describe('Resource BIND_RELATION', () => {
 
 });
 
-describe('Resource CLEAR_RELATION', () => {
+describe('Resource CLEAR_COLLECTION_RELATION', () => {
   let resource: Resource;
   let resourceHttpServiceSpy: any;
 
@@ -226,10 +261,25 @@ describe('Resource CLEAR_RELATION', () => {
     DependencyInjector.injector = TestBed;
   });
 
+  it('should throw error when passed relationName is empty', () => {
+    expect(() => resource.clearCollectionRelation(''))
+      .toThrowError(`Passed param(s) 'relationName = ' is not valid`);
+  });
+
+  it('should throw error when passed relationName is undefined', () => {
+    expect(() => resource.clearCollectionRelation(undefined))
+      .toThrowError(`Passed param(s) 'relationName = undefined' is not valid`);
+  });
+
+  it('should throw error when passed relationName is null', () => {
+    expect(() => resource.clearCollectionRelation(null))
+      .toThrowError(`Passed param(s) 'relationName = null' is not valid`);
+  });
+
   it('should clear template params in TEMPLATED relation link', () => {
     resourceHttpServiceSpy.put.and.returnValue(of(new HttpResponse()));
 
-    resource.clearRelation('product')
+    resource.clearCollectionRelation('product')
       .subscribe(() => {
         const resultResourceUrl = resourceHttpServiceSpy.put.calls.argsFor(0)[0];
         expect(resultResourceUrl).toBe('http://localhost:8080/api/v1/order/1/products');
@@ -239,7 +289,7 @@ describe('Resource CLEAR_RELATION', () => {
   it('should pass empty string as body', () => {
     resourceHttpServiceSpy.put.and.returnValue(of(new HttpResponse()));
 
-    resource.clearRelation('product')
+    resource.clearCollectionRelation('product')
       .subscribe(() => {
         const body = resourceHttpServiceSpy.put.calls.argsFor(0)[1];
         expect(body).toBe('');
@@ -249,7 +299,7 @@ describe('Resource CLEAR_RELATION', () => {
   it('should pass content-type: text/uri-list', () => {
     resourceHttpServiceSpy.put.and.returnValue(of(new HttpResponse()));
 
-    resource.clearRelation('product')
+    resource.clearCollectionRelation('product')
       .subscribe(() => {
         const headers = resourceHttpServiceSpy.put.calls.argsFor(0)[2].headers as HttpHeaders;
         expect(headers.has('Content-Type')).toBeTrue();
@@ -260,7 +310,7 @@ describe('Resource CLEAR_RELATION', () => {
   it('should pass observe "response" value', () => {
     resourceHttpServiceSpy.put.and.returnValue(of(new HttpResponse()));
 
-    resource.clearRelation('product')
+    resource.clearCollectionRelation('product')
       .subscribe(() => {
         const observe = resourceHttpServiceSpy.put.calls.argsFor(0)[2].observe;
         expect(observe).toBeDefined();
@@ -292,6 +342,21 @@ describe('Resource DELETE_RELATION', () => {
     DependencyInjector.injector = TestBed;
   });
 
+  it('should throw error when passed relationName is empty', () => {
+    expect(() => resource.deleteRelation('', new TestProductResource()))
+      .toThrowError(`Passed param(s) 'relationName = ' is not valid`);
+  });
+
+  it('should throw error when passed relationName,entity are undefined', () => {
+    expect(() => resource.deleteRelation(undefined, undefined))
+      .toThrowError(`Passed param(s) 'relationName = undefined', 'entity = undefined' is not valid`);
+  });
+
+  it('should throw error when passed relationName,entity are null', () => {
+    expect(() => resource.deleteRelation(null, null))
+      .toThrowError(`Passed param(s) 'relationName = null', 'entity = null' is not valid`);
+  });
+
   it('should generate url from relation link href and passed resource id retrieved by self link href', () => {
     resourceHttpServiceSpy.delete.and.returnValue(of(new HttpResponse()));
 
@@ -303,13 +368,8 @@ describe('Resource DELETE_RELATION', () => {
   });
 
   it('should throw error when passed resource self link href has not id', () => {
-    try {
-      resource.deleteRelation('product', new BadTestProductResource())
-        .subscribe(() => {
-        });
-    } catch (e) {
-      expect(e.message).toBe('Passed resource self link should has id');
-    }
+    expect(() => resource.deleteRelation('product', new BadTestProductResource()))
+      .toThrowError('Passed resource self link should has id');
   });
 
   it('should pass observe "response" value', () => {

@@ -9,6 +9,7 @@ import { LinkData } from '../declarations';
 import { tap } from 'rxjs/operators';
 import { Stage } from '../../logger/stage.enum';
 import { StageLogger } from '../../logger/stage-logger';
+import { ValidationUtils } from '../../util/validation.utils';
 
 /**
  * Resource class.
@@ -37,13 +38,15 @@ export class Resource extends BaseResource {
    *
    * @param typeOrName if passed type then compared resource name with type class name
    *        else comparing passed name with resource name
+   * @throws error when required params are not valid
    */
   public isResourceOf<T extends Resource>(typeOrName: (new() => T) | string): boolean {
+    ValidationUtils.validateInputParams({typeOrName});
     if (_.isObject(typeOrName)) {
       const that = new typeOrName() as T;
-      return  _.eq(_.toLower(this.resourceName), _.toLower(that.constructor.name));
+      return _.eq(_.toLower(this.resourceName), _.toLower(that.constructor.name));
     } else {
-      return  _.eq(_.toLower(this.resourceName), _.toLower(typeOrName));
+      return _.eq(_.toLower(this.resourceName), _.toLower(typeOrName));
     }
   }
 
@@ -51,17 +54,23 @@ export class Resource extends BaseResource {
    * Adds the passed entity to the resource collection behind the relation name.
    *
    * @param relationName used to get the specific resource relation link to the resource collection
-   * @param entity that should be added to the resource collection
-   * @throws error if no link is found by passed relation name
+   * @param entities one or more entities that should be added to the resource collection
+   * @throws error when required params are not valid or no link is found by passed relation name
    */
-  public addRelation<T extends Resource>(relationName: string, entity: T): Observable<HttpResponse<any>> {
-    StageLogger.resourceBeginLog(this, 'ADD_RELATION', {relationName, entity});
+  public addRelation<T extends Resource>(relationName: string, entities: Array<T>): Observable<HttpResponse<any>> {
+    StageLogger.resourceBeginLog(this, 'ADD_RELATION', {relationName, resourceLinks: this._links, entities});
+    ValidationUtils.validateInputParams({relationName, entities});
 
     const relationLink = this.getRelationLink(relationName);
     const url = relationLink.templated ? UrlUtils.removeTemplateParams(relationLink.href) : relationLink.href;
-    const resource = ResourceUtils.initResource(entity) as Resource;
 
-    return getResourceHttpService().post(url, resource.getSelfLinkHref(), {
+    const body = entities
+      .map(entity => {
+        return ResourceUtils.initResource(entity).getSelfLinkHref();
+      })
+      .join('\n\r');
+
+    return getResourceHttpService().post(url, body, {
       observe: 'response',
       headers: new HttpHeaders({'Content-Type': 'text/uri-list'})
     }).pipe(
@@ -76,10 +85,11 @@ export class Resource extends BaseResource {
    *
    * @param relationName with which will be associated passed entity to this resource
    * @param entity that should be bind to this resource
-   * @throws error if no link is found by passed relation name
+   * @throws error when required params are not valid or no link is found by passed relation name
    */
   public bindRelation<T extends Resource>(relationName: string, entity: T): Observable<HttpResponse<any>> {
-    StageLogger.resourceBeginLog(this, 'BIND_RELATION', {relationName, entity});
+    StageLogger.resourceBeginLog(this, 'BIND_RELATION', {relationName, resourceLinks: this._links, entity});
+    ValidationUtils.validateInputParams({relationName, entity});
 
     const relationLink = this.getRelationLink(relationName);
     const url = relationLink.templated ? UrlUtils.removeTemplateParams(relationLink.href) : relationLink.href;
@@ -96,16 +106,14 @@ export class Resource extends BaseResource {
   }
 
   /**
-   * Unbind all/single resource(s) by the relation name.
-   *
-   * If behind relation name is link to collection of the resources then it means
-   * that all resources will be unbind.
+   * Unbind all resources from collection by the relation name.
    *
    * @param relationName used to get relation link to unbind
-   * @throws error if no link is found by passed relation name
+   * @throws error when required params are not valid or no link is found by passed relation name
    */
-  public clearRelation<T extends Resource>(relationName: string): Observable<HttpResponse<any>> {
-    StageLogger.resourceBeginLog(this, 'CLEAR_RELATION', {relationName});
+  public clearCollectionRelation<T extends Resource>(relationName: string): Observable<HttpResponse<any>> {
+    StageLogger.resourceBeginLog(this, 'CLEAR_COLLECTION_RELATION', {relationName, resourceLinks: this._links});
+    ValidationUtils.validateInputParams({relationName});
 
     const relationLink = this.getRelationLink(relationName);
     const url = relationLink.templated ? UrlUtils.removeTemplateParams(relationLink.href) : relationLink.href;
@@ -115,7 +123,7 @@ export class Resource extends BaseResource {
       headers: new HttpHeaders({'Content-Type': 'text/uri-list'})
     }).pipe(
       tap(() => {
-        StageLogger.resourceEndLog(this, 'CLEAR_RELATION', {result: `relation ${ relationName } was cleared successful`});
+        StageLogger.resourceEndLog(this, 'CLEAR_COLLECTION_RELATION', {result: `relation ${ relationName } was cleared successful`});
       })
     );
   }
@@ -128,10 +136,11 @@ export class Resource extends BaseResource {
    *
    * @param relationName used to get relation link to unbind
    * @param entity that should be unbind from this resource
-   * @throws error if no link is found by passed relation name
+   * @throws error when required params are not valid or no link is found by passed relation name
    */
   public deleteRelation<T extends Resource>(relationName: string, entity: T): Observable<HttpResponse<any>> {
-    StageLogger.resourceBeginLog(this, 'DELETE_RELATION', {relationName, entity});
+    StageLogger.resourceBeginLog(this, 'DELETE_RELATION', {relationName, resourceLinks: this._links, entity});
+    ValidationUtils.validateInputParams({relationName, entity});
 
     const relationLink = this.getRelationLink(relationName);
     const url = relationLink.templated ? UrlUtils.removeTemplateParams(relationLink.href) : relationLink.href;

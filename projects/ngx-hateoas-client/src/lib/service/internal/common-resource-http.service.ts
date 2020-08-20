@@ -12,6 +12,7 @@ import { isPagedResourceCollection, isResource, isResourceCollection } from '../
 import { ResourceUtils } from '../../util/resource.utils';
 import { Stage } from '../../logger/stage.enum';
 import { StageLogger } from '../../logger/stage-logger';
+import { ValidationUtils } from '../../util/validation.utils';
 
 /**
  * Service to perform HTTP requests to get any type of the {@link Resource}, {@link PagedResourceCollection}, {@link ResourceCollection}.
@@ -36,14 +37,10 @@ export class CommonResourceHttpService extends HttpExecutor {
    * @param query url path that applied to the result url at the end
    * @param body (optional) request body
    * @param option (optional) options that applied to the request
+   * @throws error when required params are not valid
    */
   public customQuery(resourceName: string, method: HttpMethod, query: string, body?: any, option?: PagedGetOption): any {
-    if (!resourceName) {
-      return observableThrowError(new Error('resource name should be defined'));
-    }
-    if (!query) {
-      return observableThrowError(new Error('query should be defined'));
-    }
+    ValidationUtils.validateInputParams({resourceName, method, query});
 
     const url = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName, query);
     const httpParams = UrlUtils.convertToHttpParams(option);

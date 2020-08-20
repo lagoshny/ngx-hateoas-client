@@ -1,13 +1,15 @@
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { Observable, throwError as observableThrowError } from 'rxjs';
+import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { StageLogger } from '../logger/stage-logger';
 import { Stage } from '../logger/stage.enum';
+import { ValidationUtils } from '../util/validation.utils';
 
 /**
  * Base class with common logics to perform HTTP requests.
  * TODO: should manage cache?
  */
+/* tslint:disable:no-string-literal */
 export class HttpExecutor {
 
   constructor(protected httpClient: HttpClient) {
@@ -19,12 +21,17 @@ export class HttpExecutor {
                               headers?: HttpHeaders | { [p: string]: string | string[] };
                               observe?: 'body' | 'response';
                               params?: HttpParams
-                            }) {
-    StageLogger.stageLog(Stage.HTTP_REQUEST, {
+                            },
+                            body?: any) {
+    const params = {
       method,
       url,
-      params: options?.params?.keys().length > 0 ? options?.params.toString() : ''
-    });
+      params: options?.params?.keys().length > 0 ? options?.params.toString() : '',
+    };
+    if (body) {
+      params['body'] = body;
+    }
+    StageLogger.stageLog(Stage.HTTP_REQUEST, params);
   }
 
   private static logResponse(method: string,
@@ -48,6 +55,7 @@ export class HttpExecutor {
    *
    * @param url to perform request
    * @param options (optional) options that applied to the request
+   * @throws error when required params are not valid
    */
   public get(url: string, options?: {
     headers?: {
@@ -57,11 +65,7 @@ export class HttpExecutor {
     params?: HttpParams
   }): Observable<any> {
     HttpExecutor.logRequest('GET', url, options);
-    if (!url) {
-      const errMsg = 'url should be defined';
-      StageLogger.stageErrorLog(Stage.HTTP_REQUEST, {error: errMsg});
-      return observableThrowError(new Error(errMsg));
-    }
+    ValidationUtils.validateInputParams({url});
 
     let response;
     if (options?.observe === 'response') {
@@ -83,6 +87,7 @@ export class HttpExecutor {
    * @param url to perform request
    * @param body to send with request
    * @param options (optional) options that applied to the request
+   * @throws error when required params are not valid
    */
   public post(url: string, body: any | null, options?: {
     headers?: HttpHeaders | {
@@ -91,12 +96,8 @@ export class HttpExecutor {
     observe?: 'body' | 'response';
     params?: HttpParams
   }): Observable<any> {
-    HttpExecutor.logRequest('POST', url, options);
-    if (!url) {
-      const errMsg = 'url should be defined';
-      StageLogger.stageErrorLog(Stage.HTTP_REQUEST, {error: errMsg});
-      return observableThrowError(new Error(errMsg));
-    }
+    HttpExecutor.logRequest('POST', url, options, body);
+    ValidationUtils.validateInputParams({url});
 
     let response;
     if (options?.observe === 'response') {
@@ -118,6 +119,7 @@ export class HttpExecutor {
    * @param url to perform request
    * @param body to send with request
    * @param options (optional) options that applied to the request
+   * @throws error when required params are not valid
    */
   public put(url: string, body: any | null, options?: {
     headers?: HttpHeaders | {
@@ -126,12 +128,8 @@ export class HttpExecutor {
     observe?: 'body' | 'response';
     params?: HttpParams
   }): Observable<any> {
-    HttpExecutor.logRequest('PUT', url, options);
-    if (!url) {
-      const errMsg = 'url should be defined';
-      StageLogger.stageErrorLog(Stage.HTTP_REQUEST, {error: errMsg});
-      return observableThrowError(new Error(errMsg));
-    }
+    HttpExecutor.logRequest('PUT', url, options, body);
+    ValidationUtils.validateInputParams({url});
 
     let response;
     if (options?.observe === 'response') {
@@ -153,6 +151,7 @@ export class HttpExecutor {
    * @param url to perform request
    * @param body to send with request
    * @param options (optional) options that applied to the request
+   * @throws error when required params are not valid
    */
   public patch(url: string, body: any | null, options?: {
     headers?: HttpHeaders | {
@@ -161,12 +160,8 @@ export class HttpExecutor {
     observe?: 'body' | 'response';
     params?: HttpParams
   }): Observable<any> {
-    HttpExecutor.logRequest('PATCH', url, options);
-    if (!url) {
-      const errMsg = 'url should be defined';
-      StageLogger.stageErrorLog(Stage.HTTP_REQUEST, {error: errMsg});
-      return observableThrowError(new Error(errMsg));
-    }
+    HttpExecutor.logRequest('PATCH', url, options, body);
+    ValidationUtils.validateInputParams({url});
 
     let response;
     if (options?.observe === 'response') {
@@ -187,6 +182,7 @@ export class HttpExecutor {
    *
    * @param url to perform request
    * @param options (optional) options that applied to the request
+   * @throws error when required params are not valid
    */
   public delete(url: string, options?: {
     headers?: HttpHeaders | {
@@ -196,11 +192,7 @@ export class HttpExecutor {
     params?: HttpParams
   }): Observable<any> {
     HttpExecutor.logRequest('DELETE', url, options);
-    if (!url) {
-      const errMsg = 'url should be defined';
-      StageLogger.stageErrorLog(Stage.HTTP_REQUEST, {error: errMsg});
-      return observableThrowError(new Error(errMsg));
-    }
+    ValidationUtils.validateInputParams({url});
 
     let response;
     if (options?.observe === 'response') {

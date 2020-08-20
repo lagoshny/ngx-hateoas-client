@@ -190,25 +190,19 @@ describe('ResourceHttpService', () => {
     });
   });
 
-  it('COUNT throws error when resourceName is empty', () => {
-    resourceHttpService.count('').subscribe(() => {
-    }, (error) => {
-      expect(error.message).toBe('resource name should be defined');
-    });
+  it('COUNT should throw error when passed resourceName is empty', () => {
+    expect(() => resourceHttpService.count(''))
+      .toThrowError(`Passed param(s) 'resourceName = ' is not valid`);
   });
 
-  it('COUNT throws error when resourceName is null', () => {
-    resourceHttpService.count(null).subscribe(() => {
-    }, (error) => {
-      expect(error.message).toBe('resource name should be defined');
-    });
+  it('COUNT should throw error when passed resourceName is undefined', () => {
+    expect(() => resourceHttpService.count(undefined))
+      .toThrowError(`Passed param(s) 'resourceName = undefined' is not valid`);
   });
 
-  it('COUNT throws error when resourceName is undefined', () => {
-    resourceHttpService.count(undefined).subscribe(() => {
-    }, (error) => {
-      expect(error.message).toBe('resource name should be defined');
-    });
+  it('COUNT should throw error when passed resourceName is null', () => {
+    expect(() => resourceHttpService.count(null))
+      .toThrowError(`Passed param(s) 'resourceName = null' is not valid`);
   });
 
   it('COUNT should generate root resource url without query', () => {
@@ -261,53 +255,19 @@ describe('ResourceHttpService', () => {
     });
   });
 
-  it('GET_RESOURCE throws error when resourceName is empty', () => {
-    resourceHttpService.getResource('', 2).subscribe(() => {
-    }, (error) => {
-      expect(error.message).toBe('resource name should be defined');
-    });
+  it('GET_RESOURCE should throw error when passed resourceName is empty', () => {
+    expect(() => resourceHttpService.getResource('', 2))
+      .toThrowError(`Passed param(s) 'resourceName = ' is not valid`);
   });
 
-  it('GET_RESOURCE throws error when resourceName is null', () => {
-    resourceHttpService.getResource(null, 3).subscribe(() => {
-    }, (error) => {
-      expect(error.message).toBe('resource name should be defined');
-    });
+  it('GET_RESOURCE should throw error when passed resourceName,id are undefined', () => {
+    expect(() => resourceHttpService.getResource(undefined, undefined))
+      .toThrowError(`Passed param(s) 'resourceName = undefined', 'id = undefined' is not valid`);
   });
 
-  it('GET_RESOURCE throws error when resourceName is undefined', () => {
-    resourceHttpService.getResource(undefined, 4).subscribe(() => {
-    }, (error) => {
-      expect(error.message).toBe('resource name should be defined');
-    });
-  });
-
-  it('GET_RESOURCE throws error when id is equal 0', () => {
-    resourceHttpService.getResource('any', 0).subscribe(() => {
-    }, (error) => {
-      expect(error.message).toBe('id should be defined and great than 0');
-    });
-  });
-
-  it('GET_RESOURCE throws error when id is less than 0', () => {
-    resourceHttpService.getResource('any', -3).subscribe(() => {
-    }, (error) => {
-      expect(error.message).toBe('id should be defined and great than 0');
-    });
-  });
-
-  it('GET_RESOURCE throws error when id is null', () => {
-    resourceHttpService.getResource('any', null).subscribe(() => {
-    }, (error) => {
-      expect(error.message).toBe('id should be defined and great than 0');
-    });
-  });
-
-  it('GET_RESOURCE throws error when id is undefined', () => {
-    resourceHttpService.getResource('any', undefined).subscribe(() => {
-    }, (error) => {
-      expect(error.message).toBe('id should be defined and great than 0');
-    });
+  it('GET_RESOURCE should throw error when passed resourceName,id are null', () => {
+    expect(() => resourceHttpService.getResource(null, null))
+      .toThrowError(`Passed param(s) 'resourceName = null', 'id = null' is not valid`);
   });
 
   it('GET_RESOURCE should generate resource url', () => {
@@ -337,39 +297,19 @@ describe('ResourceHttpService', () => {
     });
   });
 
-  it('POST_RESOURCE throws error when resourceName is empty', () => {
-    resourceHttpService.postResource('', new SimpleResource()).subscribe(() => {
-    }, (error) => {
-      expect(error.message).toBe('resource name should be defined');
-    });
+  it('POST_RESOURCE should throw error when passed resourceName is empty', () => {
+    expect(() => resourceHttpService.postResource('', new SimpleResource()))
+      .toThrowError(`Passed param(s) 'resourceName = ' is not valid`);
   });
 
-  it('POST_RESOURCE throws error when resourceName is null', () => {
-    resourceHttpService.postResource(null, new SimpleResource()).subscribe(() => {
-    }, (error) => {
-      expect(error.message).toBe('resource name should be defined');
-    });
+  it('POST_RESOURCE should throw error when passed resourceName,body are undefined', () => {
+    expect(() => resourceHttpService.postResource(undefined, undefined))
+      .toThrowError(`Passed param(s) 'resourceName = undefined', 'body = undefined' is not valid`);
   });
 
-  it('POST_RESOURCE throws error when resourceName is undefined', () => {
-    resourceHttpService.postResource(undefined, new SimpleResource()).subscribe(() => {
-    }, (error) => {
-      expect(error.message).toBe('resource name should be defined');
-    });
-  });
-
-  it('POST_RESOURCE throws error when body is null', () => {
-    resourceHttpService.postResource('any', null).subscribe(() => {
-    }, (error) => {
-      expect(error.message).toBe('body should be defined');
-    });
-  });
-
-  it('POST_RESOURCE throws error when body is undefined', () => {
-    resourceHttpService.postResource('any', undefined).subscribe(() => {
-    }, (error) => {
-      expect(error.message).toBe('body should be defined');
-    });
+  it('POST_RESOURCE should throw error when passed resourceName,body are null', () => {
+    expect(() => resourceHttpService.postResource(null, null))
+      .toThrowError(`Passed param(s) 'resourceName = null', 'body = null' is not valid`);
   });
 
   it('POST_RESOURCE should generate resource url', () => {
@@ -399,46 +339,24 @@ describe('ResourceHttpService', () => {
     });
   });
 
-  it('SEARCH throws error when resourceName is empty', () => {
-    resourceHttpService.search('', 'any').subscribe(() => {
-    }, (error) => {
-      expect(error.message).toBe('resource name should be defined');
-    });
+  it('SEARCH should throw error when passed resourceName is empty', () => {
+    expect(() => resourceHttpService.search('', 'any'))
+      .toThrowError(`Passed param(s) 'resourceName = ' is not valid`);
   });
 
-  it('SEARCH throws error when resourceName is null', () => {
-    resourceHttpService.search(null, 'any').subscribe(() => {
-    }, (error) => {
-      expect(error.message).toBe('resource name should be defined');
-    });
+  it('SEARCH should throw error when passed searchQuery is empty', () => {
+    expect(() => resourceHttpService.search('any', ''))
+      .toThrowError(`Passed param(s) 'searchQuery = ' is not valid`);
   });
 
-  it('SEARCH throws error when resourceName is undefined', () => {
-    resourceHttpService.search(undefined, 'any').subscribe(() => {
-    }, (error) => {
-      expect(error.message).toBe('resource name should be defined');
-    });
+  it('SEARCH should throw error when passed resourceName,searchQuery are undefined', () => {
+    expect(() => resourceHttpService.search(undefined, undefined))
+      .toThrowError(`Passed param(s) 'resourceName = undefined', 'searchQuery = undefined' is not valid`);
   });
 
-  it('SEARCH throws error when searchQuery is empty', () => {
-    resourceHttpService.search('any', '').subscribe(() => {
-    }, (error) => {
-      expect(error.message).toBe('search query should be defined');
-    });
-  });
-
-  it('SEARCH throws error when searchQuery is null', () => {
-    resourceHttpService.search('any', null).subscribe(() => {
-    }, (error) => {
-      expect(error.message).toBe('search query should be defined');
-    });
-  });
-
-  it('SEARCH throws error when searchQuery is undefined', () => {
-    resourceHttpService.search('any', undefined).subscribe(() => {
-    }, (error) => {
-      expect(error.message).toBe('search query should be defined');
-    });
+  it('SEARCH should throw error when passed resourceName,searchQuery are null', () => {
+    expect(() => resourceHttpService.search(null, null))
+      .toThrowError(`Passed param(s) 'resourceName = null', 'searchQuery = null' is not valid`);
   });
 
   it('SEARCH should generate search resource url', () => {

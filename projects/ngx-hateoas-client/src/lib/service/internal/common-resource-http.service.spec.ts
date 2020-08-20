@@ -43,45 +43,23 @@ describe('CommonResourceHttpService CUSTOM_QUERY', () => {
   }));
 
   it('throws error when resourceName is empty', () => {
-    commonHttpService.customQuery('', HttpMethod.GET, 'any').subscribe(() => {
-    }, (error) => {
-      expect(error.message).toBe('resource name should be defined');
-    });
-  });
-
-  it('throws error when resourceName is null', () => {
-    commonHttpService.customQuery(null, HttpMethod.GET, 'any').subscribe(() => {
-    }, (error) => {
-      expect(error.message).toBe('resource name should be defined');
-    });
-  });
-
-  it('throws error when resourceName is undefined', () => {
-    commonHttpService.customQuery(undefined, HttpMethod.GET, 'any').subscribe(() => {
-    }, (error) => {
-      expect(error.message).toBe('resource name should be defined');
-    });
+    expect(() => commonHttpService.customQuery('', HttpMethod.GET, 'any'))
+      .toThrowError(`Passed param(s) 'resourceName = ' is not valid`);
   });
 
   it('throws error when query is empty', () => {
-    commonHttpService.customQuery('any', HttpMethod.GET, '').subscribe(() => {
-    }, (error) => {
-      expect(error.message).toBe('query should be defined');
-    });
+    expect(() => commonHttpService.customQuery('any', HttpMethod.GET, ''))
+      .toThrowError(`Passed param(s) 'query = ' is not valid`);
   });
 
-  it('throws error when query is null', () => {
-    commonHttpService.customQuery('any', HttpMethod.GET, null).subscribe(() => {
-    }, (error) => {
-      expect(error.message).toBe('query should be defined');
-    });
+  it('throws error when resourceName,method,query are undefined', () => {
+    expect(() => commonHttpService.customQuery(undefined, undefined, undefined))
+      .toThrowError(`Passed param(s) 'resourceName = undefined', 'method = undefined', 'query = undefined' is not valid`);
   });
 
-  it('throws error when query is undefined', () => {
-    commonHttpService.customQuery('any', HttpMethod.GET, undefined).subscribe(() => {
-    }, (error) => {
-      expect(error.message).toBe('query should be defined');
-    });
+  it('throws error when resourceName,method,query are null', () => {
+    expect(() => commonHttpService.customQuery(null, null, null))
+      .toThrowError(`Passed param(s) 'resourceName = null', 'method = null', 'query = null' is not valid`);
   });
 
   it('should generate custom query resource url', () => {
@@ -157,20 +135,6 @@ describe('CommonResourceHttpService CUSTOM_QUERY', () => {
 
     commonHttpService.customQuery('test', HttpMethod.GET, 'someQuery').subscribe((result) => {
       expect(result).toEqual({some: 'message'});
-    });
-  });
-
-  it('should throw error when NULL HTTP_METHOD was passed', () => {
-    commonHttpService.customQuery('test', null, 'someQuery').subscribe(() => {
-    }, error => {
-      expect(error.message).toBe('allowed ony GET/POST/PUT/PATCH http methods you pass null');
-    });
-  });
-
-  it('should throw error when UNDEFINED HTTP_METHOD was passed', () => {
-    commonHttpService.customQuery('test', undefined, 'someQuery').subscribe(() => {
-    }, error => {
-      expect(error.message).toBe('allowed ony GET/POST/PUT/PATCH http methods you pass undefined');
     });
   });
 

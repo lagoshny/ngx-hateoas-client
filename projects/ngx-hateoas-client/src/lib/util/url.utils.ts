@@ -4,6 +4,7 @@ import * as _ from 'lodash';
 import { Resource } from '../model/resource/resource';
 import uriTemplates from 'uri-templates';
 import { GetOption, PagedGetOption, Sort } from '../model/declarations';
+import { ValidationUtils } from './validation.utils';
 
 export class UrlUtils {
 
@@ -18,7 +19,7 @@ export class UrlUtils {
     if (_.isEmpty(options) || _.isNil(options)) {
       return resultParams;
     }
-    UrlUtils.checkParams(options);
+    UrlUtils.checkDuplicateParams(options);
 
     if (_.isObject(options.params) && !_.isEmpty(options.params)) {
       for (const [key, value] of Object.entries(options.params)) {
@@ -53,11 +54,11 @@ export class UrlUtils {
    * @param baseUrl will be as first part as a result url
    * @param resourceName added to the base url through slash
    * @param query (optional) if passed then adds to end of the url
+   * @throws error when required params are not valid
    */
   public static generateResourceUrl(baseUrl: string, resourceName: string, query?: string): string {
-    if (!baseUrl || !resourceName) {
-      throw Error('Base url and resource name should be defined');
-    }
+    ValidationUtils.validateInputParams({baseUrl, resourceName});
+
     let url = baseUrl;
     if (!url.endsWith('/')) {
       url = url.concat('/');
@@ -69,11 +70,10 @@ export class UrlUtils {
    * Clear url from template params.
    *
    * @param url to be cleaned
+   * @throws error when required params are not valid
    */
   public static removeTemplateParams(url: string): string {
-    if (!url) {
-      throw Error('Url should be defined');
-    }
+    ValidationUtils.validateInputParams({url});
 
     return UrlUtils.fillTemplateParams(url, {});
   }
@@ -83,12 +83,11 @@ export class UrlUtils {
    *
    * @param url to be filled
    * @param options contains params to apply to result url, if empty then template params will be cleared
+   * @throws error when required params are not valid
    */
   public static fillTemplateParams(url: string, options: PagedGetOption): string {
-    if (!url) {
-      throw Error('Url should be defined');
-    }
-    UrlUtils.checkParams(options);
+    ValidationUtils.validateInputParams({url});
+    UrlUtils.checkDuplicateParams(options);
 
     const paramsWithoutSortParam = {
       ...options,
@@ -121,7 +120,7 @@ export class UrlUtils {
     return resultParams;
   }
 
-  private static checkParams(options: GetOption): void {
+  private static checkDuplicateParams(options: GetOption): void {
     if (_.isEmpty(options) || _.isEmpty(options.params)) {
       return;
     }

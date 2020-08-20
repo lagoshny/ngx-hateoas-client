@@ -8,6 +8,7 @@ import * as _ from 'lodash';
 import { StageLogger } from '../../logger/stage-logger';
 import { Stage } from '../../logger/stage.enum';
 import { tap } from 'rxjs/operators';
+import { ValidationUtils } from '../../util/validation.utils';
 
 /**
  * Collection of resources with pagination.
@@ -106,6 +107,7 @@ export class PagedResourceCollection<T extends BaseResource> extends ResourceCol
    */
   public customPage(pageParam: PageParam): Observable<PagedResourceCollection<T>> {
     StageLogger.resourceBeginLog(this.resources[0], 'CustomPage', {pageParam});
+    ValidationUtils.checkInputParams({pageParam});
 
     if (pageParam.page < 0) {
       pageParam.page = this.pageNumber;

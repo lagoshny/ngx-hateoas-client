@@ -8,6 +8,7 @@ import { Stage } from '../logger/stage.enum';
  * Base class with common logics to perform HTTP requests.
  * TODO: should manage cache?
  */
+/* tslint:disable:no-string-literal */
 export class HttpExecutor {
 
   constructor(protected httpClient: HttpClient) {
@@ -19,12 +20,17 @@ export class HttpExecutor {
                               headers?: HttpHeaders | { [p: string]: string | string[] };
                               observe?: 'body' | 'response';
                               params?: HttpParams
-                            }) {
-    StageLogger.stageLog(Stage.HTTP_REQUEST, {
+                            },
+                            body?: any) {
+    const params = {
       method,
       url,
-      params: options?.params?.keys().length > 0 ? options?.params.toString() : ''
-    });
+      params: options?.params?.keys().length > 0 ? options?.params.toString() : '',
+    };
+    if (body) {
+      params['body'] = body;
+    }
+    StageLogger.stageLog(Stage.HTTP_REQUEST, params);
   }
 
   private static logResponse(method: string,
@@ -91,7 +97,7 @@ export class HttpExecutor {
     observe?: 'body' | 'response';
     params?: HttpParams
   }): Observable<any> {
-    HttpExecutor.logRequest('POST', url, options);
+    HttpExecutor.logRequest('POST', url, options, body);
     if (!url) {
       const errMsg = 'url should be defined';
       StageLogger.stageErrorLog(Stage.HTTP_REQUEST, {error: errMsg});
@@ -126,7 +132,7 @@ export class HttpExecutor {
     observe?: 'body' | 'response';
     params?: HttpParams
   }): Observable<any> {
-    HttpExecutor.logRequest('PUT', url, options);
+    HttpExecutor.logRequest('PUT', url, options, body);
     if (!url) {
       const errMsg = 'url should be defined';
       StageLogger.stageErrorLog(Stage.HTTP_REQUEST, {error: errMsg});
@@ -161,7 +167,7 @@ export class HttpExecutor {
     observe?: 'body' | 'response';
     params?: HttpParams
   }): Observable<any> {
-    HttpExecutor.logRequest('PATCH', url, options);
+    HttpExecutor.logRequest('PATCH', url, options, body);
     if (!url) {
       const errMsg = 'url should be defined';
       StageLogger.stageErrorLog(Stage.HTTP_REQUEST, {error: errMsg});

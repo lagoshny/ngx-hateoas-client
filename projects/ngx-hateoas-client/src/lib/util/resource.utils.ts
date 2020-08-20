@@ -161,13 +161,10 @@ export class ResourceUtils {
    */
   public static initResource(entity: any): BaseResource | any {
     if (isResource(entity)) {
-      StageLogger.stageLog(Stage.INIT_RESOURCE, {result: 'entity initialized as Resource'});
       return Object.assign(new this.resourceType(), entity);
     } else if (isEmbeddedResource(entity)) {
-      StageLogger.stageLog(Stage.INIT_RESOURCE, {result: 'entity initialized as EmbeddedResource'});
       return Object.assign(new this.embeddedResourceType(), entity);
     } else {
-      StageLogger.stageLog(Stage.INIT_RESOURCE, {result: 'entity did not initialize will be used raw entity'});
       return entity;
     }
   }

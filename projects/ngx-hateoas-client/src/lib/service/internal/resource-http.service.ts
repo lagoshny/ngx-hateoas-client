@@ -8,7 +8,7 @@ import { DependencyInjector } from '../../util/dependency-injector';
 import { UrlUtils } from '../../util/url.utils';
 import * as _ from 'lodash';
 import { isResource } from '../../model/resource-type';
-import { GetOption, RequestParam } from '../../model/declarations';
+import { GetOption } from '../../model/declarations';
 import { HttpExecutor } from '../http-executor';
 import { CacheService } from '../cache.service';
 import { HttpConfigService } from '../../config/http-config.service';
@@ -184,49 +184,14 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
   }
 
   /**
-   * Perform GET request to get count value.
-   *
-   * @param resourceName used to build root url to the resource
-   * @param countQuery name of the count method
-   * @param requestParam (optional) http request params that applied to the request
-   * @throws error when required params are not valid
-   */
-  public count(resourceName: string, countQuery?: string, requestParam?: RequestParam): Observable<number> {
-    ValidationUtils.validateInputParams({resourceName});
-
-    const url = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName)
-      .concat('/search/' + (_.isNil(countQuery) ? 'countAll' : countQuery));
-
-    StageLogger.stageLog(Stage.PREPARE_URL, {
-      result: url,
-      urlParts: `baseUrl: '${ this.httpConfig.baseApiUrl }', resource: '${ resourceName }', countQuery: '${ countQuery ? countQuery : 'countAll' }'`,
-      requestParam
-    });
-
-    return super.get(url, {params: UrlUtils.convertToHttpParams({params: requestParam}), observe: 'body'})
-      .pipe(
-        map((data: any) => {
-          if (_.isNil(data) || _.isNaN(_.toNumber(data))) {
-            const errMsg = `Returned value ${ data } should be number.`;
-            StageLogger.stageErrorLog(Stage.RESPONSE_BAD_RESULT, {error: errMsg});
-            throw Error(errMsg);
-          }
-
-          return _.toNumber(data);
-        }),
-        catchError(error => observableThrowError(error))
-      );
-  }
-
-  /**
    * Perform get resource request with url built by the resource name.
    *
    * @param resourceName used to build root url to the resource
    * @param id resource id
-   * @param option (optional) options that applied to the request
+   * @param options (optional) options that applied to the request
    * @throws error when required params are not valid
    */
-  public getResource(resourceName: string, id: number, option?: GetOption): Observable<T> {
+  public getResource(resourceName: string, id: number | string, options?: GetOption): Observable<T> {
     ValidationUtils.validateInputParams({resourceName, id});
 
     const url = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName).concat('/', _.toString(id));
@@ -234,17 +199,17 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
     StageLogger.stageLog(Stage.PREPARE_URL, {
       result: url,
       urlParts: `baseUrl: '${ this.httpConfig.baseApiUrl }', resource: '${ resourceName }', id: '${ id }'`,
-      options: option
+      options
     });
 
-    return this.get(url, {params: UrlUtils.convertToHttpParams(option)});
+    return this.get(url, {params: UrlUtils.convertToHttpParams(options)});
   }
 
   /**
-   * Perform post resource request with url built by the resource name.
+   * Perform POST resource request with url built by the resource name.
    *
-   * @param resourceName used to build root url to the resource
-   * @param body resource to pass as body
+   * @param resourceName to be post
+   * @param body resource to create
    * @throws error when required params are not valid
    */
   public postResource(resourceName: string, body: BaseResource): Observable<T> {
@@ -261,14 +226,83 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
   }
 
   /**
+   * Perform PATCH resource request with url built by the resource name and resource id.
+   *
+   * @param resourceName to be patched
+   * @param id resource id
+   * @param body contains data to patch resource properties
+   * @throws error when required params are not valid
+   */
+  public patchResource(resourceName: string, id: number | string, body: any): Observable<T | any> {
+    ValidationUtils.validateInputParams({resourceName, id, body});
+
+    const url = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName, _.toString(id));
+
+    StageLogger.stageLog(Stage.PREPARE_URL, {
+      result: url,
+      urlParts: `baseUrl: '${ this.httpConfig.baseApiUrl }', resource: '${ resourceName }', resourceId: '${ id }'`
+    });
+
+    return this.patch(url, body, {observe: 'body'});
+  }
+
+  /**
+   * Perform PUT resource request with url built by the resource name and resource id.
+   *
+   * @param resourceName to be put
+   * @param id resource id
+   * @param body contains data to replace resource properties
+   * @throws error when required params are not valid
+   */
+  public putResource(resourceName: string, id: number | string, body: any): Observable<T | any> {
+    ValidationUtils.validateInputParams({resourceName, id, body});
+
+    const url = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName, _.toString(id));
+
+    StageLogger.stageLog(Stage.PREPARE_URL, {
+      result: url,
+      urlParts: `baseUrl: '${ this.httpConfig.baseApiUrl }', resource: '${ resourceName }', resourceId: '${ id }'`
+    });
+
+    return this.put(url, body, {observe: 'body'});
+  }
+
+  /**
+   * Perform DELETE resource request with url built by the resource name and resource id.
+   *
+   * @param resourceName to be deleted
+   * @param id resource id
+   * @param options (optional) additional options that will be applied to the request
+   * @throws error when required params are not valid
+   */
+  public deleteResource(resourceName: string, id: number | string, options?: {
+    headers?: HttpHeaders | {
+      [header: string]: string | string[];
+    };
+    observe?: 'body' | 'response';
+    params?: HttpParams
+  }): Observable<T | any> {
+    ValidationUtils.validateInputParams({resourceName, id});
+
+    const url = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName, _.toString(id));
+
+    StageLogger.stageLog(Stage.PREPARE_URL, {
+      result: url,
+      urlParts: `baseUrl: '${ this.httpConfig.baseApiUrl }', resource: '${ resourceName }', resourceId: '${ id }'`
+    });
+
+    return this.delete(url, options);
+  }
+
+  /**
    * Perform search single resource request with url built by the resource name.
    *
    * @param resourceName used to build root url to the resource
    * @param searchQuery name of the search method
-   * @param option (optional) options that applied to the request
+   * @param options (optional) options that applied to the request
    * @throws error when required params are not valid
    */
-  public search(resourceName: string, searchQuery: string, option?: GetOption): Observable<T> {
+  public search(resourceName: string, searchQuery: string, options?: GetOption): Observable<T> {
     ValidationUtils.validateInputParams({resourceName, searchQuery});
 
     const url = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName).concat('/search/' + searchQuery);
@@ -278,7 +312,7 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
       urlParts: `baseUrl: '${ this.httpConfig.baseApiUrl }', resource: '${ resourceName }', searchQuery: '${ searchQuery }'`
     });
 
-    return this.get(url, {params: UrlUtils.convertToHttpParams(option)});
+    return this.get(url, {params: UrlUtils.convertToHttpParams(options)});
   }
 
 }

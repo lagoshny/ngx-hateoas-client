@@ -119,6 +119,10 @@ describe('UrlUtils', () => {
     expect(UrlUtils.generateResourceUrl(baseUrl, 'test', 'testQuery')).toBe(`${ baseUrl }/test/testQuery`);
   });
 
+  it('GENERATE_RESOURCE_URL should return url with base url and resourceName and query without add double slash', () => {
+    expect(UrlUtils.generateResourceUrl(baseUrl, 'test', '/testQuery')).toBe(`${ baseUrl }/test/testQuery`);
+  });
+
   it('REMOVE_TEMPLATE_PARAMS should throw error when url is empty', () => {
     expect(() => UrlUtils.removeTemplateParams(''))
       .toThrowError(`Passed param(s) 'url = ' is not valid`);

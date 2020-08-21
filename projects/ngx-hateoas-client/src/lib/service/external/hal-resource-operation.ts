@@ -1,7 +1,7 @@
 import { Observable } from 'rxjs';
 import { DependencyInjector } from '../../util/dependency-injector';
 import { HalResourceService } from './hal-resource.service';
-import { GetOption, HttpMethod, PagedGetOption, RequestBody, RequestOption, RequestParam } from '../../model/declarations';
+import { GetOption, HttpMethod, PagedGetOption, RequestBody, RequestOption } from '../../model/declarations';
 import { Resource } from '../../model/resource/resource';
 import { PagedResourceCollection } from '../../model/resource/paged-resource-collection';
 import { ResourceCollection } from '../../model/resource/resource-collection';
@@ -22,24 +22,24 @@ export class HalResourceOperation<T extends Resource> {
   }
 
   /**
-   * {@link HalResourceService#get}.
+   * {@link HalResourceService#getResource}.
    */
-  public get(id: any, option?: GetOption): Observable<T> {
-    return this.halResourceService.get(this.resourceName, id, option) as Observable<T>;
+  public getResource(id: any, options?: GetOption): Observable<T> {
+    return this.halResourceService.getResource(this.resourceName, id, options) as Observable<T>;
   }
 
   /**
-   * {@link HalResourceService#getAll}.
+   * {@link HalResourceService#getCollection}.
    */
-  public getAll(option?: GetOption): Observable<ResourceCollection<T>> {
-    return this.halResourceService.getAll(this.resourceName, option);
+  public getCollection(options?: GetOption): Observable<ResourceCollection<T>> {
+    return this.halResourceService.getCollection(this.resourceName, options);
   }
 
   /**
-   * {@link HalResourceService#getAllPage}.
+   * {@link HalResourceService#getPage}.
    */
-  public getAllPage(option: PagedGetOption): Observable<PagedResourceCollection<T>> {
-    return this.halResourceService.getAllPage(this.resourceName, option);
+  public getPage(options?: PagedGetOption): Observable<PagedResourceCollection<T>> {
+    return this.halResourceService.getPage(this.resourceName, options);
   }
 
   /**
@@ -52,22 +52,15 @@ export class HalResourceOperation<T extends Resource> {
   /**
    * {@link HalResourceService#updateResource}.
    */
-  public updateResource(requestBody: RequestBody<T>): Observable<T> {
-    return this.halResourceService.updateResource(requestBody);
-  }
-
-  /**
-   * {@link HalResourceService#count}.
-   */
-  public count(query?: string, requestParam?: RequestParam): Observable<number> {
-    return this.halResourceService.count(this.resourceName, query, requestParam);
+  public updateResource(entity: T, requestBody?: RequestBody<any>): Observable<T | any> {
+    return this.halResourceService.updateResource(entity, requestBody);
   }
 
   /**
    * {@link HalResourceService#patchResource}.
    */
-  public patchResource(requestBody: RequestBody<T>): Observable<T> {
-    return this.halResourceService.patchResource(requestBody);
+  public patchResource(entity: T, requestBody?: RequestBody<any>): Observable<T | any> {
+    return this.halResourceService.patchResource(entity, requestBody);
   }
 
   /**
@@ -80,32 +73,42 @@ export class HalResourceOperation<T extends Resource> {
   /**
    * {@see ResourceCollectionHttpService#search}
    */
-  public searchCollection(query: string, option?: GetOption): Observable<ResourceCollection<T>> {
-    return this.halResourceService.searchCollection(this.resourceName, query, option);
+  public searchCollection(query: string, options?: GetOption): Observable<ResourceCollection<T>> {
+    return this.halResourceService.searchCollection(this.resourceName, query, options);
   }
 
   /**
    * {@see PagedResourceCollection#search}
    */
-  public searchPage(query: string, option?: PagedGetOption): Observable<PagedResourceCollection<T>> {
-    return this.halResourceService.searchPage(this.resourceName, query, option);
+  public searchPage(query: string, options?: PagedGetOption): Observable<PagedResourceCollection<T>> {
+    return this.halResourceService.searchPage(this.resourceName, query, options);
   }
 
   /**
    * {@see ResourceHttpService#search}
    */
-  public searchSingle(query: string, option?: GetOption): Observable<T> {
-    return this.halResourceService.searchSingle(this.resourceName, query, option);
+  public searchSingle(query: string, options?: GetOption): Observable<T> {
+    return this.halResourceService.searchSingle(this.resourceName, query, options);
   }
 
   /**
-   * {@see CommonHttpService#customQuery}
+   * {@see ResourceHttpService#customQuery}
    */
-  public customQuery(method: HttpMethod,
-                     query: string,
-                     requestBody: RequestBody<any>,
-                     option?: PagedGetOption): Observable<any | T | ResourceCollection<T> | PagedResourceCollection<T>> {
-    return this.halResourceService.customQuery(this.resourceName, method, query, requestBody, option);
+  public customQuery<R>(method: HttpMethod,
+                        query: string,
+                        requestBody?: RequestBody<any>,
+                        options?: PagedGetOption): Observable<R> {
+    return this.halResourceService.customQuery(this.resourceName, method, query, requestBody, options);
+  }
+
+  /**
+   * {@see ResourceHttpService#customSearchQuery}
+   */
+  public customSearchQuery<R>(method: HttpMethod,
+                              searchQuery: string,
+                              requestBody?: RequestBody<any>,
+                              options?: PagedGetOption): Observable<R> {
+    return this.halResourceService.customSearchQuery(this.resourceName, method, searchQuery, requestBody, options);
   }
 
 }

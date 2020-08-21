@@ -63,7 +63,7 @@ export class UrlUtils {
     if (!url.endsWith('/')) {
       url = url.concat('/');
     }
-    return url.concat(resourceName).concat(query ? `/${ query }` : '');
+    return url.concat(resourceName).concat(query ? `${ query.startsWith('/') ? query : '/' + query }` : '');
   }
 
   /**

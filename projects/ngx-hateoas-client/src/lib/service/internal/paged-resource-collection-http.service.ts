@@ -78,14 +78,14 @@ export class PagedResourceCollectionHttpService<T extends PagedResourceCollectio
    *
    * @param resourceName used to build root url to the resource
    * @param query (optional) url path that applied to the result url at the end
-   * @param option (optional) options that applied to the request
+   * @param options (optional) options that applied to the request
    * @throws error when required params are not valid
    */
-  public getResourcePage(resourceName: string, query?: string, option?: PagedGetOption): Observable<T> {
+  public getResourcePage(resourceName: string, query?: string, options?: PagedGetOption): Observable<T> {
     ValidationUtils.validateInputParams({resourceName});
 
     const url = UrlUtils.removeTemplateParams(UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName, query));
-    const pagedOption = !_.isEmpty(option) ? option : {};
+    const pagedOption = !_.isEmpty(options) ? options : {};
     if (_.isEmpty(pagedOption.pageParam)) {
       pagedOption.pageParam = PagedResourceCollectionHttpService.DEFAULT_PAGE;
     }
@@ -97,15 +97,15 @@ export class PagedResourceCollectionHttpService<T extends PagedResourceCollectio
    *
    * @param resourceName used to build root url to the resource
    * @param searchQuery name of the search method
-   * @param option (optional) options that applied to the request
+   * @param options (optional) options that applied to the request
    * @throws error when required params are not valid
    */
-  public search(resourceName: string, searchQuery: string, option?: PagedGetOption): Observable<T> {
+  public search(resourceName: string, searchQuery: string, options?: PagedGetOption): Observable<T> {
     ValidationUtils.validateInputParams({resourceName, searchQuery});
 
     const url = UrlUtils.removeTemplateParams(
       UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName)).concat('/search/' + searchQuery);
-    const pagedOption = !_.isEmpty(option) ? option : {};
+    const pagedOption = !_.isEmpty(options) ? options : {};
     if (_.isEmpty(pagedOption.pageParam)) {
       pagedOption.pageParam = PagedResourceCollectionHttpService.DEFAULT_PAGE;
     }

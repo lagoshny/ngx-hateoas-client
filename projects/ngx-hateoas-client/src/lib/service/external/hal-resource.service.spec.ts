@@ -56,64 +56,64 @@ describe('HalResourceService', () => {
     ResourceUtils.useResourceType(Resource);
   }));
 
-  it('GET should throw error when passed resourceName is empty', () => {
-    expect(() => halResourceService.get('', 2))
+  it('GET_RESOURCE should throw error when passed resourceName is empty', () => {
+    expect(() => halResourceService.getResource('', 2))
       .toThrowError(`Passed param(s) 'resourceName = ' is not valid`);
   });
 
-  it('GET should throw error when passed resourceName,id are undefined', () => {
-    expect(() => halResourceService.get(undefined, undefined))
+  it('GET_RESOURCE should throw error when passed resourceName,id are undefined', () => {
+    expect(() => halResourceService.getResource(undefined, undefined))
       .toThrowError(`Passed param(s) 'resourceName = undefined', 'id = undefined' is not valid`);
   });
 
-  it('GET should throw error when passed resourceName,id are null', () => {
-    expect(() => halResourceService.get(null, null))
+  it('GET_RESOURCE should throw error when passed resourceName,id are null', () => {
+    expect(() => halResourceService.getResource(null, null))
       .toThrowError(`Passed param(s) 'resourceName = null', 'id = null' is not valid`);
   });
 
-  it('GET_ALL should throw error when passed resourceName is empty', () => {
-    expect(() => halResourceService.getAll(''))
+  it('GET_COLLECTION should throw error when passed resourceName is empty', () => {
+    expect(() => halResourceService.getCollection(''))
       .toThrowError(`Passed param(s) 'resourceName = ' is not valid`);
   });
 
-  it('GET_ALL should throw error when passed resourceName is undefined', () => {
-    expect(() => halResourceService.getAll(undefined))
+  it('GET_COLLECTION should throw error when passed resourceName is undefined', () => {
+    expect(() => halResourceService.getCollection(undefined))
       .toThrowError(`Passed param(s) 'resourceName = undefined' is not valid`);
   });
 
-  it('GET_ALL should throw error when passed resourceName is null', () => {
-    expect(() => halResourceService.getAll(null))
+  it('GET_COLLECTION should throw error when passed resourceName is null', () => {
+    expect(() => halResourceService.getCollection(null))
       .toThrowError(`Passed param(s) 'resourceName = null' is not valid`);
   });
 
-  it('GET_ALL should invoke getResourceCollection with query null param', () => {
+  it('GET_COLLECTION should invoke getResourceCollection with query null param', () => {
     resourceCollectionHttpServiceSpy.getResourceCollection.and.returnValue(of(anything()));
 
-    halResourceService.getAll('test').subscribe(() => {
+    halResourceService.getCollection('test').subscribe(() => {
       const query = resourceCollectionHttpServiceSpy.getResourceCollection.calls.argsFor(0)[1];
       expect(query).toBeNull();
     });
   });
 
-  it('GET_ALL_PAGE should throw error when passed resourceName is empty', () => {
-    expect(() => halResourceService.getAllPage(''))
+  it('GET_PAGE should throw error when passed resourceName is empty', () => {
+    expect(() => halResourceService.getPage(''))
       .toThrowError(`Passed param(s) 'resourceName = ' is not valid`);
   });
 
-  it('GET_ALL_PAGE should throw error when passed resourceName is undefined', () => {
-    expect(() => halResourceService.getAllPage(undefined))
+  it('GET_PAGE should throw error when passed resourceName is undefined', () => {
+    expect(() => halResourceService.getPage(undefined))
       .toThrowError(`Passed param(s) 'resourceName = undefined' is not valid`);
   });
 
-  it('GET_ALL_PAGE should throw error when passed resourceName is null', () => {
-    expect(() => halResourceService.getAllPage(null))
+  it('GET_PAGE should throw error when passed resourceName is null', () => {
+    expect(() => halResourceService.getPage(null))
       .toThrowError(`Passed param(s) 'resourceName = null' is not valid`);
   });
 
-  it('GET_ALL_PAGE should invoke getResourcePage with query null param', () => {
+  it('GET_PAGE should invoke getResourcePage with query null param', () => {
     pagedResourceCollectionHttpServiceSpy.getResourcePage.and.returnValue(of(anything()));
 
-    halResourceService.getAllPage('test').subscribe(() => {
+    halResourceService.getPage('test').subscribe(() => {
       const query = pagedResourceCollectionHttpServiceSpy.getResourcePage.calls.argsFor(0)[1];
       expect(query).toBeNull();
     });
@@ -147,21 +147,21 @@ describe('HalResourceService', () => {
       });
   });
 
-  it('UPDATE_RESOURCE should throw error when passed requestBody is undefined', () => {
+  it('UPDATE_RESOURCE should throw error when passed entity is undefined', () => {
     expect(() => halResourceService.updateResource(undefined))
-      .toThrowError(`Passed param(s) 'requestBody = undefined' is not valid`);
+      .toThrowError(`Passed param(s) 'entity = undefined' is not valid`);
   });
 
-  it('UPDATE_RESOURCE should throw error when passed requestBody is null', () => {
+  it('UPDATE_RESOURCE should throw error when passed entity is null', () => {
     expect(() => halResourceService.updateResource(null))
-      .toThrowError(`Passed param(s) 'requestBody = null' is not valid`);
+      .toThrowError(`Passed param(s) 'entity = null' is not valid`);
   });
 
   it('UPDATE_RESOURCE should doing the request to the passed resource self link', () => {
     resourceHttpServiceSpy.put.and.returnValue(of(anything()));
 
     const simpleResource = new SimpleResource();
-    halResourceService.updateResource({body: simpleResource})
+    halResourceService.updateResource(simpleResource)
       .subscribe(() => {
         const url = resourceHttpServiceSpy.put.calls.argsFor(0)[0];
         expect(url).toBe(simpleResource._links.self.href);
@@ -173,7 +173,7 @@ describe('HalResourceService', () => {
     const resourceWithRelation = new ResourceWithRelation();
     resourceWithRelation.relation = new ResourceRelation();
 
-    halResourceService.updateResource({body: resourceWithRelation})
+    halResourceService.updateResource(resourceWithRelation)
       .subscribe(() => {
         const body = resourceHttpServiceSpy.put.calls.argsFor(0)[1];
         expect(body).toBeDefined();
@@ -186,7 +186,7 @@ describe('HalResourceService', () => {
     const resourceWithRelation = new ResourceWithRelation();
     resourceWithRelation.name = null;
 
-    halResourceService.updateResource({body: resourceWithRelation, valuesOption: {include: Include.NULL_VALUES}})
+    halResourceService.updateResource(resourceWithRelation, {body: resourceWithRelation, valuesOption: {include: Include.NULL_VALUES}})
       .subscribe(() => {
         const body = resourceHttpServiceSpy.put.calls.argsFor(0)[1];
         expect(body).toBeDefined();
@@ -194,36 +194,21 @@ describe('HalResourceService', () => {
       });
   });
 
-  it('COUNT should throw error when passed resourceName is empty', () => {
-    expect(() => halResourceService.count(''))
-      .toThrowError(`Passed param(s) 'resourceName = ' is not valid`);
-  });
-
-  it('COUNT should throw error when passed resourceName is undefined', () => {
-    expect(() => halResourceService.count(undefined))
-      .toThrowError(`Passed param(s) 'resourceName = undefined' is not valid`);
-  });
-
-  it('COUNT should throw error when passed resourceName is null', () => {
-    expect(() => halResourceService.count(null))
-      .toThrowError(`Passed param(s) 'resourceName = null' is not valid`);
-  });
-
-  it('PATCH_RESOURCE should throw error when passed requestBody is undefined', () => {
+  it('PATCH_RESOURCE should throw error when passed entity is undefined', () => {
     expect(() => halResourceService.patchResource(undefined))
-      .toThrowError(`Passed param(s) 'requestBody = undefined' is not valid`);
+      .toThrowError(`Passed param(s) 'entity = undefined' is not valid`);
   });
 
-  it('PATCH_RESOURCE should throw error when passed requestBody is null', () => {
+  it('PATCH_RESOURCE should throw error when passed entity is null', () => {
     expect(() => halResourceService.patchResource(null))
-      .toThrowError(`Passed param(s) 'requestBody = null' is not valid`);
+      .toThrowError(`Passed param(s) 'entity = null' is not valid`);
   });
 
   it('PATCH_RESOURCE should doing the request to the passed resource self link', () => {
     resourceHttpServiceSpy.patch.and.returnValue(of(anything()));
 
     const simpleResource = new SimpleResource();
-    halResourceService.patchResource({body: simpleResource})
+    halResourceService.patchResource(simpleResource)
       .subscribe(() => {
         const url = resourceHttpServiceSpy.patch.calls.argsFor(0)[0];
         expect(url).toBe(simpleResource._links.self.href);
@@ -235,7 +220,7 @@ describe('HalResourceService', () => {
     const resourceWithRelation = new ResourceWithRelation();
     resourceWithRelation.relation = new ResourceRelation();
 
-    halResourceService.patchResource({body: resourceWithRelation})
+    halResourceService.patchResource(resourceWithRelation)
       .subscribe(() => {
         const body = resourceHttpServiceSpy.patch.calls.argsFor(0)[1];
         expect(body).toBeDefined();
@@ -248,7 +233,7 @@ describe('HalResourceService', () => {
     const resourceWithRelation = new ResourceWithRelation();
     resourceWithRelation.name = null;
 
-    halResourceService.patchResource({body: resourceWithRelation, valuesOption: {include: Include.NULL_VALUES}})
+    halResourceService.patchResource(resourceWithRelation, {body: resourceWithRelation, valuesOption: {include: Include.NULL_VALUES}})
       .subscribe(() => {
         const body = resourceHttpServiceSpy.patch.calls.argsFor(0)[1];
         expect(body).toBeDefined();
@@ -406,6 +391,76 @@ describe('HalResourceService', () => {
         const body = commonHttpServiceSpy.customQuery.calls.argsFor(0)[3];
         expect(body).toBeDefined();
         expect(body.name).toBeNull();
+      });
+  });
+
+  //
+  it('CUSTOM_SEARCH_QUERY should throw error when passed resourceName is empty', () => {
+    expect(() => halResourceService.customSearchQuery('', HttpMethod.POST, 'searchQuery', {body: new SimpleResource()}))
+      .toThrowError(`Passed param(s) 'resourceName = ' is not valid`);
+  });
+
+  it('CUSTOM_SEARCH_QUERY should throw error when passed query is empty', () => {
+    expect(() => halResourceService.customSearchQuery('any', HttpMethod.POST, '', {body: new SimpleResource()}))
+      .toThrowError(`Passed param(s) 'searchQuery = ' is not valid`);
+  });
+
+  it('CUSTOM_SEARCH_QUERY should throw error when passed resourceName,method,query are undefined', () => {
+    expect(() => halResourceService.customSearchQuery(undefined, undefined, undefined))
+      .toThrowError(`Passed param(s) 'resourceName = undefined', 'method = undefined', 'searchQuery = undefined' is not valid`);
+  });
+
+  it('CUSTOM_SEARCH_QUERY should throw error when passed resourceName,method,query are null', () => {
+    expect(() => halResourceService.customSearchQuery(null, null, null))
+      .toThrowError(`Passed param(s) 'resourceName = null', 'method = null', 'searchQuery = null' is not valid`);
+  });
+
+  it('CUSTOM_SEARCH_QUERY should resolve resource values', () => {
+    commonHttpServiceSpy.customQuery.and.returnValue(of(anything()));
+    const resourceWithRelation = new ResourceWithRelation();
+    resourceWithRelation.relation = new ResourceRelation();
+
+    halResourceService.customSearchQuery('test', HttpMethod.POST, 'searchQuery', {body: resourceWithRelation})
+      .subscribe(() => {
+        const body = commonHttpServiceSpy.customQuery.calls.argsFor(0)[3];
+        expect(body).toBeDefined();
+        expect(body.relation).toBe('http://localhost:8080/api/v1/resourceRelation/1');
+      });
+  });
+
+  it('CUSTOM_SEARCH_QUERY should resolve resource values considering null values', () => {
+    commonHttpServiceSpy.customQuery.and.returnValue(of(anything()));
+    const resourceWithRelation = new ResourceWithRelation();
+    resourceWithRelation.name = null;
+
+    halResourceService.customSearchQuery('test', HttpMethod.POST, 'searchQuery',
+      {body: resourceWithRelation, valuesOption: {include: Include.NULL_VALUES}})
+      .subscribe(() => {
+        const body = commonHttpServiceSpy.customQuery.calls.argsFor(0)[3];
+        expect(body).toBeDefined();
+        expect(body.name).toBeNull();
+      });
+  });
+
+  it('CUSTOM_SEARCH_QUERY should put \'search\' path to result url', () => {
+    commonHttpServiceSpy.customQuery.and.returnValue(of(anything()));
+
+    halResourceService.customSearchQuery('test', HttpMethod.GET, 'searchQuery')
+      .subscribe(() => {
+        const url = commonHttpServiceSpy.customQuery.calls.argsFor(0)[2];
+        expect(url).toBeDefined();
+        expect(url).toBe('/search/searchQuery');
+      });
+  });
+
+  it('CUSTOM_SEARCH_QUERY should put \'search\' path without additional slash to result url', () => {
+    commonHttpServiceSpy.customQuery.and.returnValue(of(anything()));
+
+    halResourceService.customSearchQuery('test', HttpMethod.GET, '/searchQuery')
+      .subscribe(() => {
+        const url = commonHttpServiceSpy.customQuery.calls.argsFor(0)[2];
+        expect(url).toBeDefined();
+        expect(url).toBe('/search/searchQuery');
       });
   });
 

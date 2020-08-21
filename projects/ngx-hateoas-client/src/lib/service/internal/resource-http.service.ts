@@ -184,49 +184,14 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
   }
 
   /**
-   * Perform GET request to get count value.
-   *
-   * @param resourceName used to build root url to the resource
-   * @param countQuery name of the count method
-   * @param requestParam (optional) http request params that applied to the request
-   * @throws error when required params are not valid
-   */
-  public count(resourceName: string, countQuery?: string, requestParam?: RequestParam): Observable<number> {
-    ValidationUtils.validateInputParams({resourceName});
-
-    const url = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName)
-      .concat('/search/' + (_.isNil(countQuery) ? 'countAll' : countQuery));
-
-    StageLogger.stageLog(Stage.PREPARE_URL, {
-      result: url,
-      urlParts: `baseUrl: '${ this.httpConfig.baseApiUrl }', resource: '${ resourceName }', countQuery: '${ countQuery ? countQuery : 'countAll' }'`,
-      requestParam
-    });
-
-    return super.get(url, {params: UrlUtils.convertToHttpParams({params: requestParam}), observe: 'body'})
-      .pipe(
-        map((data: any) => {
-          if (_.isNil(data) || _.isNaN(_.toNumber(data))) {
-            const errMsg = `Returned value ${ data } should be number.`;
-            StageLogger.stageErrorLog(Stage.RESPONSE_BAD_RESULT, {error: errMsg});
-            throw Error(errMsg);
-          }
-
-          return _.toNumber(data);
-        }),
-        catchError(error => observableThrowError(error))
-      );
-  }
-
-  /**
    * Perform get resource request with url built by the resource name.
    *
    * @param resourceName used to build root url to the resource
    * @param id resource id
-   * @param option (optional) options that applied to the request
+   * @param options (optional) options that applied to the request
    * @throws error when required params are not valid
    */
-  public getResource(resourceName: string, id: number, option?: GetOption): Observable<T> {
+  public getResource(resourceName: string, id: number, options?: GetOption): Observable<T> {
     ValidationUtils.validateInputParams({resourceName, id});
 
     const url = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName).concat('/', _.toString(id));
@@ -234,10 +199,10 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
     StageLogger.stageLog(Stage.PREPARE_URL, {
       result: url,
       urlParts: `baseUrl: '${ this.httpConfig.baseApiUrl }', resource: '${ resourceName }', id: '${ id }'`,
-      options: option
+      options
     });
 
-    return this.get(url, {params: UrlUtils.convertToHttpParams(option)});
+    return this.get(url, {params: UrlUtils.convertToHttpParams(options)});
   }
 
   /**
@@ -265,10 +230,10 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
    *
    * @param resourceName used to build root url to the resource
    * @param searchQuery name of the search method
-   * @param option (optional) options that applied to the request
+   * @param options (optional) options that applied to the request
    * @throws error when required params are not valid
    */
-  public search(resourceName: string, searchQuery: string, option?: GetOption): Observable<T> {
+  public search(resourceName: string, searchQuery: string, options?: GetOption): Observable<T> {
     ValidationUtils.validateInputParams({resourceName, searchQuery});
 
     const url = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName).concat('/search/' + searchQuery);
@@ -278,7 +243,7 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
       urlParts: `baseUrl: '${ this.httpConfig.baseApiUrl }', resource: '${ resourceName }', searchQuery: '${ searchQuery }'`
     });
 
-    return this.get(url, {params: UrlUtils.convertToHttpParams(option)});
+    return this.get(url, {params: UrlUtils.convertToHttpParams(options)});
   }
 
 }

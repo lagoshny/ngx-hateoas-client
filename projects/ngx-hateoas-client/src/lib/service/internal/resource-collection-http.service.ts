@@ -70,14 +70,14 @@ export class ResourceCollectionHttpService<T extends ResourceCollection<BaseReso
    *
    * @param resourceName used to build root url to the resource
    * @param query (optional) url path that applied to the result url at the end
-   * @param option (optional) options that applied to the request
+   * @param options (optional) options that applied to the request
    * @throws error when required params are not valid
    */
-  public getResourceCollection(resourceName: string, query?: string, option?: GetOption): Observable<T> {
+  public getResourceCollection(resourceName: string, query?: string, options?: GetOption): Observable<T> {
     ValidationUtils.validateInputParams({resourceName});
 
     const url = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName, query);
-    const httpParams = UrlUtils.convertToHttpParams(option);
+    const httpParams = UrlUtils.convertToHttpParams(options);
 
     return this.get(url, {params: httpParams});
   }
@@ -87,14 +87,14 @@ export class ResourceCollectionHttpService<T extends ResourceCollection<BaseReso
    *
    * @param resourceName used to build root url to the resource
    * @param searchQuery name of the search method
-   * @param option (optional) options that applied to the request
+   * @param options (optional) options that applied to the request
    * @throws error when required params are not valid
    */
-  public search(resourceName: string, searchQuery: string, option?: GetOption): Observable<T> {
+  public search(resourceName: string, searchQuery: string, options?: GetOption): Observable<T> {
     ValidationUtils.validateInputParams({resourceName, searchQuery});
 
     const url = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName).concat('/search/' + searchQuery);
-    const httpParams = UrlUtils.convertToHttpParams(option);
+    const httpParams = UrlUtils.convertToHttpParams(options);
 
     return this.get(url, {params: httpParams});
   }

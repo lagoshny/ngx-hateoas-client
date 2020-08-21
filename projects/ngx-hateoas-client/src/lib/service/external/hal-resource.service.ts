@@ -3,7 +3,7 @@ import { Observable } from 'rxjs';
 import { ResourceHttpService } from '../internal/resource-http.service';
 import { PagedResourceCollectionHttpService } from '../internal/paged-resource-collection-http.service';
 import { PagedResourceCollection } from '../../model/resource/paged-resource-collection';
-import { GetOption, HttpMethod, PagedGetOption, RequestBody, RequestOption, RequestParam } from '../../model/declarations';
+import { GetOption, HttpMethod, PagedGetOption, RequestBody, RequestOption } from '../../model/declarations';
 import { ResourceUtils } from '../../util/resource.utils';
 import { ResourceCollection } from '../../model/resource/resource-collection';
 import { ResourceCollectionHttpService } from '../internal/resource-collection-http.service';
@@ -38,7 +38,7 @@ export class HalResourceService<T extends Resource> {
    * @param options (optional) options that should be applied to the request
    * @throws error when required params are not valid
    */
-  public getResource(resourceName: string, id: any, options?: GetOption): Observable<T> {
+  public getResource(resourceName: string, id: number | string, options?: GetOption): Observable<T> {
     StageLogger.resourceBeginLog(resourceName, 'ResourceService GET_RESOURCE', {id, options});
     ValidationUtils.validateInputParams({resourceName, id});
 
@@ -128,6 +128,29 @@ export class HalResourceService<T extends Resource> {
   }
 
   /**
+   * Update resource by id.
+   * Updating all resource properties at the time to passed body properties. If some properties are not passed then will be used null value.
+   * If you need update some part resource properties, use {@link HalResourceService#patchResource} method.
+   *
+   * @param resourceName to update
+   * @param id resource id
+   * @param requestBody that contains the body directly and optional body values option {@link ValuesOption}
+   * @throws error when required params are not valid
+   */
+  public updateResourceById(resourceName: string, id: number | string, requestBody: RequestBody<any>): Observable<T> {
+    StageLogger.resourceBeginLog(resourceName, 'ResourceService UPDATE_RESOURCE_BY_ID', {id, body: requestBody});
+    ValidationUtils.validateInputParams({resourceName, id, requestBody});
+
+    const body = ResourceUtils.resolveValues(requestBody);
+
+    return this.resourceHttpService.putResource(resourceName, id, body)
+      .pipe(tap(() => {
+        StageLogger.resourceEndLog(resourceName, 'ResourceService UPDATE_RESOURCE_BY_ID',
+          {result: `resource '${ resourceName }' with id ${ id } was updated successful`});
+      }));
+  }
+
+  /**
    * Patch resource.
    * Allows fine-grained update resource properties, it means that only passed properties in body will be changed,
    * other properties stay as is.
@@ -152,6 +175,29 @@ export class HalResourceService<T extends Resource> {
   }
 
   /**
+   * Patch resource by id.
+   * Allows fine-grained update resource properties, it means that only passed properties in body will be changed,
+   * other properties stay as is.
+   *
+   * @param resourceName to patch
+   * @param id resource id
+   * @param requestBody that contains the body directly and optional body values option {@link ValuesOption}
+   * @throws error when required params are not valid
+   */
+  public patchResourceById(resourceName: string, id: number | string, requestBody: RequestBody<any>): Observable<T | any> {
+    StageLogger.resourceBeginLog(resourceName, 'ResourceService PATCH_RESOURCE_BY_ID', {id, body: requestBody});
+    ValidationUtils.validateInputParams({resourceName, id, requestBody});
+
+    const body = ResourceUtils.resolveValues(requestBody);
+
+    return this.resourceHttpService.patchResource(resourceName, id, body)
+      .pipe(tap(() => {
+        StageLogger.resourceEndLog(resourceName, 'ResourceService PATCH_RESOURCE_BY_ID',
+          {result: `resource '${ resourceName }' with id ${ id } was patched successful`});
+      }));
+  }
+
+  /**
    * Delete resource.
    *
    * @param entity to delete
@@ -170,6 +216,28 @@ export class HalResourceService<T extends Resource> {
       .pipe(tap(() => {
         StageLogger.resourceEndLog(entity, 'ResourceService DELETE_RESOURCE',
           {result: `resource '${ resource['resourceName'] }' was deleted successful`});
+      }));
+  }
+
+  /**
+   * Delete resource by id.
+   *
+   * @param resourceName to delete
+   * @param id resource id
+   * @param options (optional) options that should be applied to the request
+   * @throws error when required params are not valid
+   */
+  public deleteResourceById(resourceName: string, id: number | string, options?: RequestOption): Observable<T | any> {
+    StageLogger.resourceBeginLog(resourceName, 'ResourceService DELETE_RESOURCE_BY_ID', {id, options});
+    ValidationUtils.validateInputParams({resourceName, id});
+
+    const httpParams = UrlUtils.convertToHttpParams({params: options?.params});
+
+    return this.resourceHttpService.deleteResource(resourceName, id,
+      {observe: options?.observe, params: httpParams})
+      .pipe(tap(() => {
+        StageLogger.resourceEndLog(resourceName, 'ResourceService DELETE_RESOURCE_BY_ID',
+          {result: `resource '${ resourceName }' with id ${ id } was deleted successful`});
       }));
   }
 

@@ -24,7 +24,7 @@ export class HalResourceOperation<T extends Resource> {
   /**
    * {@link HalResourceService#getResource}.
    */
-  public getResource(id: any, options?: GetOption): Observable<T> {
+  public getResource(id: number | string, options?: GetOption): Observable<T> {
     return this.halResourceService.getResource(this.resourceName, id, options) as Observable<T>;
   }
 
@@ -57,6 +57,13 @@ export class HalResourceOperation<T extends Resource> {
   }
 
   /**
+   * {@link HalResourceService#updateResourceById}.
+   */
+  public updateResourceById(id: number | string, requestBody: RequestBody<any>): Observable<T | any> {
+    return this.halResourceService.updateResourceById(this.resourceName, id, requestBody);
+  }
+
+  /**
    * {@link HalResourceService#patchResource}.
    */
   public patchResource(entity: T, requestBody?: RequestBody<any>): Observable<T | any> {
@@ -64,10 +71,24 @@ export class HalResourceOperation<T extends Resource> {
   }
 
   /**
+   * {@link HalResourceService#patchResourceById}.
+   */
+  public patchResourceById(id: number | string, requestBody: RequestBody<any>): Observable<T | any> {
+    return this.halResourceService.patchResourceById(this.resourceName, id, requestBody);
+  }
+
+  /**
    * {@link HalResourceService#deleteResource}.
    */
   public deleteResource(entity: T, options?: RequestOption): Observable<T | any> {
     return this.halResourceService.deleteResource(entity, options);
+  }
+
+  /**
+   * {@link HalResourceService#deleteResourceById}.
+   */
+  public deleteResourceById(id: number | string, options?: RequestOption): Observable<T | any> {
+    return this.halResourceService.deleteResourceById(this.resourceName, id, options);
   }
 
   /**

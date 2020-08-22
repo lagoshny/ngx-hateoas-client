@@ -8,6 +8,8 @@ import { Resource } from '../model/resource/resource';
 import { ResourceCollection } from '../model/resource/resource-collection';
 import { EmbeddedResource } from '../model/resource/embedded-resource';
 import { PagedResourceCollection } from '../model/resource/paged-resource-collection';
+import { CacheService } from '../service/cache.service';
+import { ResourceIdentifiable } from '../model/resource/resource-identifiable';
 
 /**
  * This service for configuration library.
@@ -36,6 +38,10 @@ export class HalConfigurationService {
   public configure(config: HalConfiguration): void {
     this.httpConfig.baseApiUrl = config.baseApiUrl;
     ConsoleLogger.enabled = config.verboseLogs;
+    CacheService.enabled = config.cache?.enabled;
+    if (config.cache?.expireTime && config.cache?.expireTime > 0) {
+      CacheService.expireTime = config.cache?.expireTime;
+    }
 
     ConsoleLogger.prettyInfo('HateoasClient was configured with options', {
       baseApiUrl: config.baseApiUrl

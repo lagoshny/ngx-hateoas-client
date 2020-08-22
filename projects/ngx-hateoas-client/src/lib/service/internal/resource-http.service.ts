@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable, throwError as observableThrowError } from 'rxjs';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { catchError, map } from 'rxjs/operators';
+import { catchError, map, tap } from 'rxjs/operators';
 import { ResourceUtils } from '../../util/resource.utils';
 import { BaseResource } from '../../model/resource/base-resource';
 import { DependencyInjector } from '../../util/dependency-injector';
@@ -45,13 +45,12 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
    */
   public get(url: string,
              options?: GetOption): Observable<T> {
-    const httpParams = UrlUtils.convertToHttpParams(options);
-
-    return super.getHttp(url, {params: httpParams}, options?.useCache)
+    const httpOptions = {params: UrlUtils.convertToHttpParams(options)};
+    return super.getHttp(url, httpOptions, options?.useCache)
       .pipe(
         map((data: any) => {
           if (!isResource(data)) {
-            this.cacheService.evictValue(CacheKey.of(url, {params: httpParams}));
+            this.cacheService.evictValue(CacheKey.of(url, httpOptions));
             const errMsg = 'You try to get wrong resource type, expected single resource.';
             StageLogger.stageErrorLog(Stage.INIT_RESOURCE, {
               error: errMsg
@@ -79,7 +78,7 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
     observe?: 'body' | 'response';
     params?: HttpParams
   }): Observable<any> {
-    return super.post(url, body, options)
+    return super.postHttp(url, body, options)
       .pipe(
         map((data: any) => {
           if (isResource(data)) {
@@ -106,7 +105,7 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
     observe?: 'body' | 'response';
     params?: HttpParams
   }): Observable<any> {
-    return super.put(url, body, options)
+    return super.putHttp(url, body, options)
       .pipe(
         map((data: any) => {
           if (isResource(data)) {
@@ -133,7 +132,7 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
     observe?: 'body' | 'response';
     params?: HttpParams
   }): Observable<any> {
-    return super.patch(url, body, options)
+    return super.patchHttp(url, body, options)
       .pipe(
         map((data: any) => {
           if (isResource(data)) {
@@ -160,7 +159,7 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
     observe?: 'body' | 'response';
     params?: HttpParams
   }): Observable<any> {
-    return super.delete(url, options)
+    return super.deleteHttp(url, options)
       .pipe(
         map((data: any) => {
           if (isResource(data)) {

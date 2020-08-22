@@ -42,10 +42,12 @@ export class ResourceCollectionHttpService<T extends ResourceCollection<BaseReso
    */
   public get(url: string,
              options?: GetOption): Observable<T> {
-    return super.getHttp(url, {params: UrlUtils.convertToHttpParams(options), observe: 'body'})
+    const httpOptions = {params: UrlUtils.convertToHttpParams(options)};
+    return super.getHttp(url, httpOptions)
       .pipe(
         map((data: any) => {
           if (!isResourceCollection(data)) {
+            this.cacheService.evictValue(CacheKey.of(url, httpOptions));
             const errMsg = 'You try to get wrong resource type, expected resource collection type.';
             StageLogger.stageErrorLog(Stage.INIT_RESOURCE, {error: errMsg});
             throw new Error(errMsg);
@@ -68,6 +70,11 @@ export class ResourceCollectionHttpService<T extends ResourceCollection<BaseReso
 
     const url = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName);
 
+    StageLogger.stageLog(Stage.PREPARE_URL, {
+      result: url,
+      urlParts: `baseUrl: '${ this.httpConfig.baseApiUrl }', resource: '${ resourceName }'`
+    });
+
     return this.get(url, options);
   }
 
@@ -83,6 +90,11 @@ export class ResourceCollectionHttpService<T extends ResourceCollection<BaseReso
     ValidationUtils.validateInputParams({resourceName, searchQuery});
 
     const url = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName).concat('/search/' + searchQuery);
+
+    StageLogger.stageLog(Stage.PREPARE_URL, {
+      result: url,
+      urlParts: `baseUrl: '${ this.httpConfig.baseApiUrl }', resource: '${ resourceName }', searchQuery: '${ searchQuery }'`
+    });
 
     return this.get(url, options);
   }

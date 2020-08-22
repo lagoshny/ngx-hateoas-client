@@ -43,6 +43,12 @@ export class CommonResourceHttpService extends HttpExecutor {
     ValidationUtils.validateInputParams({resourceName, method, query});
 
     const url = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName, query);
+
+    StageLogger.stageLog(Stage.PREPARE_URL, {
+      result: url,
+      urlParts: `baseUrl: '${ this.httpConfig.baseApiUrl }', resource: '${ resourceName }', query: '${ query }'`
+    });
+
     const httpParams = UrlUtils.convertToHttpParams(options);
 
     StageLogger.stageLog(Stage.PREPARE_URL, {
@@ -56,13 +62,13 @@ export class CommonResourceHttpService extends HttpExecutor {
         result = super.getHttp(url, {params: httpParams, observe: 'body'}, false);
         break;
       case HttpMethod.POST:
-        result = super.post(url, body, {params: httpParams, observe: 'body'});
+        result = super.postHttp(url, body, {params: httpParams, observe: 'body'});
         break;
       case HttpMethod.PUT:
-        result = super.put(url, body, {params: httpParams, observe: 'body'});
+        result = super.putHttp(url, body, {params: httpParams, observe: 'body'});
         break;
       case HttpMethod.PATCH:
-        result = super.patch(url, body, {params: httpParams, observe: 'body'});
+        result = super.patchHttp(url, body, {params: httpParams, observe: 'body'});
         break;
       default:
         const errMsg = `allowed ony GET/POST/PUT/PATCH http methods you pass ${ method }`;

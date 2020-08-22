@@ -177,7 +177,7 @@ export abstract class BaseResource extends ResourceIdentifiable {
 
     return getResourceHttpService().put(url, ResourceUtils.resolveValues(requestBody),
       {
-        observe: options?.observe ? options.observe : 'body',
+        observe: options?.observe,
         params: relationLink.templated ? new HttpParams() : UrlUtils.convertToHttpParams(options)
       }).pipe(
       tap(() => {

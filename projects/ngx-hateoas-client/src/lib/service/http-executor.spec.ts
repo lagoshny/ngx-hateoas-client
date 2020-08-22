@@ -33,62 +33,62 @@ describe('HttpExecutor', () => {
   });
 
   it('POST should throw error when passed url is empty', () => {
-    expect(() => httpExecutor.post('', null))
+    expect(() => httpExecutor.postHttp('', null))
       .toThrowError(`Passed param(s) 'url = ' is not valid`);
   });
 
   it('POST should throw error when passed url is null', () => {
-    expect(() => httpExecutor.post(null, null))
+    expect(() => httpExecutor.postHttp(null, null))
       .toThrowError(`Passed param(s) 'url = null' is not valid`);
   });
 
   it('POST should throw error when passed url is undefined', () => {
-    expect(() => httpExecutor.post(undefined, null))
+    expect(() => httpExecutor.postHttp(undefined, null))
       .toThrowError(`Passed param(s) 'url = undefined' is not valid`);
   });
 
   it('PATCH should throw error when passed url is empty', () => {
-    expect(() => httpExecutor.patch('', null))
+    expect(() => httpExecutor.patchHttp('', null))
       .toThrowError(`Passed param(s) 'url = ' is not valid`);
   });
 
   it('PATCH should throw error when passed url is null', () => {
-    expect(() => httpExecutor.patch(null, null))
+    expect(() => httpExecutor.patchHttp(null, null))
       .toThrowError(`Passed param(s) 'url = null' is not valid`);
   });
 
   it('PATCH should throw error when passed url is undefined', () => {
-    expect(() => httpExecutor.patch(undefined, null))
+    expect(() => httpExecutor.patchHttp(undefined, null))
       .toThrowError(`Passed param(s) 'url = undefined' is not valid`);
   });
 
   it('PUT should throw error when passed url is empty', () => {
-    expect(() => httpExecutor.put('', null))
+    expect(() => httpExecutor.putHttp('', null))
       .toThrowError(`Passed param(s) 'url = ' is not valid`);
   });
 
   it('PUT should throw error when passed url is null', () => {
-    expect(() => httpExecutor.put(null, null))
+    expect(() => httpExecutor.putHttp(null, null))
       .toThrowError(`Passed param(s) 'url = null' is not valid`);
   });
 
   it('PUT should throw error when passed url is undefined', () => {
-    expect(() => httpExecutor.put(undefined, null))
+    expect(() => httpExecutor.putHttp(undefined, null))
       .toThrowError(`Passed param(s) 'url = undefined' is not valid`);
   });
 
   it('DELETE should throw error when passed url is empty', () => {
-    expect(() => httpExecutor.delete(''))
+    expect(() => httpExecutor.deleteHttp(''))
       .toThrowError(`Passed param(s) 'url = ' is not valid`);
   });
 
   it('DELETE should throw error when passed url is null', () => {
-    expect(() => httpExecutor.delete(null))
+    expect(() => httpExecutor.deleteHttp(null))
       .toThrowError(`Passed param(s) 'url = null' is not valid`);
   });
 
   it('DELETE should throw error when passed url is undefined', () => {
-    expect(() => httpExecutor.delete(undefined))
+    expect(() => httpExecutor.deleteHttp(undefined))
       .toThrowError(`Passed param(s) 'url = undefined' is not valid`);
   });
 

@@ -5,6 +5,7 @@ import { GetOption, HttpMethod, PagedGetOption, RequestBody, RequestOption } fro
 import { Resource } from '../../model/resource/resource';
 import { PagedResourceCollection } from '../../model/resource/paged-resource-collection';
 import { ResourceCollection } from '../../model/resource/resource-collection';
+import { HttpResponse } from '@angular/common/http';
 
 /**
  * Main resource operation class.
@@ -80,14 +81,14 @@ export class HalResourceOperation<T extends Resource> {
   /**
    * {@link HalResourceService#deleteResource}.
    */
-  public deleteResource(entity: T, options?: RequestOption): Observable<T | any> {
+  public deleteResource(entity: T, options?: RequestOption): Observable<HttpResponse<any> | any> {
     return this.halResourceService.deleteResource(entity, options);
   }
 
   /**
    * {@link HalResourceService#deleteResourceById}.
    */
-  public deleteResourceById(id: number | string, options?: RequestOption): Observable<T | any> {
+  public deleteResourceById(id: number | string, options?: RequestOption): Observable<HttpResponse<any> | any> {
     return this.halResourceService.deleteResourceById(this.resourceName, id, options);
   }
 

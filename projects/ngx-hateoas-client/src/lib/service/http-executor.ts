@@ -70,14 +70,14 @@ export class HttpExecutor {
                    params?: HttpParams
                  },
                  useCache: boolean = true): Observable<any> {
-    if (useCache && url) {
+    ValidationUtils.validateInputParams({url});
+    if (useCache) {
       const cachedValue = this.cacheService.getValue(CacheKey.of(url, options));
       if (cachedValue != null) {
         return observableOf(cachedValue);
       }
     }
     HttpExecutor.logRequest('GET', url, options);
-    ValidationUtils.validateInputParams({url});
 
     let response;
     if (options?.observe === 'response') {
@@ -88,10 +88,10 @@ export class HttpExecutor {
 
     return response.pipe(
       tap((data: any) => {
+        HttpExecutor.logResponse('GET', url, options, data);
         if (useCache) {
           this.cacheService.putValue(CacheKey.of(url, options), data);
         }
-        HttpExecutor.logResponse('GET', url, options, data);
       })
     );
   }
@@ -104,7 +104,7 @@ export class HttpExecutor {
    * @param options (optional) options that applied to the request
    * @throws error when required params are not valid
    */
-  public post(url: string, body: any | null, options?: {
+  public postHttp(url: string, body: any | null, options?: {
     headers?: HttpHeaders | {
       [header: string]: string | string[];
     };
@@ -137,7 +137,7 @@ export class HttpExecutor {
    * @param options (optional) options that applied to the request
    * @throws error when required params are not valid
    */
-  public put(url: string, body: any | null, options?: {
+  public putHttp(url: string, body: any | null, options?: {
     headers?: HttpHeaders | {
       [header: string]: string | string[];
     };
@@ -170,7 +170,7 @@ export class HttpExecutor {
    * @param options (optional) options that applied to the request
    * @throws error when required params are not valid
    */
-  public patch(url: string, body: any | null, options?: {
+  public patchHttp(url: string, body: any | null, options?: {
     headers?: HttpHeaders | {
       [header: string]: string | string[];
     };
@@ -202,7 +202,7 @@ export class HttpExecutor {
    * @param options (optional) options that applied to the request
    * @throws error when required params are not valid
    */
-  public delete(url: string, options?: {
+  public deleteHttp(url: string, options?: {
     headers?: HttpHeaders | {
       [header: string]: string | string[];
     };

@@ -152,11 +152,11 @@ function doRequest<T extends BaseResource>(url: string, pageParams?: PageParam):
 
   let httpParams;
   if (pageParams) {
-    httpParams = UrlUtils.convertToHttpParams({pageParams: pageParams});
+    httpParams = UrlUtils.convertToHttpParams({pageParams});
   }
 
   return getPagedResourceCollectionHttpService()
-    .getHttp(UrlUtils.removeTemplateParams(url), {params: httpParams}).pipe(
+    .get(UrlUtils.removeTemplateParams(url), {params: httpParams}).pipe(
       tap((data) => {
         StageLogger.stageLog(Stage.HTTP_RESPONSE, {method: 'GET', url, httpParams, result: data});
       })

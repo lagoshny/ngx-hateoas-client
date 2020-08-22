@@ -16,6 +16,7 @@ import { HttpExecutor } from '../http-executor';
 import { StageLogger } from '../../logger/stage-logger';
 import { Stage } from '../../logger/stage.enum';
 import { ValidationUtils } from '../../util/validation.utils';
+import { CacheKey } from '../../model/cache/cache-key';
 
 /**
  * Get instance of the PagedResourceCollectionHttpService by Angular DependencyInjector.
@@ -50,9 +51,11 @@ export class PagedResourceCollectionHttpService<T extends PagedResourceCollectio
    */
   public get(url: string,
              options?: PagedGetOption): Observable<T> {
-    return super.getHttp(url, {params: UrlUtils.convertToHttpParams(options), observe: 'body'}, options?.useCache).pipe(
+    const httpOptions = {params: UrlUtils.convertToHttpParams(options)};
+    return super.getHttp(url, httpOptions, options?.useCache).pipe(
       map((data: any) => {
         if (!isPagedResourceCollection(data)) {
+          this.cacheService.evictValue(CacheKey.of(url, httpOptions));
           const errMsg = 'You try to get wrong resource type, expected paged resource collection type.';
           StageLogger.stageErrorLog(Stage.INIT_RESOURCE, {error: errMsg});
           throw Error(errMsg);
@@ -74,6 +77,12 @@ export class PagedResourceCollectionHttpService<T extends PagedResourceCollectio
     ValidationUtils.validateInputParams({resourceName});
 
     const url = UrlUtils.removeTemplateParams(UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName));
+
+    StageLogger.stageLog(Stage.PREPARE_URL, {
+      result: url,
+      urlParts: `baseUrl: '${ this.httpConfig.baseApiUrl }', resource: '${ resourceName }'`
+    });
+
     const pagedOption = !_.isEmpty(options) ? options : {};
     if (_.isEmpty(pagedOption.pageParams)) {
       pagedOption.pageParams = PagedResourceCollectionHttpService.DEFAULT_PAGE;
@@ -94,6 +103,12 @@ export class PagedResourceCollectionHttpService<T extends PagedResourceCollectio
 
     const url = UrlUtils.removeTemplateParams(
       UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName)).concat('/search/' + searchQuery);
+
+    StageLogger.stageLog(Stage.PREPARE_URL, {
+      result: url,
+      urlParts: `baseUrl: '${ this.httpConfig.baseApiUrl }', resource: '${ resourceName }'`
+    });
+
     const pagedOption = !_.isEmpty(options) ? options : {};
     if (_.isEmpty(pagedOption.pageParams)) {
       pagedOption.pageParams = PagedResourceCollectionHttpService.DEFAULT_PAGE;

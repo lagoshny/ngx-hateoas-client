@@ -9,7 +9,6 @@ import { ResourceCollection } from '../model/resource/resource-collection';
 import { EmbeddedResource } from '../model/resource/embedded-resource';
 import { PagedResourceCollection } from '../model/resource/paged-resource-collection';
 import { CacheService } from '../service/cache.service';
-import { ResourceIdentifiable } from '../model/resource/resource-identifiable';
 
 /**
  * This service for configuration library.

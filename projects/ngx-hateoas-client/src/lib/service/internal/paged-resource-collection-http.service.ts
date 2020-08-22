@@ -86,6 +86,10 @@ export class PagedResourceCollectionHttpService<T extends PagedResourceCollectio
     const pagedOption = !_.isEmpty(options) ? options : {};
     if (_.isEmpty(pagedOption.pageParams)) {
       pagedOption.pageParams = PagedResourceCollectionHttpService.DEFAULT_PAGE;
+    } else if (!pagedOption.pageParams.size) {
+      pagedOption.pageParams.size = PagedResourceCollectionHttpService.DEFAULT_PAGE.size;
+    } else if (!pagedOption.pageParams.page) {
+      pagedOption.pageParams.page = PagedResourceCollectionHttpService.DEFAULT_PAGE.page;
     }
     return this.get(url, pagedOption);
   }
@@ -112,6 +116,10 @@ export class PagedResourceCollectionHttpService<T extends PagedResourceCollectio
     const pagedOption = !_.isEmpty(options) ? options : {};
     if (_.isEmpty(pagedOption.pageParams)) {
       pagedOption.pageParams = PagedResourceCollectionHttpService.DEFAULT_PAGE;
+    } else if (!pagedOption.pageParams.size) {
+      pagedOption.pageParams.size = PagedResourceCollectionHttpService.DEFAULT_PAGE.size;
+    } else if (!pagedOption.pageParams.page) {
+      pagedOption.pageParams.page = PagedResourceCollectionHttpService.DEFAULT_PAGE.page;
     }
     return this.get(url, pagedOption);
   }

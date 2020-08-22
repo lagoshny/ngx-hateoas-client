@@ -4,14 +4,14 @@ export class CacheKey {
 
   public value: string;
 
-  constructor(private readonly url: string, private readonly options: {
+  constructor(public readonly url: string, private readonly options: {
     observe?: 'body' | 'response';
     params?: HttpParams
   }) {
     this.value = `url=${ this.url }`;
     if (options) {
       if (options.params && options.params.keys().length > 0) {
-        this.value += `&params=${ this.options?.params?.toString() }`;
+        this.value += `${ this.value.includes('?') ? '&' : '?' }${ this.options?.params?.toString() }`;
       }
       if (options.observe) {
         this.value += `&observe=${ this.options?.observe }`;

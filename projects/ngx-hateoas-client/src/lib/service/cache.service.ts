@@ -5,6 +5,7 @@ import { StageLogger } from '../logger/stage-logger';
 import { Stage } from '../logger/stage.enum';
 import { CacheKey } from '../model/cache/cache-key';
 import * as _ from 'lodash';
+import { HttpConfigService } from '../config/http-config.service';
 
 @Injectable()
 export class CacheService<T extends ResourceIdentifiable> {
@@ -17,6 +18,9 @@ export class CacheService<T extends ResourceIdentifiable> {
   public static enabled: boolean;
 
   private cacheMap: Map<string, CacheResource<T>> = new Map<string, CacheResource<T>>();
+
+  constructor(private httpConfig: HttpConfigService) {
+  }
 
   /**
    * Get cache value.
@@ -72,9 +76,23 @@ export class CacheService<T extends ResourceIdentifiable> {
     if (!CacheService.enabled) {
       return;
     }
-    const result = this.cacheMap.delete(key.value);
-    if (result) {
-      StageLogger.stageLog(Stage.CACHE_EVICT, {cacheKey: key.value, evicted: result});
+
+    // Get resource name by url to evict all resource cache with collection/paged collection data
+    const resourceName = key.url.replace(`${ this.httpConfig.baseApiUrl }/`, '').split('/')[0];
+    if (!resourceName) {
+      return;
+    }
+    const evictedCache = [];
+    for (const cacheKey of this.cacheMap.keys()) {
+      if (cacheKey.startsWith(`url=${ this.httpConfig.baseApiUrl }/${ resourceName }`)) {
+        evictedCache.push({
+          key: cacheKey
+        });
+        this.cacheMap.delete(cacheKey);
+      }
+    }
+    if (evictedCache.length > 0) {
+      StageLogger.stageLog(Stage.CACHE_EVICT, {cacheKey: key.value, evicted: evictedCache});
     }
   }
 

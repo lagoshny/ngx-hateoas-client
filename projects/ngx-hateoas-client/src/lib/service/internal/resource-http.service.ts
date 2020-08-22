@@ -210,7 +210,7 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
       urlParts: `baseUrl: '${ this.httpConfig.baseApiUrl }', resource: '${ resourceName }'`
     });
 
-    return this.post(url, body, {observe: 'body'});
+    return this.post(url, body);
   }
 
   /**
@@ -231,7 +231,7 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
       urlParts: `baseUrl: '${ this.httpConfig.baseApiUrl }', resource: '${ resourceName }', resourceId: '${ id }'`
     });
 
-    return this.patch(url, body, {observe: 'body'});
+    return this.patch(url, body);
   }
 
   /**
@@ -252,7 +252,7 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
       urlParts: `baseUrl: '${ this.httpConfig.baseApiUrl }', resource: '${ resourceName }', resourceId: '${ id }'`
     });
 
-    return this.put(url, body, {observe: 'body'});
+    return this.put(url, body);
   }
 
   /**

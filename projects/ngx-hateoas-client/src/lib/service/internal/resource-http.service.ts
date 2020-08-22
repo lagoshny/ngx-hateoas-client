@@ -15,6 +15,7 @@ import { HttpConfigService } from '../../config/http-config.service';
 import { Stage } from '../../logger/stage.enum';
 import { StageLogger } from '../../logger/stage-logger';
 import { ValidationUtils } from '../../util/validation.utils';
+import { CacheKey } from '../../model/cache/cache-key';
 
 /**
  * Get instance of the ResourceHttpService by Angular DependencyInjector.
@@ -48,8 +49,9 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
     };
     params?: HttpParams
   }): Observable<T> {
-    if (this.cacheService.hasResource(url)) {
-      return observableOf(this.cacheService.getResource());
+    const cachedValue = this.cacheService.getValue(CacheKey.of(url, options));
+    if (cachedValue != null) {
+      return observableOf(cachedValue);
     }
 
     return super.get(url, {...options, observe: 'body'})
@@ -64,7 +66,7 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
           }
 
           const resource: T = ResourceUtils.instantiateResource(data);
-          this.cacheService.putResource(url, resource);
+          this.cacheService.putValue(CacheKey.of(url, options), resource);
 
           return resource;
         }),
@@ -89,7 +91,7 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
     return super.post(url, body, options)
       .pipe(
         map((data: any) => {
-          this.cacheService.evictResource(url);
+          this.cacheService.evictValue(CacheKey.of(url, options));
           if (isResource(data)) {
             return ResourceUtils.instantiateResource(data);
           }
@@ -117,7 +119,7 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
     return super.put(url, body, options)
       .pipe(
         map((data: any) => {
-          this.cacheService.evictResource(url);
+          this.cacheService.evictValue(CacheKey.of(url, options));
           if (isResource(data)) {
             return ResourceUtils.instantiateResource(data);
           }
@@ -145,7 +147,7 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
     return super.patch(url, body, options)
       .pipe(
         map((data: any) => {
-          this.cacheService.evictResource(url);
+          this.cacheService.evictValue(CacheKey.of(url, options));
           if (isResource(data)) {
             return ResourceUtils.instantiateResource(data);
           }
@@ -173,7 +175,7 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
     return super.delete(url, options)
       .pipe(
         map((data: any) => {
-          this.cacheService.evictResource(url);
+          this.cacheService.evictValue(CacheKey.of(url, options));
           if (isResource(data)) {
             return ResourceUtils.instantiateResource(data);
           }

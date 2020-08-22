@@ -16,6 +16,7 @@ import { HttpExecutor } from '../http-executor';
 import { StageLogger } from '../../logger/stage-logger';
 import { Stage } from '../../logger/stage.enum';
 import { ValidationUtils } from '../../util/validation.utils';
+import { CacheKey } from '../../model/cache/cache-key';
 
 /**
  * Get instance of the PagedResourceCollectionHttpService by Angular DependencyInjector.
@@ -54,8 +55,9 @@ export class PagedResourceCollectionHttpService<T extends PagedResourceCollectio
     };
     params?: HttpParams
   }): Observable<T> {
-    if (this.cacheService.hasResource(url)) {
-      return observableOf(this.cacheService.getResource());
+    const cachedValue = this.cacheService.getValue(CacheKey.of(url, options));
+    if (cachedValue != null) {
+      return observableOf(cachedValue);
     }
 
     return super.get(url, {...options, observe: 'body'}).pipe(
@@ -65,10 +67,10 @@ export class PagedResourceCollectionHttpService<T extends PagedResourceCollectio
           StageLogger.stageErrorLog(Stage.INIT_RESOURCE, {error: errMsg});
           throw Error(errMsg);
         }
-        const resource: T = ResourceUtils.instantiatePagedResourceCollection(data);
-        this.cacheService.putResource(url, resource);
+        const pagedResourceCollection: T = ResourceUtils.instantiatePagedResourceCollection(data);
+        this.cacheService.putValue(CacheKey.of(url, options), pagedResourceCollection);
 
-        return resource;
+        return pagedResourceCollection;
       }),
       catchError(error => observableThrowError(error)));
   }

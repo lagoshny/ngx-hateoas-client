@@ -15,6 +15,7 @@ import { HttpExecutor } from '../http-executor';
 import { StageLogger } from '../../logger/stage-logger';
 import { Stage } from '../../logger/stage.enum';
 import { ValidationUtils } from '../../util/validation.utils';
+import { CacheKey } from '../../model/cache/cache-key';
 
 export function getResourceCollectionHttpService(): ResourceCollectionHttpService<ResourceCollection<BaseResource>> {
   return DependencyInjector.get(ResourceCollectionHttpService);
@@ -45,8 +46,9 @@ export class ResourceCollectionHttpService<T extends ResourceCollection<BaseReso
     };
     params?: HttpParams
   }): Observable<T> {
-    if (this.cacheService.hasResource(url)) {
-      return observableOf(this.cacheService.getResource());
+    const cachedValue = this.cacheService.getValue(CacheKey.of(url, options));
+    if (cachedValue != null) {
+      return observableOf(cachedValue);
     }
 
     return super.get(url, {...options, observe: 'body'})
@@ -58,9 +60,9 @@ export class ResourceCollectionHttpService<T extends ResourceCollection<BaseReso
             throw new Error(errMsg);
           }
 
-          const resource: T = ResourceUtils.instantiateResourceCollection(data);
-          this.cacheService.putResource(url, resource);
-          return resource;
+          const resourceCollection: T = ResourceUtils.instantiateResourceCollection(data);
+          this.cacheService.putValue(CacheKey.of(url, options), resourceCollection);
+          return resourceCollection;
         }),
         catchError(error => observableThrowError(error)));
   }

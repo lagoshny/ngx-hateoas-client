@@ -38,7 +38,7 @@ export abstract class BaseResource extends ResourceIdentifiable {
 
     return getResourceHttpService().get(url, {
         params: relationLink.templated ? new HttpParams() : UrlUtils.convertToHttpParams(options)
-      }
+      }, options?.useCache
     ).pipe(
       tap(() => {
         StageLogger.resourceEndLog(this, 'GET_RELATION', {result: `relation ${ relationName } was got successful`});
@@ -63,8 +63,8 @@ export abstract class BaseResource extends ResourceIdentifiable {
     const url = relationLink.templated ? UrlUtils.fillTemplateParams(relationLink.href, options) : relationLink.href;
 
     return getResourceCollectionHttpService().get(url, {
-      params: relationLink.templated ? new HttpParams() : UrlUtils.convertToHttpParams(options)
-    }).pipe(
+      params: relationLink.templated ? new HttpParams() : UrlUtils.convertToHttpParams(options),
+    }, options?.useCache).pipe(
       tap(() => {
         StageLogger.resourceEndLog(this, 'GET_RELATED_COLLECTION', {result: `related collection ${ relationName } was got successful`});
       })
@@ -91,7 +91,7 @@ export abstract class BaseResource extends ResourceIdentifiable {
 
     return getPagedResourceCollectionHttpService().get(url, {
       params: relationLink.templated ? new HttpParams() : UrlUtils.convertToHttpParams(options)
-    }).pipe(
+    }, options?.useCache).pipe(
       tap(() => {
         StageLogger.resourceEndLog(this, 'GET_RELATED_PAGE', {result: `related page ${ relationName } was got successful`});
       })

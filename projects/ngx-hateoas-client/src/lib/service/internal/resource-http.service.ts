@@ -41,17 +41,22 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
    *
    * @param url to perform request
    * @param options request options
+   * @param useCache value {@code true} if need to use cache, {@code false} otherwise
    * @throws error when required params are not valid or returned resource type is not resource
    */
-  public get(url: string, options?: {
-    headers?: {
-      [header: string]: string | string[];
-    };
-    params?: HttpParams
-  }): Observable<T> {
-    const cachedValue = this.cacheService.getValue(CacheKey.of(url, options));
-    if (cachedValue != null) {
-      return observableOf(cachedValue);
+  public get(url: string,
+             options?: {
+               headers?: {
+                 [header: string]: string | string[];
+               };
+               params?: HttpParams
+             },
+             useCache: boolean = true): Observable<T> {
+    if (useCache) {
+      const cachedValue = this.cacheService.getValue(CacheKey.of(url, options));
+      if (cachedValue != null) {
+        return observableOf(cachedValue);
+      }
     }
 
     return super.get(url, {...options, observe: 'body'})
@@ -66,7 +71,9 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
           }
 
           const resource: T = ResourceUtils.instantiateResource(data);
-          this.cacheService.putValue(CacheKey.of(url, options), resource);
+          if (useCache) {
+            this.cacheService.putValue(CacheKey.of(url, options), resource);
+          }
 
           return resource;
         }),
@@ -204,7 +211,7 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
       options
     });
 
-    return this.get(url, {params: UrlUtils.convertToHttpParams(options)});
+    return this.get(url, {params: UrlUtils.convertToHttpParams(options)}, options?.useCache);
   }
 
   /**
@@ -314,7 +321,7 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
       urlParts: `baseUrl: '${ this.httpConfig.baseApiUrl }', resource: '${ resourceName }', searchQuery: '${ searchQuery }'`
     });
 
-    return this.get(url, {params: UrlUtils.convertToHttpParams(options)});
+    return this.get(url, {params: UrlUtils.convertToHttpParams(options)}, options?.useCache);
   }
 
 }

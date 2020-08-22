@@ -152,7 +152,7 @@ describe('PagedpagedResourceCollectionHttpService', () => {
       params: {
         test: 'testParam'
       },
-      pageParam: {
+      pageParams: {
         page: 1,
         size: 2,
         sort: {
@@ -239,7 +239,7 @@ describe('PagedpagedResourceCollectionHttpService', () => {
       params: {
         test: 'testParam'
       },
-      pageParam: {
+      pageParams: {
         page: 1,
         size: 2,
         sort: {

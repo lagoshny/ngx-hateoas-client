@@ -47,17 +47,22 @@ export class PagedResourceCollectionHttpService<T extends PagedResourceCollectio
    *
    * @param url to perform request
    * @param options request options
+   * @param useCache value {@code true} if need to use cache, {@code false} otherwise
    * @throws error when required params are not valid or returned resource type is not paged collection of the resources
    */
-  public get(url: string, options?: {
-    headers?: {
-      [header: string]: string | string[];
-    };
-    params?: HttpParams
-  }): Observable<T> {
-    const cachedValue = this.cacheService.getValue(CacheKey.of(url, options));
-    if (cachedValue != null) {
-      return observableOf(cachedValue);
+  public get(url: string,
+             options?: {
+               headers?: {
+                 [header: string]: string | string[];
+               };
+               params?: HttpParams
+             },
+             useCache: boolean = true): Observable<T> {
+    if (useCache) {
+      const cachedValue = this.cacheService.getValue(CacheKey.of(url, options));
+      if (cachedValue != null) {
+        return observableOf(cachedValue);
+      }
     }
 
     return super.get(url, {...options, observe: 'body'}).pipe(
@@ -68,7 +73,9 @@ export class PagedResourceCollectionHttpService<T extends PagedResourceCollectio
           throw Error(errMsg);
         }
         const pagedResourceCollection: T = ResourceUtils.instantiatePagedResourceCollection(data);
-        this.cacheService.putValue(CacheKey.of(url, options), pagedResourceCollection);
+        if (useCache) {
+          this.cacheService.putValue(CacheKey.of(url, options), pagedResourceCollection);
+        }
 
         return pagedResourceCollection;
       }),
@@ -79,19 +86,18 @@ export class PagedResourceCollectionHttpService<T extends PagedResourceCollectio
    * Perform get paged resource collection request with url built by the resource name.
    *
    * @param resourceName used to build root url to the resource
-   * @param query (optional) url path that applied to the result url at the end
    * @param options (optional) options that applied to the request
    * @throws error when required params are not valid
    */
-  public getResourcePage(resourceName: string, query?: string, options?: PagedGetOption): Observable<T> {
+  public getResourcePage(resourceName: string, options?: PagedGetOption): Observable<T> {
     ValidationUtils.validateInputParams({resourceName});
 
-    const url = UrlUtils.removeTemplateParams(UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName, query));
+    const url = UrlUtils.removeTemplateParams(UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName));
     const pagedOption = !_.isEmpty(options) ? options : {};
-    if (_.isEmpty(pagedOption.pageParam)) {
-      pagedOption.pageParam = PagedResourceCollectionHttpService.DEFAULT_PAGE;
+    if (_.isEmpty(pagedOption.pageParams)) {
+      pagedOption.pageParams = PagedResourceCollectionHttpService.DEFAULT_PAGE;
     }
-    return this.get(url, {params: UrlUtils.convertToHttpParams(pagedOption)});
+    return this.get(url, {params: UrlUtils.convertToHttpParams(pagedOption)}, options?.useCache);
   }
 
   /**
@@ -108,10 +114,10 @@ export class PagedResourceCollectionHttpService<T extends PagedResourceCollectio
     const url = UrlUtils.removeTemplateParams(
       UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName)).concat('/search/' + searchQuery);
     const pagedOption = !_.isEmpty(options) ? options : {};
-    if (_.isEmpty(pagedOption.pageParam)) {
-      pagedOption.pageParam = PagedResourceCollectionHttpService.DEFAULT_PAGE;
+    if (_.isEmpty(pagedOption.pageParams)) {
+      pagedOption.pageParams = PagedResourceCollectionHttpService.DEFAULT_PAGE;
     }
-    return this.get(url, {params: UrlUtils.convertToHttpParams(pagedOption)});
+    return this.get(url, {params: UrlUtils.convertToHttpParams(pagedOption)}, options?.useCache);
   }
 
 }

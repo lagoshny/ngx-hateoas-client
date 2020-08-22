@@ -25,15 +25,18 @@ export interface LinkData {
  * Extend {@link GetOption} with page param.
  */
 export interface PagedGetOption extends GetOption {
-  pageParam?: PageParam;
+  pageParams?: PageParam;
 }
 
 /**
  * Contains options that can be applied to the GET request.
  */
 export interface GetOption {
-  params?: RequestParam;
-  projection?: string;
+  params?: {
+    [paramName: string]: Resource | string | number | boolean;
+    projection?: string;
+  };
+  useCache?: boolean;
 }
 
 /**

@@ -26,7 +26,7 @@ export class HalResourceService<T extends Resource> {
 
   constructor(private commonHttpService: CommonResourceHttpService,
               private resourceHttpService: ResourceHttpService<T>,
-              private resourceCollectionHttpServiceSpy: ResourceCollectionHttpService<ResourceCollection<T>>,
+              private resourceCollectionHttpService: ResourceCollectionHttpService<ResourceCollection<T>>,
               private pagedResourceCollectionHttpService: PagedResourceCollectionHttpService<PagedResourceCollection<T>>) {
   }
 
@@ -60,7 +60,7 @@ export class HalResourceService<T extends Resource> {
     StageLogger.resourceBeginLog(resourceName, 'ResourceService GET_COLLECTION', {options});
     ValidationUtils.validateInputParams({resourceName});
 
-    return this.resourceCollectionHttpServiceSpy.getResourceCollection(resourceName, null, options)
+    return this.resourceCollectionHttpService.getResourceCollection(resourceName, options)
       .pipe(tap(() => {
         StageLogger.resourceEndLog(resourceName, 'ResourceService GET_COLLECTION',
           {result: `get all resources by '${ resourceName }' was successful`});
@@ -78,7 +78,7 @@ export class HalResourceService<T extends Resource> {
     StageLogger.resourceBeginLog(resourceName, 'ResourceService GET_PAGE', {options});
     ValidationUtils.validateInputParams({resourceName});
 
-    return this.pagedResourceCollectionHttpService.getResourcePage(resourceName, null, options)
+    return this.pagedResourceCollectionHttpService.getResourcePage(resourceName, options)
       .pipe(tap(() => {
         StageLogger.resourceEndLog(resourceName, 'ResourceService GET_PAGE',
           {result: `get all page resources by '${ resourceName }' was successful`});
@@ -248,7 +248,7 @@ export class HalResourceService<T extends Resource> {
     StageLogger.resourceBeginLog(resourceName, 'ResourceService SEARCH_COLLECTION', {query: searchQuery, options});
     ValidationUtils.validateInputParams({resourceName, searchQuery});
 
-    return this.resourceCollectionHttpServiceSpy.search(resourceName, searchQuery, options)
+    return this.resourceCollectionHttpService.search(resourceName, searchQuery, options)
       .pipe(tap(() => {
         StageLogger.resourceEndLog(resourceName, 'ResourceService SEARCH_COLLECTION',
           {result: `search collection by '${ resourceName }' was performed successful`});

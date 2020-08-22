@@ -62,7 +62,7 @@ describe('UrlUtils', () => {
 
   it('CONVERT_TO_HTTP_PARAMS should adds page params', () => {
     const result = UrlUtils.convertToHttpParams({
-      pageParam: {
+      pageParams: {
         page: 1,
         size: 20,
         sort: {
@@ -175,7 +175,7 @@ describe('UrlUtils', () => {
         any: 123
       },
       projection: 'testProjection',
-      pageParam: {
+      pageParams: {
         page: 2,
         size: 30,
         sort: {
@@ -192,7 +192,7 @@ describe('UrlUtils', () => {
       params: {
         any: 123
       },
-      pageParam: {
+      pageParams: {
         page: 2,
         size: 30,
       }

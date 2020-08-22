@@ -38,17 +38,22 @@ export class ResourceCollectionHttpService<T extends ResourceCollection<BaseReso
    *
    * @param url to perform request
    * @param options request options
+   * @param useCache value {@code true} if need to use cache, {@code false} otherwise
    * @throws error when required params are not valid or returned resource type is not collection of the resources
    */
-  public get(url: string, options?: {
-    headers?: {
-      [header: string]: string | string[];
-    };
-    params?: HttpParams
-  }): Observable<T> {
-    const cachedValue = this.cacheService.getValue(CacheKey.of(url, options));
-    if (cachedValue != null) {
-      return observableOf(cachedValue);
+  public get(url: string,
+             options?: {
+               headers?: {
+                 [header: string]: string | string[];
+               };
+               params?: HttpParams
+             },
+             useCache: boolean = true): Observable<T> {
+    if (useCache) {
+      const cachedValue = this.cacheService.getValue(CacheKey.of(url, options));
+      if (cachedValue != null) {
+        return observableOf(cachedValue);
+      }
     }
 
     return super.get(url, {...options, observe: 'body'})
@@ -61,7 +66,10 @@ export class ResourceCollectionHttpService<T extends ResourceCollection<BaseReso
           }
 
           const resourceCollection: T = ResourceUtils.instantiateResourceCollection(data);
-          this.cacheService.putValue(CacheKey.of(url, options), resourceCollection);
+          if (useCache) {
+            this.cacheService.putValue(CacheKey.of(url, options), resourceCollection);
+          }
+
           return resourceCollection;
         }),
         catchError(error => observableThrowError(error)));
@@ -71,17 +79,16 @@ export class ResourceCollectionHttpService<T extends ResourceCollection<BaseReso
    * Perform get resource collection request with url built by the resource name.
    *
    * @param resourceName used to build root url to the resource
-   * @param query (optional) url path that applied to the result url at the end
    * @param options (optional) options that applied to the request
    * @throws error when required params are not valid
    */
-  public getResourceCollection(resourceName: string, query?: string, options?: GetOption): Observable<T> {
+  public getResourceCollection(resourceName: string, options?: GetOption): Observable<T> {
     ValidationUtils.validateInputParams({resourceName});
 
-    const url = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName, query);
+    const url = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName);
     const httpParams = UrlUtils.convertToHttpParams(options);
 
-    return this.get(url, {params: httpParams});
+    return this.get(url, {params: httpParams}, options?.useCache);
   }
 
   /**
@@ -98,7 +105,7 @@ export class ResourceCollectionHttpService<T extends ResourceCollection<BaseReso
     const url = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName).concat('/search/' + searchQuery);
     const httpParams = UrlUtils.convertToHttpParams(options);
 
-    return this.get(url, {params: httpParams});
+    return this.get(url, {params: httpParams}, options?.useCache);
   }
 
 }

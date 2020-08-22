@@ -152,7 +152,7 @@ function doRequest<T extends BaseResource>(url: string, pageParams?: PageParam):
 
   let httpParams;
   if (pageParams) {
-    httpParams = UrlUtils.convertToHttpParams({pageParam: pageParams});
+    httpParams = UrlUtils.convertToHttpParams({pageParams: pageParams});
   }
 
   return getPagedResourceCollectionHttpService()

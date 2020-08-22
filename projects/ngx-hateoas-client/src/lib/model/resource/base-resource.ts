@@ -36,14 +36,13 @@ export abstract class BaseResource extends ResourceIdentifiable {
       ? UrlUtils.fillTemplateParams(relationLink.href, options)
       : relationLink.href;
 
-    return getResourceHttpService().get(url, {
-        params: relationLink.templated ? new HttpParams() : UrlUtils.convertToHttpParams(options)
-      }, options?.useCache
-    ).pipe(
-      tap(() => {
-        StageLogger.resourceEndLog(this, 'GET_RELATION', {result: `relation ${ relationName } was got successful`});
-      })
-    ) as Observable<T>;
+    return getResourceHttpService()
+      .get(url, relationLink.templated ? {useCache: options?.useCache} : options)
+      .pipe(
+        tap(() => {
+          StageLogger.resourceEndLog(this, 'GET_RELATION', {result: `relation ${ relationName } was got successful`});
+        })
+      ) as Observable<T>;
   }
 
   /**
@@ -62,13 +61,13 @@ export abstract class BaseResource extends ResourceIdentifiable {
     const relationLink = this.getRelationLink(relationName);
     const url = relationLink.templated ? UrlUtils.fillTemplateParams(relationLink.href, options) : relationLink.href;
 
-    return getResourceCollectionHttpService().get(url, {
-      params: relationLink.templated ? new HttpParams() : UrlUtils.convertToHttpParams(options),
-    }, options?.useCache).pipe(
-      tap(() => {
-        StageLogger.resourceEndLog(this, 'GET_RELATED_COLLECTION', {result: `related collection ${ relationName } was got successful`});
-      })
-    ) as Observable<T>;
+    return getResourceCollectionHttpService()
+      .get(url, relationLink.templated ? {useCache: options?.useCache} : options)
+      .pipe(
+        tap(() => {
+          StageLogger.resourceEndLog(this, 'GET_RELATED_COLLECTION', {result: `related collection ${ relationName } was got successful`});
+        })
+      ) as Observable<T>;
   }
 
   /**
@@ -89,13 +88,13 @@ export abstract class BaseResource extends ResourceIdentifiable {
       ? UrlUtils.fillTemplateParams(relationLink.href, options)
       : relationLink.href;
 
-    return getPagedResourceCollectionHttpService().get(url, {
-      params: relationLink.templated ? new HttpParams() : UrlUtils.convertToHttpParams(options)
-    }, options?.useCache).pipe(
-      tap(() => {
-        StageLogger.resourceEndLog(this, 'GET_RELATED_PAGE', {result: `related page ${ relationName } was got successful`});
-      })
-    ) as Observable<T>;
+    return getPagedResourceCollectionHttpService()
+      .get(url, relationLink.templated ? {useCache: options?.useCache} : options)
+      .pipe(
+        tap(() => {
+          StageLogger.resourceEndLog(this, 'GET_RELATED_PAGE', {result: `related page ${ relationName } was got successful`});
+        })
+      ) as Observable<T>;
   }
 
   /**

@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { CacheService } from '../cache.service';
 import { HttpConfigService } from '../../config/http-config.service';
-import { Observable, of as observableOf, throwError as observableThrowError } from 'rxjs';
+import { Observable, throwError as observableThrowError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { isResourceCollection } from '../../model/resource-type';
 import { ResourceUtils } from '../../util/resource.utils';
@@ -28,9 +28,9 @@ export function getResourceCollectionHttpService(): ResourceCollectionHttpServic
 export class ResourceCollectionHttpService<T extends ResourceCollection<BaseResource>> extends HttpExecutor {
 
   constructor(httpClient: HttpClient,
-              public cacheService: CacheService<T>,
+              cacheService: CacheService<T>,
               private httpConfig: HttpConfigService) {
-    super(httpClient);
+    super(httpClient, cacheService);
   }
 
   /**
@@ -38,25 +38,11 @@ export class ResourceCollectionHttpService<T extends ResourceCollection<BaseReso
    *
    * @param url to perform request
    * @param options request options
-   * @param useCache value {@code true} if need to use cache, {@code false} otherwise
    * @throws error when required params are not valid or returned resource type is not collection of the resources
    */
   public get(url: string,
-             options?: {
-               headers?: {
-                 [header: string]: string | string[];
-               };
-               params?: HttpParams
-             },
-             useCache: boolean = true): Observable<T> {
-    if (useCache) {
-      const cachedValue = this.cacheService.getValue(CacheKey.of(url, options));
-      if (cachedValue != null) {
-        return observableOf(cachedValue);
-      }
-    }
-
-    return super.get(url, {...options, observe: 'body'})
+             options?: GetOption): Observable<T> {
+    return super.getHttp(url, {params: UrlUtils.convertToHttpParams(options), observe: 'body'})
       .pipe(
         map((data: any) => {
           if (!isResourceCollection(data)) {
@@ -65,12 +51,7 @@ export class ResourceCollectionHttpService<T extends ResourceCollection<BaseReso
             throw new Error(errMsg);
           }
 
-          const resourceCollection: T = ResourceUtils.instantiateResourceCollection(data);
-          if (useCache) {
-            this.cacheService.putValue(CacheKey.of(url, options), resourceCollection);
-          }
-
-          return resourceCollection;
+          return ResourceUtils.instantiateResourceCollection(data) as T;
         }),
         catchError(error => observableThrowError(error)));
   }
@@ -86,9 +67,8 @@ export class ResourceCollectionHttpService<T extends ResourceCollection<BaseReso
     ValidationUtils.validateInputParams({resourceName});
 
     const url = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName);
-    const httpParams = UrlUtils.convertToHttpParams(options);
 
-    return this.get(url, {params: httpParams}, options?.useCache);
+    return this.get(url, options);
   }
 
   /**
@@ -103,9 +83,8 @@ export class ResourceCollectionHttpService<T extends ResourceCollection<BaseReso
     ValidationUtils.validateInputParams({resourceName, searchQuery});
 
     const url = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName).concat('/search/' + searchQuery);
-    const httpParams = UrlUtils.convertToHttpParams(options);
 
-    return this.get(url, {params: httpParams}, options?.useCache);
+    return this.get(url, options);
   }
 
 }

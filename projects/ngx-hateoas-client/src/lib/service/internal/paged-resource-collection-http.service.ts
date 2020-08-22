@@ -1,13 +1,13 @@
 import { Injectable } from '@angular/core';
 import { BaseResource } from '../../model/resource/base-resource';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { CacheService } from '../cache.service';
 import { HttpConfigService } from '../../config/http-config.service';
 import { PagedResourceCollection } from '../../model/resource/paged-resource-collection';
 import { catchError, map } from 'rxjs/operators';
 import * as _ from 'lodash';
 import { isPagedResourceCollection } from '../../model/resource-type';
-import { Observable, of as observableOf, throwError as observableThrowError } from 'rxjs';
+import { Observable, throwError as observableThrowError } from 'rxjs';
 import { ResourceUtils } from '../../util/resource.utils';
 import { UrlUtils } from '../../util/url.utils';
 import { DependencyInjector } from '../../util/dependency-injector';
@@ -16,7 +16,6 @@ import { HttpExecutor } from '../http-executor';
 import { StageLogger } from '../../logger/stage-logger';
 import { Stage } from '../../logger/stage.enum';
 import { ValidationUtils } from '../../util/validation.utils';
-import { CacheKey } from '../../model/cache/cache-key';
 
 /**
  * Get instance of the PagedResourceCollectionHttpService by Angular DependencyInjector.
@@ -37,9 +36,9 @@ export class PagedResourceCollectionHttpService<T extends PagedResourceCollectio
   };
 
   constructor(httpClient: HttpClient,
-              public cacheService: CacheService<T>,
+              cacheService: CacheService<T>,
               private httpConfig: HttpConfigService) {
-    super(httpClient);
+    super(httpClient, cacheService);
   }
 
   /**
@@ -47,37 +46,19 @@ export class PagedResourceCollectionHttpService<T extends PagedResourceCollectio
    *
    * @param url to perform request
    * @param options request options
-   * @param useCache value {@code true} if need to use cache, {@code false} otherwise
    * @throws error when required params are not valid or returned resource type is not paged collection of the resources
    */
   public get(url: string,
-             options?: {
-               headers?: {
-                 [header: string]: string | string[];
-               };
-               params?: HttpParams
-             },
-             useCache: boolean = true): Observable<T> {
-    if (useCache) {
-      const cachedValue = this.cacheService.getValue(CacheKey.of(url, options));
-      if (cachedValue != null) {
-        return observableOf(cachedValue);
-      }
-    }
-
-    return super.get(url, {...options, observe: 'body'}).pipe(
+             options?: PagedGetOption): Observable<T> {
+    return super.getHttp(url, {params: UrlUtils.convertToHttpParams(options), observe: 'body'}, options?.useCache).pipe(
       map((data: any) => {
         if (!isPagedResourceCollection(data)) {
           const errMsg = 'You try to get wrong resource type, expected paged resource collection type.';
           StageLogger.stageErrorLog(Stage.INIT_RESOURCE, {error: errMsg});
           throw Error(errMsg);
         }
-        const pagedResourceCollection: T = ResourceUtils.instantiatePagedResourceCollection(data);
-        if (useCache) {
-          this.cacheService.putValue(CacheKey.of(url, options), pagedResourceCollection);
-        }
 
-        return pagedResourceCollection;
+        return ResourceUtils.instantiatePagedResourceCollection(data) as T;
       }),
       catchError(error => observableThrowError(error)));
   }
@@ -97,7 +78,7 @@ export class PagedResourceCollectionHttpService<T extends PagedResourceCollectio
     if (_.isEmpty(pagedOption.pageParams)) {
       pagedOption.pageParams = PagedResourceCollectionHttpService.DEFAULT_PAGE;
     }
-    return this.get(url, {params: UrlUtils.convertToHttpParams(pagedOption)}, options?.useCache);
+    return this.get(url, pagedOption);
   }
 
   /**
@@ -117,7 +98,7 @@ export class PagedResourceCollectionHttpService<T extends PagedResourceCollectio
     if (_.isEmpty(pagedOption.pageParams)) {
       pagedOption.pageParams = PagedResourceCollectionHttpService.DEFAULT_PAGE;
     }
-    return this.get(url, {params: UrlUtils.convertToHttpParams(pagedOption)}, options?.useCache);
+    return this.get(url, pagedOption);
   }
 
 }

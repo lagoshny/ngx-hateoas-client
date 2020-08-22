@@ -48,7 +48,7 @@ describe('PagedpagedResourceCollectionHttpService', () => {
   it('GET REQUEST should throw error when returned object is EMBEDDED_RESOURCE', () => {
     httpClientSpy.get.and.returnValue(of(rawEmbeddedResource));
 
-    pagedResourceCollectionHttpService.get('someUrl').subscribe(() => {
+    pagedResourceCollectionHttpService.getHttp('someUrl').subscribe(() => {
     }, error => {
       expect(error.message).toBe('You try to get wrong resource type, expected paged resource collection type.');
     });
@@ -57,7 +57,7 @@ describe('PagedpagedResourceCollectionHttpService', () => {
   it('GET REQUEST should throw error when returned object is RESOURCE', () => {
     httpClientSpy.get.and.returnValue(of(rawResource));
 
-    pagedResourceCollectionHttpService.get('someUrl').subscribe(() => {
+    pagedResourceCollectionHttpService.getHttp('someUrl').subscribe(() => {
     }, error => {
       expect(error.message).toBe('You try to get wrong resource type, expected paged resource collection type.');
     });
@@ -66,7 +66,7 @@ describe('PagedpagedResourceCollectionHttpService', () => {
   it('GET REQUEST should throw error when returned object is COLLECTION_RESOURCE', () => {
     httpClientSpy.get.and.returnValue(of(rawResourceCollection));
 
-    pagedResourceCollectionHttpService.get('someUrl').subscribe(() => {
+    pagedResourceCollectionHttpService.getHttp('someUrl').subscribe(() => {
     }, error => {
       expect(error.message).toBe('You try to get wrong resource type, expected paged resource collection type.');
     });
@@ -75,7 +75,7 @@ describe('PagedpagedResourceCollectionHttpService', () => {
   it('GET REQUEST should throw error when returned object is any data that not paged resource collection', () => {
     httpClientSpy.get.and.returnValue(of({any: 'value'}));
 
-    pagedResourceCollectionHttpService.get('someUrl').subscribe(() => {
+    pagedResourceCollectionHttpService.getHttp('someUrl').subscribe(() => {
     }, error => {
       expect(error.message).toBe('You try to get wrong resource type, expected paged resource collection type.');
     });
@@ -87,7 +87,7 @@ describe('PagedpagedResourceCollectionHttpService', () => {
     cacheServiceSpy.getResource.and.returnValue(cachedResult);
     cacheServiceSpy.hasResource.and.returnValue(true);
 
-    pagedResourceCollectionHttpService.get('someUrl').subscribe((result) => {
+    pagedResourceCollectionHttpService.getHttp('someUrl').subscribe((result) => {
       expect(httpClientSpy.get.calls.count()).toBe(0);
       expect(cacheServiceSpy.getResource.calls.count()).toBe(1);
       expect(result.resources.length).toBe(2);
@@ -98,7 +98,7 @@ describe('PagedpagedResourceCollectionHttpService', () => {
   it('GET REQUEST should put result to cache', () => {
     httpClientSpy.get.and.returnValue(of(rawPagedResourceCollection));
 
-    pagedResourceCollectionHttpService.get('someUrl').subscribe(() => {
+    pagedResourceCollectionHttpService.getHttp('someUrl').subscribe(() => {
       expect(cacheServiceSpy.putResource.calls.count()).toBe(1);
     });
   });
@@ -106,7 +106,7 @@ describe('PagedpagedResourceCollectionHttpService', () => {
   it('GET REQUEST should return paged collected resource', () => {
     httpClientSpy.get.and.returnValue(of(rawPagedResourceCollection));
 
-    pagedResourceCollectionHttpService.get('someUrl').subscribe((result) => {
+    pagedResourceCollectionHttpService.getHttp('someUrl').subscribe((result) => {
       expect(result instanceof PagedResourceCollection).toBeTrue();
     });
   });

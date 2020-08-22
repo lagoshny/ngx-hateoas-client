@@ -1,18 +1,21 @@
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, of as observableOf } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { StageLogger } from '../logger/stage-logger';
 import { Stage } from '../logger/stage.enum';
 import { ValidationUtils } from '../util/validation.utils';
+import { CacheKey } from '../model/cache/cache-key';
+import { CacheService } from './cache.service';
+import { ResourceIdentifiable } from '../model/resource/resource-identifiable';
 
 /**
  * Base class with common logics to perform HTTP requests.
- * TODO: should manage cache?
  */
 /* tslint:disable:no-string-literal */
 export class HttpExecutor {
 
-  constructor(protected httpClient: HttpClient) {
+  constructor(protected httpClient: HttpClient,
+              protected cacheService: CacheService<ResourceIdentifiable>) {
   }
 
   private static logRequest(method: string,
@@ -55,15 +58,24 @@ export class HttpExecutor {
    *
    * @param url to perform request
    * @param options (optional) options that applied to the request
+   * @param useCache value {@code true} if need to use cache, {@code false} otherwise
    * @throws error when required params are not valid
    */
-  public get(url: string, options?: {
-    headers?: {
-      [header: string]: string | string[];
-    };
-    observe?: 'body' | 'response';
-    params?: HttpParams
-  }): Observable<any> {
+  public getHttp(url: string,
+                 options?: {
+                   headers?: {
+                     [header: string]: string | string[];
+                   };
+                   observe?: 'body' | 'response';
+                   params?: HttpParams
+                 },
+                 useCache: boolean = true): Observable<any> {
+    if (useCache && url) {
+      const cachedValue = this.cacheService.getValue(CacheKey.of(url, options));
+      if (cachedValue != null) {
+        return observableOf(cachedValue);
+      }
+    }
     HttpExecutor.logRequest('GET', url, options);
     ValidationUtils.validateInputParams({url});
 
@@ -75,7 +87,10 @@ export class HttpExecutor {
     }
 
     return response.pipe(
-      tap((data) => {
+      tap((data: any) => {
+        if (useCache) {
+          this.cacheService.putValue(CacheKey.of(url, options), data);
+        }
         HttpExecutor.logResponse('GET', url, options, data);
       })
     );
@@ -109,6 +124,7 @@ export class HttpExecutor {
     return response.pipe(
       tap((data) => {
         HttpExecutor.logResponse('POST', url, options, data);
+        this.cacheService.evictValue(CacheKey.of(url, options));
       })
     );
   }
@@ -141,6 +157,7 @@ export class HttpExecutor {
     return response.pipe(
       tap((data) => {
         HttpExecutor.logResponse('PUT', url, options, data);
+        this.cacheService.evictValue(CacheKey.of(url, options));
       })
     );
   }
@@ -173,6 +190,7 @@ export class HttpExecutor {
     return response.pipe(
       tap((data) => {
         HttpExecutor.logResponse('PATCH', url, options, data);
+        this.cacheService.evictValue(CacheKey.of(url, options));
       })
     );
   }
@@ -204,6 +222,7 @@ export class HttpExecutor {
     return response.pipe(
       tap((data) => {
         HttpExecutor.logResponse('DELETE', url, options, data);
+        this.cacheService.evictValue(CacheKey.of(url, options));
       })
     );
   }

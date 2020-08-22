@@ -73,7 +73,9 @@ export class CacheService<T extends ResourceIdentifiable> {
       return;
     }
     const result = this.cacheMap.delete(key.value);
-    StageLogger.stageLog(Stage.CACHE_EVICT, {cacheKey: key.value, evicted: result});
+    if (result) {
+      StageLogger.stageLog(Stage.CACHE_EVICT, {cacheKey: key.value, evicted: result});
+    }
   }
 
 }

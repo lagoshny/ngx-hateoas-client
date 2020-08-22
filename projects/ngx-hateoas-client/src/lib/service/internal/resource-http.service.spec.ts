@@ -42,7 +42,7 @@ describe('ResourceHttpService', () => {
   it('GET REQUEST should throw error when returned object is COLLECTION_RESOURCE', () => {
     httpClientSpy.get.and.returnValue(of(rawResourceCollection));
 
-    resourceHttpService.get('someUrl').subscribe(() => {
+    resourceHttpService.getHttp('someUrl').subscribe(() => {
     }, error => {
       expect(error.message).toBe('You try to get wrong resource type, expected single resource.');
     });
@@ -51,7 +51,7 @@ describe('ResourceHttpService', () => {
   it('GET REQUEST should throw error when returned object is PAGED_COLLECTION_RESOURCE', () => {
     httpClientSpy.get.and.returnValue(of(rawPagedResourceCollection));
 
-    resourceHttpService.get('someUrl').subscribe(() => {
+    resourceHttpService.getHttp('someUrl').subscribe(() => {
     }, error => {
       expect(error.message).toBe('You try to get wrong resource type, expected single resource.');
     });
@@ -60,7 +60,7 @@ describe('ResourceHttpService', () => {
   it('GET REQUEST should throw error when returned object is any data that not resource', () => {
     httpClientSpy.get.and.returnValue(of({any: 'value'}));
 
-    resourceHttpService.get('someUrl').subscribe(() => {
+    resourceHttpService.getHttp('someUrl').subscribe(() => {
     }, error => {
       expect(error.message).toBe('You try to get wrong resource type, expected single resource.');
     });
@@ -69,7 +69,7 @@ describe('ResourceHttpService', () => {
   it('GET REQUEST should return resource', () => {
     httpClientSpy.get.and.returnValue(of(rawResource));
 
-    resourceHttpService.get('someUrl').subscribe((result) => {
+    resourceHttpService.getHttp('someUrl').subscribe((result) => {
       expect(result instanceof Resource).toBeTrue();
     });
   });
@@ -79,7 +79,7 @@ describe('ResourceHttpService', () => {
     cacheServiceSpy.getResource.and.returnValue(cachedResult);
     cacheServiceSpy.hasResource.and.returnValue(true);
 
-    resourceHttpService.get('someUrl').subscribe((result) => {
+    resourceHttpService.getHttp('someUrl').subscribe((result) => {
       expect(httpClientSpy.get.calls.count()).toBe(0);
       expect(cacheServiceSpy.getResource.calls.count()).toBe(1);
       expect(result['text']).toBe('test cache');
@@ -89,7 +89,7 @@ describe('ResourceHttpService', () => {
   it('GET REQUEST should put result to cache', () => {
     httpClientSpy.get.and.returnValue(of(rawResource));
 
-    resourceHttpService.get('someUrl').subscribe(() => {
+    resourceHttpService.getHttp('someUrl').subscribe(() => {
       expect(cacheServiceSpy.putResource.calls.count()).toBe(1);
     });
   });

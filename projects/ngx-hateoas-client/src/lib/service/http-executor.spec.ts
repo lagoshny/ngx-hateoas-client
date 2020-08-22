@@ -18,17 +18,17 @@ describe('HttpExecutor', () => {
   }));
 
   it('GET should throw error when passed url is empty', () => {
-    expect(() => httpExecutor.get(''))
+    expect(() => httpExecutor.getHttp(''))
       .toThrowError(`Passed param(s) 'url = ' is not valid`);
   });
 
   it('GET should throw error when passed url is null', () => {
-    expect(() => httpExecutor.get(null))
+    expect(() => httpExecutor.getHttp(null))
       .toThrowError(`Passed param(s) 'url = null' is not valid`);
   });
 
   it('GET should throw error when passed url is undefined', () => {
-    expect(() => httpExecutor.get(undefined))
+    expect(() => httpExecutor.getHttp(undefined))
       .toThrowError(`Passed param(s) 'url = undefined' is not valid`);
   });
 

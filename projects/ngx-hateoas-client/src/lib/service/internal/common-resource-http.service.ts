@@ -21,9 +21,9 @@ import { ValidationUtils } from '../../util/validation.utils';
 export class CommonResourceHttpService extends HttpExecutor {
 
   constructor(httpClient: HttpClient,
-              public cacheService: CacheService<ResourceIdentifiable>,
+              cacheService: CacheService<ResourceIdentifiable>,
               private httpConfig: HttpConfigService) {
-    super(httpClient);
+    super(httpClient, cacheService);
   }
 
   /**
@@ -53,7 +53,7 @@ export class CommonResourceHttpService extends HttpExecutor {
     let result: Observable<any>;
     switch (method) {
       case HttpMethod.GET:
-        result = super.get(url, {params: httpParams, observe: 'body'});
+        result = super.getHttp(url, {params: httpParams, observe: 'body'}, false);
         break;
       case HttpMethod.POST:
         result = super.post(url, body, {params: httpParams, observe: 'body'});

@@ -44,7 +44,7 @@ describe('ResourceCollectionHttpService', () => {
   it('GET REQUEST should throw error when returned object is EMBEDDED_RESOURCE', () => {
     httpClientSpy.get.and.returnValue(of(rawEmbeddedResource));
 
-    resourceCollectionHttpServiceSpy.get('someUrl').subscribe(() => {
+    resourceCollectionHttpServiceSpy.getHttp('someUrl').subscribe(() => {
     }, error => {
       expect(error.message).toBe('You try to get wrong resource type, expected resource collection type.');
     });
@@ -53,7 +53,7 @@ describe('ResourceCollectionHttpService', () => {
   it('GET REQUEST should throw error when returned object is RESOURCE', () => {
     httpClientSpy.get.and.returnValue(of(rawResource));
 
-    resourceCollectionHttpServiceSpy.get('someUrl').subscribe(() => {
+    resourceCollectionHttpServiceSpy.getHttp('someUrl').subscribe(() => {
     }, error => {
       expect(error.message).toBe('You try to get wrong resource type, expected resource collection type.');
     });
@@ -62,7 +62,7 @@ describe('ResourceCollectionHttpService', () => {
   it('GET REQUEST should throw error when returned object is PAGED_COLLECTION_RESOURCE', () => {
     httpClientSpy.get.and.returnValue(of(rawPagedResourceCollection));
 
-    resourceCollectionHttpServiceSpy.get('someUrl').subscribe(() => {
+    resourceCollectionHttpServiceSpy.getHttp('someUrl').subscribe(() => {
     }, error => {
       expect(error.message).toBe('You try to get wrong resource type, expected resource collection type.');
     });
@@ -71,7 +71,7 @@ describe('ResourceCollectionHttpService', () => {
   it('GET REQUEST should throw error when returned object is any data that not resource collection', () => {
     httpClientSpy.get.and.returnValue(of({any: 'value'}));
 
-    resourceCollectionHttpServiceSpy.get('someUrl').subscribe(() => {
+    resourceCollectionHttpServiceSpy.getHttp('someUrl').subscribe(() => {
     }, error => {
       expect(error.message).toBe('You try to get wrong resource type, expected resource collection type.');
     });
@@ -83,7 +83,7 @@ describe('ResourceCollectionHttpService', () => {
     cacheServiceSpy.getResource.and.returnValue(cachedResult);
     cacheServiceSpy.hasResource.and.returnValue(true);
 
-    resourceCollectionHttpServiceSpy.get('someUrl').subscribe((result) => {
+    resourceCollectionHttpServiceSpy.getHttp('someUrl').subscribe((result) => {
       expect(httpClientSpy.get.calls.count()).toBe(0);
       expect(cacheServiceSpy.getResource.calls.count()).toBe(1);
       expect(result.resources.length).toBe(2);
@@ -94,7 +94,7 @@ describe('ResourceCollectionHttpService', () => {
   it('GET REQUEST should put result to cache', () => {
     httpClientSpy.get.and.returnValue(of(rawResourceCollection));
 
-    resourceCollectionHttpServiceSpy.get('someUrl').subscribe(() => {
+    resourceCollectionHttpServiceSpy.getHttp('someUrl').subscribe(() => {
       expect(cacheServiceSpy.putResource.calls.count()).toBe(1);
     });
   });
@@ -102,7 +102,7 @@ describe('ResourceCollectionHttpService', () => {
   it('GET REQUEST should return collected resource', () => {
     httpClientSpy.get.and.returnValue(of(rawResourceCollection));
 
-    resourceCollectionHttpServiceSpy.get('someUrl').subscribe((result) => {
+    resourceCollectionHttpServiceSpy.getHttp('someUrl').subscribe((result) => {
       expect(result instanceof ResourceCollection).toBeTrue();
     });
   });

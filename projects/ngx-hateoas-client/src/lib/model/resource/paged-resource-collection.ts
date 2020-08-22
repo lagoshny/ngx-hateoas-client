@@ -156,7 +156,7 @@ function doRequest<T extends BaseResource>(url: string, pageParams?: PageParam):
   }
 
   return getPagedResourceCollectionHttpService()
-    .get(UrlUtils.removeTemplateParams(url), {params: httpParams}).pipe(
+    .getHttp(UrlUtils.removeTemplateParams(url), {params: httpParams}).pipe(
       tap((data) => {
         StageLogger.stageLog(Stage.HTTP_RESPONSE, {method: 'GET', url, httpParams, result: data});
       })

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable, of as observableOf, throwError as observableThrowError } from 'rxjs';
+import { Observable, throwError as observableThrowError } from 'rxjs';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { catchError, map } from 'rxjs/operators';
 import { ResourceUtils } from '../../util/resource.utils';
@@ -31,9 +31,9 @@ export function getResourceHttpService(): ResourceHttpService<BaseResource> {
 export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
 
   constructor(httpClient: HttpClient,
-              public cacheService: CacheService<T>,
+              cacheService: CacheService<T>,
               private httpConfig: HttpConfigService) {
-    super(httpClient);
+    super(httpClient, cacheService);
   }
 
   /**
@@ -41,28 +41,17 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
    *
    * @param url to perform request
    * @param options request options
-   * @param useCache value {@code true} if need to use cache, {@code false} otherwise
    * @throws error when required params are not valid or returned resource type is not resource
    */
   public get(url: string,
-             options?: {
-               headers?: {
-                 [header: string]: string | string[];
-               };
-               params?: HttpParams
-             },
-             useCache: boolean = true): Observable<T> {
-    if (useCache) {
-      const cachedValue = this.cacheService.getValue(CacheKey.of(url, options));
-      if (cachedValue != null) {
-        return observableOf(cachedValue);
-      }
-    }
+             options?: GetOption): Observable<T> {
+    const httpParams = UrlUtils.convertToHttpParams(options);
 
-    return super.get(url, {...options, observe: 'body'})
+    return super.getHttp(url, {params: httpParams}, options?.useCache)
       .pipe(
         map((data: any) => {
           if (!isResource(data)) {
+            this.cacheService.evictValue(CacheKey.of(url, {params: httpParams}));
             const errMsg = 'You try to get wrong resource type, expected single resource.';
             StageLogger.stageErrorLog(Stage.INIT_RESOURCE, {
               error: errMsg
@@ -70,12 +59,7 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
             throw Error(errMsg);
           }
 
-          const resource: T = ResourceUtils.instantiateResource(data);
-          if (useCache) {
-            this.cacheService.putValue(CacheKey.of(url, options), resource);
-          }
-
-          return resource;
+          return ResourceUtils.instantiateResource(data) as T;
         }),
         catchError(error => observableThrowError(error)));
   }
@@ -98,7 +82,6 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
     return super.post(url, body, options)
       .pipe(
         map((data: any) => {
-          this.cacheService.evictValue(CacheKey.of(url, options));
           if (isResource(data)) {
             return ResourceUtils.instantiateResource(data);
           }
@@ -126,7 +109,6 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
     return super.put(url, body, options)
       .pipe(
         map((data: any) => {
-          this.cacheService.evictValue(CacheKey.of(url, options));
           if (isResource(data)) {
             return ResourceUtils.instantiateResource(data);
           }
@@ -154,7 +136,6 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
     return super.patch(url, body, options)
       .pipe(
         map((data: any) => {
-          this.cacheService.evictValue(CacheKey.of(url, options));
           if (isResource(data)) {
             return ResourceUtils.instantiateResource(data);
           }
@@ -182,7 +163,6 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
     return super.delete(url, options)
       .pipe(
         map((data: any) => {
-          this.cacheService.evictValue(CacheKey.of(url, options));
           if (isResource(data)) {
             return ResourceUtils.instantiateResource(data);
           }
@@ -211,7 +191,7 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
       options
     });
 
-    return this.get(url, {params: UrlUtils.convertToHttpParams(options)}, options?.useCache);
+    return this.get(url, options);
   }
 
   /**
@@ -321,7 +301,7 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
       urlParts: `baseUrl: '${ this.httpConfig.baseApiUrl }', resource: '${ resourceName }', searchQuery: '${ searchQuery }'`
     });
 
-    return this.get(url, {params: UrlUtils.convertToHttpParams(options)}, options?.useCache);
+    return this.get(url, options);
   }
 
 }

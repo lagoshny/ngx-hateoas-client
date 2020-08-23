@@ -9,6 +9,7 @@ import { HttpParams } from '@angular/common/http';
 import { PagedResourceCollectionHttpService } from './paged-resource-collection-http.service';
 import { PagedResourceCollection } from '../../model/resource/paged-resource-collection';
 import { Resource } from '../../model/resource/resource';
+import { CacheService } from '../cache.service';
 
 /* tslint:disable:no-string-literal */
 describe('PagedResourceCollectionHttpService', () => {
@@ -82,6 +83,17 @@ describe('PagedResourceCollectionHttpService', () => {
     });
   });
 
+  it('GET REQUEST should evict cache when returned object is not paged resource collection', () => {
+    CacheService.enabled = true;
+    httpClientSpy.get.and.returnValue(of({any: 'value'}));
+
+    pagedResourceCollectionHttpService.get('someUrl').subscribe(() => {
+    }, () => {
+      expect(cacheServiceSpy.evictValue.calls.count()).toBe(1);
+    });
+    CacheService.enabled = false;
+  });
+
   it('GET REQUEST should return paged collected resource', () => {
     httpClientSpy.get.and.returnValue(of(rawPagedResourceCollection));
 
@@ -90,7 +102,7 @@ describe('PagedResourceCollectionHttpService', () => {
     });
   });
 
-  it('GET REQUEST should throw error when page params passed IN PARAMS OBJECT for NOT TEMPLATED link', () => {
+  it('GET REQUEST should throw error when page params passed IN PARAMS OBJECT', () => {
     expect(() => {
       pagedResourceCollectionHttpService.get('someUrl', {
         params: {
@@ -101,10 +113,10 @@ describe('PagedResourceCollectionHttpService', () => {
     }).toThrowError('Please, pass page params in page object key, not with params object!');
   });
 
-  it('should pass page params as http request params', () => {
-    httpClientSpy.get.and.returnValue(of(new PagedResourceCollection(new ResourceCollection())));
+  it('GET REQUEST should pass page params as http request params', () => {
+    httpClientSpy.get.and.returnValue(of(rawPagedResourceCollection));
 
-    pagedResourceCollectionHttpService.get('magazine', {
+    pagedResourceCollectionHttpService.get('http://localhost:8080/api/v1/order/1/magazine', {
       pageParams: {
         size: 10,
         page: 1,
@@ -128,10 +140,10 @@ describe('PagedResourceCollectionHttpService', () => {
     });
   });
 
-  it('should adds projection param to http request params', () => {
-    httpClientSpy.get.and.returnValue(of(new PagedResourceCollection(new ResourceCollection())));
+  it('GET REQUEST should adds projection param to http request params', () => {
+    httpClientSpy.get.and.returnValue(of(rawPagedResourceCollection));
 
-    pagedResourceCollectionHttpService.get('magazine', {
+    pagedResourceCollectionHttpService.get('http://localhost:8080/api/v1/order/1/magazine', {
       params: {
         projection: 'magazineProjection'
       }
@@ -227,6 +239,38 @@ describe('PagedResourceCollectionHttpService', () => {
     });
   });
 
+  it('GET_RESOURCE_PAGE should use default page number options', () => {
+    httpClientSpy.get.and.returnValue(of(rawPagedResourceCollection));
+
+    pagedResourceCollectionHttpService.getResourcePage('test', {
+      pageParams: {
+        size: 10
+      }
+    }).subscribe(() => {
+      const httpParams = httpClientSpy.get.calls.argsFor(0)[1].params as HttpParams;
+      expect(httpParams.has('size')).toBeTrue();
+      expect(httpParams.get('size')).toBe('10');
+      expect(httpParams.has('page')).toBeTrue();
+      expect(httpParams.get('page')).toBe('0');
+    });
+  });
+
+  it('GET_RESOURCE_PAGE should use default page size options', () => {
+    httpClientSpy.get.and.returnValue(of(rawPagedResourceCollection));
+
+    pagedResourceCollectionHttpService.getResourcePage('test', {
+      pageParams: {
+        page: 1
+      }
+    }).subscribe(() => {
+      const httpParams = httpClientSpy.get.calls.argsFor(0)[1].params as HttpParams;
+      expect(httpParams.has('size')).toBeTrue();
+      expect(httpParams.get('size')).toBe('20');
+      expect(httpParams.has('page')).toBeTrue();
+      expect(httpParams.get('page')).toBe('1');
+    });
+  });
+
   it('SEARCH throws error when resourceName is empty', () => {
     expect(() => pagedResourceCollectionHttpService.search('', 'any'))
       .toThrowError(`Passed param(s) 'resourceName = ' is not valid`);
@@ -311,6 +355,39 @@ describe('PagedResourceCollectionHttpService', () => {
 
       expect(httpParams.has('test')).toBeTrue();
       expect(httpParams.get('test')).toBe('testParam');
+    });
+  });
+
+
+  it('SEARCH should use default page number options', () => {
+    httpClientSpy.get.and.returnValue(of(rawPagedResourceCollection));
+
+    pagedResourceCollectionHttpService.search('test', 'any', {
+      pageParams: {
+        size: 10
+      }
+    }).subscribe(() => {
+      const httpParams = httpClientSpy.get.calls.argsFor(0)[1].params as HttpParams;
+      expect(httpParams.has('size')).toBeTrue();
+      expect(httpParams.get('size')).toBe('10');
+      expect(httpParams.has('page')).toBeTrue();
+      expect(httpParams.get('page')).toBe('0');
+    });
+  });
+
+  it('SEARCH should use default page size options', () => {
+    httpClientSpy.get.and.returnValue(of(rawPagedResourceCollection));
+
+    pagedResourceCollectionHttpService.search('test', 'any', {
+      pageParams: {
+        page: 1
+      }
+    }).subscribe(() => {
+      const httpParams = httpClientSpy.get.calls.argsFor(0)[1].params as HttpParams;
+      expect(httpParams.has('size')).toBeTrue();
+      expect(httpParams.get('size')).toBe('20');
+      expect(httpParams.has('page')).toBeTrue();
+      expect(httpParams.get('page')).toBe('1');
     });
   });
 

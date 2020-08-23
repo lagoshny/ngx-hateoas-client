@@ -3,14 +3,7 @@ import { HttpConfigService } from '../../config/http-config.service';
 import { ResourceCollection } from '../../model/resource/resource-collection';
 import { BaseResource } from '../../model/resource/base-resource';
 import { of } from 'rxjs';
-import {
-  rawEmbeddedResource,
-  rawPagedResourceCollection,
-  rawResource,
-  rawResourceCollection,
-  SimplePagedResourceCollection,
-  SimpleResource
-} from '../../model/resource/resources.test';
+import { rawEmbeddedResource, rawPagedResourceCollection, rawResource, rawResourceCollection } from '../../model/resource/resources.test';
 import { ResourceUtils } from '../../util/resource.utils';
 import { HttpParams } from '@angular/common/http';
 import { PagedResourceCollectionHttpService } from './paged-resource-collection-http.service';
@@ -18,7 +11,7 @@ import { PagedResourceCollection } from '../../model/resource/paged-resource-col
 import { Resource } from '../../model/resource/resource';
 
 /* tslint:disable:no-string-literal */
-describe('PagedpagedResourceCollectionHttpService', () => {
+describe('PagedResourceCollectionHttpService', () => {
   let pagedResourceCollectionHttpService: PagedResourceCollectionHttpService<PagedResourceCollection<BaseResource>>;
   let httpClientSpy: any;
   let cacheServiceSpy: any;
@@ -29,9 +22,9 @@ describe('PagedpagedResourceCollectionHttpService', () => {
       get: jasmine.createSpy('get')
     };
     cacheServiceSpy = {
-      putResource: jasmine.createSpy('putResource'),
-      hasResource: jasmine.createSpy('hasResource'),
-      getResource: jasmine.createSpy('getResource')
+      putValue: jasmine.createSpy('putValue'),
+      getValue: jasmine.createSpy('getValue'),
+      evictValue: jasmine.createSpy('evictValue')
     };
     httpConfigService = {
       baseApiUrl: 'http://localhost:8080/api/v1'
@@ -39,16 +32,24 @@ describe('PagedpagedResourceCollectionHttpService', () => {
 
     pagedResourceCollectionHttpService =
       new PagedResourceCollectionHttpService<PagedResourceCollection<BaseResource>>(httpClientSpy, cacheServiceSpy, httpConfigService);
+  }));
 
+  beforeEach(() => {
     ResourceUtils.useResourceType(Resource);
     ResourceUtils.useResourceCollectionType(ResourceCollection);
     ResourceUtils.usePagedResourceCollectionType(PagedResourceCollection);
-  }));
+  });
+
+  afterEach(() => {
+    ResourceUtils.useResourceType(null);
+    ResourceUtils.useResourceCollectionType(null);
+    ResourceUtils.usePagedResourceCollectionType(null);
+  });
 
   it('GET REQUEST should throw error when returned object is EMBEDDED_RESOURCE', () => {
     httpClientSpy.get.and.returnValue(of(rawEmbeddedResource));
 
-    pagedResourceCollectionHttpService.getHttp('someUrl').subscribe(() => {
+    pagedResourceCollectionHttpService.get('someUrl').subscribe(() => {
     }, error => {
       expect(error.message).toBe('You try to get wrong resource type, expected paged resource collection type.');
     });
@@ -57,7 +58,7 @@ describe('PagedpagedResourceCollectionHttpService', () => {
   it('GET REQUEST should throw error when returned object is RESOURCE', () => {
     httpClientSpy.get.and.returnValue(of(rawResource));
 
-    pagedResourceCollectionHttpService.getHttp('someUrl').subscribe(() => {
+    pagedResourceCollectionHttpService.get('someUrl').subscribe(() => {
     }, error => {
       expect(error.message).toBe('You try to get wrong resource type, expected paged resource collection type.');
     });
@@ -66,7 +67,7 @@ describe('PagedpagedResourceCollectionHttpService', () => {
   it('GET REQUEST should throw error when returned object is COLLECTION_RESOURCE', () => {
     httpClientSpy.get.and.returnValue(of(rawResourceCollection));
 
-    pagedResourceCollectionHttpService.getHttp('someUrl').subscribe(() => {
+    pagedResourceCollectionHttpService.get('someUrl').subscribe(() => {
     }, error => {
       expect(error.message).toBe('You try to get wrong resource type, expected paged resource collection type.');
     });
@@ -75,39 +76,72 @@ describe('PagedpagedResourceCollectionHttpService', () => {
   it('GET REQUEST should throw error when returned object is any data that not paged resource collection', () => {
     httpClientSpy.get.and.returnValue(of({any: 'value'}));
 
-    pagedResourceCollectionHttpService.getHttp('someUrl').subscribe(() => {
+    pagedResourceCollectionHttpService.get('someUrl').subscribe(() => {
     }, error => {
       expect(error.message).toBe('You try to get wrong resource type, expected paged resource collection type.');
-    });
-  });
-
-  it('GET REQUEST should return result from cache', () => {
-    const cachedResult = new SimplePagedResourceCollection();
-    cachedResult.resources.push(Object.assign(new SimpleResource(), {text: 'test cache'}));
-    cacheServiceSpy.getResource.and.returnValue(cachedResult);
-    cacheServiceSpy.hasResource.and.returnValue(true);
-
-    pagedResourceCollectionHttpService.getHttp('someUrl').subscribe((result) => {
-      expect(httpClientSpy.get.calls.count()).toBe(0);
-      expect(cacheServiceSpy.getResource.calls.count()).toBe(1);
-      expect(result.resources.length).toBe(2);
-      expect(result.resources[1]['text']).toBe('test cache');
-    });
-  });
-
-  it('GET REQUEST should put result to cache', () => {
-    httpClientSpy.get.and.returnValue(of(rawPagedResourceCollection));
-
-    pagedResourceCollectionHttpService.getHttp('someUrl').subscribe(() => {
-      expect(cacheServiceSpy.putResource.calls.count()).toBe(1);
     });
   });
 
   it('GET REQUEST should return paged collected resource', () => {
     httpClientSpy.get.and.returnValue(of(rawPagedResourceCollection));
 
-    pagedResourceCollectionHttpService.getHttp('someUrl').subscribe((result) => {
+    pagedResourceCollectionHttpService.get('someUrl').subscribe((result) => {
       expect(result instanceof PagedResourceCollection).toBeTrue();
+    });
+  });
+
+  it('GET REQUEST should throw error when page params passed IN PARAMS OBJECT for NOT TEMPLATED link', () => {
+    expect(() => {
+      pagedResourceCollectionHttpService.get('someUrl', {
+        params: {
+          page: 1,
+          size: 2
+        }
+      }).subscribe();
+    }).toThrowError('Please, pass page params in page object key, not with params object!');
+  });
+
+  it('should pass page params as http request params', () => {
+    httpClientSpy.get.and.returnValue(of(new PagedResourceCollection(new ResourceCollection())));
+
+    pagedResourceCollectionHttpService.get('magazine', {
+      pageParams: {
+        size: 10,
+        page: 1,
+        sort: {
+          abc: 'ASC',
+          cde: 'DESC'
+        }
+      }
+    }).subscribe(() => {
+      const resultResourceUrl = httpClientSpy.get.calls.argsFor(0)[0];
+      expect(resultResourceUrl).toBe('http://localhost:8080/api/v1/order/1/magazine');
+
+      const httpParams = httpClientSpy.get.calls.argsFor(0)[1].params;
+      expect(httpParams.has('size')).toBeTrue();
+      expect(httpParams.get('size')).toBe('10');
+      expect(httpParams.has('page')).toBeTrue();
+      expect(httpParams.get('page')).toBe('1');
+      expect(httpParams.has('sort')).toBeTrue();
+      expect(httpParams.getAll('sort')[0]).toBe('abc,ASC');
+      expect(httpParams.getAll('sort')[1]).toBe('cde,DESC');
+    });
+  });
+
+  it('should adds projection param to http request params', () => {
+    httpClientSpy.get.and.returnValue(of(new PagedResourceCollection(new ResourceCollection())));
+
+    pagedResourceCollectionHttpService.get('magazine', {
+      params: {
+        projection: 'magazineProjection'
+      }
+    }).subscribe(() => {
+      const resultResourceUrl = httpClientSpy.get.calls.argsFor(0)[0];
+      expect(resultResourceUrl).toBe('http://localhost:8080/api/v1/order/1/magazine');
+
+      const httpParams = httpClientSpy.get.calls.argsFor(0)[1].params;
+      expect(httpParams.has('projection')).toBeTrue();
+      expect(httpParams.get('projection')).toBe('magazineProjection');
     });
   });
 
@@ -135,21 +169,12 @@ describe('PagedpagedResourceCollectionHttpService', () => {
     });
   });
 
-  it('GET_RESOURCE_PAGE should generate root resource url with query param', () => {
-    httpClientSpy.get.and.returnValue(of(rawPagedResourceCollection));
-
-    pagedResourceCollectionHttpService.getResourcePage('test', 'someQuery').subscribe(() => {
-      const url = httpClientSpy.get.calls.argsFor(0)[0];
-      expect(url).toBe(`${ httpConfigService.baseApiUrl }/test/someQuery`);
-    });
-  });
-
   it('GET_RESOURCE_PAGE should pass http request params when it passed', () => {
     httpClientSpy.get.and.returnValue(of(rawPagedResourceCollection));
 
-    pagedResourceCollectionHttpService.getResourcePage('test', null, {
-      projection: 'testProjection',
+    pagedResourceCollectionHttpService.getResourcePage('test', {
       params: {
+        projection: 'testProjection',
         test: 'testParam'
       },
       pageParams: {
@@ -182,9 +207,9 @@ describe('PagedpagedResourceCollectionHttpService', () => {
   it('GET_RESOURCE_PAGE should use default page options', () => {
     httpClientSpy.get.and.returnValue(of(rawPagedResourceCollection));
 
-    pagedResourceCollectionHttpService.getResourcePage('test', null, {
-      projection: 'testProjection',
+    pagedResourceCollectionHttpService.getResourcePage('test', {
       params: {
+        projection: 'testProjection',
         test: 'testParam'
       }
     }).subscribe(() => {
@@ -235,8 +260,8 @@ describe('PagedpagedResourceCollectionHttpService', () => {
     httpClientSpy.get.and.returnValue(of(rawPagedResourceCollection));
 
     pagedResourceCollectionHttpService.search('test', 'someQuery', {
-      projection: 'testProjection',
       params: {
+        projection: 'testProjection',
         test: 'testParam'
       },
       pageParams: {
@@ -270,8 +295,8 @@ describe('PagedpagedResourceCollectionHttpService', () => {
     httpClientSpy.get.and.returnValue(of(rawPagedResourceCollection));
 
     pagedResourceCollectionHttpService.search('test', 'someQuery', {
-      projection: 'testProjection',
       params: {
+        projection: 'testProjection',
         test: 'testParam'
       }
     }).subscribe(() => {

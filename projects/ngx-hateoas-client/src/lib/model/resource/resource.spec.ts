@@ -89,9 +89,14 @@ describe('Resource ADD_RELATION', () => {
   }));
 
   beforeEach(() => {
-    ResourceUtils.useResourceType(Resource);
     resource = new TestOrderResource();
     DependencyInjector.injector = TestBed;
+    ResourceUtils.useResourceType(Resource);
+  });
+
+  afterEach(() => {
+    DependencyInjector.injector = null;
+    ResourceUtils.useResourceType(null);
   });
 
   it('should throw error when passed relationName is empty', () => {
@@ -175,9 +180,14 @@ describe('Resource BIND_RELATION', () => {
   }));
 
   beforeEach(() => {
+    DependencyInjector.injector = TestBed;
     ResourceUtils.useResourceType(Resource);
     resource = new TestOrderResource();
-    DependencyInjector.injector = TestBed;
+  });
+
+  afterEach(() => {
+    DependencyInjector.injector = null;
+    ResourceUtils.useResourceType(null);
   });
 
   it('should throw error when passed relationName is empty', () => {
@@ -256,9 +266,14 @@ describe('Resource CLEAR_COLLECTION_RELATION', () => {
   }));
 
   beforeEach(() => {
+    DependencyInjector.injector = TestBed;
     ResourceUtils.useResourceType(Resource);
     resource = new TestOrderResource();
-    DependencyInjector.injector = TestBed;
+  });
+
+  afterEach(() => {
+    DependencyInjector.injector = null;
+    ResourceUtils.useResourceType(null);
   });
 
   it('should throw error when passed relationName is empty', () => {
@@ -337,9 +352,14 @@ describe('Resource DELETE_RELATION', () => {
   }));
 
   beforeEach(() => {
+    DependencyInjector.injector = TestBed;
     ResourceUtils.useResourceType(Resource);
     resource = new TestOrderResource();
-    DependencyInjector.injector = TestBed;
+  });
+
+  afterEach(() => {
+    DependencyInjector.injector = null;
+    ResourceUtils.useResourceType(null);
   });
 
   it('should throw error when passed relationName is empty', () => {

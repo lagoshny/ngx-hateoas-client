@@ -47,7 +47,9 @@ export class ResourceCollectionHttpService<T extends ResourceCollection<BaseReso
       .pipe(
         map((data: any) => {
           if (!isResourceCollection(data)) {
-            this.cacheService.evictValue(CacheKey.of(url, httpOptions));
+            if (CacheService.enabled) {
+              this.cacheService.evictValue(CacheKey.of(url, httpOptions));
+            }
             const errMsg = 'You try to get wrong resource type, expected resource collection type.';
             StageLogger.stageErrorLog(Stage.INIT_RESOURCE, {error: errMsg});
             throw new Error(errMsg);

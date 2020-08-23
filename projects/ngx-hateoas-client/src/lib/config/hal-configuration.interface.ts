@@ -20,11 +20,11 @@ export interface HalConfiguration {
    */
   cache?: {
     /**
-     * Should app use cache.
+     * When {@code true} then cache will be used, {@code false} otherwise.
      */
     enabled: boolean;
     /**
-     * Time in seconds when cache was expired.
+     * Time in seconds when cache need to be expired.
      */
     expireTime?: number;
   };

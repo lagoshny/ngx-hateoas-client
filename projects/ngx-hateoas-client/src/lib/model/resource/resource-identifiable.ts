@@ -20,12 +20,12 @@ export abstract class ResourceIdentifiable {
    */
   public getRelationLink(relationName: string): LinkData {
     if (_.isEmpty(this._links)) {
-      throw Error(`Resource links is empty, can't to get relation '${ relationName }'`);
+      throw new Error(`Resource links is empty, can't to get relation '${ relationName }'`);
     }
 
     const relationLink = this._links[relationName];
     if (_.isEmpty(relationLink) || _.isEmpty(relationLink.href)) {
-      throw Error(`Resource relation with name '${ relationName }' not found`);
+      throw new Error(`Resource relation with name '${ relationName }' not found`);
     }
 
     return relationLink;

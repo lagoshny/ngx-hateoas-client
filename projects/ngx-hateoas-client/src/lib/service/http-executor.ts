@@ -11,6 +11,7 @@ import { ResourceIdentifiable } from '../model/resource/resource-identifiable';
 /**
  * Base class with common logics to perform HTTP requests.
  */
+
 /* tslint:disable:no-string-literal */
 export class HttpExecutor {
 
@@ -71,7 +72,7 @@ export class HttpExecutor {
                  },
                  useCache: boolean = true): Observable<any> {
     ValidationUtils.validateInputParams({url});
-    if (useCache) {
+    if (CacheService.enabled && useCache) {
       const cachedValue = this.cacheService.getValue(CacheKey.of(url, options));
       if (cachedValue != null) {
         return observableOf(cachedValue);
@@ -89,7 +90,7 @@ export class HttpExecutor {
     return response.pipe(
       tap((data: any) => {
         HttpExecutor.logResponse('GET', url, options, data);
-        if (useCache) {
+        if (CacheService.enabled && useCache) {
           this.cacheService.putValue(CacheKey.of(url, options), data);
         }
       })
@@ -124,7 +125,9 @@ export class HttpExecutor {
     return response.pipe(
       tap((data) => {
         HttpExecutor.logResponse('POST', url, options, data);
-        this.cacheService.evictValue(CacheKey.of(url, options));
+        if (CacheService.enabled) {
+          this.cacheService.evictValue(CacheKey.of(url, options));
+        }
       })
     );
   }
@@ -157,7 +160,9 @@ export class HttpExecutor {
     return response.pipe(
       tap((data) => {
         HttpExecutor.logResponse('PUT', url, options, data);
-        this.cacheService.evictValue(CacheKey.of(url, options));
+        if (CacheService.enabled) {
+          this.cacheService.evictValue(CacheKey.of(url, options));
+        }
       })
     );
   }
@@ -190,7 +195,9 @@ export class HttpExecutor {
     return response.pipe(
       tap((data) => {
         HttpExecutor.logResponse('PATCH', url, options, data);
-        this.cacheService.evictValue(CacheKey.of(url, options));
+        if (CacheService.enabled) {
+          this.cacheService.evictValue(CacheKey.of(url, options));
+        }
       })
     );
   }
@@ -222,7 +229,9 @@ export class HttpExecutor {
     return response.pipe(
       tap((data) => {
         HttpExecutor.logResponse('DELETE', url, options, data);
-        this.cacheService.evictValue(CacheKey.of(url, options));
+        if (CacheService.enabled) {
+          this.cacheService.evictValue(CacheKey.of(url, options));
+        }
       })
     );
   }

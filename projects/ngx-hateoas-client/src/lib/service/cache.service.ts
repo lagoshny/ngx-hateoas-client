@@ -29,9 +29,6 @@ export class CacheService<T extends ResourceIdentifiable> {
    * @return cached value or {@code null} when cached value is not exist or expired
    */
   public getValue(key: CacheKey): T {
-    if (!CacheService.enabled) {
-      return null;
-    }
     const cacheResource = this.cacheMap.get(key.value);
     if (_.isNil(cacheResource)) {
       StageLogger.stageLog(Stage.CACHE_GET, {cacheKey: key.value, result: null});
@@ -61,6 +58,7 @@ export class CacheService<T extends ResourceIdentifiable> {
     if (!CacheService.enabled) {
       return;
     }
+    // TODO проверить надо ли удалять старое
     this.cacheMap.delete(key.value);
     this.cacheMap.set(key.value, new CacheResource<T>(resource, new Date()));
 
@@ -73,10 +71,6 @@ export class CacheService<T extends ResourceIdentifiable> {
    * @param key cache key
    */
   public evictValue(key: CacheKey): void {
-    if (!CacheService.enabled) {
-      return;
-    }
-
     // Get resource name by url to evict all resource cache with collection/paged collection data
     const resourceName = key.url.replace(`${ this.httpConfig.baseApiUrl }/`, '').split('/')[0];
     if (!resourceName) {

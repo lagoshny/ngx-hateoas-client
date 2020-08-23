@@ -26,9 +26,9 @@ describe('CommonResourceHttpService CUSTOM_QUERY', () => {
       put: jasmine.createSpy('put'),
     };
     cacheServiceSpy = {
-      putResource: jasmine.createSpy('putResource'),
-      hasResource: jasmine.createSpy('hasResource'),
-      getResource: jasmine.createSpy('getResource')
+      putValue: jasmine.createSpy('putValue'),
+      getValue: jasmine.createSpy('getValue'),
+      evictValue: jasmine.createSpy('evictValue')
     };
     httpConfigService = {
       baseApiUrl: 'http://localhost:8080/api/v1'
@@ -36,11 +36,19 @@ describe('CommonResourceHttpService CUSTOM_QUERY', () => {
 
     commonHttpService =
       new CommonResourceHttpService(httpClientSpy, cacheServiceSpy, httpConfigService);
+  }));
 
+  beforeEach(() => {
     ResourceUtils.useResourceType(Resource);
     ResourceUtils.useResourceCollectionType(ResourceCollection);
     ResourceUtils.usePagedResourceCollectionType(PagedResourceCollection);
-  }));
+  });
+
+  afterEach(() => {
+    ResourceUtils.useResourceType(null);
+    ResourceUtils.useResourceCollectionType(null);
+    ResourceUtils.usePagedResourceCollectionType(null);
+  });
 
   it('throws error when resourceName is empty', () => {
     expect(() => commonHttpService.customQuery('', HttpMethod.GET, 'any'))
@@ -75,7 +83,6 @@ describe('CommonResourceHttpService CUSTOM_QUERY', () => {
     httpClientSpy.get.and.returnValue(of(anything()));
 
     commonHttpService.customQuery('test', HttpMethod.GET, 'someQuery', null, {
-      projection: 'testProjection',
       pageParams: {
         sort: {
           prop1: 'ASC',
@@ -85,6 +92,7 @@ describe('CommonResourceHttpService CUSTOM_QUERY', () => {
         page: 2
       },
       params: {
+        projection: 'testProjection',
         test: 'testParam'
       }
     }).subscribe(() => {
@@ -169,6 +177,5 @@ describe('CommonResourceHttpService CUSTOM_QUERY', () => {
       expect(httpClientSpy.put.calls.count()).toBe(1);
     });
   });
-
 
 });

@@ -52,18 +52,21 @@ export class PagedResourceCollectionHttpService<T extends PagedResourceCollectio
   public get(url: string,
              options?: PagedGetOption): Observable<T> {
     const httpOptions = {params: UrlUtils.convertToHttpParams(options)};
-    return super.getHttp(url, httpOptions, options?.useCache).pipe(
-      map((data: any) => {
-        if (!isPagedResourceCollection(data)) {
-          this.cacheService.evictValue(CacheKey.of(url, httpOptions));
-          const errMsg = 'You try to get wrong resource type, expected paged resource collection type.';
-          StageLogger.stageErrorLog(Stage.INIT_RESOURCE, {error: errMsg});
-          throw Error(errMsg);
-        }
+    return super.getHttp(url, httpOptions, options?.useCache)
+      .pipe(
+        map((data: any) => {
+          if (!isPagedResourceCollection(data)) {
+            if (CacheService.enabled) {
+              this.cacheService.evictValue(CacheKey.of(url, httpOptions));
+            }
+            const errMsg = 'You try to get wrong resource type, expected paged resource collection type.';
+            StageLogger.stageErrorLog(Stage.INIT_RESOURCE, {error: errMsg});
+            throw new Error(errMsg);
+          }
 
-        return ResourceUtils.instantiatePagedResourceCollection(data) as T;
-      }),
-      catchError(error => observableThrowError(error)));
+          return ResourceUtils.instantiatePagedResourceCollection(data) as T;
+        }),
+        catchError(error => observableThrowError(error)));
   }
 
   /**

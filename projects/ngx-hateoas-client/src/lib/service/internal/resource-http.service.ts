@@ -50,12 +50,14 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
       .pipe(
         map((data: any) => {
           if (!isResource(data)) {
-            this.cacheService.evictValue(CacheKey.of(url, httpOptions));
+            if (CacheService.enabled) {
+              this.cacheService.evictValue(CacheKey.of(url, httpOptions));
+            }
             const errMsg = 'You try to get wrong resource type, expected single resource.';
             StageLogger.stageErrorLog(Stage.INIT_RESOURCE, {
               error: errMsg
             });
-            throw Error(errMsg);
+            throw new Error(errMsg);
           }
 
           return ResourceUtils.instantiateResource(data) as T;

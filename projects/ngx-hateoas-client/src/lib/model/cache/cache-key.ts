@@ -1,10 +1,17 @@
 import { HttpParams } from '@angular/common/http';
 
+/**
+ * Contains all needed information about a resource.
+ * It generates a string cache key to hold in a cache map from information about a resource.
+ */
 export class CacheKey {
 
+  /**
+   * String cache key value.
+   */
   public value: string;
 
-  constructor(public readonly url: string, private readonly options: {
+  private constructor(public readonly url: string, private readonly options: {
     observe?: 'body' | 'response';
     params?: HttpParams
   }) {
@@ -19,6 +26,12 @@ export class CacheKey {
     }
   }
 
+  /**
+   * Create cache key from resource url and request params.
+   *
+   * @param url resource url
+   * @param params request params
+   */
   public static of(url: string, params: {
     observe?: 'body' | 'response';
     params?: HttpParams

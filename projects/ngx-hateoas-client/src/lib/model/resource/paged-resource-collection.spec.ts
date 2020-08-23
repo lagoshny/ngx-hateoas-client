@@ -54,6 +54,10 @@ describe('PagedResourceCollection', () => {
     DependencyInjector.injector = TestBed;
   });
 
+  afterEach(() => {
+    DependencyInjector.injector = null;
+  });
+
   it('should be created from resource collection with default page options', () => {
     const pagedResourceCollection = new PagedResourceCollection(new SimpleResourceCollection());
 

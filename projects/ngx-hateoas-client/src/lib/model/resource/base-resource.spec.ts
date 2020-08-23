@@ -120,6 +120,28 @@ describe('BaseResource GET_RELATION', () => {
     expect(() => baseResource.getRelation('order', undefined).subscribe()).not.toThrow();
   });
 
+  it('should fill projection template param for TEMPLATED link', () => {
+    resourceHttpServiceSpy.get.and.returnValue(of(new TestOrderResource()));
+
+    baseResource.getRelation('paymentType', {
+      params: {
+        projection: 'paymentProjection'
+      }
+    }).subscribe(() => {
+      const resultResourceUrl = resourceHttpServiceSpy.get.calls.argsFor(0)[0];
+      expect(resultResourceUrl).toBe('http://localhost:8080/api/v1/order/1/payment?projection=paymentProjection');
+    });
+  });
+
+  it('should clear template params for TEMPLATED link when passed params object IS EMPTY', () => {
+    resourceHttpServiceSpy.get.and.returnValue(of(new TestOrderResource()));
+
+    baseResource.getRelation('paymentType', {}).subscribe(() => {
+      const resultResourceUrl = resourceHttpServiceSpy.get.calls.argsFor(0)[0];
+      expect(resultResourceUrl).toBe('http://localhost:8080/api/v1/order/1/payment');
+    });
+  });
+
 });
 
 describe('BaseResource GET_RELATED_COLLECTION', () => {
@@ -168,6 +190,41 @@ describe('BaseResource GET_RELATED_COLLECTION', () => {
     resourceCollectionHttpServiceSpy.get.and.returnValue(of(new TestOrderResource()));
 
     expect(() => baseResource.getRelatedCollection('order', undefined).subscribe()).not.toThrow();
+  });
+
+  it('should fill template params in TEMPLATED link from passed params object', () => {
+    resourceCollectionHttpServiceSpy.get.and.returnValue(of(new TestOrderResource()));
+
+    baseResource.getRelatedCollection('paymentType', {
+      params: {
+        paymentId: 10
+      }
+    }).subscribe(() => {
+      const resultResourceUrl = resourceCollectionHttpServiceSpy.get.calls.argsFor(0)[0];
+      expect(resultResourceUrl).toBe('http://localhost:8080/api/v1/order/1/payment?paymentId=10');
+    });
+  });
+
+  it('should fill projection template param for TEMPLATED link', () => {
+    resourceCollectionHttpServiceSpy.get.and.returnValue(of(new TestOrderResource()));
+
+    baseResource.getRelatedCollection('paymentType', {
+      params: {
+        projection: 'paymentProjection'
+      }
+    }).subscribe(() => {
+      const resultResourceUrl = resourceCollectionHttpServiceSpy.get.calls.argsFor(0)[0];
+      expect(resultResourceUrl).toBe('http://localhost:8080/api/v1/order/1/payment?projection=paymentProjection');
+    });
+  });
+
+  it('should clear template params for TEMPLATED link when passed params object IS EMPTY', () => {
+    resourceCollectionHttpServiceSpy.get.and.returnValue(of(new TestOrderResource()));
+
+    baseResource.getRelatedCollection('paymentType', {}).subscribe(() => {
+      const resultResourceUrl = resourceCollectionHttpServiceSpy.get.calls.argsFor(0)[0];
+      expect(resultResourceUrl).toBe('http://localhost:8080/api/v1/order/1/payment');
+    });
   });
 
 });

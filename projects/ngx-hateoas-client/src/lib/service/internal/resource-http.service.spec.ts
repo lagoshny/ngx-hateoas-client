@@ -8,8 +8,7 @@ import { Resource } from '../../model/resource/resource';
 import { of } from 'rxjs';
 import { rawPagedResourceCollection, rawResource, rawResourceCollection, SimpleResource } from '../../model/resource/resources.test';
 import { HttpParams } from '@angular/common/http';
-import { ResourceCollection } from '../../model/resource/resource-collection';
-import { PagedResourceCollection } from '../../model/resource/paged-resource-collection';
+import { CacheService } from '../cache.service';
 
 describe('ResourceHttpService', () => {
   let resourceHttpService: ResourceHttpService<BaseResource>;
@@ -81,61 +80,44 @@ describe('ResourceHttpService', () => {
     });
   });
 
-  // it('should clear template params for TEMPLATED link when passed params object IS EMPTY', () => {
-  //   resourceHttpServiceSpy.get.and.returnValue(of(new TestOrderResource()));
-  //
-  //   baseResource.getRelation('paymentType', {}).subscribe(() => {
-  //     const resultResourceUrl = resourceHttpServiceSpy.get.calls.argsFor(0)[0];
-  //     expect(resultResourceUrl).toBe('http://localhost:8080/api/v1/order/1/payment');
-  //   });
-  // });
+  it('GET REQUEST should fill http request params from params object', () => {
+    httpClientSpy.get.and.returnValue(of(rawResource));
 
-  // it('should fill projection template param for TEMPLATED link', () => {
-  //   resourceHttpServiceSpy.get.and.returnValue(of(new TestOrderResource()));
-  //
-  //   baseResource.getRelation('paymentType', {
-  //     params: {
-  //       projection: 'paymentProjection'
-  //     }
-  //   }).subscribe(() => {
-  //     const resultResourceUrl = resourceHttpServiceSpy.get.calls.argsFor(0)[0];
-  //     expect(resultResourceUrl).toBe('http://localhost:8080/api/v1/order/1/payment?projection=paymentProjection');
-  //   });
-  // });
+    resourceHttpService.get('order', {
+      params: {
+        orderType: 'online'
+      }
+    }).subscribe(() => {
+      const httpParams = httpClientSpy.get.calls.argsFor(0)[1].params;
+      expect(httpParams.has('orderType')).toBeTrue();
+      expect(httpParams.get('orderType')).toBe('online');
+    });
+  });
 
-  // it('should fill http request params for NOT TEMPLATED link from params object', () => {
-  //   resourceHttpServiceSpy.get.and.returnValue(of(new TestOrderResource()));
-  //
-  //   baseResource.getRelation('order', {
-  //     params: {
-  //       orderType: 'online'
-  //     }
-  //   }).subscribe(() => {
-  //     const resultResourceUrl = resourceHttpServiceSpy.get.calls.argsFor(0)[0];
-  //     expect(resultResourceUrl).toBe('http://localhost:8080/api/v1/order/1');
-  //
-  //     const httpParams = resourceHttpServiceSpy.get.calls.argsFor(0)[1].params;
-  //     expect(httpParams.has('orderType')).toBeTrue();
-  //     expect(httpParams.get('orderType')).toBe('online');
-  //   });
-  // });
-  //
-  // it('should adds projection param in http request params for NOT TEMPLATED link', () => {
-  //   resourceHttpServiceSpy.get.and.returnValue(of(new TestOrderResource()));
-  //
-  //   baseResource.getRelation('order', {
-  //     params: {
-  //       projection: 'orderProjection'
-  //     }
-  //   }).subscribe(() => {
-  //     const resultResourceUrl = resourceHttpServiceSpy.get.calls.argsFor(0)[0];
-  //     expect(resultResourceUrl).toBe('http://localhost:8080/api/v1/order/1');
-  //
-  //     const httpParams = resourceHttpServiceSpy.get.calls.argsFor(0)[1].params;
-  //     expect(httpParams.has('projection')).toBeTrue();
-  //     expect(httpParams.get('projection')).toBe('orderProjection');
-  //   });
-  // });
+  it('GET REQUEST should adds projection param in http request params', () => {
+    httpClientSpy.get.and.returnValue(of(rawResource));
+
+    resourceHttpService.get('order', {
+      params: {
+        projection: 'orderProjection'
+      }
+    }).subscribe(() => {
+      const httpParams = httpClientSpy.get.calls.argsFor(0)[1].params;
+      expect(httpParams.has('projection')).toBeTrue();
+      expect(httpParams.get('projection')).toBe('orderProjection');
+    });
+  });
+
+  it('GET REQUEST should evict cache when returned object is not resource', () => {
+    CacheService.enabled = true;
+    httpClientSpy.get.and.returnValue(of({any: 'value'}));
+
+    resourceHttpService.get('someUrl').subscribe(() => {
+    }, () => {
+      expect(cacheServiceSpy.evictValue.calls.count()).toBe(1);
+    });
+    CacheService.enabled = false;
+  });
 
   it('POST REQUEST should return resource', () => {
     httpClientSpy.post.and.returnValue(of(rawResource));

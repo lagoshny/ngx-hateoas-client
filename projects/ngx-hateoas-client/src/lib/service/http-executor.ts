@@ -5,8 +5,8 @@ import { StageLogger } from '../logger/stage-logger';
 import { Stage } from '../logger/stage.enum';
 import { ValidationUtils } from '../util/validation.utils';
 import { CacheKey } from './internal/cache/model/cache-key';
-import { ResourceCacheService } from './internal/cache/resource-cache.service';
 import { isResourceObject } from '../model/resource-type';
+import { ResourceCacheService } from './internal/cache/resource-cache.service';
 
 /**
  * Base class with common logics to perform HTTP requests.

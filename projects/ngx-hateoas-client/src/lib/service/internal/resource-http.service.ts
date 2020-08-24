@@ -1,14 +1,14 @@
 import { Injectable } from '@angular/core';
 import { Observable, throwError as observableThrowError } from 'rxjs';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { catchError, map, tap } from 'rxjs/operators';
+import { catchError, map } from 'rxjs/operators';
 import { ResourceUtils } from '../../util/resource.utils';
 import { BaseResource } from '../../model/resource/base-resource';
 import { DependencyInjector } from '../../util/dependency-injector';
 import { UrlUtils } from '../../util/url.utils';
 import * as _ from 'lodash';
 import { isResource } from '../../model/resource-type';
-import { GetOption, ResourceIdentifiable } from '../../model/declarations';
+import { GetOption } from '../../model/declarations';
 import { HttpExecutor } from '../http-executor';
 import { ResourceCacheService } from './cache/resource-cache.service';
 import { HttpConfigService } from '../../config/http-config.service';

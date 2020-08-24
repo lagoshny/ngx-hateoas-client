@@ -11,7 +11,6 @@ export class ValidationUtils {
    * @param params object with params to check
    * @throws error if any params are not defined
    */
-  // TODO поменять во мн. числе на are
   public static validateInputParams(params: object): void {
     if (_.isNil(params)) {
       const errMsg = 'Passed params object is not valid';

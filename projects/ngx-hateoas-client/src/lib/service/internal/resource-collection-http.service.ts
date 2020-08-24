@@ -9,7 +9,7 @@ import { ResourceUtils } from '../../util/resource.utils';
 import { ResourceCollection } from '../../model/resource/resource-collection';
 import { BaseResource } from '../../model/resource/base-resource';
 import { DependencyInjector } from '../../util/dependency-injector';
-import { GetOption, ResourceIdentifiable } from '../../model/declarations';
+import { GetOption } from '../../model/declarations';
 import { UrlUtils } from '../../util/url.utils';
 import { HttpExecutor } from '../http-executor';
 import { StageLogger } from '../../logger/stage-logger';

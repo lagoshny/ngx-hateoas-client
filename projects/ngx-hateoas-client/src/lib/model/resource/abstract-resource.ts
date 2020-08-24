@@ -4,7 +4,7 @@ import * as _ from 'lodash';
 /**
  * Abstract impl identifies resource interface.
  */
-export abstract class AbstractResourceIdentifiable {
+export abstract class AbstractResource {
 
   /**
    * List of links related with the resource.

@@ -18,7 +18,7 @@ export class ResourceCacheService {
   /**
    * Time before cache was expired (seconds).
    */
-  private cacheLifeTime: number = ResourceCacheService.DEFAULT_CACHE_LIFE_TIME;
+  public cacheLifeTime: number = ResourceCacheService.DEFAULT_CACHE_LIFE_TIME;
 
   private cacheMap: Map<string, CachedResource<ResourceIdentifiable>> = new Map<string, CachedResource<ResourceIdentifiable>>();
 
@@ -43,7 +43,7 @@ export class ResourceCacheService {
     const cacheExpiredTime = new Date(cacheValue.cachedTime);
     cacheExpiredTime.setSeconds(cacheExpiredTime.getSeconds() + this.cacheLifeTime);
     if (cacheExpiredTime.getTime() < new Date().getTime()) {
-      this.cacheMap.delete(key.value);
+      this.evictResource(key);
       StageLogger.stageLog(Stage.CACHE_GET, {cacheKey: key.value, message: 'cache was expired', result: null});
       return null;
     }
@@ -62,8 +62,6 @@ export class ResourceCacheService {
   public putResource(key: CacheKey, value: ResourceIdentifiable): void {
     ValidationUtils.validateInputParams({key, value});
 
-    // TODO проверить надо ли удалять старое
-    this.cacheMap.delete(key.value);
     this.cacheMap.set(key.value, new CachedResource(value, new Date()));
 
     StageLogger.stageLog(Stage.CACHE_PUT, {cacheKey: key.value, value});
@@ -94,10 +92,6 @@ export class ResourceCacheService {
     if (evictedCache.length > 0) {
       StageLogger.stageLog(Stage.CACHE_EVICT, {cacheKey: key.value, evicted: evictedCache});
     }
-  }
-
-  public setCacheLifeTime(lifeTime: number) {
-    this.cacheLifeTime = lifeTime;
   }
 
 }

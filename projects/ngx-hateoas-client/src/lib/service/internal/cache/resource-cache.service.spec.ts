@@ -1,7 +1,7 @@
 import { HttpConfigService } from '../../../config/http-config.service';
 import { ResourceCacheService } from './resource-cache.service';
 import { CacheKey } from './model/cache-key';
-import { rawResource } from '../../../model/resource/resources.test';
+import { rawPagedResourceCollection, rawResource, rawResourceCollection } from '../../../model/resource/resources.test';
 import { async } from '@angular/core/testing';
 
 describe('CacheService', () => {
@@ -15,42 +15,33 @@ describe('CacheService', () => {
     cacheService = new ResourceCacheService(httpConfigService);
   }));
 
-  it('GET_VALUE should throw error when passed key is null', () => {
+  it('GET_RESOURCE should throw error when passed key is null', () => {
     expect(() => cacheService.getResource(null))
       .toThrowError(`Passed param(s) 'key = null' is not valid`);
   });
 
-  it('GET_VALUE should throw error when passed key is undefined', () => {
+  it('GET_RESOURCE should throw error when passed key is undefined', () => {
     expect(() => cacheService.getResource(undefined))
       .toThrowError(`Passed param(s) 'key = undefined' is not valid`);
   });
 
-  it('GET_VALUE should return null when a cache has not value', () => {
+  it('GET_RESOURCE should return null when a cache has not value', () => {
     const result = cacheService.getResource(CacheKey.of('any', {}));
     expect(result).toBeNull();
   });
 
-  it('GET_VALUE should return null when a cache has value but it is expired', async(() => {
-    cacheService.setCacheLifeTime(1 / 1000);
+  it('GET_RESOURCE should return null when a cache has value but it is expired', async(() => {
+    cacheService.cacheLifeTime = 1 / 1000;
     cacheService.putResource(CacheKey.of('someVal', {}), rawResource);
 
     setTimeout(() => {
       const result = cacheService.getResource(CacheKey.of('someVal', {}));
-      expect(result).toBeDefined();
       expect(result).toBe(null);
-      cacheService.setCacheLifeTime(5 * 60 * 1000);
+      cacheService.cacheLifeTime = ResourceCacheService.DEFAULT_CACHE_LIFE_TIME;
     }, 200);
   }));
 
-  // it('GET_VALUE should delete expired value from a cache', () => {
-  //   cacheService.putResource(CacheKey.of('someVal', {}), {value: 'test'});
-  //
-  //   const result = cacheService.getResource(CacheKey.of('someVal', {}));
-  //   expect(result).toBeDefined();
-  //   expect(result).toEqual({value: 'test'});
-  // });
-
-  it('GET_VALUE should return value from a cache', () => {
+  it('GET_RESOURCE should return value from a cache', () => {
     cacheService.putResource(CacheKey.of('someVal', {}), rawResource);
 
     const result = cacheService.getResource(CacheKey.of('someVal', {}));
@@ -58,5 +49,41 @@ describe('CacheService', () => {
     expect(result).toEqual(rawResource);
   });
 
+  it('PUT_RESOURCE should throw error when passed key,value are null', () => {
+    expect(() => cacheService.putResource(null, null))
+      .toThrowError(`Passed param(s) 'key = null', 'value = null' is not valid`);
+  });
+
+  it('PUT_RESOURCE should throw error when passed key,value are undefined', () => {
+    expect(() => cacheService.putResource(undefined, undefined))
+      .toThrowError(`Passed param(s) 'key = undefined', 'value = undefined' is not valid`);
+  });
+
+  it('PUT_RESOURCE should put value to a cache', () => {
+    cacheService.putResource(CacheKey.of('someVal', {}), rawPagedResourceCollection);
+
+    const result = cacheService.getResource(CacheKey.of('someVal', {}));
+    expect(result).toEqual(rawPagedResourceCollection);
+  });
+
+  it('EVICT_RESOURCE should throw error when passed key,value are null', () => {
+    expect(() => cacheService.evictResource(null))
+      .toThrowError(`Passed param(s) 'key = null' is not valid`);
+  });
+
+  it('EVICT_RESOURCE should throw error when passed key,value are undefined', () => {
+    expect(() => cacheService.evictResource(undefined))
+      .toThrowError(`Passed param(s) 'key = undefined' is not valid`);
+  });
+
+  it('EVICT_RESOURCE should evict all resource cache by resourceName from key', () => {
+    cacheService.putResource(CacheKey.of('http://localhost:8080/api/v1/resources/1', {}), rawResource);
+    cacheService.putResource(CacheKey.of('http://localhost:8080/api/v1/resources', {}), rawResourceCollection);
+
+    cacheService.evictResource(CacheKey.of('http://localhost:8080/api/v1/resources/1', {}));
+
+    expect(cacheService.getResource(CacheKey.of('http://localhost:8080/api/v1/resources/1', {}))).toBeNull();
+    expect(cacheService.getResource(CacheKey.of('http://localhost:8080/api/v1/resources', {}))).toBeNull();
+  });
 
 });

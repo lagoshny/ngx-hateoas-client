@@ -40,7 +40,7 @@ export class HalConfigurationService {
     ConsoleLogger.enabled = config.verboseLogs;
     this.resourceCacheService.enabled = config.cache?.enabled;
     if (config.cache?.lifeTime && config.cache?.lifeTime > 0) {
-      this.resourceCacheService.setCacheLifeTime(config.cache?.lifeTime);
+      this.resourceCacheService.cacheLifeTime = config.cache?.lifeTime;
     }
 
     ConsoleLogger.prettyInfo('HateoasClient was configured with options', {

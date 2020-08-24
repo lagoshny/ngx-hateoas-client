@@ -5,7 +5,7 @@ import { Observable, throwError as observableThrowError } from 'rxjs';
 import { HttpMethod, PagedGetOption } from '../../model/declarations';
 import { UrlUtils } from '../../util/url.utils';
 import { HttpClient } from '@angular/common/http';
-import { CacheService } from '../cache.service';
+import { CacheService } from './cache.service';
 import { HttpConfigService } from '../../config/http-config.service';
 import { map } from 'rxjs/operators';
 import { isPagedResourceCollection, isResource, isResourceCollection } from '../../model/resource-type';

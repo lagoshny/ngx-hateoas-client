@@ -1,14 +1,13 @@
 /* tslint:disable:no-string-literal */
 import { BaseResource } from '../../model/resource/base-resource';
 import { HttpConfigService } from '../../config/http-config.service';
-import { async } from '@angular/core/testing';
 import { ResourceUtils } from '../../util/resource.utils';
 import { ResourceHttpService } from './resource-http.service';
 import { Resource } from '../../model/resource/resource';
 import { of } from 'rxjs';
 import { rawPagedResourceCollection, rawResource, rawResourceCollection, SimpleResource } from '../../model/resource/resources.test';
 import { HttpParams } from '@angular/common/http';
-import { CacheService } from '../cache.service';
+import { CacheService } from './cache.service';
 
 describe('ResourceHttpService', () => {
   let resourceHttpService: ResourceHttpService<BaseResource>;
@@ -16,7 +15,7 @@ describe('ResourceHttpService', () => {
   let cacheServiceSpy: any;
   let httpConfigService: HttpConfigService;
 
-  beforeEach(async(() => {
+  beforeEach(() => {
     httpClientSpy = {
       get: jasmine.createSpy('get'),
       post: jasmine.createSpy('post'),
@@ -35,9 +34,7 @@ describe('ResourceHttpService', () => {
 
     resourceHttpService =
       new ResourceHttpService<BaseResource>(httpClientSpy, cacheServiceSpy, httpConfigService);
-  }));
 
-  beforeEach(() => {
     ResourceUtils.useResourceType(Resource);
   });
 

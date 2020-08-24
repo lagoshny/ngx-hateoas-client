@@ -1,5 +1,4 @@
 /* tslint:disable:no-string-literal */
-import { async } from '@angular/core/testing';
 import { HalResourceService } from './hal-resource.service';
 import { HttpMethod, Include, Resource } from '../../ngx-hateoas-client.module';
 import { of } from 'rxjs';
@@ -33,7 +32,7 @@ describe('HalResourceService', () => {
   let resourceCollectionHttpServiceSpy: any;
   let pagedResourceCollectionHttpServiceSpy: any;
 
-  beforeEach(async(() => {
+  beforeEach(() => {
     commonHttpServiceSpy = {
       customQuery: jasmine.createSpy('customQuery')
     };
@@ -56,9 +55,7 @@ describe('HalResourceService', () => {
     halResourceService =
       new HalResourceService<Resource>(commonHttpServiceSpy, resourceHttpServiceSpy,
         resourceCollectionHttpServiceSpy, pagedResourceCollectionHttpServiceSpy);
-  }));
 
-  beforeEach(() => {
     ResourceUtils.useResourceType(Resource);
   });
 

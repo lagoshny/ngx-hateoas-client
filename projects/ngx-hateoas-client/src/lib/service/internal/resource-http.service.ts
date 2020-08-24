@@ -10,7 +10,7 @@ import * as _ from 'lodash';
 import { isResource } from '../../model/resource-type';
 import { GetOption } from '../../model/declarations';
 import { HttpExecutor } from '../http-executor';
-import { CacheService } from '../cache.service';
+import { CacheService } from './cache.service';
 import { HttpConfigService } from '../../config/http-config.service';
 import { Stage } from '../../logger/stage.enum';
 import { StageLogger } from '../../logger/stage-logger';

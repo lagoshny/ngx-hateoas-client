@@ -1,6 +1,5 @@
 /* tslint:disable:no-string-literal */
 import { HttpConfigService } from '../../config/http-config.service';
-import { async } from '@angular/core/testing';
 import { CommonResourceHttpService } from './common-resource-http.service';
 import { HttpMethod } from '../../model/declarations';
 import { of } from 'rxjs';
@@ -18,7 +17,7 @@ describe('CommonResourceHttpService CUSTOM_QUERY', () => {
   let cacheServiceSpy: any;
   let httpConfigService: HttpConfigService;
 
-  beforeEach(async(() => {
+  beforeEach(() => {
     httpClientSpy = {
       get: jasmine.createSpy('get'),
       post: jasmine.createSpy('post'),
@@ -36,9 +35,7 @@ describe('CommonResourceHttpService CUSTOM_QUERY', () => {
 
     commonHttpService =
       new CommonResourceHttpService(httpClientSpy, cacheServiceSpy, httpConfigService);
-  }));
 
-  beforeEach(() => {
     ResourceUtils.useResourceType(Resource);
     ResourceUtils.useResourceCollectionType(ResourceCollection);
     ResourceUtils.usePagedResourceCollectionType(PagedResourceCollection);

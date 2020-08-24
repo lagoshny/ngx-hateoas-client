@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { CacheService } from '../cache.service';
+import { CacheService } from './cache.service';
 import { HttpConfigService } from '../../config/http-config.service';
 import { Observable, throwError as observableThrowError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';

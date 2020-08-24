@@ -5,7 +5,7 @@ import { StageLogger } from '../logger/stage-logger';
 import { Stage } from '../logger/stage.enum';
 import { ValidationUtils } from '../util/validation.utils';
 import { CacheKey } from '../model/cache/cache-key';
-import { CacheService } from './cache.service';
+import { CacheService } from './internal/cache.service';
 import { ResourceIdentifiable } from '../model/resource/resource-identifiable';
 
 /**

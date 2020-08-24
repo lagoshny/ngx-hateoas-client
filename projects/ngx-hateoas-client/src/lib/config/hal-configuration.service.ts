@@ -8,7 +8,7 @@ import { Resource } from '../model/resource/resource';
 import { ResourceCollection } from '../model/resource/resource-collection';
 import { EmbeddedResource } from '../model/resource/embedded-resource';
 import { PagedResourceCollection } from '../model/resource/paged-resource-collection';
-import { CacheService } from '../service/cache.service';
+import { CacheService } from '../service/internal/cache.service';
 
 /**
  * This service for configuration library.

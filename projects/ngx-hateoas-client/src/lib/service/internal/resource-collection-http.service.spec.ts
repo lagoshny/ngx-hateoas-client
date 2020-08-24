@@ -1,4 +1,3 @@
-import { async } from '@angular/core/testing';
 import { HttpConfigService } from '../../config/http-config.service';
 import { ResourceCollectionHttpService } from './resource-collection-http.service';
 import { ResourceCollection } from '../../model/resource/resource-collection';
@@ -8,7 +7,7 @@ import { rawEmbeddedResource, rawPagedResourceCollection, rawResource, rawResour
 import { ResourceUtils } from '../../util/resource.utils';
 import { HttpParams } from '@angular/common/http';
 import { Resource } from '../../model/resource/resource';
-import { CacheService } from '../cache.service';
+import { CacheService } from './cache.service';
 
 /* tslint:disable:no-string-literal */
 describe('ResourceCollectionHttpService', () => {
@@ -17,7 +16,7 @@ describe('ResourceCollectionHttpService', () => {
   let cacheServiceSpy: any;
   let httpConfigService: HttpConfigService;
 
-  beforeEach(async(() => {
+  beforeEach(() => {
     httpClientSpy = {
       get: jasmine.createSpy('get')
     };
@@ -32,9 +31,7 @@ describe('ResourceCollectionHttpService', () => {
 
     resourceCollectionHttpService =
       new ResourceCollectionHttpService<ResourceCollection<BaseResource>>(httpClientSpy, cacheServiceSpy, httpConfigService);
-  }));
 
-  beforeEach(() => {
     ResourceUtils.useResourceType(Resource);
     ResourceUtils.useResourceCollectionType(ResourceCollection);
   });

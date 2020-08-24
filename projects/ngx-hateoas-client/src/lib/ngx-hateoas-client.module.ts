@@ -2,7 +2,7 @@ import { ModuleWithProviders, NgModule } from '@angular/core';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { HalConfigurationService } from './config/hal-configuration.service';
 import { HttpConfigService } from './config/http-config.service';
-import { CacheService } from './service/cache.service';
+import { CacheService } from './service/internal/cache.service';
 import { HalResourceService } from './service/external/hal-resource.service';
 import { ResourceHttpService } from './service/internal/resource-http.service';
 import { PagedResourceCollectionHttpService } from './service/internal/paged-resource-collection-http.service';

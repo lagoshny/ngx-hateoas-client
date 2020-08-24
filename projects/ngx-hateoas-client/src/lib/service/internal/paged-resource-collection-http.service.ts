@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BaseResource } from '../../model/resource/base-resource';
 import { HttpClient } from '@angular/common/http';
-import { CacheService } from '../cache.service';
+import { CacheService } from './cache.service';
 import { HttpConfigService } from '../../config/http-config.service';
 import { PagedResourceCollection } from '../../model/resource/paged-resource-collection';
 import { catchError, map } from 'rxjs/operators';

@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
-import { ResourceIdentifiable } from '../model/resource/resource-identifiable';
-import { CacheResource } from '../model/cache/cache-resource';
-import { StageLogger } from '../logger/stage-logger';
-import { Stage } from '../logger/stage.enum';
-import { CacheKey } from '../model/cache/cache-key';
+import { ResourceIdentifiable } from '../../model/resource/resource-identifiable';
+import { CacheResource } from '../../model/cache/cache-resource';
+import { StageLogger } from '../../logger/stage-logger';
+import { Stage } from '../../logger/stage.enum';
+import { CacheKey } from '../../model/cache/cache-key';
 import * as _ from 'lodash';
-import { HttpConfigService } from '../config/http-config.service';
+import { HttpConfigService } from '../../config/http-config.service';
 
 @Injectable()
 export class CacheService<T extends ResourceIdentifiable> {

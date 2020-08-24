@@ -9,7 +9,7 @@ import { HttpParams } from '@angular/common/http';
 import { PagedResourceCollectionHttpService } from './paged-resource-collection-http.service';
 import { PagedResourceCollection } from '../../model/resource/paged-resource-collection';
 import { Resource } from '../../model/resource/resource';
-import { CacheService } from '../cache.service';
+import { CacheService } from './cache.service';
 
 /* tslint:disable:no-string-literal */
 describe('PagedResourceCollectionHttpService', () => {
@@ -18,7 +18,7 @@ describe('PagedResourceCollectionHttpService', () => {
   let cacheServiceSpy: any;
   let httpConfigService: HttpConfigService;
 
-  beforeEach(async(() => {
+  beforeEach(() => {
     httpClientSpy = {
       get: jasmine.createSpy('get')
     };
@@ -33,9 +33,7 @@ describe('PagedResourceCollectionHttpService', () => {
 
     pagedResourceCollectionHttpService =
       new PagedResourceCollectionHttpService<PagedResourceCollection<BaseResource>>(httpClientSpy, cacheServiceSpy, httpConfigService);
-  }));
 
-  beforeEach(() => {
     ResourceUtils.useResourceType(Resource);
     ResourceUtils.useResourceCollectionType(ResourceCollection);
     ResourceUtils.usePagedResourceCollectionType(PagedResourceCollection);

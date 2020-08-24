@@ -1,7 +1,7 @@
 import { HttpExecutor } from './http-executor';
 import { async } from '@angular/core/testing';
 import { of } from 'rxjs';
-import { CacheService } from './cache.service';
+import { CacheService } from './internal/cache.service';
 import anything = jasmine.anything;
 
 describe('HttpExecutor', () => {
@@ -9,7 +9,7 @@ describe('HttpExecutor', () => {
   let httpClientSpy: any;
   let cacheServiceSpy: any;
 
-  beforeEach(async(() => {
+  beforeEach(() => {
     httpClientSpy = {
       get: jasmine.createSpy('get'),
       post: jasmine.createSpy('post'),
@@ -25,7 +25,7 @@ describe('HttpExecutor', () => {
     };
 
     httpExecutor = new HttpExecutor(httpClientSpy, cacheServiceSpy);
-  }));
+  });
 
   it('GET should throw error when passed url is empty', () => {
     expect(() => httpExecutor.getHttp(''))

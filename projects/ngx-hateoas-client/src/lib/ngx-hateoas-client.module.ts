@@ -1,7 +1,7 @@
 import { ModuleWithProviders, NgModule } from '@angular/core';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { HalConfigurationService } from './config/hal-configuration.service';
-import { HttpConfigService } from './config/http-config.service';
+import { LibConfig } from './config/lib-config';
 import { HalResourceService } from './service/external/hal-resource.service';
 import { ResourceHttpService } from './service/internal/resource-http.service';
 import { PagedResourceCollectionHttpService } from './service/internal/paged-resource-collection-http.service';
@@ -26,7 +26,7 @@ export { HalResourceService } from './service/external/hal-resource.service';
   declarations: [],
   providers: [
     HttpClient,
-    HttpConfigService,
+    LibConfig,
     ResourceCacheService,
     HalResourceService,
     CommonResourceHttpService,

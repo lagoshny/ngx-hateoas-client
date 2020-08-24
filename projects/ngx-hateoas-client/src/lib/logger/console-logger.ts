@@ -1,19 +1,18 @@
 import * as _ from 'lodash';
+import { LibConfig } from '../config/lib-config';
 
 /* tslint:disable:variable-name no-console */
 export class ConsoleLogger {
 
-  private static _enabled = false;
-
   public static info(message?: any, ...optionalParams: any[]): void {
-    if (!this.enabled) {
+    if (!LibConfig.config.logs.verboseLogs) {
       return;
     }
     console.info(message, ...optionalParams);
   }
 
   public static error(message?: any, ...optionalParams: any[]): void {
-    if (!this.enabled) {
+    if (!LibConfig.config.logs.verboseLogs) {
       return;
     }
     console.error(message, ...optionalParams);
@@ -26,7 +25,7 @@ export class ConsoleLogger {
    * @param params additional params for verbose log
    */
   public static prettyInfo(message: string, params?: object): void {
-    if (!this.enabled) {
+    if (!LibConfig.config.logs.verboseLogs) {
       return;
     }
 
@@ -58,7 +57,7 @@ export class ConsoleLogger {
    * @param params additional params for verbose log
    */
   public static resourcePrettyInfo(resourceName: string, message: string, params?: object): void {
-    if (!this.enabled) {
+    if (!LibConfig.config.logs.verboseLogs) {
       return;
     }
 
@@ -90,7 +89,7 @@ export class ConsoleLogger {
    * @param params additional params for verbose log
    */
   public static prettyError(message: string, params?: object): void {
-    if (!this.enabled) {
+    if (!LibConfig.config.logs.verboseLogs) {
       return;
     }
 
@@ -112,14 +111,6 @@ export class ConsoleLogger {
     }
 
     ConsoleLogger.error(msg, ...color);
-  }
-
-  static set enabled(value: boolean) {
-    this._enabled = value;
-  }
-
-  static get enabled(): boolean {
-    return this._enabled;
   }
 
 }

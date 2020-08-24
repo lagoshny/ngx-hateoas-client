@@ -1,18 +1,17 @@
 /* tslint:disable:no-string-literal */
 import { BaseResource } from '../../model/resource/base-resource';
-import { HttpConfigService } from '../../config/http-config.service';
 import { ResourceUtils } from '../../util/resource.utils';
 import { ResourceHttpService } from './resource-http.service';
 import { Resource } from '../../model/resource/resource';
 import { of } from 'rxjs';
 import { rawPagedResourceCollection, rawResource, rawResourceCollection, SimpleResource } from '../../model/resource/resources.test';
 import { HttpParams } from '@angular/common/http';
+import { LibConfig } from '../../config/lib-config';
 
 describe('ResourceHttpService', () => {
   let resourceHttpService: ResourceHttpService<BaseResource>;
   let httpClientSpy: any;
   let cacheServiceSpy: any;
-  let httpConfigService: HttpConfigService;
 
   beforeEach(() => {
     httpClientSpy = {
@@ -28,18 +27,16 @@ describe('ResourceHttpService', () => {
       getResource: jasmine.createSpy('getResource'),
       evictResource: jasmine.createSpy('evictResource')
     };
-    httpConfigService = {
-      baseApiUrl: 'http://localhost:8080/api/v1'
-    };
 
     resourceHttpService =
-      new ResourceHttpService<BaseResource>(httpClientSpy, cacheServiceSpy, httpConfigService);
+      new ResourceHttpService<BaseResource>(httpClientSpy, cacheServiceSpy);
 
     ResourceUtils.useResourceType(Resource);
   });
 
   afterEach(() => {
     ResourceUtils.useResourceType(null);
+    LibConfig.config = LibConfig.DEFAULT_CONFIG;
   });
 
   it('GET REQUEST should throw error when returned object is COLLECTION_RESOURCE', () => {
@@ -106,7 +103,7 @@ describe('ResourceHttpService', () => {
   });
 
   it('GET REQUEST should evict cache when returned object is not resource', () => {
-    cacheServiceSpy.enabled = true;
+    LibConfig.config.cache.enabled = true;
     httpClientSpy.get.and.returnValue(of({any: 'value'}));
 
     resourceHttpService.get('someUrl').subscribe(() => {
@@ -199,7 +196,7 @@ describe('ResourceHttpService', () => {
 
     resourceHttpService.getResource('test', 10).subscribe(() => {
       const url = httpClientSpy.get.calls.argsFor(0)[0];
-      expect(url).toBe(`${ httpConfigService.baseApiUrl }/test/10`);
+      expect(url).toBe(`${ LibConfig.config.http.baseApiUrl }/test/10`);
     });
   });
 
@@ -241,7 +238,7 @@ describe('ResourceHttpService', () => {
 
     resourceHttpService.postResource('test', new SimpleResource()).subscribe(() => {
       const url = httpClientSpy.post.calls.argsFor(0)[0];
-      expect(url).toBe(`${ httpConfigService.baseApiUrl }/test`);
+      expect(url).toBe(`${ LibConfig.config.http.baseApiUrl }/test`);
     });
   });
 
@@ -288,7 +285,7 @@ describe('ResourceHttpService', () => {
 
     resourceHttpService.search('test', 'someQuery').subscribe(() => {
       const url = httpClientSpy.get.calls.argsFor(0)[0];
-      expect(url).toBe(`${ httpConfigService.baseApiUrl }/test/search/someQuery`);
+      expect(url).toBe(`${ LibConfig.config.http.baseApiUrl }/test/search/someQuery`);
     });
   });
 

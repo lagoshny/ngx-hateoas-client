@@ -5,6 +5,7 @@ import { Resource } from './resource';
 import { of } from 'rxjs';
 import { ResourceUtils } from '../../util/resource.utils';
 import { HttpHeaders, HttpResponse } from '@angular/common/http';
+import { LibConfig } from '../../config/lib-config';
 
 // tslint:disable:variable-name
 // tslint:disable:no-string-literal
@@ -83,6 +84,12 @@ describe('Resource ADD_RELATION', () => {
 
     TestBed.configureTestingModule({
       providers: [
+        {
+          provide: LibConfig, useValue: {
+            enableCache: false,
+            baseApiUrl: 'http://localhost:8080/api/v1',
+          }
+        },
         {provide: ResourceHttpService, useValue: resourceHttpServiceSpy}
       ]
     }).compileComponents();
@@ -174,6 +181,12 @@ describe('Resource BIND_RELATION', () => {
 
     TestBed.configureTestingModule({
       providers: [
+        {
+          provide: LibConfig, useValue: {
+            enableCache: false,
+            baseApiUrl: 'http://localhost:8080/api/v1',
+          }
+        },
         {provide: ResourceHttpService, useValue: resourceHttpServiceSpy}
       ]
     }).compileComponents();
@@ -260,6 +273,12 @@ describe('Resource CLEAR_COLLECTION_RELATION', () => {
 
     TestBed.configureTestingModule({
       providers: [
+        {
+          provide: LibConfig, useValue: {
+            enableCache: false,
+            baseApiUrl: 'http://localhost:8080/api/v1',
+          }
+        },
         {provide: ResourceHttpService, useValue: resourceHttpServiceSpy}
       ]
     }).compileComponents();

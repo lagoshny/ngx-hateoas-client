@@ -1,6 +1,7 @@
 import * as _ from 'lodash';
 import { ConsoleLogger } from './console-logger';
 import { Stage } from './stage.enum';
+import { LibConfig } from '../config/lib-config';
 
 /**
  * Simplify logger calls.
@@ -10,6 +11,9 @@ import { Stage } from './stage.enum';
 export class StageLogger {
 
   public static resourceBeginLog(resource: object | string, method: string, params?: object): void {
+    if (!LibConfig.config.logs.verboseLogs) {
+      return;
+    }
     const paramToLog = this.prepareParams(params);
 
     let resourceName;
@@ -25,6 +29,9 @@ export class StageLogger {
   }
 
   public static resourceEndLog(resource: object | string, method: string, params: object): void {
+    if (!LibConfig.config.logs.verboseLogs) {
+      return;
+    }
     const paramToLog = this.prepareParams(params);
 
     let resourceName;
@@ -39,12 +46,18 @@ export class StageLogger {
   }
 
   public static stageLog(stage: Stage, params: object): void {
+    if (!LibConfig.config.logs.verboseLogs) {
+      return;
+    }
     const paramToLog = this.prepareParams(params);
 
     ConsoleLogger.prettyInfo(`STAGE ${ stage }`, paramToLog);
   }
 
   public static stageErrorLog(stage: Stage, params: object): void {
+    if (!LibConfig.config.logs.verboseLogs) {
+      return;
+    }
     const paramToLog = this.prepareParams(params);
 
     ConsoleLogger.prettyError(`STAGE ${ stage }`, paramToLog);

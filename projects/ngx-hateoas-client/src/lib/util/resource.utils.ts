@@ -181,11 +181,11 @@ export class ResourceUtils {
     if (_.isEmpty(resourceLinks) || _.isEmpty(resourceLinks.self) || _.isNil(resourceLinks.self.href)) {
       return undefined;
     }
-    const selfLink = resourceLinks.self.href;
+    const selfLinkHref = resourceLinks.self.href;
 
-    for (const link of Object.keys(resourceLinks)) {
-      if (link !== 'self' && UrlUtils.removeTemplateParams(resourceLinks[link].href) === selfLink) {
-        return _.upperFirst(link);
+    for (const linkKey of Object.keys(resourceLinks)) {
+      if (linkKey !== 'self' && UrlUtils.removeTemplateParams(resourceLinks[linkKey].href) === selfLinkHref) {
+        return _.upperFirst(linkKey);
       }
     }
   }

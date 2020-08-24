@@ -17,7 +17,6 @@ import { ValidationUtils } from '../../util/validation.utils';
  *
  * If you have an embedded entity then consider to use the {@link EmbeddedResource} class.
  */
-// TODO: добавить метод getResourceName, и по дефолту сделать получение имени по текущему конструктору
 // tslint:disable:variable-name
 export class Resource extends BaseResource {
 

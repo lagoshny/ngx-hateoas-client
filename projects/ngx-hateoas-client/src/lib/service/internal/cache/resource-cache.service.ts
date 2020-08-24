@@ -20,7 +20,7 @@ export class ResourceCacheService {
    */
   public cacheLifeTime: number = ResourceCacheService.DEFAULT_CACHE_LIFE_TIME;
 
-  private cacheMap: Map<string, CachedResource<ResourceIdentifiable>> = new Map<string, CachedResource<ResourceIdentifiable>>();
+  private cacheMap: Map<string, CachedResource> = new Map<string, CachedResource>();
 
   constructor(private httpConfig: HttpConfigService) {
   }

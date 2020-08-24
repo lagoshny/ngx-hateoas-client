@@ -3,13 +3,13 @@
  */
 import { ResourceIdentifiable } from '../../../../model/declarations';
 
-export class CachedResource<T extends ResourceIdentifiable>  {
+export class CachedResource  {
 
   /**
    * Cached resource value.
    * It's can be {@link Resource}, {@link ResourceCollection}, {@link PagedResourceCollection}.
    */
-  public value: T;
+  public value: ResourceIdentifiable;
 
   /**
    * Time when value was added to the cache.

@@ -51,12 +51,12 @@ describe('CacheService', () => {
 
   it('PUT_RESOURCE should throw error when passed key,value are null', () => {
     expect(() => cacheService.putResource(null, null))
-      .toThrowError(`Passed param(s) 'key = null', 'value = null' is not valid`);
+      .toThrowError(`Passed param(s) 'key = null', 'value = null' are not valid`);
   });
 
   it('PUT_RESOURCE should throw error when passed key,value are undefined', () => {
     expect(() => cacheService.putResource(undefined, undefined))
-      .toThrowError(`Passed param(s) 'key = undefined', 'value = undefined' is not valid`);
+      .toThrowError(`Passed param(s) 'key = undefined', 'value = undefined' are not valid`);
   });
 
   it('PUT_RESOURCE should put value to a cache', () => {

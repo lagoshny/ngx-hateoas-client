@@ -186,12 +186,12 @@ describe('ResourceHttpService', () => {
 
   it('GET_RESOURCE should throw error when passed resourceName,id are undefined', () => {
     expect(() => resourceHttpService.getResource(undefined, undefined))
-      .toThrowError(`Passed param(s) 'resourceName = undefined', 'id = undefined' is not valid`);
+      .toThrowError(`Passed param(s) 'resourceName = undefined', 'id = undefined' are not valid`);
   });
 
   it('GET_RESOURCE should throw error when passed resourceName,id are null', () => {
     expect(() => resourceHttpService.getResource(null, null))
-      .toThrowError(`Passed param(s) 'resourceName = null', 'id = null' is not valid`);
+      .toThrowError(`Passed param(s) 'resourceName = null', 'id = null' are not valid`);
   });
 
   it('GET_RESOURCE should generate resource url', () => {
@@ -228,12 +228,12 @@ describe('ResourceHttpService', () => {
 
   it('POST_RESOURCE should throw error when passed resourceName,body are undefined', () => {
     expect(() => resourceHttpService.postResource(undefined, undefined))
-      .toThrowError(`Passed param(s) 'resourceName = undefined', 'body = undefined' is not valid`);
+      .toThrowError(`Passed param(s) 'resourceName = undefined', 'body = undefined' are not valid`);
   });
 
   it('POST_RESOURCE should throw error when passed resourceName,body are null', () => {
     expect(() => resourceHttpService.postResource(null, null))
-      .toThrowError(`Passed param(s) 'resourceName = null', 'body = null' is not valid`);
+      .toThrowError(`Passed param(s) 'resourceName = null', 'body = null' are not valid`);
   });
 
   it('POST_RESOURCE should generate resource url', () => {
@@ -275,12 +275,12 @@ describe('ResourceHttpService', () => {
 
   it('SEARCH should throw error when passed resourceName,searchQuery are undefined', () => {
     expect(() => resourceHttpService.search(undefined, undefined))
-      .toThrowError(`Passed param(s) 'resourceName = undefined', 'searchQuery = undefined' is not valid`);
+      .toThrowError(`Passed param(s) 'resourceName = undefined', 'searchQuery = undefined' are not valid`);
   });
 
   it('SEARCH should throw error when passed resourceName,searchQuery are null', () => {
     expect(() => resourceHttpService.search(null, null))
-      .toThrowError(`Passed param(s) 'resourceName = null', 'searchQuery = null' is not valid`);
+      .toThrowError(`Passed param(s) 'resourceName = null', 'searchQuery = null' are not valid`);
   });
 
   it('SEARCH should generate search resource url', () => {

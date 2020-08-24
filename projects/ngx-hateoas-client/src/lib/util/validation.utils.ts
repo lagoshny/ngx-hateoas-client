@@ -34,7 +34,7 @@ export class ValidationUtils {
       }
     }
     if (notValidParams.length > 0) {
-      const errMsg = `Passed param(s) ${ notValidParams.join(', ') } is not valid`;
+      const errMsg = `Passed param(s) ${ notValidParams.join(', ') } ${ notValidParams.length > 1 ? 'are' : 'is' } not valid`;
       StageLogger.stageErrorLog(Stage.CHECK_PARAMS, {error: errMsg});
       throw new Error(errMsg);
     }

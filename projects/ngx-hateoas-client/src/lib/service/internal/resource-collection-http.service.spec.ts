@@ -176,12 +176,12 @@ describe('ResourceCollectionHttpService', () => {
 
   it('SEARCH throws error when resourceName,searchQuery are null', () => {
     expect(() => resourceCollectionHttpService.search(null, null))
-      .toThrowError(`Passed param(s) 'resourceName = null', 'searchQuery = null' is not valid`);
+      .toThrowError(`Passed param(s) 'resourceName = null', 'searchQuery = null' are not valid`);
   });
 
   it('SEARCH throws error when resourceName,searchQuery are undefined', () => {
     expect(() => resourceCollectionHttpService.search(undefined, undefined))
-      .toThrowError(`Passed param(s) 'resourceName = undefined', 'searchQuery = undefined' is not valid`);
+      .toThrowError(`Passed param(s) 'resourceName = undefined', 'searchQuery = undefined' are not valid`);
   });
 
   it('SEARCH should generate search resource url', () => {

@@ -60,12 +60,12 @@ describe('CommonResourceHttpService CUSTOM_QUERY', () => {
 
   it('throws error when resourceName,method,query are undefined', () => {
     expect(() => commonHttpService.customQuery(undefined, undefined, undefined))
-      .toThrowError(`Passed param(s) 'resourceName = undefined', 'method = undefined', 'query = undefined' is not valid`);
+      .toThrowError(`Passed param(s) 'resourceName = undefined', 'method = undefined', 'query = undefined' are not valid`);
   });
 
   it('throws error when resourceName,method,query are null', () => {
     expect(() => commonHttpService.customQuery(null, null, null))
-      .toThrowError(`Passed param(s) 'resourceName = null', 'method = null', 'query = null' is not valid`);
+      .toThrowError(`Passed param(s) 'resourceName = null', 'method = null', 'query = null' are not valid`);
   });
 
   it('should generate custom query resource url', () => {

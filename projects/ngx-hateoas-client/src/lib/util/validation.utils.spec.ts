@@ -23,6 +23,10 @@ describe('ValidationUtils', () => {
     expect(() => ValidationUtils.validateInputParams({array: []})).toThrowError(`Passed param(s) 'array = []' is not valid`);
   });
 
+  it('CHECK_INPUT_PARAMS should throw error with message contains several invalid params', () => {
+    expect(() => ValidationUtils.validateInputParams({array: [], obj: {}})).toThrowError(`Passed param(s) 'array = []', 'obj = {}' are not valid`);
+  });
+
   it('CHECK_INPUT_PARAMS should be pass when params is boolean = false', () => {
     expect(() => ValidationUtils.validateInputParams({bool: false})).not.toThrow();
   });

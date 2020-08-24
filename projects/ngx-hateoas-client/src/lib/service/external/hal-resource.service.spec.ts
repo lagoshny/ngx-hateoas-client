@@ -70,12 +70,12 @@ describe('HalResourceService', () => {
 
   it('GET_RESOURCE should throw error when passed resourceName,id are undefined', () => {
     expect(() => halResourceService.getResource(undefined, undefined))
-      .toThrowError(`Passed param(s) 'resourceName = undefined', 'id = undefined' is not valid`);
+      .toThrowError(`Passed param(s) 'resourceName = undefined', 'id = undefined' are not valid`);
   });
 
   it('GET_RESOURCE should throw error when passed resourceName,id are null', () => {
     expect(() => halResourceService.getResource(null, null))
-      .toThrowError(`Passed param(s) 'resourceName = null', 'id = null' is not valid`);
+      .toThrowError(`Passed param(s) 'resourceName = null', 'id = null' are not valid`);
   });
 
   it('GET_COLLECTION should throw error when passed resourceName is empty', () => {
@@ -115,12 +115,12 @@ describe('HalResourceService', () => {
 
   it('CREATE_RESOURCE should throw error when passed resourceName,requestBody are undefined', () => {
     expect(() => halResourceService.createResource(undefined, undefined))
-      .toThrowError(`Passed param(s) 'resourceName = undefined', 'requestBody = undefined' is not valid`);
+      .toThrowError(`Passed param(s) 'resourceName = undefined', 'requestBody = undefined' are not valid`);
   });
 
   it('CREATE_RESOURCE should throw error when passed resourceName,requestBody are null', () => {
     expect(() => halResourceService.createResource(null, null))
-      .toThrowError(`Passed param(s) 'resourceName = null', 'requestBody = null' is not valid`);
+      .toThrowError(`Passed param(s) 'resourceName = null', 'requestBody = null' are not valid`);
   });
 
   it('CREATE_RESOURCE should resolve resource values', () => {
@@ -206,12 +206,12 @@ describe('HalResourceService', () => {
 
   it('UPDATE_RESOURCE_BY_ID should throw error when passed resourceName,id,requestBody are undefined', () => {
     expect(() => halResourceService.updateResourceById(undefined, undefined, undefined))
-      .toThrowError(`Passed param(s) 'resourceName = undefined', 'id = undefined', 'requestBody = undefined' is not valid`);
+      .toThrowError(`Passed param(s) 'resourceName = undefined', 'id = undefined', 'requestBody = undefined' are not valid`);
   });
 
   it('UPDATE_RESOURCE_BY_ID should throw error when passed resourceName,id,requestBody are null', () => {
     expect(() => halResourceService.updateResourceById(null, null, null))
-      .toThrowError(`Passed param(s) 'resourceName = null', 'id = null', 'requestBody = null' is not valid`);
+      .toThrowError(`Passed param(s) 'resourceName = null', 'id = null', 'requestBody = null' are not valid`);
   });
 
   it('UPDATE_RESOURCE_BY_ID should resolve resource values', () => {
@@ -310,12 +310,12 @@ describe('HalResourceService', () => {
 
   it('PATCH_RESOURCE_BY_ID should throw error when passed resourceName,id,requestBody are undefined', () => {
     expect(() => halResourceService.patchResourceById(undefined, undefined, undefined))
-      .toThrowError(`Passed param(s) 'resourceName = undefined', 'id = undefined', 'requestBody = undefined' is not valid`);
+      .toThrowError(`Passed param(s) 'resourceName = undefined', 'id = undefined', 'requestBody = undefined' are not valid`);
   });
 
   it('PATCH_RESOURCE_BY_ID should throw error when passed resourceName,id,requestBody are null', () => {
     expect(() => halResourceService.patchResourceById(null, null, null))
-      .toThrowError(`Passed param(s) 'resourceName = null', 'id = null', 'requestBody = null' is not valid`);
+      .toThrowError(`Passed param(s) 'resourceName = null', 'id = null', 'requestBody = null' are not valid`);
   });
 
   it('PATCH_RESOURCE_BY_ID should resolve resource values', () => {
@@ -402,12 +402,12 @@ describe('HalResourceService', () => {
 
   it('DELETE_RESOURCE_BY_ID should throw error when passed resourceName,id,requestBody are undefined', () => {
     expect(() => halResourceService.deleteResourceById(undefined, undefined))
-      .toThrowError(`Passed param(s) 'resourceName = undefined', 'id = undefined' is not valid`);
+      .toThrowError(`Passed param(s) 'resourceName = undefined', 'id = undefined' are not valid`);
   });
 
   it('DELETE_RESOURCE_BY_ID should throw error when passed resourceName,id are null', () => {
     expect(() => halResourceService.deleteResourceById(null, null))
-      .toThrowError(`Passed param(s) 'resourceName = null', 'id = null' is not valid`);
+      .toThrowError(`Passed param(s) 'resourceName = null', 'id = null' are not valid`);
   });
 
   it('DELETE_RESOURCE_BY_ID should pass option params as http request params', () => {
@@ -445,12 +445,12 @@ describe('HalResourceService', () => {
 
   it('SEARCH_COLLECTION should throw error when passed resourceName,searchQuery are undefined', () => {
     expect(() => halResourceService.searchCollection(undefined, undefined))
-      .toThrowError(`Passed param(s) 'resourceName = undefined', 'searchQuery = undefined' is not valid`);
+      .toThrowError(`Passed param(s) 'resourceName = undefined', 'searchQuery = undefined' are not valid`);
   });
 
   it('SEARCH_COLLECTION should throw error when passed resourceName,searchQuery are null', () => {
     expect(() => halResourceService.searchCollection(null, null))
-      .toThrowError(`Passed param(s) 'resourceName = null', 'searchQuery = null' is not valid`);
+      .toThrowError(`Passed param(s) 'resourceName = null', 'searchQuery = null' are not valid`);
   });
 
   it('SEARCH_PAGE should throw error when passed resourceName is empty', () => {
@@ -465,12 +465,12 @@ describe('HalResourceService', () => {
 
   it('SEARCH_PAGE should throw error when passed resourceName,searchQuery are undefined', () => {
     expect(() => halResourceService.searchPage(undefined, undefined))
-      .toThrowError(`Passed param(s) 'resourceName = undefined', 'searchQuery = undefined' is not valid`);
+      .toThrowError(`Passed param(s) 'resourceName = undefined', 'searchQuery = undefined' are not valid`);
   });
 
   it('SEARCH_PAGE should throw error when passed resourceName,searchQuery are null', () => {
     expect(() => halResourceService.searchPage(null, null))
-      .toThrowError(`Passed param(s) 'resourceName = null', 'searchQuery = null' is not valid`);
+      .toThrowError(`Passed param(s) 'resourceName = null', 'searchQuery = null' are not valid`);
   });
 
   it('SEARCH_SINGLE should throw error when passed resourceName is empty', () => {
@@ -485,12 +485,12 @@ describe('HalResourceService', () => {
 
   it('SEARCH_SINGLE should throw error when passed resourceName,searchQuery are undefined', () => {
     expect(() => halResourceService.searchSingle(undefined, undefined))
-      .toThrowError(`Passed param(s) 'resourceName = undefined', 'searchQuery = undefined' is not valid`);
+      .toThrowError(`Passed param(s) 'resourceName = undefined', 'searchQuery = undefined' are not valid`);
   });
 
   it('SEARCH_SINGLE should throw error when passed resourceName,searchQuery are null', () => {
     expect(() => halResourceService.searchSingle(null, null))
-      .toThrowError(`Passed param(s) 'resourceName = null', 'searchQuery = null' is not valid`);
+      .toThrowError(`Passed param(s) 'resourceName = null', 'searchQuery = null' are not valid`);
   });
 
   it('CUSTOM_QUERY should throw error when passed resourceName is empty', () => {
@@ -505,12 +505,12 @@ describe('HalResourceService', () => {
 
   it('CUSTOM_QUERY should throw error when passed resourceName,method,query are undefined', () => {
     expect(() => halResourceService.customQuery(undefined, undefined, undefined))
-      .toThrowError(`Passed param(s) 'resourceName = undefined', 'method = undefined', 'query = undefined' is not valid`);
+      .toThrowError(`Passed param(s) 'resourceName = undefined', 'method = undefined', 'query = undefined' are not valid`);
   });
 
   it('CUSTOM_QUERY should throw error when passed resourceName,method,query are null', () => {
     expect(() => halResourceService.customQuery(null, null, null))
-      .toThrowError(`Passed param(s) 'resourceName = null', 'method = null', 'query = null' is not valid`);
+      .toThrowError(`Passed param(s) 'resourceName = null', 'method = null', 'query = null' are not valid`);
   });
 
   it('CUSTOM_QUERY should resolve resource values', () => {
@@ -553,12 +553,12 @@ describe('HalResourceService', () => {
 
   it('CUSTOM_SEARCH_QUERY should throw error when passed resourceName,method,query are undefined', () => {
     expect(() => halResourceService.customSearchQuery(undefined, undefined, undefined))
-      .toThrowError(`Passed param(s) 'resourceName = undefined', 'method = undefined', 'searchQuery = undefined' is not valid`);
+      .toThrowError(`Passed param(s) 'resourceName = undefined', 'method = undefined', 'searchQuery = undefined' are not valid`);
   });
 
   it('CUSTOM_SEARCH_QUERY should throw error when passed resourceName,method,query are null', () => {
     expect(() => halResourceService.customSearchQuery(null, null, null))
-      .toThrowError(`Passed param(s) 'resourceName = null', 'method = null', 'searchQuery = null' is not valid`);
+      .toThrowError(`Passed param(s) 'resourceName = null', 'method = null', 'searchQuery = null' are not valid`);
   });
 
   it('CUSTOM_SEARCH_QUERY should resolve resource values', () => {

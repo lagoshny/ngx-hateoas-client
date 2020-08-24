@@ -1,11 +1,10 @@
-import { ResourceIdentifiable } from '../../model/resource/resource-identifiable';
 import { HttpExecutor } from '../http-executor';
 import { Injectable } from '@angular/core';
 import { Observable, throwError as observableThrowError } from 'rxjs';
 import { HttpMethod, PagedGetOption } from '../../model/declarations';
 import { UrlUtils } from '../../util/url.utils';
 import { HttpClient } from '@angular/common/http';
-import { CacheService } from './cache.service';
+import { ResourceCacheService } from './cache/resource-cache.service';
 import { HttpConfigService } from '../../config/http-config.service';
 import { map } from 'rxjs/operators';
 import { isPagedResourceCollection, isResource, isResourceCollection } from '../../model/resource-type';
@@ -21,7 +20,7 @@ import { ValidationUtils } from '../../util/validation.utils';
 export class CommonResourceHttpService extends HttpExecutor {
 
   constructor(httpClient: HttpClient,
-              cacheService: CacheService<ResourceIdentifiable>,
+              cacheService: ResourceCacheService,
               private httpConfig: HttpConfigService) {
     super(httpClient, cacheService);
   }

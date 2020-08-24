@@ -9,7 +9,7 @@ import { HttpParams } from '@angular/common/http';
 import { PagedResourceCollectionHttpService } from './paged-resource-collection-http.service';
 import { PagedResourceCollection } from '../../model/resource/paged-resource-collection';
 import { Resource } from '../../model/resource/resource';
-import { CacheService } from './cache.service';
+import { ResourceCacheService } from './cache/resource-cache.service';
 
 /* tslint:disable:no-string-literal */
 describe('PagedResourceCollectionHttpService', () => {
@@ -23,9 +23,10 @@ describe('PagedResourceCollectionHttpService', () => {
       get: jasmine.createSpy('get')
     };
     cacheServiceSpy = {
-      putValue: jasmine.createSpy('putValue'),
-      getValue: jasmine.createSpy('getValue'),
-      evictValue: jasmine.createSpy('evictValue')
+      enabled: false,
+      putResource: jasmine.createSpy('putResource'),
+      getResource: jasmine.createSpy('getResource'),
+      evictResource: jasmine.createSpy('evictResource')
     };
     httpConfigService = {
       baseApiUrl: 'http://localhost:8080/api/v1'
@@ -82,14 +83,13 @@ describe('PagedResourceCollectionHttpService', () => {
   });
 
   it('GET REQUEST should evict cache when returned object is not paged resource collection', () => {
-    CacheService.enabled = true;
+    cacheServiceSpy.enabled = true;
     httpClientSpy.get.and.returnValue(of({any: 'value'}));
 
     pagedResourceCollectionHttpService.get('someUrl').subscribe(() => {
     }, () => {
-      expect(cacheServiceSpy.evictValue.calls.count()).toBe(1);
+      expect(cacheServiceSpy.evictResource.calls.count()).toBe(1);
     });
-    CacheService.enabled = false;
   });
 
   it('GET REQUEST should return paged collected resource', () => {

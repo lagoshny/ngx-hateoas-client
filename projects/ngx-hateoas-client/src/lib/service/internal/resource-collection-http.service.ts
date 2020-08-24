@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { CacheService } from './cache.service';
+import { ResourceCacheService } from './cache/resource-cache.service';
 import { HttpConfigService } from '../../config/http-config.service';
 import { Observable, throwError as observableThrowError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
@@ -9,13 +9,13 @@ import { ResourceUtils } from '../../util/resource.utils';
 import { ResourceCollection } from '../../model/resource/resource-collection';
 import { BaseResource } from '../../model/resource/base-resource';
 import { DependencyInjector } from '../../util/dependency-injector';
-import { GetOption } from '../../model/declarations';
+import { GetOption, ResourceIdentifiable } from '../../model/declarations';
 import { UrlUtils } from '../../util/url.utils';
 import { HttpExecutor } from '../http-executor';
 import { StageLogger } from '../../logger/stage-logger';
 import { Stage } from '../../logger/stage.enum';
 import { ValidationUtils } from '../../util/validation.utils';
-import { CacheKey } from '../../model/cache/cache-key';
+import { CacheKey } from './cache/model/cache-key';
 
 export function getResourceCollectionHttpService(): ResourceCollectionHttpService<ResourceCollection<BaseResource>> {
   return DependencyInjector.get(ResourceCollectionHttpService);
@@ -28,7 +28,7 @@ export function getResourceCollectionHttpService(): ResourceCollectionHttpServic
 export class ResourceCollectionHttpService<T extends ResourceCollection<BaseResource>> extends HttpExecutor {
 
   constructor(httpClient: HttpClient,
-              cacheService: CacheService<T>,
+              cacheService: ResourceCacheService,
               private httpConfig: HttpConfigService) {
     super(httpClient, cacheService);
   }
@@ -47,8 +47,8 @@ export class ResourceCollectionHttpService<T extends ResourceCollection<BaseReso
       .pipe(
         map((data: any) => {
           if (!isResourceCollection(data)) {
-            if (CacheService.enabled) {
-              this.cacheService.evictValue(CacheKey.of(url, httpOptions));
+            if (this.cacheService.enabled) {
+              this.cacheService.evictResource(CacheKey.of(url, httpOptions));
             }
             const errMsg = 'You try to get wrong resource type, expected resource collection type.';
             StageLogger.stageErrorLog(Stage.INIT_RESOURCE, {error: errMsg});

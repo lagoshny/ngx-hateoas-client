@@ -2,9 +2,9 @@ import { Link, LinkData } from '../declarations';
 import * as _ from 'lodash';
 
 /**
- *  Identifies resource classes.
+ * Abstract impl identifies resource interface.
  */
-export abstract class ResourceIdentifiable {
+export abstract class AbstractResourceIdentifiable {
 
   /**
    * List of links related with the resource.

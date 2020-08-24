@@ -7,7 +7,6 @@ import { Resource } from '../../model/resource/resource';
 import { of } from 'rxjs';
 import { rawPagedResourceCollection, rawResource, rawResourceCollection, SimpleResource } from '../../model/resource/resources.test';
 import { HttpParams } from '@angular/common/http';
-import { CacheService } from './cache.service';
 
 describe('ResourceHttpService', () => {
   let resourceHttpService: ResourceHttpService<BaseResource>;
@@ -24,9 +23,10 @@ describe('ResourceHttpService', () => {
       delete: jasmine.createSpy('delete')
     };
     cacheServiceSpy = {
-      putValue: jasmine.createSpy('putValue'),
-      getValue: jasmine.createSpy('getValue'),
-      evictValue: jasmine.createSpy('evictValue')
+      enabled: false,
+      putResource: jasmine.createSpy('putResource'),
+      getResource: jasmine.createSpy('getResource'),
+      evictResource: jasmine.createSpy('evictResource')
     };
     httpConfigService = {
       baseApiUrl: 'http://localhost:8080/api/v1'
@@ -106,14 +106,13 @@ describe('ResourceHttpService', () => {
   });
 
   it('GET REQUEST should evict cache when returned object is not resource', () => {
-    CacheService.enabled = true;
+    cacheServiceSpy.enabled = true;
     httpClientSpy.get.and.returnValue(of({any: 'value'}));
 
     resourceHttpService.get('someUrl').subscribe(() => {
     }, () => {
-      expect(cacheServiceSpy.evictValue.calls.count()).toBe(1);
+      expect(cacheServiceSpy.evictResource.calls.count()).toBe(1);
     });
-    CacheService.enabled = false;
   });
 
   it('POST REQUEST should return resource', () => {

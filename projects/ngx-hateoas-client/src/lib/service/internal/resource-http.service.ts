@@ -8,14 +8,14 @@ import { DependencyInjector } from '../../util/dependency-injector';
 import { UrlUtils } from '../../util/url.utils';
 import * as _ from 'lodash';
 import { isResource } from '../../model/resource-type';
-import { GetOption } from '../../model/declarations';
+import { GetOption, ResourceIdentifiable } from '../../model/declarations';
 import { HttpExecutor } from '../http-executor';
-import { CacheService } from './cache.service';
+import { ResourceCacheService } from './cache/resource-cache.service';
 import { HttpConfigService } from '../../config/http-config.service';
 import { Stage } from '../../logger/stage.enum';
 import { StageLogger } from '../../logger/stage-logger';
 import { ValidationUtils } from '../../util/validation.utils';
-import { CacheKey } from '../../model/cache/cache-key';
+import { CacheKey } from './cache/model/cache-key';
 
 /**
  * Get instance of the ResourceHttpService by Angular DependencyInjector.
@@ -31,7 +31,7 @@ export function getResourceHttpService(): ResourceHttpService<BaseResource> {
 export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
 
   constructor(httpClient: HttpClient,
-              cacheService: CacheService<T>,
+              cacheService: ResourceCacheService,
               private httpConfig: HttpConfigService) {
     super(httpClient, cacheService);
   }
@@ -50,8 +50,8 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
       .pipe(
         map((data: any) => {
           if (!isResource(data)) {
-            if (CacheService.enabled) {
-              this.cacheService.evictValue(CacheKey.of(url, httpOptions));
+            if (this.cacheService.enabled) {
+              this.cacheService.evictResource(CacheKey.of(url, httpOptions));
             }
             const errMsg = 'You try to get wrong resource type, expected single resource.';
             StageLogger.stageErrorLog(Stage.INIT_RESOURCE, {

@@ -25,9 +25,10 @@ describe('CommonResourceHttpService CUSTOM_QUERY', () => {
       put: jasmine.createSpy('put'),
     };
     cacheServiceSpy = {
-      putValue: jasmine.createSpy('putValue'),
-      getValue: jasmine.createSpy('getValue'),
-      evictValue: jasmine.createSpy('evictValue')
+      enabled: false,
+      putResource: jasmine.createSpy('putResource'),
+      getResource: jasmine.createSpy('getResource'),
+      evictResource: jasmine.createSpy('evictResource')
     };
     httpConfigService = {
       baseApiUrl: 'http://localhost:8080/api/v1'

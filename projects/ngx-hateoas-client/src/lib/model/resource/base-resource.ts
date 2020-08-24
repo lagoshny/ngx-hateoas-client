@@ -1,7 +1,7 @@
 import { Observable } from 'rxjs';
 import { getResourceHttpService } from '../../service/internal/resource-http.service';
 import { UrlUtils } from '../../util/url.utils';
-import { ResourceIdentifiable } from './resource-identifiable';
+import { AbstractResourceIdentifiable } from './abstract-resource-identifiable';
 import { ResourceCollection } from './resource-collection';
 import { getResourceCollectionHttpService } from '../../service/internal/resource-collection-http.service';
 import { GetOption, PagedGetOption, RequestBody, RequestOption } from '../declarations';
@@ -16,7 +16,7 @@ import { ValidationUtils } from '../../util/validation.utils';
 /**
  * Common resource class.
  */
-export abstract class BaseResource extends ResourceIdentifiable {
+export abstract class BaseResource extends AbstractResourceIdentifiable {
 
   /**
    * Get single resource by the relation name.

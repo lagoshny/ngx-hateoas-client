@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BaseResource } from '../../model/resource/base-resource';
 import { HttpClient } from '@angular/common/http';
-import { CacheService } from './cache.service';
+import { ResourceCacheService } from './cache/resource-cache.service';
 import { HttpConfigService } from '../../config/http-config.service';
 import { PagedResourceCollection } from '../../model/resource/paged-resource-collection';
 import { catchError, map } from 'rxjs/operators';
@@ -11,12 +11,12 @@ import { Observable, throwError as observableThrowError } from 'rxjs';
 import { ResourceUtils } from '../../util/resource.utils';
 import { UrlUtils } from '../../util/url.utils';
 import { DependencyInjector } from '../../util/dependency-injector';
-import { PagedGetOption, PageParam } from '../../model/declarations';
+import { PagedGetOption, PageParam, ResourceIdentifiable } from '../../model/declarations';
 import { HttpExecutor } from '../http-executor';
 import { StageLogger } from '../../logger/stage-logger';
 import { Stage } from '../../logger/stage.enum';
 import { ValidationUtils } from '../../util/validation.utils';
-import { CacheKey } from '../../model/cache/cache-key';
+import { CacheKey } from './cache/model/cache-key';
 
 /**
  * Get instance of the PagedResourceCollectionHttpService by Angular DependencyInjector.
@@ -37,7 +37,7 @@ export class PagedResourceCollectionHttpService<T extends PagedResourceCollectio
   };
 
   constructor(httpClient: HttpClient,
-              cacheService: CacheService<T>,
+              cacheService: ResourceCacheService,
               private httpConfig: HttpConfigService) {
     super(httpClient, cacheService);
   }
@@ -56,8 +56,8 @@ export class PagedResourceCollectionHttpService<T extends PagedResourceCollectio
       .pipe(
         map((data: any) => {
           if (!isPagedResourceCollection(data)) {
-            if (CacheService.enabled) {
-              this.cacheService.evictValue(CacheKey.of(url, httpOptions));
+            if (this.cacheService.enabled) {
+              this.cacheService.evictResource(CacheKey.of(url, httpOptions));
             }
             const errMsg = 'You try to get wrong resource type, expected paged resource collection type.';
             StageLogger.stageErrorLog(Stage.INIT_RESOURCE, {error: errMsg});

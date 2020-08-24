@@ -7,7 +7,6 @@ import { rawEmbeddedResource, rawPagedResourceCollection, rawResource, rawResour
 import { ResourceUtils } from '../../util/resource.utils';
 import { HttpParams } from '@angular/common/http';
 import { Resource } from '../../model/resource/resource';
-import { CacheService } from './cache.service';
 
 /* tslint:disable:no-string-literal */
 describe('ResourceCollectionHttpService', () => {
@@ -21,9 +20,10 @@ describe('ResourceCollectionHttpService', () => {
       get: jasmine.createSpy('get')
     };
     cacheServiceSpy = {
-      putValue: jasmine.createSpy('putValue'),
-      getValue: jasmine.createSpy('getValue'),
-      evictValue: jasmine.createSpy('evictValue')
+      enabled: false,
+      putResource: jasmine.createSpy('putResource'),
+      getResource: jasmine.createSpy('getResource'),
+      evictResource: jasmine.createSpy('evictResource')
     };
     httpConfigService = {
       baseApiUrl: 'http://localhost:8080/api/v1'
@@ -114,14 +114,13 @@ describe('ResourceCollectionHttpService', () => {
   });
 
   it('GET REQUEST should evict cache when returned object is not resource collection', () => {
-    CacheService.enabled = true;
+    cacheServiceSpy.enabled = true;
     httpClientSpy.get.and.returnValue(of({any: 'value'}));
 
     resourceCollectionHttpService.get('someUrl').subscribe(() => {
     }, () => {
-      expect(cacheServiceSpy.evictValue.calls.count()).toBe(1);
+      expect(cacheServiceSpy.evictResource.calls.count()).toBe(1);
     });
-    CacheService.enabled = false;
   });
 
   it('GET_RESOURCE_COLLECTION throws error when resourceName is empty', () => {

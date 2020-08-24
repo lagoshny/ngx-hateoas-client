@@ -24,9 +24,9 @@ export interface HalConfiguration {
      */
     enabled: boolean;
     /**
-     * Time in seconds when cache need to be expired.
+     * Time in seconds after which cache need to be expired.
      */
-    expireTime?: number;
+    lifeTime?: number;
   };
 
 }

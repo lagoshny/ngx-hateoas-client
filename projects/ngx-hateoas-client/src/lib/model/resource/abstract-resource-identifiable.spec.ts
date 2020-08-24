@@ -1,8 +1,8 @@
-import { ResourceIdentifiable } from './resource-identifiable';
+import { AbstractResourceIdentifiable } from './abstract-resource-identifiable';
 
 // tslint:disable:variable-name
 // tslint:disable:no-string-literal
-class TestResourceIdentifiable extends ResourceIdentifiable {
+class TestResourceIdentifiable extends AbstractResourceIdentifiable {
   _links = {
     product: {
       href: 'http://localhost:8080/api/v1/product/1'
@@ -20,7 +20,7 @@ class TestResourceIdentifiable extends ResourceIdentifiable {
 }
 
 describe('ResourceIdentifiable', () => {
-  let resourceIdentifiable: ResourceIdentifiable;
+  let resourceIdentifiable: AbstractResourceIdentifiable;
 
   beforeEach(() => {
     resourceIdentifiable = new TestResourceIdentifiable();

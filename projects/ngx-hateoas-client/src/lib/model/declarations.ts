@@ -22,6 +22,17 @@ export interface LinkData {
 }
 
 /**
+ * Interface that allows to identify that object is resource when it is has a links object.
+ */
+export interface ResourceIdentifiable {
+
+  /**
+   * List of links related with the resource.
+   */
+  _links: Link;
+}
+
+/**
  * Extend {@link GetOption} with page param.
  */
 export interface PagedGetOption extends GetOption {

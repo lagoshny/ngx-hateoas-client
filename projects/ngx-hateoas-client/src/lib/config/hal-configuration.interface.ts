@@ -15,4 +15,18 @@ export interface HalConfiguration {
    */
   verboseLogs?: boolean;
 
+  /**
+   * Cache options.
+   */
+  cache?: {
+    /**
+     * When {@code true} then cache will be used, {@code false} otherwise.
+     */
+    enabled: boolean;
+    /**
+     * Time in seconds after which cache need to be expired.
+     */
+    lifeTime?: number;
+  };
+
 }

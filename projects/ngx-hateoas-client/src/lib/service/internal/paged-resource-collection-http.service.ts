@@ -1,21 +1,22 @@
 import { Injectable } from '@angular/core';
 import { BaseResource } from '../../model/resource/base-resource';
-import { HttpClient, HttpParams } from '@angular/common/http';
-import { CacheService } from '../cache.service';
+import { HttpClient } from '@angular/common/http';
+import { ResourceCacheService } from './cache/resource-cache.service';
 import { HttpConfigService } from '../../config/http-config.service';
 import { PagedResourceCollection } from '../../model/resource/paged-resource-collection';
 import { catchError, map } from 'rxjs/operators';
 import * as _ from 'lodash';
 import { isPagedResourceCollection } from '../../model/resource-type';
-import { Observable, of as observableOf, throwError as observableThrowError } from 'rxjs';
+import { Observable, throwError as observableThrowError } from 'rxjs';
 import { ResourceUtils } from '../../util/resource.utils';
 import { UrlUtils } from '../../util/url.utils';
 import { DependencyInjector } from '../../util/dependency-injector';
-import { PagedGetOption, PageParam } from '../../model/declarations';
+import { PagedGetOption, PageParam, ResourceIdentifiable } from '../../model/declarations';
 import { HttpExecutor } from '../http-executor';
 import { StageLogger } from '../../logger/stage-logger';
 import { Stage } from '../../logger/stage.enum';
 import { ValidationUtils } from '../../util/validation.utils';
+import { CacheKey } from './cache/model/cache-key';
 
 /**
  * Get instance of the PagedResourceCollectionHttpService by Angular DependencyInjector.
@@ -36,9 +37,9 @@ export class PagedResourceCollectionHttpService<T extends PagedResourceCollectio
   };
 
   constructor(httpClient: HttpClient,
-              public cacheService: CacheService<T>,
+              cacheService: ResourceCacheService,
               private httpConfig: HttpConfigService) {
-    super(httpClient);
+    super(httpClient, cacheService);
   }
 
   /**
@@ -48,48 +49,52 @@ export class PagedResourceCollectionHttpService<T extends PagedResourceCollectio
    * @param options request options
    * @throws error when required params are not valid or returned resource type is not paged collection of the resources
    */
-  public get(url: string, options?: {
-    headers?: {
-      [header: string]: string | string[];
-    };
-    params?: HttpParams
-  }): Observable<T> {
-    if (this.cacheService.hasResource(url)) {
-      return observableOf(this.cacheService.getResource());
-    }
+  public get(url: string,
+             options?: PagedGetOption): Observable<T> {
+    const httpOptions = {params: UrlUtils.convertToHttpParams(options)};
+    return super.getHttp(url, httpOptions, options?.useCache)
+      .pipe(
+        map((data: any) => {
+          if (!isPagedResourceCollection(data)) {
+            if (this.cacheService.enabled) {
+              this.cacheService.evictResource(CacheKey.of(url, httpOptions));
+            }
+            const errMsg = 'You try to get wrong resource type, expected paged resource collection type.';
+            StageLogger.stageErrorLog(Stage.INIT_RESOURCE, {error: errMsg});
+            throw new Error(errMsg);
+          }
 
-    return super.get(url, {...options, observe: 'body'}).pipe(
-      map((data: any) => {
-        if (!isPagedResourceCollection(data)) {
-          const errMsg = 'You try to get wrong resource type, expected paged resource collection type.';
-          StageLogger.stageErrorLog(Stage.INIT_RESOURCE, {error: errMsg});
-          throw Error(errMsg);
-        }
-        const resource: T = ResourceUtils.instantiatePagedResourceCollection(data);
-        this.cacheService.putResource(url, resource);
-
-        return resource;
-      }),
-      catchError(error => observableThrowError(error)));
+          return ResourceUtils.instantiatePagedResourceCollection(data) as T;
+        }),
+        catchError(error => observableThrowError(error)));
   }
 
   /**
    * Perform get paged resource collection request with url built by the resource name.
    *
    * @param resourceName used to build root url to the resource
-   * @param query (optional) url path that applied to the result url at the end
    * @param options (optional) options that applied to the request
    * @throws error when required params are not valid
    */
-  public getResourcePage(resourceName: string, query?: string, options?: PagedGetOption): Observable<T> {
+  public getResourcePage(resourceName: string, options?: PagedGetOption): Observable<T> {
     ValidationUtils.validateInputParams({resourceName});
 
-    const url = UrlUtils.removeTemplateParams(UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName, query));
+    const url = UrlUtils.removeTemplateParams(UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName));
+
+    StageLogger.stageLog(Stage.PREPARE_URL, {
+      result: url,
+      urlParts: `baseUrl: '${ this.httpConfig.baseApiUrl }', resource: '${ resourceName }'`
+    });
+
     const pagedOption = !_.isEmpty(options) ? options : {};
-    if (_.isEmpty(pagedOption.pageParam)) {
-      pagedOption.pageParam = PagedResourceCollectionHttpService.DEFAULT_PAGE;
+    if (_.isEmpty(pagedOption.pageParams)) {
+      pagedOption.pageParams = PagedResourceCollectionHttpService.DEFAULT_PAGE;
+    } else if (!pagedOption.pageParams.size) {
+      pagedOption.pageParams.size = PagedResourceCollectionHttpService.DEFAULT_PAGE.size;
+    } else if (!pagedOption.pageParams.page) {
+      pagedOption.pageParams.page = PagedResourceCollectionHttpService.DEFAULT_PAGE.page;
     }
-    return this.get(url, {params: UrlUtils.convertToHttpParams(pagedOption)});
+    return this.get(url, pagedOption);
   }
 
   /**
@@ -105,11 +110,21 @@ export class PagedResourceCollectionHttpService<T extends PagedResourceCollectio
 
     const url = UrlUtils.removeTemplateParams(
       UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName)).concat('/search/' + searchQuery);
+
+    StageLogger.stageLog(Stage.PREPARE_URL, {
+      result: url,
+      urlParts: `baseUrl: '${ this.httpConfig.baseApiUrl }', resource: '${ resourceName }'`
+    });
+
     const pagedOption = !_.isEmpty(options) ? options : {};
-    if (_.isEmpty(pagedOption.pageParam)) {
-      pagedOption.pageParam = PagedResourceCollectionHttpService.DEFAULT_PAGE;
+    if (_.isEmpty(pagedOption.pageParams)) {
+      pagedOption.pageParams = PagedResourceCollectionHttpService.DEFAULT_PAGE;
+    } else if (!pagedOption.pageParams.size) {
+      pagedOption.pageParams.size = PagedResourceCollectionHttpService.DEFAULT_PAGE.size;
+    } else if (!pagedOption.pageParams.page) {
+      pagedOption.pageParams.page = PagedResourceCollectionHttpService.DEFAULT_PAGE.page;
     }
-    return this.get(url, {params: UrlUtils.convertToHttpParams(pagedOption)});
+    return this.get(url, pagedOption);
   }
 
 }

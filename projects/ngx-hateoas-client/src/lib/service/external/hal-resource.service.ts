@@ -13,6 +13,7 @@ import { tap } from 'rxjs/operators';
 import { Resource } from '../../model/resource/resource';
 import { StageLogger } from '../../logger/stage-logger';
 import { ValidationUtils } from '../../util/validation.utils';
+import { HttpResponse } from '@angular/common/http';
 
 /**
  * Service to operate with {@link Resource}.
@@ -26,7 +27,7 @@ export class HalResourceService<T extends Resource> {
 
   constructor(private commonHttpService: CommonResourceHttpService,
               private resourceHttpService: ResourceHttpService<T>,
-              private resourceCollectionHttpServiceSpy: ResourceCollectionHttpService<ResourceCollection<T>>,
+              private resourceCollectionHttpService: ResourceCollectionHttpService<ResourceCollection<T>>,
               private pagedResourceCollectionHttpService: PagedResourceCollectionHttpService<PagedResourceCollection<T>>) {
   }
 
@@ -60,7 +61,7 @@ export class HalResourceService<T extends Resource> {
     StageLogger.resourceBeginLog(resourceName, 'ResourceService GET_COLLECTION', {options});
     ValidationUtils.validateInputParams({resourceName});
 
-    return this.resourceCollectionHttpServiceSpy.getResourceCollection(resourceName, null, options)
+    return this.resourceCollectionHttpService.getResourceCollection(resourceName, options)
       .pipe(tap(() => {
         StageLogger.resourceEndLog(resourceName, 'ResourceService GET_COLLECTION',
           {result: `get all resources by '${ resourceName }' was successful`});
@@ -78,7 +79,7 @@ export class HalResourceService<T extends Resource> {
     StageLogger.resourceBeginLog(resourceName, 'ResourceService GET_PAGE', {options});
     ValidationUtils.validateInputParams({resourceName});
 
-    return this.pagedResourceCollectionHttpService.getResourcePage(resourceName, null, options)
+    return this.pagedResourceCollectionHttpService.getResourcePage(resourceName, options)
       .pipe(tap(() => {
         StageLogger.resourceEndLog(resourceName, 'ResourceService GET_PAGE',
           {result: `get all page resources by '${ resourceName }' was successful`});
@@ -113,7 +114,7 @@ export class HalResourceService<T extends Resource> {
    * @param requestBody that contains the body directly and optional body values option {@link ValuesOption}
    * @throws error when required params are not valid
    */
-  public updateResource(entity: T, requestBody?: RequestBody<any>): Observable<T> {
+  public updateResource(entity: T, requestBody?: RequestBody<any>): Observable<T | any> {
     StageLogger.resourceBeginLog(entity, 'ResourceService UPDATE_RESOURCE', {body: requestBody ? requestBody : entity});
     ValidationUtils.validateInputParams({entity});
 
@@ -137,7 +138,7 @@ export class HalResourceService<T extends Resource> {
    * @param requestBody that contains the body directly and optional body values option {@link ValuesOption}
    * @throws error when required params are not valid
    */
-  public updateResourceById(resourceName: string, id: number | string, requestBody: RequestBody<any>): Observable<T> {
+  public updateResourceById(resourceName: string, id: number | string, requestBody: RequestBody<any>): Observable<T | any> {
     StageLogger.resourceBeginLog(resourceName, 'ResourceService UPDATE_RESOURCE_BY_ID', {id, body: requestBody});
     ValidationUtils.validateInputParams({resourceName, id, requestBody});
 
@@ -204,7 +205,7 @@ export class HalResourceService<T extends Resource> {
    * @param options (optional) options that should be applied to the request
    * @throws error when required params are not valid
    */
-  public deleteResource(entity: T, options?: RequestOption): Observable<T | any> {
+  public deleteResource(entity: T, options?: RequestOption): Observable<HttpResponse<any> | any> {
     StageLogger.resourceBeginLog(entity, 'ResourceService DELETE_RESOURCE', {options});
     ValidationUtils.validateInputParams({entity});
 
@@ -212,7 +213,7 @@ export class HalResourceService<T extends Resource> {
     const httpParams = UrlUtils.convertToHttpParams({params: options?.params});
 
     return this.resourceHttpService.delete(resource.getSelfLinkHref(),
-      {observe: options?.observe, params: httpParams})
+      {observe: options?.observe ? options?.observe : 'response', params: httpParams})
       .pipe(tap(() => {
         StageLogger.resourceEndLog(entity, 'ResourceService DELETE_RESOURCE',
           {result: `resource '${ resource['resourceName'] }' was deleted successful`});
@@ -227,14 +228,14 @@ export class HalResourceService<T extends Resource> {
    * @param options (optional) options that should be applied to the request
    * @throws error when required params are not valid
    */
-  public deleteResourceById(resourceName: string, id: number | string, options?: RequestOption): Observable<T | any> {
+  public deleteResourceById(resourceName: string, id: number | string, options?: RequestOption): Observable<HttpResponse<any> | any> {
     StageLogger.resourceBeginLog(resourceName, 'ResourceService DELETE_RESOURCE_BY_ID', {id, options});
     ValidationUtils.validateInputParams({resourceName, id});
 
     const httpParams = UrlUtils.convertToHttpParams({params: options?.params});
 
     return this.resourceHttpService.deleteResource(resourceName, id,
-      {observe: options?.observe, params: httpParams})
+      {observe: options?.observe ? options?.observe : 'response', params: httpParams})
       .pipe(tap(() => {
         StageLogger.resourceEndLog(resourceName, 'ResourceService DELETE_RESOURCE_BY_ID',
           {result: `resource '${ resourceName }' with id ${ id } was deleted successful`});
@@ -248,7 +249,7 @@ export class HalResourceService<T extends Resource> {
     StageLogger.resourceBeginLog(resourceName, 'ResourceService SEARCH_COLLECTION', {query: searchQuery, options});
     ValidationUtils.validateInputParams({resourceName, searchQuery});
 
-    return this.resourceCollectionHttpServiceSpy.search(resourceName, searchQuery, options)
+    return this.resourceCollectionHttpService.search(resourceName, searchQuery, options)
       .pipe(tap(() => {
         StageLogger.resourceEndLog(resourceName, 'ResourceService SEARCH_COLLECTION',
           {result: `search collection by '${ resourceName }' was performed successful`});

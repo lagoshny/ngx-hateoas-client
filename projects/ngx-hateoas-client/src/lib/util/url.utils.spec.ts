@@ -19,11 +19,6 @@ describe('UrlUtils', () => {
     expect(UrlUtils.convertToHttpParams({}).keys().length).toBe(0);
   });
 
-  it('CONVERT_TO_HTTP_PARAMS should throw error when option.params has projection param', () => {
-    expect(() => UrlUtils.convertToHttpParams({params: {projection: 'test'}}))
-      .toThrowError('Please, pass projection param in projection object key, not with params object!');
-  });
-
   it('CONVERT_TO_HTTP_PARAMS should throw error when option.params has page param', () => {
     expect(() => UrlUtils.convertToHttpParams({params: {page: 'test'}}))
       .toThrowError('Please, pass page params in page object key, not with params object!');
@@ -62,7 +57,7 @@ describe('UrlUtils', () => {
 
   it('CONVERT_TO_HTTP_PARAMS should adds page params', () => {
     const result = UrlUtils.convertToHttpParams({
-      pageParam: {
+      pageParams: {
         page: 1,
         size: 20,
         sort: {
@@ -85,7 +80,9 @@ describe('UrlUtils', () => {
 
   it('CONVERT_TO_HTTP_PARAMS should adds projection param', () => {
     const result = UrlUtils.convertToHttpParams({
-      projection: 'testProjection'
+      params: {
+        projection: 'testProjection'
+      }
     });
 
     expect(result.has('projection')).toBeTrue();
@@ -172,10 +169,10 @@ describe('UrlUtils', () => {
   it('FILL_TEMPLATE_PARAMS should fill ALL template params', () => {
     expect(UrlUtils.fillTemplateParams(templatedUrl, {
       params: {
-        any: 123
+        any: 123,
+        projection: 'testProjection',
       },
-      projection: 'testProjection',
-      pageParam: {
+      pageParams: {
         page: 2,
         size: 30,
         sort: {
@@ -192,7 +189,7 @@ describe('UrlUtils', () => {
       params: {
         any: 123
       },
-      pageParam: {
+      pageParams: {
         page: 2,
         size: 30,
       }

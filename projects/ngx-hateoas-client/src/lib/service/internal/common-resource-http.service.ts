@@ -1,11 +1,10 @@
-import { ResourceIdentifiable } from '../../model/resource/resource-identifiable';
 import { HttpExecutor } from '../http-executor';
 import { Injectable } from '@angular/core';
 import { Observable, throwError as observableThrowError } from 'rxjs';
 import { HttpMethod, PagedGetOption } from '../../model/declarations';
 import { UrlUtils } from '../../util/url.utils';
 import { HttpClient } from '@angular/common/http';
-import { CacheService } from '../cache.service';
+import { ResourceCacheService } from './cache/resource-cache.service';
 import { HttpConfigService } from '../../config/http-config.service';
 import { map } from 'rxjs/operators';
 import { isPagedResourceCollection, isResource, isResourceCollection } from '../../model/resource-type';
@@ -21,9 +20,9 @@ import { ValidationUtils } from '../../util/validation.utils';
 export class CommonResourceHttpService extends HttpExecutor {
 
   constructor(httpClient: HttpClient,
-              public cacheService: CacheService<ResourceIdentifiable>,
+              cacheService: ResourceCacheService,
               private httpConfig: HttpConfigService) {
-    super(httpClient);
+    super(httpClient, cacheService);
   }
 
   /**
@@ -43,6 +42,12 @@ export class CommonResourceHttpService extends HttpExecutor {
     ValidationUtils.validateInputParams({resourceName, method, query});
 
     const url = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName, query);
+
+    StageLogger.stageLog(Stage.PREPARE_URL, {
+      result: url,
+      urlParts: `baseUrl: '${ this.httpConfig.baseApiUrl }', resource: '${ resourceName }', query: '${ query }'`
+    });
+
     const httpParams = UrlUtils.convertToHttpParams(options);
 
     StageLogger.stageLog(Stage.PREPARE_URL, {
@@ -53,16 +58,16 @@ export class CommonResourceHttpService extends HttpExecutor {
     let result: Observable<any>;
     switch (method) {
       case HttpMethod.GET:
-        result = super.get(url, {params: httpParams, observe: 'body'});
+        result = super.getHttp(url, {params: httpParams, observe: 'body'}, false);
         break;
       case HttpMethod.POST:
-        result = super.post(url, body, {params: httpParams, observe: 'body'});
+        result = super.postHttp(url, body, {params: httpParams, observe: 'body'});
         break;
       case HttpMethod.PUT:
-        result = super.put(url, body, {params: httpParams, observe: 'body'});
+        result = super.putHttp(url, body, {params: httpParams, observe: 'body'});
         break;
       case HttpMethod.PATCH:
-        result = super.patch(url, body, {params: httpParams, observe: 'body'});
+        result = super.patchHttp(url, body, {params: httpParams, observe: 'body'});
         break;
       default:
         const errMsg = `allowed ony GET/POST/PUT/PATCH http methods you pass ${ method }`;

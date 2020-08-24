@@ -1,5 +1,4 @@
 /* tslint:disable:no-string-literal */
-import { async } from '@angular/core/testing';
 import { HalResourceService } from './hal-resource.service';
 import { HttpMethod, Include, Resource } from '../../ngx-hateoas-client.module';
 import { of } from 'rxjs';
@@ -33,7 +32,7 @@ describe('HalResourceService', () => {
   let resourceCollectionHttpServiceSpy: any;
   let pagedResourceCollectionHttpServiceSpy: any;
 
-  beforeEach(async(() => {
+  beforeEach(() => {
     commonHttpServiceSpy = {
       customQuery: jasmine.createSpy('customQuery')
     };
@@ -56,8 +55,13 @@ describe('HalResourceService', () => {
     halResourceService =
       new HalResourceService<Resource>(commonHttpServiceSpy, resourceHttpServiceSpy,
         resourceCollectionHttpServiceSpy, pagedResourceCollectionHttpServiceSpy);
+
     ResourceUtils.useResourceType(Resource);
-  }));
+  });
+
+  afterEach(() => {
+    ResourceUtils.useResourceType(null);
+  });
 
   it('GET_RESOURCE should throw error when passed resourceName is empty', () => {
     expect(() => halResourceService.getResource('', 2))
@@ -89,15 +93,6 @@ describe('HalResourceService', () => {
       .toThrowError(`Passed param(s) 'resourceName = null' is not valid`);
   });
 
-  it('GET_COLLECTION should invoke getResourceCollection with query null param', () => {
-    resourceCollectionHttpServiceSpy.getResourceCollection.and.returnValue(of(anything()));
-
-    halResourceService.getCollection('test').subscribe(() => {
-      const query = resourceCollectionHttpServiceSpy.getResourceCollection.calls.argsFor(0)[1];
-      expect(query).toBeNull();
-    });
-  });
-
   it('GET_PAGE should throw error when passed resourceName is empty', () => {
     expect(() => halResourceService.getPage(''))
       .toThrowError(`Passed param(s) 'resourceName = ' is not valid`);
@@ -111,15 +106,6 @@ describe('HalResourceService', () => {
   it('GET_PAGE should throw error when passed resourceName is null', () => {
     expect(() => halResourceService.getPage(null))
       .toThrowError(`Passed param(s) 'resourceName = null' is not valid`);
-  });
-
-  it('GET_PAGE should invoke getResourcePage with query null param', () => {
-    pagedResourceCollectionHttpServiceSpy.getResourcePage.and.returnValue(of(anything()));
-
-    halResourceService.getPage('test').subscribe(() => {
-      const query = pagedResourceCollectionHttpServiceSpy.getResourcePage.calls.argsFor(0)[1];
-      expect(query).toBeNull();
-    });
   });
 
   it('CREATE_RESOURCE should throw error when passed resourceName is empty', () => {

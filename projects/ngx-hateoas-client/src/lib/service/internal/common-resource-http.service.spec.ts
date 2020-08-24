@@ -1,6 +1,5 @@
 /* tslint:disable:no-string-literal */
 import { HttpConfigService } from '../../config/http-config.service';
-import { async } from '@angular/core/testing';
 import { CommonResourceHttpService } from './common-resource-http.service';
 import { HttpMethod } from '../../model/declarations';
 import { of } from 'rxjs';
@@ -18,7 +17,7 @@ describe('CommonResourceHttpService CUSTOM_QUERY', () => {
   let cacheServiceSpy: any;
   let httpConfigService: HttpConfigService;
 
-  beforeEach(async(() => {
+  beforeEach(() => {
     httpClientSpy = {
       get: jasmine.createSpy('get'),
       post: jasmine.createSpy('post'),
@@ -26,9 +25,10 @@ describe('CommonResourceHttpService CUSTOM_QUERY', () => {
       put: jasmine.createSpy('put'),
     };
     cacheServiceSpy = {
+      enabled: false,
       putResource: jasmine.createSpy('putResource'),
-      hasResource: jasmine.createSpy('hasResource'),
-      getResource: jasmine.createSpy('getResource')
+      getResource: jasmine.createSpy('getResource'),
+      evictResource: jasmine.createSpy('evictResource')
     };
     httpConfigService = {
       baseApiUrl: 'http://localhost:8080/api/v1'
@@ -40,7 +40,13 @@ describe('CommonResourceHttpService CUSTOM_QUERY', () => {
     ResourceUtils.useResourceType(Resource);
     ResourceUtils.useResourceCollectionType(ResourceCollection);
     ResourceUtils.usePagedResourceCollectionType(PagedResourceCollection);
-  }));
+  });
+
+  afterEach(() => {
+    ResourceUtils.useResourceType(null);
+    ResourceUtils.useResourceCollectionType(null);
+    ResourceUtils.usePagedResourceCollectionType(null);
+  });
 
   it('throws error when resourceName is empty', () => {
     expect(() => commonHttpService.customQuery('', HttpMethod.GET, 'any'))
@@ -75,8 +81,7 @@ describe('CommonResourceHttpService CUSTOM_QUERY', () => {
     httpClientSpy.get.and.returnValue(of(anything()));
 
     commonHttpService.customQuery('test', HttpMethod.GET, 'someQuery', null, {
-      projection: 'testProjection',
-      pageParam: {
+      pageParams: {
         sort: {
           prop1: 'ASC',
           prop2: 'DESC'
@@ -85,6 +90,7 @@ describe('CommonResourceHttpService CUSTOM_QUERY', () => {
         page: 2
       },
       params: {
+        projection: 'testProjection',
         test: 'testParam'
       }
     }).subscribe(() => {
@@ -169,6 +175,5 @@ describe('CommonResourceHttpService CUSTOM_QUERY', () => {
       expect(httpClientSpy.put.calls.count()).toBe(1);
     });
   });
-
 
 });

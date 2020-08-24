@@ -1,5 +1,4 @@
 import { Resource } from '../model/resource/resource';
-import { async } from '@angular/core/testing';
 import { ResourceUtils } from './resource.utils';
 import { EmbeddedResource } from '../model/resource/embedded-resource';
 import { ResourceCollection } from '../model/resource/resource-collection';
@@ -10,12 +9,19 @@ import { Include } from '../model/declarations';
 /* tslint:disable:no-string-literal */
 describe('ResourceUtils', () => {
 
-  beforeEach(async(() => {
+  beforeEach(() => {
     ResourceUtils.useResourceType(Resource);
     ResourceUtils.useEmbeddedResourceType(EmbeddedResource);
     ResourceUtils.useResourceCollectionType(ResourceCollection);
     ResourceUtils.usePagedResourceCollectionType(PagedResourceCollection);
-  }));
+  });
+
+  afterEach(() => {
+    ResourceUtils.useResourceType(null);
+    ResourceUtils.useEmbeddedResourceType(null);
+    ResourceUtils.useResourceCollectionType(null);
+    ResourceUtils.usePagedResourceCollectionType(null);
+  });
 
   it('INSTANTIATE_RESOURCE should return "null" when passed payload is empty object', () => {
     expect(ResourceUtils.instantiateResource({})).toBeNull();

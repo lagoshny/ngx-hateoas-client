@@ -1,18 +1,22 @@
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, of as observableOf } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { StageLogger } from '../logger/stage-logger';
 import { Stage } from '../logger/stage.enum';
 import { ValidationUtils } from '../util/validation.utils';
+import { CacheKey } from './internal/cache/model/cache-key';
+import { ResourceCacheService } from './internal/cache/resource-cache.service';
+import { isResourceObject } from '../model/resource-type';
 
 /**
  * Base class with common logics to perform HTTP requests.
- * TODO: should manage cache?
  */
+
 /* tslint:disable:no-string-literal */
 export class HttpExecutor {
 
-  constructor(protected httpClient: HttpClient) {
+  constructor(protected httpClient: HttpClient,
+              protected cacheService: ResourceCacheService) {
   }
 
   private static logRequest(method: string,
@@ -55,17 +59,26 @@ export class HttpExecutor {
    *
    * @param url to perform request
    * @param options (optional) options that applied to the request
+   * @param useCache value {@code true} if need to use cache, {@code false} otherwise
    * @throws error when required params are not valid
    */
-  public get(url: string, options?: {
-    headers?: {
-      [header: string]: string | string[];
-    };
-    observe?: 'body' | 'response';
-    params?: HttpParams
-  }): Observable<any> {
-    HttpExecutor.logRequest('GET', url, options);
+  public getHttp(url: string,
+                 options?: {
+                   headers?: {
+                     [header: string]: string | string[];
+                   };
+                   observe?: 'body' | 'response';
+                   params?: HttpParams
+                 },
+                 useCache: boolean = true): Observable<any> {
     ValidationUtils.validateInputParams({url});
+    if (this.cacheService.enabled && useCache) {
+      const cachedValue = this.cacheService.getResource(CacheKey.of(url, options));
+      if (cachedValue != null) {
+        return observableOf(cachedValue);
+      }
+    }
+    HttpExecutor.logRequest('GET', url, options);
 
     let response;
     if (options?.observe === 'response') {
@@ -75,8 +88,11 @@ export class HttpExecutor {
     }
 
     return response.pipe(
-      tap((data) => {
+      tap((data: any) => {
         HttpExecutor.logResponse('GET', url, options, data);
+        if (this.cacheService.enabled && useCache && isResourceObject(data)) {
+          this.cacheService.putResource(CacheKey.of(url, options), data);
+        }
       })
     );
   }
@@ -89,7 +105,7 @@ export class HttpExecutor {
    * @param options (optional) options that applied to the request
    * @throws error when required params are not valid
    */
-  public post(url: string, body: any | null, options?: {
+  public postHttp(url: string, body: any | null, options?: {
     headers?: HttpHeaders | {
       [header: string]: string | string[];
     };
@@ -109,6 +125,9 @@ export class HttpExecutor {
     return response.pipe(
       tap((data) => {
         HttpExecutor.logResponse('POST', url, options, data);
+        if (this.cacheService.enabled) {
+          this.cacheService.evictResource(CacheKey.of(url, options));
+        }
       })
     );
   }
@@ -121,7 +140,7 @@ export class HttpExecutor {
    * @param options (optional) options that applied to the request
    * @throws error when required params are not valid
    */
-  public put(url: string, body: any | null, options?: {
+  public putHttp(url: string, body: any | null, options?: {
     headers?: HttpHeaders | {
       [header: string]: string | string[];
     };
@@ -141,6 +160,9 @@ export class HttpExecutor {
     return response.pipe(
       tap((data) => {
         HttpExecutor.logResponse('PUT', url, options, data);
+        if (this.cacheService.enabled) {
+          this.cacheService.evictResource(CacheKey.of(url, options));
+        }
       })
     );
   }
@@ -153,7 +175,7 @@ export class HttpExecutor {
    * @param options (optional) options that applied to the request
    * @throws error when required params are not valid
    */
-  public patch(url: string, body: any | null, options?: {
+  public patchHttp(url: string, body: any | null, options?: {
     headers?: HttpHeaders | {
       [header: string]: string | string[];
     };
@@ -173,6 +195,9 @@ export class HttpExecutor {
     return response.pipe(
       tap((data) => {
         HttpExecutor.logResponse('PATCH', url, options, data);
+        if (this.cacheService.enabled) {
+          this.cacheService.evictResource(CacheKey.of(url, options));
+        }
       })
     );
   }
@@ -184,7 +209,7 @@ export class HttpExecutor {
    * @param options (optional) options that applied to the request
    * @throws error when required params are not valid
    */
-  public delete(url: string, options?: {
+  public deleteHttp(url: string, options?: {
     headers?: HttpHeaders | {
       [header: string]: string | string[];
     };
@@ -204,6 +229,9 @@ export class HttpExecutor {
     return response.pipe(
       tap((data) => {
         HttpExecutor.logResponse('DELETE', url, options, data);
+        if (this.cacheService.enabled) {
+          this.cacheService.evictResource(CacheKey.of(url, options));
+        }
       })
     );
   }

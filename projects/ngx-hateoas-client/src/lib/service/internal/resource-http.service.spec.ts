@@ -1,7 +1,6 @@
 /* tslint:disable:no-string-literal */
 import { BaseResource } from '../../model/resource/base-resource';
 import { HttpConfigService } from '../../config/http-config.service';
-import { async } from '@angular/core/testing';
 import { ResourceUtils } from '../../util/resource.utils';
 import { ResourceHttpService } from './resource-http.service';
 import { Resource } from '../../model/resource/resource';
@@ -15,7 +14,7 @@ describe('ResourceHttpService', () => {
   let cacheServiceSpy: any;
   let httpConfigService: HttpConfigService;
 
-  beforeEach(async(() => {
+  beforeEach(() => {
     httpClientSpy = {
       get: jasmine.createSpy('get'),
       post: jasmine.createSpy('post'),
@@ -24,8 +23,8 @@ describe('ResourceHttpService', () => {
       delete: jasmine.createSpy('delete')
     };
     cacheServiceSpy = {
+      enabled: false,
       putResource: jasmine.createSpy('putResource'),
-      hasResource: jasmine.createSpy('hasResource'),
       getResource: jasmine.createSpy('getResource'),
       evictResource: jasmine.createSpy('evictResource')
     };
@@ -37,7 +36,11 @@ describe('ResourceHttpService', () => {
       new ResourceHttpService<BaseResource>(httpClientSpy, cacheServiceSpy, httpConfigService);
 
     ResourceUtils.useResourceType(Resource);
-  }));
+  });
+
+  afterEach(() => {
+    ResourceUtils.useResourceType(null);
+  });
 
   it('GET REQUEST should throw error when returned object is COLLECTION_RESOURCE', () => {
     httpClientSpy.get.and.returnValue(of(rawResourceCollection));
@@ -74,23 +77,41 @@ describe('ResourceHttpService', () => {
     });
   });
 
-  it('GET REQUEST should return result from cache', () => {
-    const cachedResult = Object.assign(new SimpleResource(), {text: 'test cache'});
-    cacheServiceSpy.getResource.and.returnValue(cachedResult);
-    cacheServiceSpy.hasResource.and.returnValue(true);
+  it('GET REQUEST should fill http request params from params object', () => {
+    httpClientSpy.get.and.returnValue(of(rawResource));
 
-    resourceHttpService.get('someUrl').subscribe((result) => {
-      expect(httpClientSpy.get.calls.count()).toBe(0);
-      expect(cacheServiceSpy.getResource.calls.count()).toBe(1);
-      expect(result['text']).toBe('test cache');
+    resourceHttpService.get('order', {
+      params: {
+        orderType: 'online'
+      }
+    }).subscribe(() => {
+      const httpParams = httpClientSpy.get.calls.argsFor(0)[1].params;
+      expect(httpParams.has('orderType')).toBeTrue();
+      expect(httpParams.get('orderType')).toBe('online');
     });
   });
 
-  it('GET REQUEST should put result to cache', () => {
+  it('GET REQUEST should adds projection param in http request params', () => {
     httpClientSpy.get.and.returnValue(of(rawResource));
 
+    resourceHttpService.get('order', {
+      params: {
+        projection: 'orderProjection'
+      }
+    }).subscribe(() => {
+      const httpParams = httpClientSpy.get.calls.argsFor(0)[1].params;
+      expect(httpParams.has('projection')).toBeTrue();
+      expect(httpParams.get('projection')).toBe('orderProjection');
+    });
+  });
+
+  it('GET REQUEST should evict cache when returned object is not resource', () => {
+    cacheServiceSpy.enabled = true;
+    httpClientSpy.get.and.returnValue(of({any: 'value'}));
+
     resourceHttpService.get('someUrl').subscribe(() => {
-      expect(cacheServiceSpy.putResource.calls.count()).toBe(1);
+    }, () => {
+      expect(cacheServiceSpy.evictResource.calls.count()).toBe(1);
     });
   });
 
@@ -110,14 +131,6 @@ describe('ResourceHttpService', () => {
     });
   });
 
-  it('POST REQUEST should evict result resource from cache', () => {
-    httpClientSpy.post.and.returnValue(of(rawResource));
-
-    resourceHttpService.post('someUrl', 'any').subscribe(() => {
-      expect(cacheServiceSpy.evictResource.calls.count()).toBe(1);
-    });
-  });
-
   it('PUT REQUEST should return resource', () => {
     httpClientSpy.put.and.returnValue(of(rawResource));
 
@@ -131,14 +144,6 @@ describe('ResourceHttpService', () => {
 
     resourceHttpService.put('someUrl', 'any').subscribe((result) => {
       expect(result).toEqual({any: 'value'});
-    });
-  });
-
-  it('PUT REQUEST should evict result resource from cache', () => {
-    httpClientSpy.put.and.returnValue(of(rawResource));
-
-    resourceHttpService.put('someUrl', 'any').subscribe(() => {
-      expect(cacheServiceSpy.evictResource.calls.count()).toBe(1);
     });
   });
 
@@ -158,14 +163,6 @@ describe('ResourceHttpService', () => {
     });
   });
 
-  it('PATCH REQUEST should evict result resource from cache', () => {
-    httpClientSpy.patch.and.returnValue(of(rawResource));
-
-    resourceHttpService.patch('someUrl', 'any').subscribe(() => {
-      expect(cacheServiceSpy.evictResource.calls.count()).toBe(1);
-    });
-  });
-
   it('DELETE_REQUEST should return resource', () => {
     httpClientSpy.delete.and.returnValue(of(rawResource));
 
@@ -179,14 +176,6 @@ describe('ResourceHttpService', () => {
 
     resourceHttpService.delete('someUrl').subscribe((result) => {
       expect(result).toEqual({any: 'value'});
-    });
-  });
-
-  it('DELETE_REQUEST should evict result resource from cache', () => {
-    httpClientSpy.delete.and.returnValue(of(rawResource));
-
-    resourceHttpService.delete('someUrl').subscribe(() => {
-      expect(cacheServiceSpy.evictResource.calls.count()).toBe(1);
     });
   });
 
@@ -218,8 +207,8 @@ describe('ResourceHttpService', () => {
     httpClientSpy.get.and.returnValue(of(rawResource));
 
     resourceHttpService.getResource('test', 5, {
-      projection: 'testProjection',
       params: {
+        projection: 'testProjection',
         test: 'testParam'
       }
     }).subscribe(() => {
@@ -307,8 +296,8 @@ describe('ResourceHttpService', () => {
     httpClientSpy.get.and.returnValue(of(rawResource));
 
     resourceHttpService.search('test', 'someQuery', {
-      projection: 'testProjection',
       params: {
+        projection: 'testProjection',
         test: 'testParam'
       }
     }).subscribe(() => {

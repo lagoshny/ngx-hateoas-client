@@ -1,4 +1,4 @@
-import { ResourceIdentifiable } from './resource-identifiable';
+import { AbstractResourceIdentifiable } from './abstract-resource-identifiable';
 import { BaseResource } from './base-resource';
 
 /**
@@ -6,7 +6,7 @@ import { BaseResource } from './base-resource';
  *
  * If you want to have a pagination {@see PagedResourceCollection}.
  */
-export class ResourceCollection<T extends BaseResource> extends ResourceIdentifiable {
+export class ResourceCollection<T extends BaseResource> extends AbstractResourceIdentifiable {
 
   public resources: Array<T> = [];
 

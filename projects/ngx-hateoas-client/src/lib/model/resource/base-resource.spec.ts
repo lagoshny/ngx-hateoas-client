@@ -76,6 +76,10 @@ describe('BaseResource GET_RELATION', () => {
     DependencyInjector.injector = TestBed;
   });
 
+  afterEach(() => {
+    DependencyInjector.injector = null;
+  });
+
   it('should throw error when passed relationName is empty', () => {
     expect(() => baseResource.getRelation(''))
       .toThrowError(`Passed param(s) 'relationName = ' is not valid`);
@@ -104,21 +108,25 @@ describe('BaseResource GET_RELATION', () => {
     });
   });
 
-  it('should throw error when pass projection param in params object for TEMPLATED link', () => {
-    expect(() => {
-      baseResource.getRelation('paymentType', {
-        params: {
-          projection: 'paymentProjection'
-        }
-      }).subscribe();
-    }).toThrowError('Please, pass projection param in projection object key, not with params object!');
+  it('no errors when passed "null" value options', () => {
+    resourceHttpServiceSpy.get.and.returnValue(of(new TestOrderResource()));
+
+    expect(() => baseResource.getRelation('order', null).subscribe()).not.toThrow();
+  });
+
+  it('no errors when passed "undefined" value for options', () => {
+    resourceHttpServiceSpy.get.and.returnValue(of(new TestOrderResource()));
+
+    expect(() => baseResource.getRelation('order', undefined).subscribe()).not.toThrow();
   });
 
   it('should fill projection template param for TEMPLATED link', () => {
     resourceHttpServiceSpy.get.and.returnValue(of(new TestOrderResource()));
 
     baseResource.getRelation('paymentType', {
-      projection: 'paymentProjection'
+      params: {
+        projection: 'paymentProjection'
+      }
     }).subscribe(() => {
       const resultResourceUrl = resourceHttpServiceSpy.get.calls.argsFor(0)[0];
       expect(resultResourceUrl).toBe('http://localhost:8080/api/v1/order/1/payment?projection=paymentProjection');
@@ -131,68 +139,6 @@ describe('BaseResource GET_RELATION', () => {
     baseResource.getRelation('paymentType', {}).subscribe(() => {
       const resultResourceUrl = resourceHttpServiceSpy.get.calls.argsFor(0)[0];
       expect(resultResourceUrl).toBe('http://localhost:8080/api/v1/order/1/payment');
-    });
-  });
-
-  it('should fill http request params for NOT TEMPLATED link from params object', () => {
-    resourceHttpServiceSpy.get.and.returnValue(of(new TestOrderResource()));
-
-    baseResource.getRelation('order', {
-      params: {
-        orderType: 'online'
-      }
-    }).subscribe(() => {
-      const resultResourceUrl = resourceHttpServiceSpy.get.calls.argsFor(0)[0];
-      expect(resultResourceUrl).toBe('http://localhost:8080/api/v1/order/1');
-
-      const httpParams = resourceHttpServiceSpy.get.calls.argsFor(0)[1].params;
-      expect(httpParams.has('orderType')).toBeTrue();
-      expect(httpParams.get('orderType')).toBe('online');
-    });
-  });
-
-  it('should adds projection param in http request params for NOT TEMPLATED link', () => {
-    resourceHttpServiceSpy.get.and.returnValue(of(new TestOrderResource()));
-
-    baseResource.getRelation('order', {
-      projection: 'orderProjection'
-    }).subscribe(() => {
-      const resultResourceUrl = resourceHttpServiceSpy.get.calls.argsFor(0)[0];
-      expect(resultResourceUrl).toBe('http://localhost:8080/api/v1/order/1');
-
-      const httpParams = resourceHttpServiceSpy.get.calls.argsFor(0)[1].params;
-      expect(httpParams.has('projection')).toBeTrue();
-      expect(httpParams.get('projection')).toBe('orderProjection');
-    });
-  });
-
-  it('should throw error when pass projection param in params object for NOT TEMPLATED link', () => {
-    resourceHttpServiceSpy.get.and.returnValue(of(new TestOrderResource()));
-
-    expect(() => {
-      baseResource.getRelation('order', {
-        params: {
-          projection: 'orderProjection'
-        }
-      }).subscribe();
-    }).toThrowError('Please, pass projection param in projection object key, not with params object!');
-  });
-
-  it('no errors when passed "null" value options', () => {
-    resourceHttpServiceSpy.get.and.returnValue(of(new TestOrderResource()));
-
-    baseResource.getRelation('order', null).subscribe(() => {
-      const httpParams = resourceHttpServiceSpy.get.calls.argsFor(0)[1].params;
-      expect(httpParams.keys().length).toBe(0);
-    });
-  });
-
-  it('no errors when passed "undefined" value for options', () => {
-    resourceHttpServiceSpy.get.and.returnValue(of(new TestOrderResource()));
-
-    baseResource.getRelation('order', undefined).subscribe(() => {
-      const httpParams = resourceHttpServiceSpy.get.calls.argsFor(0)[1].params;
-      expect(httpParams.keys().length).toBe(0);
     });
   });
 
@@ -234,6 +180,18 @@ describe('BaseResource GET_RELATED_COLLECTION', () => {
       .toThrowError(`Passed param(s) 'relationName = null' is not valid`);
   });
 
+  it('no errors when passed "null" value options', () => {
+    resourceCollectionHttpServiceSpy.get.and.returnValue(of(new TestOrderResource()));
+
+    expect(() => baseResource.getRelatedCollection('order', null).subscribe()).not.toThrow();
+  });
+
+  it('no errors when passed "undefined" value for options', () => {
+    resourceCollectionHttpServiceSpy.get.and.returnValue(of(new TestOrderResource()));
+
+    expect(() => baseResource.getRelatedCollection('order', undefined).subscribe()).not.toThrow();
+  });
+
   it('should fill template params in TEMPLATED link from passed params object', () => {
     resourceCollectionHttpServiceSpy.get.and.returnValue(of(new TestOrderResource()));
 
@@ -247,21 +205,13 @@ describe('BaseResource GET_RELATED_COLLECTION', () => {
     });
   });
 
-  it('should throw error when pass projection param in params object for TEMPLATED link', () => {
-    expect(() => {
-      baseResource.getRelatedCollection('paymentType', {
-        params: {
-          projection: 'paymentProjection'
-        }
-      }).subscribe();
-    }).toThrowError('Please, pass projection param in projection object key, not with params object!');
-  });
-
   it('should fill projection template param for TEMPLATED link', () => {
     resourceCollectionHttpServiceSpy.get.and.returnValue(of(new TestOrderResource()));
 
     baseResource.getRelatedCollection('paymentType', {
-      projection: 'paymentProjection'
+      params: {
+        projection: 'paymentProjection'
+      }
     }).subscribe(() => {
       const resultResourceUrl = resourceCollectionHttpServiceSpy.get.calls.argsFor(0)[0];
       expect(resultResourceUrl).toBe('http://localhost:8080/api/v1/order/1/payment?projection=paymentProjection');
@@ -274,68 +224,6 @@ describe('BaseResource GET_RELATED_COLLECTION', () => {
     baseResource.getRelatedCollection('paymentType', {}).subscribe(() => {
       const resultResourceUrl = resourceCollectionHttpServiceSpy.get.calls.argsFor(0)[0];
       expect(resultResourceUrl).toBe('http://localhost:8080/api/v1/order/1/payment');
-    });
-  });
-
-  it('should fill http request params for NOT TEMPLATED link from params object', () => {
-    resourceCollectionHttpServiceSpy.get.and.returnValue(of(new TestOrderResource()));
-
-    baseResource.getRelatedCollection('order', {
-      params: {
-        orderType: 'online'
-      }
-    }).subscribe(() => {
-      const resultResourceUrl = resourceCollectionHttpServiceSpy.get.calls.argsFor(0)[0];
-      expect(resultResourceUrl).toBe('http://localhost:8080/api/v1/order/1');
-
-      const httpParams = resourceCollectionHttpServiceSpy.get.calls.argsFor(0)[1].params;
-      expect(httpParams.has('orderType')).toBeTrue();
-      expect(httpParams.get('orderType')).toBe('online');
-    });
-  });
-
-  it('should adds projection param in http request params for NOT TEMPLATED link', () => {
-    resourceCollectionHttpServiceSpy.get.and.returnValue(of(new TestOrderResource()));
-
-    baseResource.getRelatedCollection('order', {
-      projection: 'orderProjection'
-    }).subscribe(() => {
-      const resultResourceUrl = resourceCollectionHttpServiceSpy.get.calls.argsFor(0)[0];
-      expect(resultResourceUrl).toBe('http://localhost:8080/api/v1/order/1');
-
-      const httpParams = resourceCollectionHttpServiceSpy.get.calls.argsFor(0)[1].params;
-      expect(httpParams.has('projection')).toBeTrue();
-      expect(httpParams.get('projection')).toBe('orderProjection');
-    });
-  });
-
-  it('should throw error when pass projection param in params object for NOT TEMPLATED link', () => {
-    resourceCollectionHttpServiceSpy.get.and.returnValue(of(new TestOrderResource()));
-
-    expect(() => {
-      baseResource.getRelatedCollection('order', {
-        params: {
-          projection: 'orderProjection'
-        }
-      }).subscribe();
-    }).toThrowError('Please, pass projection param in projection object key, not with params object!');
-  });
-
-  it('no errors when passed "null" value options', () => {
-    resourceCollectionHttpServiceSpy.get.and.returnValue(of(new TestOrderResource()));
-
-    baseResource.getRelatedCollection('order', null).subscribe(() => {
-      const httpParams = resourceCollectionHttpServiceSpy.get.calls.argsFor(0)[1].params;
-      expect(httpParams.keys().length).toBe(0);
-    });
-  });
-
-  it('no errors when passed "undefined" value for options', () => {
-    resourceCollectionHttpServiceSpy.get.and.returnValue(of(new TestOrderResource()));
-
-    baseResource.getRelatedCollection('order', undefined).subscribe(() => {
-      const httpParams = resourceCollectionHttpServiceSpy.get.calls.argsFor(0)[1].params;
-      expect(httpParams.keys().length).toBe(0);
     });
   });
 
@@ -388,11 +276,36 @@ describe('BaseResource GET_RELATED_PAGE', () => {
     }).toThrowError('Please, pass page params in page object key, not with params object!');
   });
 
+  it('no errors when passed "null" value options', () => {
+    pagedResourceCollectionHttpServiceSpy.get.and.returnValue(of(new PagedResourceCollection(new ResourceCollection())));
+
+    expect(() => baseResource.getRelatedPage('updateStatus', null).subscribe()).not.toThrow();
+  });
+
+  it('no errors when passed "undefined" value for options', () => {
+    pagedResourceCollectionHttpServiceSpy.get.and.returnValue(of(new PagedResourceCollection(new ResourceCollection())));
+
+    expect(() => baseResource.getRelatedPage('updateStatus', undefined)).not.toThrow();
+  });
+
+  it('should fill projection param in TEMPLATED link when it passed IN projection property', () => {
+    pagedResourceCollectionHttpServiceSpy.get.and.returnValue(of(new PagedResourceCollection(new ResourceCollection())));
+
+    baseResource.getRelatedPage('product', {
+      params: {
+        projection: 'productProjection'
+      }
+    }).subscribe(() => {
+      const resultResourceUrl = pagedResourceCollectionHttpServiceSpy.get.calls.argsFor(0)[0];
+      expect(resultResourceUrl).toBe('http://localhost:8080/api/v1/order/1/products?projection=productProjection');
+    });
+  });
+
   it('should fill page params in TEMPLATED link when page params passed IN PAGE OBJECT', () => {
     pagedResourceCollectionHttpServiceSpy.get.and.returnValue(of(new PagedResourceCollection(new ResourceCollection())));
 
     baseResource.getRelatedPage('product', {
-      pageParam: {
+      pageParams: {
         page: 1,
         size: 2,
         sort: {
@@ -403,116 +316,24 @@ describe('BaseResource GET_RELATED_PAGE', () => {
     }).subscribe(() => {
       const resultResourceUrl = pagedResourceCollectionHttpServiceSpy.get.calls.argsFor(0)[0];
       expect(resultResourceUrl).toBe('http://localhost:8080/api/v1/order/1/products?page=1&size=2&sort=abc,ASC&sort=cde,DESC');
-
-      const httpParams = pagedResourceCollectionHttpServiceSpy.get.calls.argsFor(0)[1].params;
-      expect(httpParams.keys().length).toBe(0);
     });
   });
 
-  it('should throw error when projection param passed IN PARAMS OBJECT for TEMPLATED link', () => {
-    expect(() => {
-      baseResource.getRelatedPage('product', {
-        params: {
-          projection: 'productProjection'
-        }
-      }).subscribe();
-    }).toThrowError('Please, pass projection param in projection object key, not with params object!');
-  });
-
-  it('should fill projection param in TEMPLATED link when it passed IN projection property', () => {
+  it('should pass only useCache options for TEMPLATED link', () => {
     pagedResourceCollectionHttpServiceSpy.get.and.returnValue(of(new PagedResourceCollection(new ResourceCollection())));
 
     baseResource.getRelatedPage('product', {
-      projection: 'productProjection'
-    }).subscribe(() => {
-      const resultResourceUrl = pagedResourceCollectionHttpServiceSpy.get.calls.argsFor(0)[0];
-      expect(resultResourceUrl).toBe('http://localhost:8080/api/v1/order/1/products?projection=productProjection');
-
-      const httpParams = pagedResourceCollectionHttpServiceSpy.get.calls.argsFor(0)[1].params;
-      expect(httpParams.keys().length).toBe(0);
-    });
-  });
-
-  it('should pass page params as http request params when link is NOT TEMPLATED', () => {
-    pagedResourceCollectionHttpServiceSpy.get.and.returnValue(of(new PagedResourceCollection(new ResourceCollection())));
-
-    baseResource.getRelatedPage('magazine', {
-      pageParam: {
-        size: 10,
+      pageParams: {
         page: 1,
+        size: 2,
         sort: {
           abc: 'ASC',
           cde: 'DESC'
         }
       }
     }).subscribe(() => {
-      const resultResourceUrl = pagedResourceCollectionHttpServiceSpy.get.calls.argsFor(0)[0];
-      expect(resultResourceUrl).toBe('http://localhost:8080/api/v1/order/1/magazine');
-
-      const httpParams = pagedResourceCollectionHttpServiceSpy.get.calls.argsFor(0)[1].params;
-      expect(httpParams.has('size')).toBeTrue();
-      expect(httpParams.get('size')).toBe('10');
-      expect(httpParams.has('page')).toBeTrue();
-      expect(httpParams.get('page')).toBe('1');
-      expect(httpParams.has('sort')).toBeTrue();
-      expect(httpParams.getAll('sort')[0]).toBe('abc,ASC');
-      expect(httpParams.getAll('sort')[1]).toBe('cde,DESC');
-    });
-  });
-
-  it('should throw error when page params passed IN PARAMS OBJECT for NOT TEMPLATED link', () => {
-    expect(() => {
-      baseResource.getRelatedPage('magazine', {
-        params: {
-          page: 1,
-          size: 2
-        }
-      }).subscribe();
-    }).toThrowError('Please, pass page params in page object key, not with params object!');
-  });
-
-  it('should throw error when projection param passed IN PARAMS OBJECT for NOT TEMPLATED link', () => {
-    expect(() => {
-      baseResource.getRelatedPage('magazine', {
-        params: {
-          projection: 'magazineProjection'
-        }
-      }).subscribe();
-    }).toThrowError('Please, pass projection param in projection object key, not with params object!');
-  });
-
-  it('should adds projection param to http request params for NOT TEMPLATED link', () => {
-    pagedResourceCollectionHttpServiceSpy.get.and.returnValue(of(new PagedResourceCollection(new ResourceCollection())));
-
-    baseResource.getRelatedPage('magazine', {
-      projection: 'magazineProjection'
-    }).subscribe(() => {
-      const resultResourceUrl = pagedResourceCollectionHttpServiceSpy.get.calls.argsFor(0)[0];
-      expect(resultResourceUrl).toBe('http://localhost:8080/api/v1/order/1/magazine');
-
-      const httpParams = pagedResourceCollectionHttpServiceSpy.get.calls.argsFor(0)[1].params;
-      expect(httpParams.has('projection')).toBeTrue();
-      expect(httpParams.get('projection')).toBe('magazineProjection');
-    });
-  });
-
-  it('no errors when passed "null" value options', () => {
-    pagedResourceCollectionHttpServiceSpy.get.and.returnValue(of(new PagedResourceCollection(new ResourceCollection())));
-
-    baseResource.getRelatedPage('updateStatus', null).subscribe(() => {
       const options = pagedResourceCollectionHttpServiceSpy.get.calls.argsFor(0)[1];
-      expect(options).toBeDefined();
-      expect((options.params as HttpParams).keys().length).toBe(0);
-    });
-  });
-
-  it('no errors when passed "undefined" value for options', () => {
-    pagedResourceCollectionHttpServiceSpy.get.and.returnValue(of(new PagedResourceCollection(new ResourceCollection())));
-
-    baseResource.getRelatedPage('updateStatus', undefined).subscribe(() => {
-      const options = pagedResourceCollectionHttpServiceSpy.get.calls.argsFor(0)[1];
-      expect(options).toBeDefined();
-      expect((options.params as HttpParams).keys().length).toBe(0);
+      expect(options).toEqual({useCache: undefined});
     });
   });
 
@@ -821,17 +642,6 @@ describe('BaseResource PUT_RELATION', () => {
     }).subscribe(() => {
       const httpParams = resourceHttpServiceSpy.put.calls.argsFor(0)[2].params;
       expect(httpParams.has('statusId')).toBeTrue();
-    });
-  });
-
-  it('should pass default observe "body" option', () => {
-    resourceHttpServiceSpy.put.and.returnValue(of(new TestOrderResource()));
-
-    baseResource.putRelation('updateStatus', {body: {}}, {
-      params: {statusId: 1}
-    }).subscribe(() => {
-      const observe = resourceHttpServiceSpy.put.calls.argsFor(0)[2].observe;
-      expect(observe).toBe('body');
     });
   });
 

@@ -1,11 +1,14 @@
 import { HttpExecutor } from './http-executor';
-import { async } from '@angular/core/testing';
+import { of } from 'rxjs';
+import { rawResource } from '../model/resource/resources.test';
+import anything = jasmine.anything;
 
 describe('HttpExecutor', () => {
   let httpExecutor: HttpExecutor;
   let httpClientSpy: any;
+  let cacheServiceSpy: any;
 
-  beforeEach(async(() => {
+  beforeEach(() => {
     httpClientSpy = {
       get: jasmine.createSpy('get'),
       post: jasmine.createSpy('post'),
@@ -14,82 +17,238 @@ describe('HttpExecutor', () => {
       delete: jasmine.createSpy('delete')
     };
 
-    httpExecutor = new HttpExecutor(httpClientSpy);
-  }));
+    cacheServiceSpy = {
+      enabled: false,
+      putResource: jasmine.createSpy('putResource'),
+      getResource: jasmine.createSpy('getResource'),
+      evictResource: jasmine.createSpy('evictResource')
+    };
+
+    httpExecutor = new HttpExecutor(httpClientSpy, cacheServiceSpy);
+  });
 
   it('GET should throw error when passed url is empty', () => {
-    expect(() => httpExecutor.get(''))
+    expect(() => httpExecutor.getHttp(''))
       .toThrowError(`Passed param(s) 'url = ' is not valid`);
   });
 
   it('GET should throw error when passed url is null', () => {
-    expect(() => httpExecutor.get(null))
+    expect(() => httpExecutor.getHttp(null))
       .toThrowError(`Passed param(s) 'url = null' is not valid`);
   });
 
   it('GET should throw error when passed url is undefined', () => {
-    expect(() => httpExecutor.get(undefined))
+    expect(() => httpExecutor.getHttp(undefined))
       .toThrowError(`Passed param(s) 'url = undefined' is not valid`);
   });
 
+  it('GET should doing request when cache is disable', () => {
+    cacheServiceSpy.enabled = true;
+    httpClientSpy.get.and.returnValue(of(anything()));
+    httpExecutor.getHttp('any').subscribe(() => {
+      expect(httpClientSpy.get.calls.count()).toBe(1);
+    });
+  });
+
+  it('GET should doing request when useCache is false but cache is enabled', () => {
+    cacheServiceSpy.enabled = true;
+    httpClientSpy.get.and.returnValue(of(anything()));
+    httpExecutor.getHttp('any', null, false).subscribe(() => {
+      expect(httpClientSpy.get.calls.count()).toBe(1);
+    });
+  });
+
+  it('GET should fetch value from cache when cache is enabled', () => {
+    cacheServiceSpy.enabled = true;
+    cacheServiceSpy.getResource.and.returnValue(of(anything()));
+
+    httpExecutor.getHttp('any').subscribe(() => {
+      expect(cacheServiceSpy.getResource.calls.count()).toBe(1);
+      expect(httpClientSpy.get.calls.count()).toBe(0);
+    });
+  });
+
+  it('GET should doing request when cache has not value', () => {
+    cacheServiceSpy.enabled = true;
+    httpClientSpy.get.and.returnValue(of(anything()));
+    cacheServiceSpy.getResource.and.returnValue(null);
+
+    httpExecutor.getHttp('any').subscribe(() => {
+      expect(cacheServiceSpy.getResource.calls.count()).toBe(1);
+      expect(httpClientSpy.get.calls.count()).toBe(1);
+    });
+  });
+
+  it('GET should put request result to the cache when cache is enabled', () => {
+    cacheServiceSpy.enabled = true;
+    httpClientSpy.get.and.returnValue(of(rawResource));
+
+    httpExecutor.getHttp('any').subscribe(() => {
+      expect(httpClientSpy.get.calls.count()).toBe(1);
+      expect(cacheServiceSpy.putResource.calls.count()).toBe(1);
+    });
+  });
+
+  it('GET should NOT put request result to the cache when result is not resource', () => {
+    cacheServiceSpy.enabled = true;
+    httpClientSpy.get.and.returnValue(of(anything()));
+
+    httpExecutor.getHttp('any').subscribe(() => {
+      expect(httpClientSpy.get.calls.count()).toBe(1);
+      expect(cacheServiceSpy.putResource.calls.count()).toBe(0);
+    });
+  });
+
+  it('GET should NOT put request result to the cache when cache is disabled', () => {
+    cacheServiceSpy.enabled = false;
+    httpClientSpy.get.and.returnValue(of(anything()));
+
+    httpExecutor.getHttp('any').subscribe(() => {
+      expect(httpClientSpy.get.calls.count()).toBe(1);
+      expect(cacheServiceSpy.putResource.calls.count()).toBe(0);
+    });
+  });
+
+  it('GET should NOT put request result to the cache when pass useCache = false', () => {
+    cacheServiceSpy.enabled = true;
+    httpClientSpy.get.and.returnValue(of(anything()));
+
+    httpExecutor.getHttp('any', null, false).subscribe(() => {
+      expect(httpClientSpy.get.calls.count()).toBe(1);
+      expect(cacheServiceSpy.putResource.calls.count()).toBe(0);
+    });
+  });
+
   it('POST should throw error when passed url is empty', () => {
-    expect(() => httpExecutor.post('', null))
+    expect(() => httpExecutor.postHttp('', null))
       .toThrowError(`Passed param(s) 'url = ' is not valid`);
   });
 
   it('POST should throw error when passed url is null', () => {
-    expect(() => httpExecutor.post(null, null))
+    expect(() => httpExecutor.postHttp(null, null))
       .toThrowError(`Passed param(s) 'url = null' is not valid`);
   });
 
   it('POST should throw error when passed url is undefined', () => {
-    expect(() => httpExecutor.post(undefined, null))
+    expect(() => httpExecutor.postHttp(undefined, null))
       .toThrowError(`Passed param(s) 'url = undefined' is not valid`);
   });
 
+  it('POST should evict cache when cache is enabled', () => {
+    cacheServiceSpy.enabled = true;
+    httpClientSpy.post.and.returnValue(of(anything()));
+
+    httpExecutor.postHttp('any', {}).subscribe(() => {
+      expect(cacheServiceSpy.evictResource.calls.count()).toBe(1);
+    });
+  });
+
+  it('POST should NOT evict cache when cache is disabled', () => {
+    cacheServiceSpy.enabled = false;
+    httpClientSpy.post.and.returnValue(of(anything()));
+
+    httpExecutor.postHttp('any', {}).subscribe(() => {
+      expect(cacheServiceSpy.evictResource.calls.count()).toBe(0);
+    });
+  });
+
   it('PATCH should throw error when passed url is empty', () => {
-    expect(() => httpExecutor.patch('', null))
+    expect(() => httpExecutor.patchHttp('', null))
       .toThrowError(`Passed param(s) 'url = ' is not valid`);
   });
 
   it('PATCH should throw error when passed url is null', () => {
-    expect(() => httpExecutor.patch(null, null))
+    expect(() => httpExecutor.patchHttp(null, null))
       .toThrowError(`Passed param(s) 'url = null' is not valid`);
   });
 
   it('PATCH should throw error when passed url is undefined', () => {
-    expect(() => httpExecutor.patch(undefined, null))
+    expect(() => httpExecutor.patchHttp(undefined, null))
       .toThrowError(`Passed param(s) 'url = undefined' is not valid`);
   });
 
+  it('PATCH should evict cache when cache is enabled', () => {
+    cacheServiceSpy.enabled = true;
+    httpClientSpy.patch.and.returnValue(of(anything()));
+
+    httpExecutor.patchHttp('any', {}).subscribe(() => {
+      expect(cacheServiceSpy.evictResource.calls.count()).toBe(1);
+    });
+  });
+
+  it('PATCH should NOT evict cache when cache is disabled', () => {
+    cacheServiceSpy.enabled = false;
+    httpClientSpy.patch.and.returnValue(of(anything()));
+
+    httpExecutor.patchHttp('any', {}).subscribe(() => {
+      expect(cacheServiceSpy.evictResource.calls.count()).toBe(0);
+    });
+  });
+
   it('PUT should throw error when passed url is empty', () => {
-    expect(() => httpExecutor.put('', null))
+    expect(() => httpExecutor.putHttp('', null))
       .toThrowError(`Passed param(s) 'url = ' is not valid`);
   });
 
   it('PUT should throw error when passed url is null', () => {
-    expect(() => httpExecutor.put(null, null))
+    expect(() => httpExecutor.putHttp(null, null))
       .toThrowError(`Passed param(s) 'url = null' is not valid`);
   });
 
   it('PUT should throw error when passed url is undefined', () => {
-    expect(() => httpExecutor.put(undefined, null))
+    expect(() => httpExecutor.putHttp(undefined, null))
       .toThrowError(`Passed param(s) 'url = undefined' is not valid`);
   });
 
+  it('PUT should evict cache when cache is enabled', () => {
+    cacheServiceSpy.enabled = true;
+    httpClientSpy.put.and.returnValue(of(anything()));
+
+    httpExecutor.putHttp('any', {}).subscribe(() => {
+      expect(cacheServiceSpy.evictResource.calls.count()).toBe(1);
+    });
+  });
+
+  it('PUT should NOT evict cache when cache is disabled', () => {
+    cacheServiceSpy.enabled = false;
+    httpClientSpy.put.and.returnValue(of(anything()));
+
+    httpExecutor.putHttp('any', {}).subscribe(() => {
+      expect(cacheServiceSpy.evictResource.calls.count()).toBe(0);
+    });
+  });
+
   it('DELETE should throw error when passed url is empty', () => {
-    expect(() => httpExecutor.delete(''))
+    expect(() => httpExecutor.deleteHttp(''))
       .toThrowError(`Passed param(s) 'url = ' is not valid`);
   });
 
   it('DELETE should throw error when passed url is null', () => {
-    expect(() => httpExecutor.delete(null))
+    expect(() => httpExecutor.deleteHttp(null))
       .toThrowError(`Passed param(s) 'url = null' is not valid`);
   });
 
   it('DELETE should throw error when passed url is undefined', () => {
-    expect(() => httpExecutor.delete(undefined))
+    expect(() => httpExecutor.deleteHttp(undefined))
       .toThrowError(`Passed param(s) 'url = undefined' is not valid`);
+  });
+
+  it('DELETE should evict cache when cache is enabled', () => {
+    cacheServiceSpy.enabled = true;
+    httpClientSpy.delete.and.returnValue(of(anything()));
+
+    httpExecutor.deleteHttp('any', {}).subscribe(() => {
+      expect(cacheServiceSpy.evictResource.calls.count()).toBe(1);
+    });
+  });
+
+  it('DELETE should NOT evict cache when cache is disabled', () => {
+    cacheServiceSpy.enabled = false;
+    httpClientSpy.delete.and.returnValue(of(anything()));
+
+    httpExecutor.deleteHttp('any', {}).subscribe(() => {
+      expect(cacheServiceSpy.evictResource.calls.count()).toBe(0);
+    });
   });
 
 });

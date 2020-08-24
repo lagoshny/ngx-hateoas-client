@@ -1,20 +1,21 @@
 import { Injectable } from '@angular/core';
-import { Observable, of as observableOf, throwError as observableThrowError } from 'rxjs';
+import { Observable, throwError as observableThrowError } from 'rxjs';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { catchError, map } from 'rxjs/operators';
+import { catchError, map, tap } from 'rxjs/operators';
 import { ResourceUtils } from '../../util/resource.utils';
 import { BaseResource } from '../../model/resource/base-resource';
 import { DependencyInjector } from '../../util/dependency-injector';
 import { UrlUtils } from '../../util/url.utils';
 import * as _ from 'lodash';
 import { isResource } from '../../model/resource-type';
-import { GetOption } from '../../model/declarations';
+import { GetOption, ResourceIdentifiable } from '../../model/declarations';
 import { HttpExecutor } from '../http-executor';
-import { CacheService } from '../cache.service';
+import { ResourceCacheService } from './cache/resource-cache.service';
 import { HttpConfigService } from '../../config/http-config.service';
 import { Stage } from '../../logger/stage.enum';
 import { StageLogger } from '../../logger/stage-logger';
 import { ValidationUtils } from '../../util/validation.utils';
+import { CacheKey } from './cache/model/cache-key';
 
 /**
  * Get instance of the ResourceHttpService by Angular DependencyInjector.
@@ -30,9 +31,9 @@ export function getResourceHttpService(): ResourceHttpService<BaseResource> {
 export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
 
   constructor(httpClient: HttpClient,
-              public cacheService: CacheService<T>,
+              cacheService: ResourceCacheService,
               private httpConfig: HttpConfigService) {
-    super(httpClient);
+    super(httpClient, cacheService);
   }
 
   /**
@@ -42,31 +43,24 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
    * @param options request options
    * @throws error when required params are not valid or returned resource type is not resource
    */
-  public get(url: string, options?: {
-    headers?: {
-      [header: string]: string | string[];
-    };
-    params?: HttpParams
-  }): Observable<T> {
-    if (this.cacheService.hasResource(url)) {
-      return observableOf(this.cacheService.getResource());
-    }
-
-    return super.get(url, {...options, observe: 'body'})
+  public get(url: string,
+             options?: GetOption): Observable<T> {
+    const httpOptions = {params: UrlUtils.convertToHttpParams(options)};
+    return super.getHttp(url, httpOptions, options?.useCache)
       .pipe(
         map((data: any) => {
           if (!isResource(data)) {
+            if (this.cacheService.enabled) {
+              this.cacheService.evictResource(CacheKey.of(url, httpOptions));
+            }
             const errMsg = 'You try to get wrong resource type, expected single resource.';
             StageLogger.stageErrorLog(Stage.INIT_RESOURCE, {
               error: errMsg
             });
-            throw Error(errMsg);
+            throw new Error(errMsg);
           }
 
-          const resource: T = ResourceUtils.instantiateResource(data);
-          this.cacheService.putResource(url, resource);
-
-          return resource;
+          return ResourceUtils.instantiateResource(data) as T;
         }),
         catchError(error => observableThrowError(error)));
   }
@@ -86,10 +80,9 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
     observe?: 'body' | 'response';
     params?: HttpParams
   }): Observable<any> {
-    return super.post(url, body, options)
+    return super.postHttp(url, body, options)
       .pipe(
         map((data: any) => {
-          this.cacheService.evictResource(url);
           if (isResource(data)) {
             return ResourceUtils.instantiateResource(data);
           }
@@ -114,10 +107,9 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
     observe?: 'body' | 'response';
     params?: HttpParams
   }): Observable<any> {
-    return super.put(url, body, options)
+    return super.putHttp(url, body, options)
       .pipe(
         map((data: any) => {
-          this.cacheService.evictResource(url);
           if (isResource(data)) {
             return ResourceUtils.instantiateResource(data);
           }
@@ -142,10 +134,9 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
     observe?: 'body' | 'response';
     params?: HttpParams
   }): Observable<any> {
-    return super.patch(url, body, options)
+    return super.patchHttp(url, body, options)
       .pipe(
         map((data: any) => {
-          this.cacheService.evictResource(url);
           if (isResource(data)) {
             return ResourceUtils.instantiateResource(data);
           }
@@ -170,10 +161,9 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
     observe?: 'body' | 'response';
     params?: HttpParams
   }): Observable<any> {
-    return super.delete(url, options)
+    return super.deleteHttp(url, options)
       .pipe(
         map((data: any) => {
-          this.cacheService.evictResource(url);
           if (isResource(data)) {
             return ResourceUtils.instantiateResource(data);
           }
@@ -202,7 +192,7 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
       options
     });
 
-    return this.get(url, {params: UrlUtils.convertToHttpParams(options)});
+    return this.get(url, options);
   }
 
   /**
@@ -222,7 +212,7 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
       urlParts: `baseUrl: '${ this.httpConfig.baseApiUrl }', resource: '${ resourceName }'`
     });
 
-    return this.post(url, body, {observe: 'body'});
+    return this.post(url, body);
   }
 
   /**
@@ -243,7 +233,7 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
       urlParts: `baseUrl: '${ this.httpConfig.baseApiUrl }', resource: '${ resourceName }', resourceId: '${ id }'`
     });
 
-    return this.patch(url, body, {observe: 'body'});
+    return this.patch(url, body);
   }
 
   /**
@@ -264,7 +254,7 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
       urlParts: `baseUrl: '${ this.httpConfig.baseApiUrl }', resource: '${ resourceName }', resourceId: '${ id }'`
     });
 
-    return this.put(url, body, {observe: 'body'});
+    return this.put(url, body);
   }
 
   /**
@@ -312,7 +302,7 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
       urlParts: `baseUrl: '${ this.httpConfig.baseApiUrl }', resource: '${ resourceName }', searchQuery: '${ searchQuery }'`
     });
 
-    return this.get(url, {params: UrlUtils.convertToHttpParams(options)});
+    return this.get(url, options);
   }
 
 }

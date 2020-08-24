@@ -3,35 +3,30 @@ import { HttpConfigService } from '../../config/http-config.service';
 import { ResourceCollection } from '../../model/resource/resource-collection';
 import { BaseResource } from '../../model/resource/base-resource';
 import { of } from 'rxjs';
-import {
-  rawEmbeddedResource,
-  rawPagedResourceCollection,
-  rawResource,
-  rawResourceCollection,
-  SimplePagedResourceCollection,
-  SimpleResource
-} from '../../model/resource/resources.test';
+import { rawEmbeddedResource, rawPagedResourceCollection, rawResource, rawResourceCollection } from '../../model/resource/resources.test';
 import { ResourceUtils } from '../../util/resource.utils';
 import { HttpParams } from '@angular/common/http';
 import { PagedResourceCollectionHttpService } from './paged-resource-collection-http.service';
 import { PagedResourceCollection } from '../../model/resource/paged-resource-collection';
 import { Resource } from '../../model/resource/resource';
+import { ResourceCacheService } from './cache/resource-cache.service';
 
 /* tslint:disable:no-string-literal */
-describe('PagedpagedResourceCollectionHttpService', () => {
+describe('PagedResourceCollectionHttpService', () => {
   let pagedResourceCollectionHttpService: PagedResourceCollectionHttpService<PagedResourceCollection<BaseResource>>;
   let httpClientSpy: any;
   let cacheServiceSpy: any;
   let httpConfigService: HttpConfigService;
 
-  beforeEach(async(() => {
+  beforeEach(() => {
     httpClientSpy = {
       get: jasmine.createSpy('get')
     };
     cacheServiceSpy = {
+      enabled: false,
       putResource: jasmine.createSpy('putResource'),
-      hasResource: jasmine.createSpy('hasResource'),
-      getResource: jasmine.createSpy('getResource')
+      getResource: jasmine.createSpy('getResource'),
+      evictResource: jasmine.createSpy('evictResource')
     };
     httpConfigService = {
       baseApiUrl: 'http://localhost:8080/api/v1'
@@ -43,7 +38,13 @@ describe('PagedpagedResourceCollectionHttpService', () => {
     ResourceUtils.useResourceType(Resource);
     ResourceUtils.useResourceCollectionType(ResourceCollection);
     ResourceUtils.usePagedResourceCollectionType(PagedResourceCollection);
-  }));
+  });
+
+  afterEach(() => {
+    ResourceUtils.useResourceType(null);
+    ResourceUtils.useResourceCollectionType(null);
+    ResourceUtils.usePagedResourceCollectionType(null);
+  });
 
   it('GET REQUEST should throw error when returned object is EMBEDDED_RESOURCE', () => {
     httpClientSpy.get.and.returnValue(of(rawEmbeddedResource));
@@ -81,25 +82,13 @@ describe('PagedpagedResourceCollectionHttpService', () => {
     });
   });
 
-  it('GET REQUEST should return result from cache', () => {
-    const cachedResult = new SimplePagedResourceCollection();
-    cachedResult.resources.push(Object.assign(new SimpleResource(), {text: 'test cache'}));
-    cacheServiceSpy.getResource.and.returnValue(cachedResult);
-    cacheServiceSpy.hasResource.and.returnValue(true);
-
-    pagedResourceCollectionHttpService.get('someUrl').subscribe((result) => {
-      expect(httpClientSpy.get.calls.count()).toBe(0);
-      expect(cacheServiceSpy.getResource.calls.count()).toBe(1);
-      expect(result.resources.length).toBe(2);
-      expect(result.resources[1]['text']).toBe('test cache');
-    });
-  });
-
-  it('GET REQUEST should put result to cache', () => {
-    httpClientSpy.get.and.returnValue(of(rawPagedResourceCollection));
+  it('GET REQUEST should evict cache when returned object is not paged resource collection', () => {
+    cacheServiceSpy.enabled = true;
+    httpClientSpy.get.and.returnValue(of({any: 'value'}));
 
     pagedResourceCollectionHttpService.get('someUrl').subscribe(() => {
-      expect(cacheServiceSpy.putResource.calls.count()).toBe(1);
+    }, () => {
+      expect(cacheServiceSpy.evictResource.calls.count()).toBe(1);
     });
   });
 
@@ -108,6 +97,61 @@ describe('PagedpagedResourceCollectionHttpService', () => {
 
     pagedResourceCollectionHttpService.get('someUrl').subscribe((result) => {
       expect(result instanceof PagedResourceCollection).toBeTrue();
+    });
+  });
+
+  it('GET REQUEST should throw error when page params passed IN PARAMS OBJECT', () => {
+    expect(() => {
+      pagedResourceCollectionHttpService.get('someUrl', {
+        params: {
+          page: 1,
+          size: 2
+        }
+      }).subscribe();
+    }).toThrowError('Please, pass page params in page object key, not with params object!');
+  });
+
+  it('GET REQUEST should pass page params as http request params', () => {
+    httpClientSpy.get.and.returnValue(of(rawPagedResourceCollection));
+
+    pagedResourceCollectionHttpService.get('http://localhost:8080/api/v1/order/1/magazine', {
+      pageParams: {
+        size: 10,
+        page: 1,
+        sort: {
+          abc: 'ASC',
+          cde: 'DESC'
+        }
+      }
+    }).subscribe(() => {
+      const resultResourceUrl = httpClientSpy.get.calls.argsFor(0)[0];
+      expect(resultResourceUrl).toBe('http://localhost:8080/api/v1/order/1/magazine');
+
+      const httpParams = httpClientSpy.get.calls.argsFor(0)[1].params;
+      expect(httpParams.has('size')).toBeTrue();
+      expect(httpParams.get('size')).toBe('10');
+      expect(httpParams.has('page')).toBeTrue();
+      expect(httpParams.get('page')).toBe('1');
+      expect(httpParams.has('sort')).toBeTrue();
+      expect(httpParams.getAll('sort')[0]).toBe('abc,ASC');
+      expect(httpParams.getAll('sort')[1]).toBe('cde,DESC');
+    });
+  });
+
+  it('GET REQUEST should adds projection param to http request params', () => {
+    httpClientSpy.get.and.returnValue(of(rawPagedResourceCollection));
+
+    pagedResourceCollectionHttpService.get('http://localhost:8080/api/v1/order/1/magazine', {
+      params: {
+        projection: 'magazineProjection'
+      }
+    }).subscribe(() => {
+      const resultResourceUrl = httpClientSpy.get.calls.argsFor(0)[0];
+      expect(resultResourceUrl).toBe('http://localhost:8080/api/v1/order/1/magazine');
+
+      const httpParams = httpClientSpy.get.calls.argsFor(0)[1].params;
+      expect(httpParams.has('projection')).toBeTrue();
+      expect(httpParams.get('projection')).toBe('magazineProjection');
     });
   });
 
@@ -135,24 +179,15 @@ describe('PagedpagedResourceCollectionHttpService', () => {
     });
   });
 
-  it('GET_RESOURCE_PAGE should generate root resource url with query param', () => {
-    httpClientSpy.get.and.returnValue(of(rawPagedResourceCollection));
-
-    pagedResourceCollectionHttpService.getResourcePage('test', 'someQuery').subscribe(() => {
-      const url = httpClientSpy.get.calls.argsFor(0)[0];
-      expect(url).toBe(`${ httpConfigService.baseApiUrl }/test/someQuery`);
-    });
-  });
-
   it('GET_RESOURCE_PAGE should pass http request params when it passed', () => {
     httpClientSpy.get.and.returnValue(of(rawPagedResourceCollection));
 
-    pagedResourceCollectionHttpService.getResourcePage('test', null, {
-      projection: 'testProjection',
+    pagedResourceCollectionHttpService.getResourcePage('test', {
       params: {
+        projection: 'testProjection',
         test: 'testParam'
       },
-      pageParam: {
+      pageParams: {
         page: 1,
         size: 2,
         sort: {
@@ -182,9 +217,9 @@ describe('PagedpagedResourceCollectionHttpService', () => {
   it('GET_RESOURCE_PAGE should use default page options', () => {
     httpClientSpy.get.and.returnValue(of(rawPagedResourceCollection));
 
-    pagedResourceCollectionHttpService.getResourcePage('test', null, {
-      projection: 'testProjection',
+    pagedResourceCollectionHttpService.getResourcePage('test', {
       params: {
+        projection: 'testProjection',
         test: 'testParam'
       }
     }).subscribe(() => {
@@ -199,6 +234,38 @@ describe('PagedpagedResourceCollectionHttpService', () => {
 
       expect(httpParams.has('test')).toBeTrue();
       expect(httpParams.get('test')).toBe('testParam');
+    });
+  });
+
+  it('GET_RESOURCE_PAGE should use default page number options', () => {
+    httpClientSpy.get.and.returnValue(of(rawPagedResourceCollection));
+
+    pagedResourceCollectionHttpService.getResourcePage('test', {
+      pageParams: {
+        size: 10
+      }
+    }).subscribe(() => {
+      const httpParams = httpClientSpy.get.calls.argsFor(0)[1].params as HttpParams;
+      expect(httpParams.has('size')).toBeTrue();
+      expect(httpParams.get('size')).toBe('10');
+      expect(httpParams.has('page')).toBeTrue();
+      expect(httpParams.get('page')).toBe('0');
+    });
+  });
+
+  it('GET_RESOURCE_PAGE should use default page size options', () => {
+    httpClientSpy.get.and.returnValue(of(rawPagedResourceCollection));
+
+    pagedResourceCollectionHttpService.getResourcePage('test', {
+      pageParams: {
+        page: 1
+      }
+    }).subscribe(() => {
+      const httpParams = httpClientSpy.get.calls.argsFor(0)[1].params as HttpParams;
+      expect(httpParams.has('size')).toBeTrue();
+      expect(httpParams.get('size')).toBe('20');
+      expect(httpParams.has('page')).toBeTrue();
+      expect(httpParams.get('page')).toBe('1');
     });
   });
 
@@ -235,11 +302,11 @@ describe('PagedpagedResourceCollectionHttpService', () => {
     httpClientSpy.get.and.returnValue(of(rawPagedResourceCollection));
 
     pagedResourceCollectionHttpService.search('test', 'someQuery', {
-      projection: 'testProjection',
       params: {
+        projection: 'testProjection',
         test: 'testParam'
       },
-      pageParam: {
+      pageParams: {
         page: 1,
         size: 2,
         sort: {
@@ -270,8 +337,8 @@ describe('PagedpagedResourceCollectionHttpService', () => {
     httpClientSpy.get.and.returnValue(of(rawPagedResourceCollection));
 
     pagedResourceCollectionHttpService.search('test', 'someQuery', {
-      projection: 'testProjection',
       params: {
+        projection: 'testProjection',
         test: 'testParam'
       }
     }).subscribe(() => {
@@ -286,6 +353,39 @@ describe('PagedpagedResourceCollectionHttpService', () => {
 
       expect(httpParams.has('test')).toBeTrue();
       expect(httpParams.get('test')).toBe('testParam');
+    });
+  });
+
+
+  it('SEARCH should use default page number options', () => {
+    httpClientSpy.get.and.returnValue(of(rawPagedResourceCollection));
+
+    pagedResourceCollectionHttpService.search('test', 'any', {
+      pageParams: {
+        size: 10
+      }
+    }).subscribe(() => {
+      const httpParams = httpClientSpy.get.calls.argsFor(0)[1].params as HttpParams;
+      expect(httpParams.has('size')).toBeTrue();
+      expect(httpParams.get('size')).toBe('10');
+      expect(httpParams.has('page')).toBeTrue();
+      expect(httpParams.get('page')).toBe('0');
+    });
+  });
+
+  it('SEARCH should use default page size options', () => {
+    httpClientSpy.get.and.returnValue(of(rawPagedResourceCollection));
+
+    pagedResourceCollectionHttpService.search('test', 'any', {
+      pageParams: {
+        page: 1
+      }
+    }).subscribe(() => {
+      const httpParams = httpClientSpy.get.calls.argsFor(0)[1].params as HttpParams;
+      expect(httpParams.has('size')).toBeTrue();
+      expect(httpParams.get('size')).toBe('20');
+      expect(httpParams.has('page')).toBeTrue();
+      expect(httpParams.get('page')).toBe('1');
     });
   });
 

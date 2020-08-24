@@ -35,14 +35,10 @@ export class UrlUtils {
       }
     }
 
-    if (!_.isEmpty(options.pageParam)) {
-      resultParams = resultParams.append('page', _.toString(options.pageParam.page));
-      resultParams = resultParams.append('size', _.toString(options.pageParam.size));
-      resultParams = UrlUtils.generateSortParams(options.pageParam.sort, resultParams);
-    }
-
-    if (!_.isNil(options.projection)) {
-      resultParams = resultParams.append('projection', options.projection);
+    if (!_.isEmpty(options.pageParams)) {
+      resultParams = resultParams.append('page', _.toString(options.pageParams.page));
+      resultParams = resultParams.append('size', _.toString(options.pageParams.size));
+      resultParams = UrlUtils.generateSortParams(options.pageParams.sort, resultParams);
     }
 
     return resultParams;
@@ -92,15 +88,15 @@ export class UrlUtils {
     const paramsWithoutSortParam = {
       ...options,
       ...options?.params,
-      ...options?.pageParam,
+      ...options?.pageParams,
       /* Sets sort to null because sort is object and should be applied as multi params with sort name
          for each sort object property, but uriTemplates can't do that and we need to do it manually */
       sort: null
     };
 
     const resultUrl = uriTemplates(url).fill(_.isNil(paramsWithoutSortParam) ? {} : paramsWithoutSortParam);
-    if (options?.pageParam) {
-      const sortParams = UrlUtils.generateSortParams(options.pageParam.sort);
+    if (options?.pageParams) {
+      const sortParams = UrlUtils.generateSortParams(options.pageParams.sort);
       if (sortParams.keys().length > 0) {
         return resultUrl.concat(resultUrl.includes('?') ? '&' : '').concat(sortParams.toString());
       }
@@ -123,9 +119,6 @@ export class UrlUtils {
   private static checkDuplicateParams(options: GetOption): void {
     if (_.isEmpty(options) || _.isEmpty(options.params)) {
       return;
-    }
-    if ('projection' in options.params) {
-      throw Error('Please, pass projection param in projection object key, not with params object!');
     }
     if ('page' in options.params || 'size' in options.params || 'sort' in options.params) {
       throw Error('Please, pass page params in page object key, not with params object!');

@@ -4,26 +4,14 @@ import { StageLogger } from '../../../logger/stage-logger';
 import { Stage } from '../../../logger/stage.enum';
 import { CacheKey } from './model/cache-key';
 import * as _ from 'lodash';
-import { HttpConfigService } from '../../../config/http-config.service';
 import { ValidationUtils } from '../../../util/validation.utils';
 import { ResourceIdentifiable } from '../../../model/declarations';
+import { LibConfig } from '../../../config/lib-config';
 
 @Injectable()
 export class ResourceCacheService {
 
-  public static DEFAULT_CACHE_LIFE_TIME = 5 * 60 * 1000;
-
-  public enabled: boolean;
-
-  /**
-   * Time before cache was expired (seconds).
-   */
-  public cacheLifeTime: number = ResourceCacheService.DEFAULT_CACHE_LIFE_TIME;
-
   private cacheMap: Map<string, CachedResource> = new Map<string, CachedResource>();
-
-  constructor(private httpConfig: HttpConfigService) {
-  }
 
   /**
    * Get cached resource value.
@@ -41,7 +29,7 @@ export class ResourceCacheService {
     }
 
     const cacheExpiredTime = new Date(cacheValue.cachedTime);
-    cacheExpiredTime.setSeconds(cacheExpiredTime.getSeconds() + this.cacheLifeTime);
+    cacheExpiredTime.setSeconds(cacheExpiredTime.getSeconds() + LibConfig.config.cache.lifeTime);
     if (cacheExpiredTime.getTime() < new Date().getTime()) {
       this.evictResource(key);
       StageLogger.stageLog(Stage.CACHE_GET, {cacheKey: key.value, message: 'cache was expired', result: null});
@@ -76,13 +64,13 @@ export class ResourceCacheService {
     ValidationUtils.validateInputParams({key});
 
     // Get resource name by url to evict all resource cache with collection/paged collection data
-    const resourceName = key.url.replace(`${ this.httpConfig.baseApiUrl }/`, '').split('/')[0];
+    const resourceName = key.url.replace(`${ LibConfig.config.http.baseApiUrl }/`, '').split('/')[0];
     if (!resourceName) {
       return;
     }
     const evictedCache = [];
     for (const cacheKey of this.cacheMap.keys()) {
-      if (cacheKey.startsWith(`url=${ this.httpConfig.baseApiUrl }/${ resourceName }`)) {
+      if (cacheKey.startsWith(`url=${ LibConfig.config.http.baseApiUrl }/${ resourceName }`)) {
         evictedCache.push({
           key: cacheKey
         });

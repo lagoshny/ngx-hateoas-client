@@ -1,5 +1,3 @@
-import { async } from '@angular/core/testing';
-import { HttpConfigService } from '../../config/http-config.service';
 import { ResourceCollection } from '../../model/resource/resource-collection';
 import { BaseResource } from '../../model/resource/base-resource';
 import { of } from 'rxjs';
@@ -9,31 +7,26 @@ import { HttpParams } from '@angular/common/http';
 import { PagedResourceCollectionHttpService } from './paged-resource-collection-http.service';
 import { PagedResourceCollection } from '../../model/resource/paged-resource-collection';
 import { Resource } from '../../model/resource/resource';
-import { ResourceCacheService } from './cache/resource-cache.service';
+import { LibConfig } from '../../config/lib-config';
 
 /* tslint:disable:no-string-literal */
 describe('PagedResourceCollectionHttpService', () => {
   let pagedResourceCollectionHttpService: PagedResourceCollectionHttpService<PagedResourceCollection<BaseResource>>;
   let httpClientSpy: any;
   let cacheServiceSpy: any;
-  let httpConfigService: HttpConfigService;
 
   beforeEach(() => {
     httpClientSpy = {
       get: jasmine.createSpy('get')
     };
     cacheServiceSpy = {
-      enabled: false,
       putResource: jasmine.createSpy('putResource'),
       getResource: jasmine.createSpy('getResource'),
       evictResource: jasmine.createSpy('evictResource')
     };
-    httpConfigService = {
-      baseApiUrl: 'http://localhost:8080/api/v1'
-    };
 
     pagedResourceCollectionHttpService =
-      new PagedResourceCollectionHttpService<PagedResourceCollection<BaseResource>>(httpClientSpy, cacheServiceSpy, httpConfigService);
+      new PagedResourceCollectionHttpService<PagedResourceCollection<BaseResource>>(httpClientSpy, cacheServiceSpy);
 
     ResourceUtils.useResourceType(Resource);
     ResourceUtils.useResourceCollectionType(ResourceCollection);
@@ -44,6 +37,7 @@ describe('PagedResourceCollectionHttpService', () => {
     ResourceUtils.useResourceType(null);
     ResourceUtils.useResourceCollectionType(null);
     ResourceUtils.usePagedResourceCollectionType(null);
+    LibConfig.config = LibConfig.DEFAULT_CONFIG;
   });
 
   it('GET REQUEST should throw error when returned object is EMBEDDED_RESOURCE', () => {
@@ -83,7 +77,7 @@ describe('PagedResourceCollectionHttpService', () => {
   });
 
   it('GET REQUEST should evict cache when returned object is not paged resource collection', () => {
-    cacheServiceSpy.enabled = true;
+    LibConfig.config.cache.enabled = true;
     httpClientSpy.get.and.returnValue(of({any: 'value'}));
 
     pagedResourceCollectionHttpService.get('someUrl').subscribe(() => {
@@ -175,7 +169,7 @@ describe('PagedResourceCollectionHttpService', () => {
 
     pagedResourceCollectionHttpService.getResourcePage('test').subscribe(() => {
       const url = httpClientSpy.get.calls.argsFor(0)[0];
-      expect(url).toBe(`${ httpConfigService.baseApiUrl }/test`);
+      expect(url).toBe(`${ LibConfig.config.http.baseApiUrl }/test`);
     });
   });
 
@@ -281,12 +275,12 @@ describe('PagedResourceCollectionHttpService', () => {
 
   it('SEARCH throws error when resourceName,searchQuery are null', () => {
     expect(() => pagedResourceCollectionHttpService.search(null, null))
-      .toThrowError(`Passed param(s) 'resourceName = null', 'searchQuery = null' is not valid`);
+      .toThrowError(`Passed param(s) 'resourceName = null', 'searchQuery = null' are not valid`);
   });
 
   it('SEARCH throws error when resourceName,searchQuery are undefined', () => {
     expect(() => pagedResourceCollectionHttpService.search(undefined, undefined))
-      .toThrowError(`Passed param(s) 'resourceName = undefined', 'searchQuery = undefined' is not valid`);
+      .toThrowError(`Passed param(s) 'resourceName = undefined', 'searchQuery = undefined' are not valid`);
   });
 
   it('SEARCH should generate search resource url', () => {
@@ -294,7 +288,7 @@ describe('PagedResourceCollectionHttpService', () => {
 
     pagedResourceCollectionHttpService.search('test', 'someQuery').subscribe(() => {
       const url = httpClientSpy.get.calls.argsFor(0)[0];
-      expect(url).toBe(`${ httpConfigService.baseApiUrl }/test/search/someQuery`);
+      expect(url).toBe(`${LibConfig.config.http.baseApiUrl }/test/search/someQuery`);
     });
   });
 

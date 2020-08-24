@@ -101,11 +101,11 @@ describe('UrlUtils', () => {
 
   it('GENERATE_RESOURCE_URL should throw error when baseUrl,resourceName is null', () => {
     expect(() => UrlUtils.generateResourceUrl(null, null))
-      .toThrowError(`Passed param(s) 'baseUrl = null', 'resourceName = null' is not valid`);
+      .toThrowError(`Passed param(s) 'baseUrl = null', 'resourceName = null' are not valid`);
   });
   it('GENERATE_RESOURCE_URL should throw error when baseUrl,resourceName is undefined', () => {
     expect(() => UrlUtils.generateResourceUrl(undefined, undefined))
-      .toThrowError(`Passed param(s) 'baseUrl = undefined', 'resourceName = undefined' is not valid`);
+      .toThrowError(`Passed param(s) 'baseUrl = undefined', 'resourceName = undefined' are not valid`);
   });
 
   it('GENERATE_RESOURCE_URL should return url with base url and resourceName', () => {

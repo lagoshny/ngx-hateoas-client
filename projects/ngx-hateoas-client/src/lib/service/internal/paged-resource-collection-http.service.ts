@@ -1,8 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BaseResource } from '../../model/resource/base-resource';
 import { HttpClient } from '@angular/common/http';
-import { ResourceCacheService } from './cache/resource-cache.service';
-import { HttpConfigService } from '../../config/http-config.service';
+import { LibConfig } from '../../config/lib-config';
 import { PagedResourceCollection } from '../../model/resource/paged-resource-collection';
 import { catchError, map } from 'rxjs/operators';
 import * as _ from 'lodash';
@@ -11,12 +10,13 @@ import { Observable, throwError as observableThrowError } from 'rxjs';
 import { ResourceUtils } from '../../util/resource.utils';
 import { UrlUtils } from '../../util/url.utils';
 import { DependencyInjector } from '../../util/dependency-injector';
-import { PagedGetOption, PageParam, ResourceIdentifiable } from '../../model/declarations';
+import { PagedGetOption, PageParam } from '../../model/declarations';
 import { HttpExecutor } from '../http-executor';
 import { StageLogger } from '../../logger/stage-logger';
 import { Stage } from '../../logger/stage.enum';
 import { ValidationUtils } from '../../util/validation.utils';
 import { CacheKey } from './cache/model/cache-key';
+import { ResourceCacheService } from './cache/resource-cache.service';
 
 /**
  * Get instance of the PagedResourceCollectionHttpService by Angular DependencyInjector.
@@ -37,8 +37,7 @@ export class PagedResourceCollectionHttpService<T extends PagedResourceCollectio
   };
 
   constructor(httpClient: HttpClient,
-              cacheService: ResourceCacheService,
-              private httpConfig: HttpConfigService) {
+              cacheService: ResourceCacheService) {
     super(httpClient, cacheService);
   }
 
@@ -56,7 +55,7 @@ export class PagedResourceCollectionHttpService<T extends PagedResourceCollectio
       .pipe(
         map((data: any) => {
           if (!isPagedResourceCollection(data)) {
-            if (this.cacheService.enabled) {
+            if (LibConfig.config.cache.enabled) {
               this.cacheService.evictResource(CacheKey.of(url, httpOptions));
             }
             const errMsg = 'You try to get wrong resource type, expected paged resource collection type.';
@@ -79,11 +78,11 @@ export class PagedResourceCollectionHttpService<T extends PagedResourceCollectio
   public getResourcePage(resourceName: string, options?: PagedGetOption): Observable<T> {
     ValidationUtils.validateInputParams({resourceName});
 
-    const url = UrlUtils.removeTemplateParams(UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName));
+    const url = UrlUtils.removeTemplateParams(UrlUtils.generateResourceUrl(LibConfig.config.http.baseApiUrl, resourceName));
 
     StageLogger.stageLog(Stage.PREPARE_URL, {
       result: url,
-      urlParts: `baseUrl: '${ this.httpConfig.baseApiUrl }', resource: '${ resourceName }'`
+      urlParts: `baseUrl: '${ LibConfig.config.http.baseApiUrl }', resource: '${ resourceName }'`
     });
 
     const pagedOption = !_.isEmpty(options) ? options : {};
@@ -109,11 +108,11 @@ export class PagedResourceCollectionHttpService<T extends PagedResourceCollectio
     ValidationUtils.validateInputParams({resourceName, searchQuery});
 
     const url = UrlUtils.removeTemplateParams(
-      UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName)).concat('/search/' + searchQuery);
+      UrlUtils.generateResourceUrl(LibConfig.config.http.baseApiUrl, resourceName)).concat('/search/' + searchQuery);
 
     StageLogger.stageLog(Stage.PREPARE_URL, {
       result: url,
-      urlParts: `baseUrl: '${ this.httpConfig.baseApiUrl }', resource: '${ resourceName }'`
+      urlParts: `baseUrl: '${ LibConfig.config.http.baseApiUrl }', resource: '${ resourceName }'`
     });
 
     const pagedOption = !_.isEmpty(options) ? options : {};

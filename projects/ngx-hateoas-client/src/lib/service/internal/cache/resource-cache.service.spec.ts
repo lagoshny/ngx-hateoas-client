@@ -1,19 +1,19 @@
-import { HttpConfigService } from '../../../config/http-config.service';
 import { ResourceCacheService } from './resource-cache.service';
 import { CacheKey } from './model/cache-key';
 import { rawPagedResourceCollection, rawResource, rawResourceCollection } from '../../../model/resource/resources.test';
 import { async } from '@angular/core/testing';
+import { LibConfig } from '../../../config/lib-config';
 
 describe('CacheService', () => {
   let cacheService: ResourceCacheService;
-  let httpConfigService: HttpConfigService;
 
   beforeEach((() => {
-    httpConfigService = {
-      baseApiUrl: 'http://localhost:8080/api/v1'
-    };
-    cacheService = new ResourceCacheService(httpConfigService);
+    cacheService = new ResourceCacheService();
   }));
+
+  afterEach(() => {
+    LibConfig.config = LibConfig.DEFAULT_CONFIG;
+  });
 
   it('GET_RESOURCE should throw error when passed key is null', () => {
     expect(() => cacheService.getResource(null))
@@ -31,13 +31,12 @@ describe('CacheService', () => {
   });
 
   it('GET_RESOURCE should return null when a cache has value but it is expired', async(() => {
-    cacheService.cacheLifeTime = 1 / 1000;
+    LibConfig.config.cache.lifeTime = 1 / 1000;
     cacheService.putResource(CacheKey.of('someVal', {}), rawResource);
 
     setTimeout(() => {
       const result = cacheService.getResource(CacheKey.of('someVal', {}));
       expect(result).toBe(null);
-      cacheService.cacheLifeTime = ResourceCacheService.DEFAULT_CACHE_LIFE_TIME;
     }, 200);
   }));
 
@@ -51,12 +50,12 @@ describe('CacheService', () => {
 
   it('PUT_RESOURCE should throw error when passed key,value are null', () => {
     expect(() => cacheService.putResource(null, null))
-      .toThrowError(`Passed param(s) 'key = null', 'value = null' is not valid`);
+      .toThrowError(`Passed param(s) 'key = null', 'value = null' are not valid`);
   });
 
   it('PUT_RESOURCE should throw error when passed key,value are undefined', () => {
     expect(() => cacheService.putResource(undefined, undefined))
-      .toThrowError(`Passed param(s) 'key = undefined', 'value = undefined' is not valid`);
+      .toThrowError(`Passed param(s) 'key = undefined', 'value = undefined' are not valid`);
   });
 
   it('PUT_RESOURCE should put value to a cache', () => {

@@ -11,7 +11,6 @@ export class ValidationUtils {
    * @param params object with params to check
    * @throws error if any params are not defined
    */
-  // TODO поменять во мн. числе на are
   public static validateInputParams(params: object): void {
     if (_.isNil(params)) {
       const errMsg = 'Passed params object is not valid';
@@ -34,7 +33,7 @@ export class ValidationUtils {
       }
     }
     if (notValidParams.length > 0) {
-      const errMsg = `Passed param(s) ${ notValidParams.join(', ') } is not valid`;
+      const errMsg = `Passed param(s) ${ notValidParams.join(', ') } ${ notValidParams.length > 1 ? 'are' : 'is' } not valid`;
       StageLogger.stageErrorLog(Stage.CHECK_PARAMS, {error: errMsg});
       throw new Error(errMsg);
     }

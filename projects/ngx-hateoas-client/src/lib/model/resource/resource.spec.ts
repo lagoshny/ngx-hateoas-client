@@ -5,6 +5,7 @@ import { Resource } from './resource';
 import { of } from 'rxjs';
 import { ResourceUtils } from '../../util/resource.utils';
 import { HttpHeaders, HttpResponse } from '@angular/common/http';
+import { LibConfig } from '../../config/lib-config';
 
 // tslint:disable:variable-name
 // tslint:disable:no-string-literal
@@ -83,6 +84,12 @@ describe('Resource ADD_RELATION', () => {
 
     TestBed.configureTestingModule({
       providers: [
+        {
+          provide: LibConfig, useValue: {
+            enableCache: false,
+            baseApiUrl: 'http://localhost:8080/api/v1',
+          }
+        },
         {provide: ResourceHttpService, useValue: resourceHttpServiceSpy}
       ]
     }).compileComponents();
@@ -111,12 +118,12 @@ describe('Resource ADD_RELATION', () => {
 
   it('should throw error when passed relationName,entities are undefined', () => {
     expect(() => resource.addRelation(undefined, undefined))
-      .toThrowError(`Passed param(s) 'relationName = undefined', 'entities = undefined' is not valid`);
+      .toThrowError(`Passed param(s) 'relationName = undefined', 'entities = undefined' are not valid`);
   });
 
   it('should throw error when passed relationName,entities are null', () => {
     expect(() => resource.addRelation(null, null))
-      .toThrowError(`Passed param(s) 'relationName = null', 'entities = null' is not valid`);
+      .toThrowError(`Passed param(s) 'relationName = null', 'entities = null' are not valid`);
   });
 
   it('should clear template params in TEMPLATED relation link', () => {
@@ -174,6 +181,12 @@ describe('Resource BIND_RELATION', () => {
 
     TestBed.configureTestingModule({
       providers: [
+        {
+          provide: LibConfig, useValue: {
+            enableCache: false,
+            baseApiUrl: 'http://localhost:8080/api/v1',
+          }
+        },
         {provide: ResourceHttpService, useValue: resourceHttpServiceSpy}
       ]
     }).compileComponents();
@@ -197,12 +210,12 @@ describe('Resource BIND_RELATION', () => {
 
   it('should throw error when passed relationName,entity are undefined', () => {
     expect(() => resource.bindRelation(undefined, undefined))
-      .toThrowError(`Passed param(s) 'relationName = undefined', 'entity = undefined' is not valid`);
+      .toThrowError(`Passed param(s) 'relationName = undefined', 'entity = undefined' are not valid`);
   });
 
   it('should throw error when passed relationName,entity are null', () => {
     expect(() => resource.bindRelation(null, null))
-      .toThrowError(`Passed param(s) 'relationName = null', 'entity = null' is not valid`);
+      .toThrowError(`Passed param(s) 'relationName = null', 'entity = null' are not valid`);
   });
 
   it('should clear template params in TEMPLATED relation link', () => {
@@ -260,6 +273,12 @@ describe('Resource CLEAR_COLLECTION_RELATION', () => {
 
     TestBed.configureTestingModule({
       providers: [
+        {
+          provide: LibConfig, useValue: {
+            enableCache: false,
+            baseApiUrl: 'http://localhost:8080/api/v1',
+          }
+        },
         {provide: ResourceHttpService, useValue: resourceHttpServiceSpy}
       ]
     }).compileComponents();
@@ -369,12 +388,12 @@ describe('Resource DELETE_RELATION', () => {
 
   it('should throw error when passed relationName,entity are undefined', () => {
     expect(() => resource.deleteRelation(undefined, undefined))
-      .toThrowError(`Passed param(s) 'relationName = undefined', 'entity = undefined' is not valid`);
+      .toThrowError(`Passed param(s) 'relationName = undefined', 'entity = undefined' are not valid`);
   });
 
   it('should throw error when passed relationName,entity are null', () => {
     expect(() => resource.deleteRelation(null, null))
-      .toThrowError(`Passed param(s) 'relationName = null', 'entity = null' is not valid`);
+      .toThrowError(`Passed param(s) 'relationName = null', 'entity = null' are not valid`);
   });
 
   it('should generate url from relation link href and passed resource id retrieved by self link href', () => {

@@ -1,21 +1,21 @@
 import { Injectable } from '@angular/core';
 import { Observable, throwError as observableThrowError } from 'rxjs';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { catchError, map, tap } from 'rxjs/operators';
+import { catchError, map } from 'rxjs/operators';
 import { ResourceUtils } from '../../util/resource.utils';
 import { BaseResource } from '../../model/resource/base-resource';
 import { DependencyInjector } from '../../util/dependency-injector';
 import { UrlUtils } from '../../util/url.utils';
 import * as _ from 'lodash';
 import { isResource } from '../../model/resource-type';
-import { GetOption, ResourceIdentifiable } from '../../model/declarations';
+import { GetOption } from '../../model/declarations';
 import { HttpExecutor } from '../http-executor';
-import { ResourceCacheService } from './cache/resource-cache.service';
-import { HttpConfigService } from '../../config/http-config.service';
+import { LibConfig } from '../../config/lib-config';
 import { Stage } from '../../logger/stage.enum';
 import { StageLogger } from '../../logger/stage-logger';
 import { ValidationUtils } from '../../util/validation.utils';
 import { CacheKey } from './cache/model/cache-key';
+import { ResourceCacheService } from './cache/resource-cache.service';
 
 /**
  * Get instance of the ResourceHttpService by Angular DependencyInjector.
@@ -31,8 +31,7 @@ export function getResourceHttpService(): ResourceHttpService<BaseResource> {
 export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
 
   constructor(httpClient: HttpClient,
-              cacheService: ResourceCacheService,
-              private httpConfig: HttpConfigService) {
+              cacheService: ResourceCacheService) {
     super(httpClient, cacheService);
   }
 
@@ -50,7 +49,7 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
       .pipe(
         map((data: any) => {
           if (!isResource(data)) {
-            if (this.cacheService.enabled) {
+            if (LibConfig.config.cache.enabled) {
               this.cacheService.evictResource(CacheKey.of(url, httpOptions));
             }
             const errMsg = 'You try to get wrong resource type, expected single resource.';
@@ -184,11 +183,11 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
   public getResource(resourceName: string, id: number | string, options?: GetOption): Observable<T> {
     ValidationUtils.validateInputParams({resourceName, id});
 
-    const url = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName).concat('/', _.toString(id));
+    const url = UrlUtils.generateResourceUrl(LibConfig.config.http.baseApiUrl, resourceName).concat('/', _.toString(id));
 
     StageLogger.stageLog(Stage.PREPARE_URL, {
       result: url,
-      urlParts: `baseUrl: '${ this.httpConfig.baseApiUrl }', resource: '${ resourceName }', id: '${ id }'`,
+      urlParts: `baseUrl: '${ LibConfig.config.http.baseApiUrl }', resource: '${ resourceName }', id: '${ id }'`,
       options
     });
 
@@ -205,11 +204,11 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
   public postResource(resourceName: string, body: BaseResource): Observable<T> {
     ValidationUtils.validateInputParams({resourceName, body});
 
-    const url = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName);
+    const url = UrlUtils.generateResourceUrl(LibConfig.config.http.baseApiUrl, resourceName);
 
     StageLogger.stageLog(Stage.PREPARE_URL, {
       result: url,
-      urlParts: `baseUrl: '${ this.httpConfig.baseApiUrl }', resource: '${ resourceName }'`
+      urlParts: `baseUrl: '${ LibConfig.config.http.baseApiUrl }', resource: '${ resourceName }'`
     });
 
     return this.post(url, body);
@@ -226,11 +225,11 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
   public patchResource(resourceName: string, id: number | string, body: any): Observable<T | any> {
     ValidationUtils.validateInputParams({resourceName, id, body});
 
-    const url = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName, _.toString(id));
+    const url = UrlUtils.generateResourceUrl(LibConfig.config.http.baseApiUrl, resourceName, _.toString(id));
 
     StageLogger.stageLog(Stage.PREPARE_URL, {
       result: url,
-      urlParts: `baseUrl: '${ this.httpConfig.baseApiUrl }', resource: '${ resourceName }', resourceId: '${ id }'`
+      urlParts: `baseUrl: '${ LibConfig.config.http.baseApiUrl }', resource: '${ resourceName }', resourceId: '${ id }'`
     });
 
     return this.patch(url, body);
@@ -247,11 +246,11 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
   public putResource(resourceName: string, id: number | string, body: any): Observable<T | any> {
     ValidationUtils.validateInputParams({resourceName, id, body});
 
-    const url = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName, _.toString(id));
+    const url = UrlUtils.generateResourceUrl(LibConfig.config.http.baseApiUrl, resourceName, _.toString(id));
 
     StageLogger.stageLog(Stage.PREPARE_URL, {
       result: url,
-      urlParts: `baseUrl: '${ this.httpConfig.baseApiUrl }', resource: '${ resourceName }', resourceId: '${ id }'`
+      urlParts: `baseUrl: '${ LibConfig.config.http.baseApiUrl }', resource: '${ resourceName }', resourceId: '${ id }'`
     });
 
     return this.put(url, body);
@@ -274,11 +273,11 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
   }): Observable<T | any> {
     ValidationUtils.validateInputParams({resourceName, id});
 
-    const url = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName, _.toString(id));
+    const url = UrlUtils.generateResourceUrl(LibConfig.config.http.baseApiUrl, resourceName, _.toString(id));
 
     StageLogger.stageLog(Stage.PREPARE_URL, {
       result: url,
-      urlParts: `baseUrl: '${ this.httpConfig.baseApiUrl }', resource: '${ resourceName }', resourceId: '${ id }'`
+      urlParts: `baseUrl: '${ LibConfig.config.http.baseApiUrl }', resource: '${ resourceName }', resourceId: '${ id }'`
     });
 
     return this.delete(url, options);
@@ -295,11 +294,11 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
   public search(resourceName: string, searchQuery: string, options?: GetOption): Observable<T> {
     ValidationUtils.validateInputParams({resourceName, searchQuery});
 
-    const url = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName).concat('/search/' + searchQuery);
+    const url = UrlUtils.generateResourceUrl(LibConfig.config.http.baseApiUrl, resourceName).concat('/search/' + searchQuery);
 
     StageLogger.stageLog(Stage.PREPARE_URL, {
       result: url,
-      urlParts: `baseUrl: '${ this.httpConfig.baseApiUrl }', resource: '${ resourceName }', searchQuery: '${ searchQuery }'`
+      urlParts: `baseUrl: '${ LibConfig.config.http.baseApiUrl }', resource: '${ resourceName }', searchQuery: '${ searchQuery }'`
     });
 
     return this.get(url, options);

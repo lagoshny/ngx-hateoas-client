@@ -4,14 +4,14 @@ import { Observable, throwError as observableThrowError } from 'rxjs';
 import { HttpMethod, PagedGetOption } from '../../model/declarations';
 import { UrlUtils } from '../../util/url.utils';
 import { HttpClient } from '@angular/common/http';
-import { ResourceCacheService } from './cache/resource-cache.service';
-import { HttpConfigService } from '../../config/http-config.service';
+import { LibConfig } from '../../config/lib-config';
 import { map } from 'rxjs/operators';
 import { isPagedResourceCollection, isResource, isResourceCollection } from '../../model/resource-type';
 import { ResourceUtils } from '../../util/resource.utils';
 import { Stage } from '../../logger/stage.enum';
 import { StageLogger } from '../../logger/stage-logger';
 import { ValidationUtils } from '../../util/validation.utils';
+import { ResourceCacheService } from './cache/resource-cache.service';
 
 /**
  * Service to perform HTTP requests to get any type of the {@link Resource}, {@link PagedResourceCollection}, {@link ResourceCollection}.
@@ -20,8 +20,7 @@ import { ValidationUtils } from '../../util/validation.utils';
 export class CommonResourceHttpService extends HttpExecutor {
 
   constructor(httpClient: HttpClient,
-              cacheService: ResourceCacheService,
-              private httpConfig: HttpConfigService) {
+              cacheService: ResourceCacheService) {
     super(httpClient, cacheService);
   }
 
@@ -41,18 +40,18 @@ export class CommonResourceHttpService extends HttpExecutor {
   public customQuery(resourceName: string, method: HttpMethod, query: string, body?: any, options?: PagedGetOption): Observable<any> {
     ValidationUtils.validateInputParams({resourceName, method, query});
 
-    const url = UrlUtils.generateResourceUrl(this.httpConfig.baseApiUrl, resourceName, query);
+    const url = UrlUtils.generateResourceUrl(LibConfig.config.http.baseApiUrl, resourceName, query);
 
     StageLogger.stageLog(Stage.PREPARE_URL, {
       result: url,
-      urlParts: `baseUrl: '${ this.httpConfig.baseApiUrl }', resource: '${ resourceName }', query: '${ query }'`
+      urlParts: `baseUrl: '${ LibConfig.config.http.baseApiUrl }', resource: '${ resourceName }', query: '${ query }'`
     });
 
     const httpParams = UrlUtils.convertToHttpParams(options);
 
     StageLogger.stageLog(Stage.PREPARE_URL, {
       result: url,
-      urlParts: `baseUrl: '${ this.httpConfig.baseApiUrl }', resource: '${ resourceName }', query: '${ query }'`
+      urlParts: `baseUrl: '${ LibConfig.config.http.baseApiUrl }', resource: '${ resourceName }', query: '${ query }'`
     });
 
     let result: Observable<any>;

@@ -1,4 +1,3 @@
-import { HttpConfigService } from '../../config/http-config.service';
 import { ResourceCollectionHttpService } from './resource-collection-http.service';
 import { ResourceCollection } from '../../model/resource/resource-collection';
 import { BaseResource } from '../../model/resource/base-resource';
@@ -7,30 +6,26 @@ import { rawEmbeddedResource, rawPagedResourceCollection, rawResource, rawResour
 import { ResourceUtils } from '../../util/resource.utils';
 import { HttpParams } from '@angular/common/http';
 import { Resource } from '../../model/resource/resource';
+import { LibConfig } from '../../config/lib-config';
 
 /* tslint:disable:no-string-literal */
 describe('ResourceCollectionHttpService', () => {
   let resourceCollectionHttpService: ResourceCollectionHttpService<ResourceCollection<BaseResource>>;
   let httpClientSpy: any;
   let cacheServiceSpy: any;
-  let httpConfigService: HttpConfigService;
 
   beforeEach(() => {
     httpClientSpy = {
       get: jasmine.createSpy('get')
     };
     cacheServiceSpy = {
-      enabled: false,
       putResource: jasmine.createSpy('putResource'),
       getResource: jasmine.createSpy('getResource'),
       evictResource: jasmine.createSpy('evictResource')
     };
-    httpConfigService = {
-      baseApiUrl: 'http://localhost:8080/api/v1'
-    };
 
     resourceCollectionHttpService =
-      new ResourceCollectionHttpService<ResourceCollection<BaseResource>>(httpClientSpy, cacheServiceSpy, httpConfigService);
+      new ResourceCollectionHttpService<ResourceCollection<BaseResource>>(httpClientSpy, cacheServiceSpy);
 
     ResourceUtils.useResourceType(Resource);
     ResourceUtils.useResourceCollectionType(ResourceCollection);
@@ -39,6 +34,7 @@ describe('ResourceCollectionHttpService', () => {
   afterEach(() => {
     ResourceUtils.useResourceType(null);
     ResourceUtils.useResourceCollectionType(null);
+    LibConfig.config = LibConfig.DEFAULT_CONFIG;
   });
 
   it('GET REQUEST should throw error when returned object is EMBEDDED_RESOURCE', () => {
@@ -114,7 +110,7 @@ describe('ResourceCollectionHttpService', () => {
   });
 
   it('GET REQUEST should evict cache when returned object is not resource collection', () => {
-    cacheServiceSpy.enabled = true;
+    LibConfig.config.cache.enabled = true;
     httpClientSpy.get.and.returnValue(of({any: 'value'}));
 
     resourceCollectionHttpService.get('someUrl').subscribe(() => {
@@ -143,7 +139,7 @@ describe('ResourceCollectionHttpService', () => {
 
     resourceCollectionHttpService.getResourceCollection('test').subscribe(() => {
       const url = httpClientSpy.get.calls.argsFor(0)[0];
-      expect(url).toBe(`${ httpConfigService.baseApiUrl }/test`);
+      expect(url).toBe(`${ LibConfig.config.http.baseApiUrl }/test`);
     });
   });
 
@@ -176,12 +172,12 @@ describe('ResourceCollectionHttpService', () => {
 
   it('SEARCH throws error when resourceName,searchQuery are null', () => {
     expect(() => resourceCollectionHttpService.search(null, null))
-      .toThrowError(`Passed param(s) 'resourceName = null', 'searchQuery = null' is not valid`);
+      .toThrowError(`Passed param(s) 'resourceName = null', 'searchQuery = null' are not valid`);
   });
 
   it('SEARCH throws error when resourceName,searchQuery are undefined', () => {
     expect(() => resourceCollectionHttpService.search(undefined, undefined))
-      .toThrowError(`Passed param(s) 'resourceName = undefined', 'searchQuery = undefined' is not valid`);
+      .toThrowError(`Passed param(s) 'resourceName = undefined', 'searchQuery = undefined' are not valid`);
   });
 
   it('SEARCH should generate search resource url', () => {
@@ -189,7 +185,7 @@ describe('ResourceCollectionHttpService', () => {
 
     resourceCollectionHttpService.search('test', 'someQuery').subscribe(() => {
       const url = httpClientSpy.get.calls.argsFor(0)[0];
-      expect(url).toBe(`${ httpConfigService.baseApiUrl }/test/search/someQuery`);
+      expect(url).toBe(`${ LibConfig.config.http.baseApiUrl }/test/search/someQuery`);
     });
   });
 

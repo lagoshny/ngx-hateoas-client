@@ -8,6 +8,7 @@ import { PagedResourceCollection } from './paged-resource-collection';
 import { ResourceCollection } from './resource-collection';
 import { HttpParams } from '@angular/common/http';
 import { ResourceCollectionHttpService } from '../../service/internal/resource-collection-http.service';
+import { LibConfig } from '../../config/lib-config';
 
 class TestProductResource extends BaseResource {
   // tslint:disable-next-line:variable-name
@@ -66,6 +67,12 @@ describe('BaseResource GET_RELATION', () => {
 
     TestBed.configureTestingModule({
       providers: [
+        {
+          provide: LibConfig, useValue: {
+            enableCache: false,
+            baseApiUrl: 'http://localhost:8080/api/v1',
+          }
+        },
         {provide: ResourceHttpService, useValue: resourceHttpServiceSpy}
       ]
     }).compileComponents();
@@ -155,6 +162,12 @@ describe('BaseResource GET_RELATED_COLLECTION', () => {
 
     TestBed.configureTestingModule({
       providers: [
+        {
+          provide: LibConfig, useValue: {
+            enableCache: false,
+            baseApiUrl: 'http://localhost:8080/api/v1',
+          }
+        },
         {provide: ResourceCollectionHttpService, useValue: resourceCollectionHttpServiceSpy}
       ]
     }).compileComponents();
@@ -240,6 +253,12 @@ describe('BaseResource GET_RELATED_PAGE', () => {
 
     TestBed.configureTestingModule({
       providers: [
+        {
+          provide: LibConfig, useValue: {
+            enableCache: false,
+            baseApiUrl: 'http://localhost:8080/api/v1',
+          }
+        },
         {provide: PagedResourceCollectionHttpService, useValue: pagedResourceCollectionHttpServiceSpy}
       ]
     }).compileComponents();
@@ -350,6 +369,12 @@ describe('BaseResource POST_RELATION', () => {
 
     TestBed.configureTestingModule({
       providers: [
+        {
+          provide: LibConfig, useValue: {
+            enableCache: false,
+            baseApiUrl: 'http://localhost:8080/api/v1',
+          }
+        },
         {provide: ResourceHttpService, useValue: resourceHttpServiceSpy}
       ]
     }).compileComponents();
@@ -367,12 +392,12 @@ describe('BaseResource POST_RELATION', () => {
 
   it('should throw error when passed relationName,requestBody are undefined', () => {
     expect(() => baseResource.postRelation(undefined, undefined))
-      .toThrowError(`Passed param(s) 'relationName = undefined', 'requestBody = undefined' is not valid`);
+      .toThrowError(`Passed param(s) 'relationName = undefined', 'requestBody = undefined' are not valid`);
   });
 
   it('should throw error when passed relationName,requestBody are null', () => {
     expect(() => baseResource.postRelation(null, null))
-      .toThrowError(`Passed param(s) 'relationName = null', 'requestBody = null' is not valid`);
+      .toThrowError(`Passed param(s) 'relationName = null', 'requestBody = null' are not valid`);
   });
 
   it('should fill url template params when url IS templated', () => {
@@ -474,6 +499,12 @@ describe('BaseResource PATCH_RELATION', () => {
 
     TestBed.configureTestingModule({
       providers: [
+        {
+          provide: LibConfig, useValue: {
+            enableCache: false,
+            baseApiUrl: 'http://localhost:8080/api/v1',
+          }
+        },
         {provide: ResourceHttpService, useValue: resourceHttpServiceSpy}
       ]
     }).compileComponents();
@@ -491,12 +522,12 @@ describe('BaseResource PATCH_RELATION', () => {
 
   it('should throw error when passed relationName,requestBody are undefined', () => {
     expect(() => baseResource.patchRelation(undefined, undefined))
-      .toThrowError(`Passed param(s) 'relationName = undefined', 'requestBody = undefined' is not valid`);
+      .toThrowError(`Passed param(s) 'relationName = undefined', 'requestBody = undefined' are not valid`);
   });
 
   it('should throw error when passed relationName,requestBody are null', () => {
     expect(() => baseResource.patchRelation(null, null))
-      .toThrowError(`Passed param(s) 'relationName = null', 'requestBody = null' is not valid`);
+      .toThrowError(`Passed param(s) 'relationName = null', 'requestBody = null' are not valid`);
   });
 
   it('should fill url template params when url IS templated', () => {
@@ -615,12 +646,12 @@ describe('BaseResource PUT_RELATION', () => {
 
   it('should throw error when passed relationName,requestBody are undefined', () => {
     expect(() => baseResource.putRelation(undefined, undefined))
-      .toThrowError(`Passed param(s) 'relationName = undefined', 'requestBody = undefined' is not valid`);
+      .toThrowError(`Passed param(s) 'relationName = undefined', 'requestBody = undefined' are not valid`);
   });
 
   it('should throw error when passed relationName,requestBody are null', () => {
     expect(() => baseResource.putRelation(null, null))
-      .toThrowError(`Passed param(s) 'relationName = null', 'requestBody = null' is not valid`);
+      .toThrowError(`Passed param(s) 'relationName = null', 'requestBody = null' are not valid`);
   });
 
   it('should fill url template params when url IS templated', () => {

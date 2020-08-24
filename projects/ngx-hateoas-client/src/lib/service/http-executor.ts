@@ -5,8 +5,9 @@ import { StageLogger } from '../logger/stage-logger';
 import { Stage } from '../logger/stage.enum';
 import { ValidationUtils } from '../util/validation.utils';
 import { CacheKey } from './internal/cache/model/cache-key';
-import { ResourceCacheService } from './internal/cache/resource-cache.service';
 import { isResourceObject } from '../model/resource-type';
+import { ResourceCacheService } from './internal/cache/resource-cache.service';
+import { LibConfig } from '../config/lib-config';
 
 /**
  * Base class with common logics to perform HTTP requests.
@@ -72,7 +73,7 @@ export class HttpExecutor {
                  },
                  useCache: boolean = true): Observable<any> {
     ValidationUtils.validateInputParams({url});
-    if (this.cacheService.enabled && useCache) {
+    if (LibConfig.config.cache.enabled && useCache) {
       const cachedValue = this.cacheService.getResource(CacheKey.of(url, options));
       if (cachedValue != null) {
         return observableOf(cachedValue);
@@ -90,7 +91,7 @@ export class HttpExecutor {
     return response.pipe(
       tap((data: any) => {
         HttpExecutor.logResponse('GET', url, options, data);
-        if (this.cacheService.enabled && useCache && isResourceObject(data)) {
+        if (LibConfig.config.cache.enabled && useCache && isResourceObject(data)) {
           this.cacheService.putResource(CacheKey.of(url, options), data);
         }
       })
@@ -125,7 +126,7 @@ export class HttpExecutor {
     return response.pipe(
       tap((data) => {
         HttpExecutor.logResponse('POST', url, options, data);
-        if (this.cacheService.enabled) {
+        if (LibConfig.config.cache.enabled) {
           this.cacheService.evictResource(CacheKey.of(url, options));
         }
       })
@@ -160,7 +161,7 @@ export class HttpExecutor {
     return response.pipe(
       tap((data) => {
         HttpExecutor.logResponse('PUT', url, options, data);
-        if (this.cacheService.enabled) {
+        if (LibConfig.config.cache.enabled) {
           this.cacheService.evictResource(CacheKey.of(url, options));
         }
       })
@@ -195,7 +196,7 @@ export class HttpExecutor {
     return response.pipe(
       tap((data) => {
         HttpExecutor.logResponse('PATCH', url, options, data);
-        if (this.cacheService.enabled) {
+        if (LibConfig.config.cache.enabled) {
           this.cacheService.evictResource(CacheKey.of(url, options));
         }
       })
@@ -229,7 +230,7 @@ export class HttpExecutor {
     return response.pipe(
       tap((data) => {
         HttpExecutor.logResponse('DELETE', url, options, data);
-        if (this.cacheService.enabled) {
+        if (LibConfig.config.cache.enabled) {
           this.cacheService.evictResource(CacheKey.of(url, options));
         }
       })

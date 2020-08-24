@@ -1,5 +1,5 @@
 /* tslint:disable:no-string-literal */
-import { HttpConfigService } from '../../config/http-config.service';
+import { LibConfig } from '../../config/lib-config';
 import { CommonResourceHttpService } from './common-resource-http.service';
 import { HttpMethod } from '../../model/declarations';
 import { of } from 'rxjs';
@@ -15,7 +15,6 @@ describe('CommonResourceHttpService CUSTOM_QUERY', () => {
   let commonHttpService: CommonResourceHttpService;
   let httpClientSpy: any;
   let cacheServiceSpy: any;
-  let httpConfigService: HttpConfigService;
 
   beforeEach(() => {
     httpClientSpy = {
@@ -25,17 +24,13 @@ describe('CommonResourceHttpService CUSTOM_QUERY', () => {
       put: jasmine.createSpy('put'),
     };
     cacheServiceSpy = {
-      enabled: false,
       putResource: jasmine.createSpy('putResource'),
       getResource: jasmine.createSpy('getResource'),
       evictResource: jasmine.createSpy('evictResource')
     };
-    httpConfigService = {
-      baseApiUrl: 'http://localhost:8080/api/v1'
-    };
 
     commonHttpService =
-      new CommonResourceHttpService(httpClientSpy, cacheServiceSpy, httpConfigService);
+      new CommonResourceHttpService(httpClientSpy, cacheServiceSpy);
 
     ResourceUtils.useResourceType(Resource);
     ResourceUtils.useResourceCollectionType(ResourceCollection);
@@ -60,12 +55,12 @@ describe('CommonResourceHttpService CUSTOM_QUERY', () => {
 
   it('throws error when resourceName,method,query are undefined', () => {
     expect(() => commonHttpService.customQuery(undefined, undefined, undefined))
-      .toThrowError(`Passed param(s) 'resourceName = undefined', 'method = undefined', 'query = undefined' is not valid`);
+      .toThrowError(`Passed param(s) 'resourceName = undefined', 'method = undefined', 'query = undefined' are not valid`);
   });
 
   it('throws error when resourceName,method,query are null', () => {
     expect(() => commonHttpService.customQuery(null, null, null))
-      .toThrowError(`Passed param(s) 'resourceName = null', 'method = null', 'query = null' is not valid`);
+      .toThrowError(`Passed param(s) 'resourceName = null', 'method = null', 'query = null' are not valid`);
   });
 
   it('should generate custom query resource url', () => {
@@ -73,7 +68,7 @@ describe('CommonResourceHttpService CUSTOM_QUERY', () => {
 
     commonHttpService.customQuery('test', HttpMethod.GET, 'someQuery').subscribe(() => {
       const url = httpClientSpy.get.calls.argsFor(0)[0];
-      expect(url).toBe(`${ httpConfigService.baseApiUrl }/test/someQuery`);
+      expect(url).toBe(`${ LibConfig.config.http.baseApiUrl }/test/someQuery`);
     });
   });
 

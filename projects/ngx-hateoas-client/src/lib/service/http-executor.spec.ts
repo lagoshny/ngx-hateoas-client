@@ -1,6 +1,7 @@
 import { HttpExecutor } from './http-executor';
 import { of } from 'rxjs';
 import { rawResource } from '../model/resource/resources.test';
+import { LibConfig } from '../config/lib-config';
 import anything = jasmine.anything;
 
 describe('HttpExecutor', () => {
@@ -18,13 +19,16 @@ describe('HttpExecutor', () => {
     };
 
     cacheServiceSpy = {
-      enabled: false,
       putResource: jasmine.createSpy('putResource'),
       getResource: jasmine.createSpy('getResource'),
       evictResource: jasmine.createSpy('evictResource')
     };
 
     httpExecutor = new HttpExecutor(httpClientSpy, cacheServiceSpy);
+  });
+
+  afterEach(() => {
+    LibConfig.config = LibConfig.DEFAULT_CONFIG;
   });
 
   it('GET should throw error when passed url is empty', () => {
@@ -43,7 +47,7 @@ describe('HttpExecutor', () => {
   });
 
   it('GET should doing request when cache is disable', () => {
-    cacheServiceSpy.enabled = true;
+    LibConfig.config.cache.enabled = true;
     httpClientSpy.get.and.returnValue(of(anything()));
     httpExecutor.getHttp('any').subscribe(() => {
       expect(httpClientSpy.get.calls.count()).toBe(1);
@@ -51,15 +55,16 @@ describe('HttpExecutor', () => {
   });
 
   it('GET should doing request when useCache is false but cache is enabled', () => {
-    cacheServiceSpy.enabled = true;
+    LibConfig.config.cache.enabled = true;
     httpClientSpy.get.and.returnValue(of(anything()));
     httpExecutor.getHttp('any', null, false).subscribe(() => {
       expect(httpClientSpy.get.calls.count()).toBe(1);
     });
+    LibConfig.setConfig(LibConfig.DEFAULT_CONFIG);
   });
 
   it('GET should fetch value from cache when cache is enabled', () => {
-    cacheServiceSpy.enabled = true;
+    LibConfig.config.cache.enabled = true;
     cacheServiceSpy.getResource.and.returnValue(of(anything()));
 
     httpExecutor.getHttp('any').subscribe(() => {
@@ -69,7 +74,7 @@ describe('HttpExecutor', () => {
   });
 
   it('GET should doing request when cache has not value', () => {
-    cacheServiceSpy.enabled = true;
+    LibConfig.config.cache.enabled = true;
     httpClientSpy.get.and.returnValue(of(anything()));
     cacheServiceSpy.getResource.and.returnValue(null);
 
@@ -80,7 +85,7 @@ describe('HttpExecutor', () => {
   });
 
   it('GET should put request result to the cache when cache is enabled', () => {
-    cacheServiceSpy.enabled = true;
+    LibConfig.config.cache.enabled = true;
     httpClientSpy.get.and.returnValue(of(rawResource));
 
     httpExecutor.getHttp('any').subscribe(() => {
@@ -90,7 +95,7 @@ describe('HttpExecutor', () => {
   });
 
   it('GET should NOT put request result to the cache when result is not resource', () => {
-    cacheServiceSpy.enabled = true;
+    LibConfig.config.cache.enabled = true;
     httpClientSpy.get.and.returnValue(of(anything()));
 
     httpExecutor.getHttp('any').subscribe(() => {
@@ -100,7 +105,7 @@ describe('HttpExecutor', () => {
   });
 
   it('GET should NOT put request result to the cache when cache is disabled', () => {
-    cacheServiceSpy.enabled = false;
+    LibConfig.config.cache.enabled = false;
     httpClientSpy.get.and.returnValue(of(anything()));
 
     httpExecutor.getHttp('any').subscribe(() => {
@@ -110,7 +115,7 @@ describe('HttpExecutor', () => {
   });
 
   it('GET should NOT put request result to the cache when pass useCache = false', () => {
-    cacheServiceSpy.enabled = true;
+    LibConfig.config.cache.enabled = true;
     httpClientSpy.get.and.returnValue(of(anything()));
 
     httpExecutor.getHttp('any', null, false).subscribe(() => {
@@ -135,7 +140,7 @@ describe('HttpExecutor', () => {
   });
 
   it('POST should evict cache when cache is enabled', () => {
-    cacheServiceSpy.enabled = true;
+    LibConfig.config.cache.enabled = true;
     httpClientSpy.post.and.returnValue(of(anything()));
 
     httpExecutor.postHttp('any', {}).subscribe(() => {
@@ -144,7 +149,7 @@ describe('HttpExecutor', () => {
   });
 
   it('POST should NOT evict cache when cache is disabled', () => {
-    cacheServiceSpy.enabled = false;
+    LibConfig.config.cache.enabled = false;
     httpClientSpy.post.and.returnValue(of(anything()));
 
     httpExecutor.postHttp('any', {}).subscribe(() => {
@@ -168,7 +173,7 @@ describe('HttpExecutor', () => {
   });
 
   it('PATCH should evict cache when cache is enabled', () => {
-    cacheServiceSpy.enabled = true;
+    LibConfig.config.cache.enabled = true;
     httpClientSpy.patch.and.returnValue(of(anything()));
 
     httpExecutor.patchHttp('any', {}).subscribe(() => {
@@ -177,7 +182,7 @@ describe('HttpExecutor', () => {
   });
 
   it('PATCH should NOT evict cache when cache is disabled', () => {
-    cacheServiceSpy.enabled = false;
+    LibConfig.config.cache.enabled = false;
     httpClientSpy.patch.and.returnValue(of(anything()));
 
     httpExecutor.patchHttp('any', {}).subscribe(() => {
@@ -201,7 +206,7 @@ describe('HttpExecutor', () => {
   });
 
   it('PUT should evict cache when cache is enabled', () => {
-    cacheServiceSpy.enabled = true;
+    LibConfig.config.cache.enabled = true;
     httpClientSpy.put.and.returnValue(of(anything()));
 
     httpExecutor.putHttp('any', {}).subscribe(() => {
@@ -210,7 +215,7 @@ describe('HttpExecutor', () => {
   });
 
   it('PUT should NOT evict cache when cache is disabled', () => {
-    cacheServiceSpy.enabled = false;
+    LibConfig.config.cache.enabled = false;
     httpClientSpy.put.and.returnValue(of(anything()));
 
     httpExecutor.putHttp('any', {}).subscribe(() => {
@@ -234,7 +239,7 @@ describe('HttpExecutor', () => {
   });
 
   it('DELETE should evict cache when cache is enabled', () => {
-    cacheServiceSpy.enabled = true;
+    LibConfig.config.cache.enabled = true;
     httpClientSpy.delete.and.returnValue(of(anything()));
 
     httpExecutor.deleteHttp('any', {}).subscribe(() => {
@@ -243,7 +248,7 @@ describe('HttpExecutor', () => {
   });
 
   it('DELETE should NOT evict cache when cache is disabled', () => {
-    cacheServiceSpy.enabled = false;
+    LibConfig.config.cache.enabled = false;
     httpClientSpy.delete.and.returnValue(of(anything()));
 
     httpExecutor.deleteHttp('any', {}).subscribe(() => {

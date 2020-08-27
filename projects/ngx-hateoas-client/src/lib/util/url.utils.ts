@@ -49,13 +49,14 @@ export class UrlUtils {
 
   /**
    * Generate link url.
+   * If proxyUrl is not empty then relation url will be use proxy.
    *
    * @param relationLink resource link to which need to generate the url
    * @param options (optional) additional options that should be applied to the request
    * @throws error when required params are not valid
    */
   public static generateLinkUrl(relationLink: LinkData, options?: PagedGetOption): string {
-    ValidationUtils.validateInputParams({relationLink});
+    ValidationUtils.validateInputParams({relationLink, linkUrl: relationLink?.href});
     let url;
     if (options && !_.isEmpty(options)) {
       url = relationLink.templated ? UrlUtils.fillTemplateParams(relationLink.href, options) : relationLink.href;
@@ -130,7 +131,7 @@ export class UrlUtils {
     };
 
     const resultUrl = uriTemplates(url).fill(_.isNil(paramsWithoutSortParam) ? {} : paramsWithoutSortParam);
-    if (options?.pageParams) {
+    if (options?.sort) {
       const sortParams = UrlUtils.generateSortParams(options.sort);
       if (sortParams.keys().length > 0) {
         return resultUrl.concat(resultUrl.includes('?') ? '&' : '').concat(sortParams.toString());

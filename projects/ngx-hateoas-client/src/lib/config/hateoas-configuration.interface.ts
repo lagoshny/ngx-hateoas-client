@@ -1,18 +1,25 @@
 /**
  * Describe all client configuration params.
  */
-export interface HalConfiguration {
+export interface HateoasConfiguration {
 
   /**
    * Http options.
    */
   http: {
     /**
-     * Base api url on which to send requests.
+     * Root server url.
+     *
+     * For default Spring application it looks like: http://localhost:8080.
+     */
+    rootUrl: string;
+    /**
+     * Proxy url on which to send requests.
+     * If passed then it uses to change baseUrl to proxyUrl when get relation link.
      *
      * For default Spring application it looks like: http://localhost:8080/api/v1.
      */
-    baseApiUrl: string;
+    proxyUrl?: string;
   };
 
   /**

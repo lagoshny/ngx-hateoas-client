@@ -183,11 +183,11 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
   public getResource(resourceName: string, id: number | string, options?: GetOption): Observable<T> {
     ValidationUtils.validateInputParams({resourceName, id});
 
-    const url = UrlUtils.generateResourceUrl(LibConfig.config.http.baseApiUrl, resourceName).concat('/', _.toString(id));
+    const url = UrlUtils.generateResourceUrl(UrlUtils.getApiUrl(), resourceName).concat('/', _.toString(id));
 
     StageLogger.stageLog(Stage.PREPARE_URL, {
       result: url,
-      urlParts: `baseUrl: '${ LibConfig.config.http.baseApiUrl }', resource: '${ resourceName }', id: '${ id }'`,
+      urlParts: `baseUrl: '${ UrlUtils.getApiUrl() }', resource: '${ resourceName }', id: '${ id }'`,
       options
     });
 
@@ -204,11 +204,11 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
   public postResource(resourceName: string, body: BaseResource): Observable<T> {
     ValidationUtils.validateInputParams({resourceName, body});
 
-    const url = UrlUtils.generateResourceUrl(LibConfig.config.http.baseApiUrl, resourceName);
+    const url = UrlUtils.generateResourceUrl(UrlUtils.getApiUrl(), resourceName);
 
     StageLogger.stageLog(Stage.PREPARE_URL, {
       result: url,
-      urlParts: `baseUrl: '${ LibConfig.config.http.baseApiUrl }', resource: '${ resourceName }'`
+      urlParts: `baseUrl: '${ UrlUtils.getApiUrl() }', resource: '${ resourceName }'`
     });
 
     return this.post(url, body);
@@ -225,11 +225,11 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
   public patchResource(resourceName: string, id: number | string, body: any): Observable<T | any> {
     ValidationUtils.validateInputParams({resourceName, id, body});
 
-    const url = UrlUtils.generateResourceUrl(LibConfig.config.http.baseApiUrl, resourceName, _.toString(id));
+    const url = UrlUtils.generateResourceUrl(UrlUtils.getApiUrl(), resourceName, _.toString(id));
 
     StageLogger.stageLog(Stage.PREPARE_URL, {
       result: url,
-      urlParts: `baseUrl: '${ LibConfig.config.http.baseApiUrl }', resource: '${ resourceName }', resourceId: '${ id }'`
+      urlParts: `baseUrl: '${ UrlUtils.getApiUrl() }', resource: '${ resourceName }', resourceId: '${ id }'`
     });
 
     return this.patch(url, body);
@@ -246,11 +246,11 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
   public putResource(resourceName: string, id: number | string, body: any): Observable<T | any> {
     ValidationUtils.validateInputParams({resourceName, id, body});
 
-    const url = UrlUtils.generateResourceUrl(LibConfig.config.http.baseApiUrl, resourceName, _.toString(id));
+    const url = UrlUtils.generateResourceUrl(UrlUtils.getApiUrl(), resourceName, _.toString(id));
 
     StageLogger.stageLog(Stage.PREPARE_URL, {
       result: url,
-      urlParts: `baseUrl: '${ LibConfig.config.http.baseApiUrl }', resource: '${ resourceName }', resourceId: '${ id }'`
+      urlParts: `baseUrl: '${ UrlUtils.getApiUrl() }', resource: '${ resourceName }', resourceId: '${ id }'`
     });
 
     return this.put(url, body);
@@ -273,11 +273,11 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
   }): Observable<T | any> {
     ValidationUtils.validateInputParams({resourceName, id});
 
-    const url = UrlUtils.generateResourceUrl(LibConfig.config.http.baseApiUrl, resourceName, _.toString(id));
+    const url = UrlUtils.generateResourceUrl(UrlUtils.getApiUrl(), resourceName, _.toString(id));
 
     StageLogger.stageLog(Stage.PREPARE_URL, {
       result: url,
-      urlParts: `baseUrl: '${ LibConfig.config.http.baseApiUrl }', resource: '${ resourceName }', resourceId: '${ id }'`
+      urlParts: `baseUrl: '${ UrlUtils.getApiUrl() }', resource: '${ resourceName }', resourceId: '${ id }'`
     });
 
     return this.delete(url, options);
@@ -294,11 +294,11 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
   public search(resourceName: string, searchQuery: string, options?: GetOption): Observable<T> {
     ValidationUtils.validateInputParams({resourceName, searchQuery});
 
-    const url = UrlUtils.generateResourceUrl(LibConfig.config.http.baseApiUrl, resourceName).concat('/search/' + searchQuery);
+    const url = UrlUtils.generateResourceUrl(UrlUtils.getApiUrl(), resourceName).concat('/search/' + searchQuery);
 
     StageLogger.stageLog(Stage.PREPARE_URL, {
       result: url,
-      urlParts: `baseUrl: '${ LibConfig.config.http.baseApiUrl }', resource: '${ resourceName }', searchQuery: '${ searchQuery }'`
+      urlParts: `baseUrl: '${ UrlUtils.getApiUrl() }', resource: '${ resourceName }', searchQuery: '${ searchQuery }'`
     });
 
     return this.get(url, options);

@@ -7,6 +7,7 @@ import { ResourceUtils } from '../../util/resource.utils';
 import { HttpParams } from '@angular/common/http';
 import { Resource } from '../../model/resource/resource';
 import { LibConfig } from '../../config/lib-config';
+import { UrlUtils } from '../../util/url.utils';
 
 /* tslint:disable:no-string-literal */
 describe('ResourceCollectionHttpService', () => {
@@ -139,7 +140,7 @@ describe('ResourceCollectionHttpService', () => {
 
     resourceCollectionHttpService.getResourceCollection('test').subscribe(() => {
       const url = httpClientSpy.get.calls.argsFor(0)[0];
-      expect(url).toBe(`${ LibConfig.config.http.baseApiUrl }/test`);
+      expect(url).toBe(`${ UrlUtils.getApiUrl() }/test`);
     });
   });
 
@@ -185,7 +186,7 @@ describe('ResourceCollectionHttpService', () => {
 
     resourceCollectionHttpService.search('test', 'someQuery').subscribe(() => {
       const url = httpClientSpy.get.calls.argsFor(0)[0];
-      expect(url).toBe(`${ LibConfig.config.http.baseApiUrl }/test/search/someQuery`);
+      expect(url).toBe(`${ UrlUtils.getApiUrl() }/test/search/someQuery`);
     });
   });
 

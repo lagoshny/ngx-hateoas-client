@@ -3,7 +3,7 @@ import { BaseResource } from './base-resource';
 import { Observable, throwError as observableThrowError } from 'rxjs';
 import { getPagedResourceCollectionHttpService } from '../../service/internal/paged-resource-collection-http.service';
 import { UrlUtils } from '../../util/url.utils';
-import { PageData, PageParam } from '../declarations';
+import { LinkData, PageData, SortedPageParam } from '../declarations';
 import * as _ from 'lodash';
 import { StageLogger } from '../../logger/stage-logger';
 import { Stage } from '../../logger/stage.enum';
@@ -15,11 +15,11 @@ import { ValidationUtils } from '../../util/validation.utils';
  */
 export class PagedResourceCollection<T extends BaseResource> extends ResourceCollection<T> {
 
-  private readonly selfUri: string;
-  private readonly nextUri: string;
-  private readonly prevUri: string;
-  private readonly firstUri: string;
-  private readonly lastUri: string;
+  private readonly selfUri: LinkData;
+  private readonly nextUri: LinkData;
+  private readonly prevUri: LinkData;
+  private readonly firstUri: LinkData;
+  private readonly lastUri: LinkData;
 
   public readonly totalElements: number;
   public readonly totalPages: number;
@@ -39,27 +39,27 @@ export class PagedResourceCollection<T extends BaseResource> extends ResourceCol
     this.pageSize = _.result(pageData, 'page.size', 20);
     this.pageNumber = _.result(pageData, 'page.number', 0);
 
-    this.selfUri = _.result(pageData, '_links.self.href', null);
-    this.nextUri = _.result(pageData, '_links.next.href', null);
-    this.prevUri = _.result(pageData, '_links.prev.href', null);
-    this.firstUri = _.result(pageData, '_links.first.href', null);
-    this.lastUri = _.result(pageData, '_links.last.href', null);
+    this.selfUri = _.result(pageData, '_links.self', null);
+    this.nextUri = _.result(pageData, '_links.next', null);
+    this.prevUri = _.result(pageData, '_links.prev', null);
+    this.firstUri = _.result(pageData, '_links.first', null);
+    this.lastUri = _.result(pageData, '_links.last', null);
   }
 
   public hasFirst(): boolean {
-    return !!this.firstUri;
+    return !!this.firstUri && !!this.firstUri.href;
   }
 
   public hasLast(): boolean {
-    return !!this.lastUri;
+    return !!this.lastUri && !!this.lastUri.href;
   }
 
   public hasNext(): boolean {
-    return !!this.nextUri;
+    return !!this.nextUri && !!this.nextUri.href;
   }
 
   public hasPrev(): boolean {
-    return !!this.prevUri;
+    return !!this.prevUri && !!this.prevUri.href;
   }
 
   public first(options?: { useCache: true }): Observable<PagedResourceCollection<T>> {
@@ -122,23 +122,23 @@ export class PagedResourceCollection<T extends BaseResource> extends ResourceCol
    * Perform query with custom page data.
    * That allows you change page size, current page or sort options.
    *
-   * @param pageParam contains data about new characteristics of the page.
+   * @param params contains data about new characteristics of the page.
    * @param options (optional) additional options that will be applied to the request
    * @throws error when required params are not valid or when passed inconsistent data
    */
-  public customPage(pageParam: PageParam, options?: { useCache: true }): Observable<PagedResourceCollection<T>> {
-    StageLogger.resourceBeginLog(this.resources[0], 'CustomPage', {pageParam});
-    ValidationUtils.validateInputParams({pageParam});
+  public customPage(params: SortedPageParam, options?: { useCache: true }): Observable<PagedResourceCollection<T>> {
+    StageLogger.resourceBeginLog(this.resources[0], 'CustomPage', {pageParam: params.pageParams});
+    ValidationUtils.validateInputParams({pageParams: params.pageParams});
 
-    if (pageParam.page < 0) {
-      pageParam.page = this.pageNumber;
+    if (params.pageParams.page < 0) {
+      params.pageParams.page = this.pageNumber;
       StageLogger.stageLog(Stage.PREPARE_PARAMS, {
         message: 'Page number is not passed will be used current value',
         currentPageNumber: this.pageNumber
       });
     }
-    if (pageParam.size < 0) {
-      pageParam.size = this.pageSize;
+    if (params.pageParams.size < 0) {
+      params.pageParams.size = this.pageSize;
       StageLogger.stageLog(Stage.PREPARE_PARAMS, {
         message: 'Page size is not passed will be used current value',
         currentPageSize: this.pageSize
@@ -146,19 +146,19 @@ export class PagedResourceCollection<T extends BaseResource> extends ResourceCol
     }
 
     const maxPageNumber = (this.totalElements / this.pageSize) - 1;
-    if (pageParam.page > maxPageNumber) {
+    if (params.pageParams.page > maxPageNumber) {
       const errMsg = `Error page number. Max page number is ${ maxPageNumber }`;
       StageLogger.stageErrorLog(Stage.PREPARE_PARAMS, {error: errMsg});
       return observableThrowError(errMsg);
     }
     const maxPageSize = this.totalElements / (this.pageSize + 1);
-    if (pageParam.page !== 0 && pageParam.size > maxPageSize) {
+    if (params.pageParams.page !== 0 && params.pageParams.size > maxPageSize) {
       const errMsg = `Error page size. Max page size is ${ maxPageSize }`;
       StageLogger.stageErrorLog(Stage.PREPARE_PARAMS, {error: errMsg});
       return observableThrowError(errMsg);
     }
 
-    return doRequest<T>(this.selfUri, options?.useCache, pageParam).pipe(
+    return doRequest<T>(this.selfUri, options?.useCache, params).pipe(
       tap(() => {
         StageLogger.resourceEndLog(this.resources[0], 'CustomPage', {result: 'custom page was performed successful'});
       })
@@ -167,16 +167,16 @@ export class PagedResourceCollection<T extends BaseResource> extends ResourceCol
 
 }
 
-function doRequest<T extends BaseResource>(url: string,
+function doRequest<T extends BaseResource>(requestLink: LinkData,
                                            useCache: boolean = true,
-                                           pageParams?: PageParam): Observable<PagedResourceCollection<T>> {
-  ValidationUtils.validateInputParams({url});
+                                           params?: SortedPageParam): Observable<PagedResourceCollection<T>> {
+  ValidationUtils.validateInputParams({requestLink});
 
   let httpParams;
-  if (!_.isEmpty(pageParams)) {
-    httpParams = UrlUtils.convertToHttpParams({pageParams});
+  if (!_.isEmpty(params)) {
+    httpParams = UrlUtils.convertToHttpParams({pageParams: params.pageParams, sort: params.sort});
   }
 
   return getPagedResourceCollectionHttpService()
-    .get(UrlUtils.removeTemplateParams(url), {params: httpParams, useCache}) as Observable<PagedResourceCollection<T>>;
+    .get(UrlUtils.generateLinkUrl(requestLink), {params: httpParams, useCache}) as Observable<PagedResourceCollection<T>>;
 }

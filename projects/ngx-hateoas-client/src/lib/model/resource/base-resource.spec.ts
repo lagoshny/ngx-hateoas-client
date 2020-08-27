@@ -326,11 +326,11 @@ describe('BaseResource GET_RELATED_PAGE', () => {
     baseResource.getRelatedPage('product', {
       pageParams: {
         page: 1,
-        size: 2,
-        sort: {
-          abc: 'ASC',
-          cde: 'DESC'
-        }
+        size: 2
+      },
+      sort: {
+        abc: 'ASC',
+        cde: 'DESC'
       }
     }).subscribe(() => {
       const resultResourceUrl = pagedResourceCollectionHttpServiceSpy.get.calls.argsFor(0)[0];
@@ -344,11 +344,11 @@ describe('BaseResource GET_RELATED_PAGE', () => {
     baseResource.getRelatedPage('product', {
       pageParams: {
         page: 1,
-        size: 2,
-        sort: {
-          abc: 'ASC',
-          cde: 'DESC'
-        }
+        size: 2
+      },
+      sort: {
+        abc: 'ASC',
+        cde: 'DESC'
       }
     }).subscribe(() => {
       const options = pagedResourceCollectionHttpServiceSpy.get.calls.argsFor(0)[1];

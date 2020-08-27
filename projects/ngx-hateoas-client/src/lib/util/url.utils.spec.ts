@@ -1,5 +1,6 @@
 import { UrlUtils } from './url.utils';
 import { SimpleResource } from '../model/resource/resources.test';
+import { LibConfig } from '../config/lib-config';
 
 describe('UrlUtils', () => {
 
@@ -29,11 +30,6 @@ describe('UrlUtils', () => {
       .toThrowError('Please, pass page params in page object key, not with params object!');
   });
 
-  it('CONVERT_TO_HTTP_PARAMS should throw error when option.params has sort param', () => {
-    expect(() => UrlUtils.convertToHttpParams({params: {sort: 'test'}}))
-      .toThrowError('Please, pass page params in page object key, not with params object!');
-  });
-
   it('CONVERT_TO_HTTP_PARAMS should adds resource param as self href link', () => {
     const simpleResource = new SimpleResource();
     const result = UrlUtils.convertToHttpParams({params: {res: simpleResource}});
@@ -59,11 +55,11 @@ describe('UrlUtils', () => {
     const result = UrlUtils.convertToHttpParams({
       pageParams: {
         page: 1,
-        size: 20,
-        sort: {
-          abs: 'ASC',
-          dce: 'DESC'
-        }
+        size: 20
+      },
+      sort: {
+        abs: 'ASC',
+        dce: 'DESC'
       }
     });
 
@@ -174,11 +170,11 @@ describe('UrlUtils', () => {
       },
       pageParams: {
         page: 2,
-        size: 30,
-        sort: {
-          first: 'ASC',
-          second: 'DESC'
-        }
+        size: 30
+      },
+      sort: {
+        first: 'ASC',
+        second: 'DESC'
       }
     }))
       .toBe('http://localhost:8080/api/v1/pagedResourceCollection?page=2&size=30&projection=testProjection&any=123&sort=first,ASC&sort=second,DESC');
@@ -195,6 +191,107 @@ describe('UrlUtils', () => {
       }
     }))
       .toBe('http://localhost:8080/api/v1/pagedResourceCollection?page=2&size=30&any=123');
+  });
+
+  it('GENERATE_LINK_URL should throw error when relationLink is null', () => {
+    expect(() => UrlUtils.generateLinkUrl(null))
+      .toThrowError(`Passed param(s) 'relationLink = null', 'linkUrl = undefined' are not valid`);
+  });
+
+  it('GENERATE_LINK_URL should throw error when relationLink is undefined', () => {
+    expect(() => UrlUtils.generateLinkUrl(undefined))
+      .toThrowError(`Passed param(s) 'relationLink = undefined', 'linkUrl = undefined' are not valid`);
+  });
+
+  it('GENERATE_LINK_URL should throw error when relationLink.href is empty', () => {
+    expect(() => UrlUtils.generateLinkUrl({href: ''}))
+      .toThrowError(`Passed param(s) 'linkUrl = ' is not valid`);
+  });
+
+  it('GENERATE_LINK_URL should throw error when relationLink.href is null', () => {
+    expect(() => UrlUtils.generateLinkUrl({href: null}))
+      .toThrowError(`Passed param(s) 'linkUrl = null' is not valid`);
+  });
+
+  it('GENERATE_LINK_URL should throw error when relationLink.href is undefined', () => {
+    expect(() => UrlUtils.generateLinkUrl({href: undefined}))
+      .toThrowError(`Passed param(s) 'linkUrl = undefined' is not valid`);
+  });
+
+  it('GENERATE_LINK_URL should fill ALL template params when link is templated', () => {
+    const result = UrlUtils.generateLinkUrl(
+      {href: `${ UrlUtils.getApiUrl() }/test{?param1,param2}`, templated: true},
+      {
+        params: {
+          param1: '1',
+          param2: '2'
+        }
+      });
+
+    expect(result).toBe(`${ UrlUtils.getApiUrl() }/test?param1=1&param2=2`);
+  });
+
+  it('GENERATE_LINK_URL should fill PART OF template params when link is templated and passed not all params', () => {
+    const result = UrlUtils.generateLinkUrl(
+      {href: `${ UrlUtils.getApiUrl() }/test{?param1,param2,sort,page,size}`, templated: true},
+      {
+        params: {
+          param1: '1'
+        },
+        sort: {
+          abc: 'ASC'
+        },
+        pageParams: {
+          size: 10,
+          page: 0
+        }
+      });
+
+    expect(result).toBe(`${ UrlUtils.getApiUrl() }/test?param1=1&page=0&size=10&sort=abc,ASC`);
+  });
+
+  it('GENERATE_LINK_URL should REMOVE template params when link is templated and passed params are empty', () => {
+    const result = UrlUtils.generateLinkUrl(
+      {href: `${ UrlUtils.getApiUrl() }/test{?param1,param2}`, templated: true});
+
+    expect(result).toBe(`${ UrlUtils.getApiUrl() }/test`);
+  });
+
+  it('GENERATE_LINK_URL should NOT FILL template params when link is not templated', () => {
+    const result = UrlUtils.generateLinkUrl(
+      {href: `${ UrlUtils.getApiUrl() }/test{?param1,param2}`, templated: false});
+
+    expect(result).toBe(`${ UrlUtils.getApiUrl() }/test{?param1,param2}`);
+  });
+
+  it('GENERATE_LINK_URL should replace root link url to proxyUrl', () => {
+    LibConfig.config.http.proxyUrl = 'http://myproxy.ru/api/v1';
+    const result = UrlUtils.generateLinkUrl({href: `${ UrlUtils.getApiUrl() }/test`});
+
+    expect(result).toBe('http://myproxy.ru/api/v1/test');
+    LibConfig.config.http.proxyUrl = '';
+  });
+
+  it('GENERATE_LINK_URL should NOT replace root link url to proxyUrl when it is empty', () => {
+    LibConfig.config.http.proxyUrl = '';
+    const result = UrlUtils.generateLinkUrl({href: `${ UrlUtils.getApiUrl() }/test`});
+
+    expect(result).toBe(`${ UrlUtils.getApiUrl() }/test`);
+  });
+
+  it('GET_API_URL should return root link when proxy is empty', () => {
+    LibConfig.config.http.proxyUrl = '';
+    const result = UrlUtils.getApiUrl();
+
+    expect(result).toBe(LibConfig.config.http.rootUrl);
+  });
+
+  it('GET_API_URL should return proxy link when proxy is NOT empty', () => {
+    LibConfig.config.http.proxyUrl = 'http://myproxy.ru/api/v1';
+    const result = UrlUtils.getApiUrl();
+
+    expect(result).toBe(LibConfig.config.http.proxyUrl);
+    LibConfig.config.http.proxyUrl = '';
   });
 
 });

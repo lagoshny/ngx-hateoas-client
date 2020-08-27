@@ -7,6 +7,7 @@ import * as _ from 'lodash';
 import { ValidationUtils } from '../../../util/validation.utils';
 import { ResourceIdentifiable } from '../../../model/declarations';
 import { LibConfig } from '../../../config/lib-config';
+import { UrlUtils } from '../../../util/url.utils';
 
 @Injectable()
 export class ResourceCacheService {
@@ -64,13 +65,13 @@ export class ResourceCacheService {
     ValidationUtils.validateInputParams({key});
 
     // Get resource name by url to evict all resource cache with collection/paged collection data
-    const resourceName = key.url.replace(`${ LibConfig.config.http.baseApiUrl }/`, '').split('/')[0];
+    const resourceName = key.url.replace(`${ UrlUtils.getApiUrl() }/`, '').split('/')[0];
     if (!resourceName) {
       return;
     }
     const evictedCache = [];
     for (const cacheKey of this.cacheMap.keys()) {
-      if (cacheKey.startsWith(`url=${ LibConfig.config.http.baseApiUrl }/${ resourceName }`)) {
+      if (cacheKey.startsWith(`url=${ UrlUtils.getApiUrl() }/${ resourceName }`)) {
         evictedCache.push({
           key: cacheKey
         });

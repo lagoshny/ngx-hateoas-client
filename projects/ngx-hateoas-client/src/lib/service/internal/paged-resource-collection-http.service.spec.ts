@@ -8,6 +8,7 @@ import { PagedResourceCollectionHttpService } from './paged-resource-collection-
 import { PagedResourceCollection } from '../../model/resource/paged-resource-collection';
 import { Resource } from '../../model/resource/resource';
 import { LibConfig } from '../../config/lib-config';
+import { UrlUtils } from '../../util/url.utils';
 
 /* tslint:disable:no-string-literal */
 describe('PagedResourceCollectionHttpService', () => {
@@ -111,11 +112,11 @@ describe('PagedResourceCollectionHttpService', () => {
     pagedResourceCollectionHttpService.get('http://localhost:8080/api/v1/order/1/magazine', {
       pageParams: {
         size: 10,
-        page: 1,
-        sort: {
-          abc: 'ASC',
-          cde: 'DESC'
-        }
+        page: 1
+      },
+      sort: {
+        abc: 'ASC',
+        cde: 'DESC'
       }
     }).subscribe(() => {
       const resultResourceUrl = httpClientSpy.get.calls.argsFor(0)[0];
@@ -169,7 +170,7 @@ describe('PagedResourceCollectionHttpService', () => {
 
     pagedResourceCollectionHttpService.getResourcePage('test').subscribe(() => {
       const url = httpClientSpy.get.calls.argsFor(0)[0];
-      expect(url).toBe(`${ LibConfig.config.http.baseApiUrl }/test`);
+      expect(url).toBe(`${ UrlUtils.getApiUrl() }/test`);
     });
   });
 
@@ -183,11 +184,11 @@ describe('PagedResourceCollectionHttpService', () => {
       },
       pageParams: {
         page: 1,
-        size: 2,
-        sort: {
-          prop1: 'DESC',
-          prop2: 'ASC'
-        }
+        size: 2
+      },
+      sort: {
+        prop1: 'DESC',
+        prop2: 'ASC'
       }
     }).subscribe(() => {
       const httpParams = httpClientSpy.get.calls.argsFor(0)[1].params as HttpParams;
@@ -288,7 +289,7 @@ describe('PagedResourceCollectionHttpService', () => {
 
     pagedResourceCollectionHttpService.search('test', 'someQuery').subscribe(() => {
       const url = httpClientSpy.get.calls.argsFor(0)[0];
-      expect(url).toBe(`${LibConfig.config.http.baseApiUrl }/test/search/someQuery`);
+      expect(url).toBe(`${UrlUtils.getApiUrl() }/test/search/someQuery`);
     });
   });
 
@@ -302,11 +303,11 @@ describe('PagedResourceCollectionHttpService', () => {
       },
       pageParams: {
         page: 1,
-        size: 2,
-        sort: {
-          prop1: 'DESC',
-          prop2: 'ASC'
-        }
+        size: 2
+      },
+      sort: {
+        prop1: 'DESC',
+        prop2: 'ASC'
       }
     }).subscribe(() => {
       const httpParams = httpClientSpy.get.calls.argsFor(0)[1].params as HttpParams;

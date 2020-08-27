@@ -1,5 +1,4 @@
 /* tslint:disable:no-string-literal */
-import { LibConfig } from '../../config/lib-config';
 import { CommonResourceHttpService } from './common-resource-http.service';
 import { HttpMethod } from '../../model/declarations';
 import { of } from 'rxjs';
@@ -9,6 +8,7 @@ import { Resource } from '../../model/resource/resource';
 import { ResourceCollection } from '../../model/resource/resource-collection';
 import { PagedResourceCollection } from '../../model/resource/paged-resource-collection';
 import { rawPagedResourceCollection, rawResource, rawResourceCollection } from '../../model/resource/resources.test';
+import { UrlUtils } from '../../util/url.utils';
 import anything = jasmine.anything;
 
 describe('CommonResourceHttpService CUSTOM_QUERY', () => {
@@ -68,7 +68,7 @@ describe('CommonResourceHttpService CUSTOM_QUERY', () => {
 
     commonHttpService.customQuery('test', HttpMethod.GET, 'someQuery').subscribe(() => {
       const url = httpClientSpy.get.calls.argsFor(0)[0];
-      expect(url).toBe(`${ LibConfig.config.http.baseApiUrl }/test/someQuery`);
+      expect(url).toBe(`${ UrlUtils.getApiUrl() }/test/someQuery`);
     });
   });
 
@@ -77,16 +77,16 @@ describe('CommonResourceHttpService CUSTOM_QUERY', () => {
 
     commonHttpService.customQuery('test', HttpMethod.GET, 'someQuery', null, {
       pageParams: {
-        sort: {
-          prop1: 'ASC',
-          prop2: 'DESC'
-        },
         size: 1,
         page: 2
       },
       params: {
         projection: 'testProjection',
         test: 'testParam'
+      },
+      sort: {
+        prop1: 'ASC',
+        prop2: 'DESC'
       }
     }).subscribe(() => {
       const httpParams = httpClientSpy.get.calls.argsFor(0)[1].params as HttpParams;

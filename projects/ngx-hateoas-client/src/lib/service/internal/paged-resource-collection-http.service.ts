@@ -78,11 +78,11 @@ export class PagedResourceCollectionHttpService<T extends PagedResourceCollectio
   public getResourcePage(resourceName: string, options?: PagedGetOption): Observable<T> {
     ValidationUtils.validateInputParams({resourceName});
 
-    const url = UrlUtils.removeTemplateParams(UrlUtils.generateResourceUrl(LibConfig.config.http.baseApiUrl, resourceName));
+    const url = UrlUtils.removeTemplateParams(UrlUtils.generateResourceUrl(UrlUtils.getApiUrl(), resourceName));
 
     StageLogger.stageLog(Stage.PREPARE_URL, {
       result: url,
-      urlParts: `baseUrl: '${ LibConfig.config.http.baseApiUrl }', resource: '${ resourceName }'`
+      urlParts: `baseUrl: '${ UrlUtils.getApiUrl() }', resource: '${ resourceName }'`
     });
 
     const pagedOption = !_.isEmpty(options) ? options : {};
@@ -108,11 +108,11 @@ export class PagedResourceCollectionHttpService<T extends PagedResourceCollectio
     ValidationUtils.validateInputParams({resourceName, searchQuery});
 
     const url = UrlUtils.removeTemplateParams(
-      UrlUtils.generateResourceUrl(LibConfig.config.http.baseApiUrl, resourceName)).concat('/search/' + searchQuery);
+      UrlUtils.generateResourceUrl(UrlUtils.getApiUrl(), resourceName)).concat('/search/' + searchQuery);
 
     StageLogger.stageLog(Stage.PREPARE_URL, {
       result: url,
-      urlParts: `baseUrl: '${ LibConfig.config.http.baseApiUrl }', resource: '${ resourceName }'`
+      urlParts: `baseUrl: '${ UrlUtils.getApiUrl() }', resource: '${ resourceName }'`
     });
 
     const pagedOption = !_.isEmpty(options) ? options : {};

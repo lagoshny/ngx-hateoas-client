@@ -32,12 +32,9 @@ export abstract class BaseResource extends AbstractResource {
     ValidationUtils.validateInputParams({relationName});
 
     const relationLink = this.getRelationLink(relationName);
-    const url = relationLink.templated
-      ? UrlUtils.fillTemplateParams(relationLink.href, options)
-      : relationLink.href;
 
     return getResourceHttpService()
-      .get(url, relationLink.templated ? {useCache: options?.useCache} : options)
+      .get(UrlUtils.generateLinkUrl(relationLink, options), relationLink.templated ? {useCache: options?.useCache} : options)
       .pipe(
         tap(() => {
           StageLogger.resourceEndLog(this, 'GET_RELATION', {result: `relation ${ relationName } was got successful`});
@@ -59,10 +56,9 @@ export abstract class BaseResource extends AbstractResource {
     ValidationUtils.validateInputParams({relationName});
 
     const relationLink = this.getRelationLink(relationName);
-    const url = relationLink.templated ? UrlUtils.fillTemplateParams(relationLink.href, options) : relationLink.href;
 
     return getResourceCollectionHttpService()
-      .get(url, relationLink.templated ? {useCache: options?.useCache} : options)
+      .get(UrlUtils.generateLinkUrl(relationLink, options), relationLink.templated ? {useCache: options?.useCache} : options)
       .pipe(
         tap(() => {
           StageLogger.resourceEndLog(this, 'GET_RELATED_COLLECTION', {result: `related collection ${ relationName } was got successful`});
@@ -84,12 +80,9 @@ export abstract class BaseResource extends AbstractResource {
     ValidationUtils.validateInputParams({relationName});
 
     const relationLink = this.getRelationLink(relationName);
-    const url = relationLink.templated
-      ? UrlUtils.fillTemplateParams(relationLink.href, options)
-      : relationLink.href;
 
     return getPagedResourceCollectionHttpService()
-      .get(url, relationLink.templated ? {useCache: options?.useCache} : options)
+      .get(UrlUtils.generateLinkUrl(relationLink, options), relationLink.templated ? {useCache: options?.useCache} : options)
       .pipe(
         tap(() => {
           StageLogger.resourceEndLog(this, 'GET_RELATED_PAGE', {result: `related page ${ relationName } was got successful`});
@@ -113,9 +106,10 @@ export abstract class BaseResource extends AbstractResource {
     ValidationUtils.validateInputParams({relationName, requestBody});
 
     const relationLink = this.getRelationLink(relationName);
-    const url = relationLink.templated ? UrlUtils.fillTemplateParams(relationLink.href, options) : relationLink.href;
 
-    return getResourceHttpService().post(url, ResourceUtils.resolveValues(requestBody),
+    return getResourceHttpService().post(
+      UrlUtils.generateLinkUrl(relationLink, options),
+      ResourceUtils.resolveValues(requestBody),
       {
         observe: options?.observe ? options.observe : 'body',
         params: relationLink.templated ? new HttpParams() : UrlUtils.convertToHttpParams(options)
@@ -143,9 +137,10 @@ export abstract class BaseResource extends AbstractResource {
     ValidationUtils.validateInputParams({relationName, requestBody});
 
     const relationLink = this.getRelationLink(relationName);
-    const url = relationLink.templated ? UrlUtils.fillTemplateParams(relationLink.href, options) : relationLink.href;
 
-    return getResourceHttpService().patch(url, ResourceUtils.resolveValues(requestBody),
+    return getResourceHttpService().patch(
+      UrlUtils.generateLinkUrl(relationLink, options),
+      ResourceUtils.resolveValues(requestBody),
       {
         observe: options?.observe ? options.observe : 'body',
         params: relationLink.templated ? new HttpParams() : UrlUtils.convertToHttpParams(options)
@@ -173,9 +168,10 @@ export abstract class BaseResource extends AbstractResource {
     ValidationUtils.validateInputParams({relationName, requestBody});
 
     const relationLink = this.getRelationLink(relationName);
-    const url = relationLink.templated ? UrlUtils.fillTemplateParams(relationLink.href, options) : relationLink.href;
 
-    return getResourceHttpService().put(url, ResourceUtils.resolveValues(requestBody),
+    return getResourceHttpService().put(
+      UrlUtils.generateLinkUrl(relationLink, options),
+      ResourceUtils.resolveValues(requestBody),
       {
         observe: options?.observe,
         params: relationLink.templated ? new HttpParams() : UrlUtils.convertToHttpParams(options)

@@ -3,8 +3,9 @@ import { isResource } from '../model/resource-type';
 import * as _ from 'lodash';
 import { Resource } from '../model/resource/resource';
 import uriTemplates from 'uri-templates';
-import { GetOption, PagedGetOption, Sort } from '../model/declarations';
+import { GetOption, LinkData, PagedGetOption, Sort } from '../model/declarations';
 import { ValidationUtils } from './validation.utils';
+import { LibConfig } from '../config/lib-config';
 
 export class UrlUtils {
 
@@ -38,10 +39,45 @@ export class UrlUtils {
     if (!_.isEmpty(options.pageParams)) {
       resultParams = resultParams.append('page', _.toString(options.pageParams.page));
       resultParams = resultParams.append('size', _.toString(options.pageParams.size));
-      resultParams = UrlUtils.generateSortParams(options.pageParams.sort, resultParams);
+    }
+    if (!_.isEmpty(options.sort)) {
+      resultParams = UrlUtils.generateSortParams(options.sort, resultParams);
     }
 
     return resultParams;
+  }
+
+  /**
+   * Generate link url.
+   * If proxyUrl is not empty then relation url will be use proxy.
+   *
+   * @param relationLink resource link to which need to generate the url
+   * @param options (optional) additional options that should be applied to the request
+   * @throws error when required params are not valid
+   */
+  public static generateLinkUrl(relationLink: LinkData, options?: PagedGetOption): string {
+    ValidationUtils.validateInputParams({relationLink, linkUrl: relationLink?.href});
+    let url;
+    if (options && !_.isEmpty(options)) {
+      url = relationLink.templated ? UrlUtils.fillTemplateParams(relationLink.href, options) : relationLink.href;
+    } else {
+      url = relationLink.templated ? UrlUtils.removeTemplateParams(relationLink.href) : relationLink.href;
+    }
+    if (LibConfig.config.http.proxyUrl) {
+      return url.replace(LibConfig.config.http.rootUrl, LibConfig.config.http.proxyUrl);
+    }
+    return url;
+  }
+
+  /**
+   * Return server api url based on proxy url when it is not empty or root url otherwise.
+   */
+  public static getApiUrl(): string {
+    if (LibConfig.config.http.proxyUrl) {
+      return LibConfig.config.http.proxyUrl;
+    } else {
+      return LibConfig.config.http.rootUrl;
+    }
   }
 
   /**
@@ -95,8 +131,8 @@ export class UrlUtils {
     };
 
     const resultUrl = uriTemplates(url).fill(_.isNil(paramsWithoutSortParam) ? {} : paramsWithoutSortParam);
-    if (options?.pageParams) {
-      const sortParams = UrlUtils.generateSortParams(options.pageParams.sort);
+    if (options?.sort) {
+      const sortParams = UrlUtils.generateSortParams(options.sort);
       if (sortParams.keys().length > 0) {
         return resultUrl.concat(resultUrl.includes('?') ? '&' : '').concat(sortParams.toString());
       }
@@ -120,7 +156,7 @@ export class UrlUtils {
     if (_.isEmpty(options) || _.isEmpty(options.params)) {
       return;
     }
-    if ('page' in options.params || 'size' in options.params || 'sort' in options.params) {
+    if ('page' in options.params || 'size' in options.params) {
       throw Error('Please, pass page params in page object key, not with params object!');
     }
   }

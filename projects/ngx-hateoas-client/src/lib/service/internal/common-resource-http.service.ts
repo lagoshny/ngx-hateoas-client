@@ -4,7 +4,6 @@ import { Observable, throwError as observableThrowError } from 'rxjs';
 import { HttpMethod, PagedGetOption } from '../../model/declarations';
 import { UrlUtils } from '../../util/url.utils';
 import { HttpClient } from '@angular/common/http';
-import { LibConfig } from '../../config/lib-config';
 import { map } from 'rxjs/operators';
 import { isPagedResourceCollection, isResource, isResourceCollection } from '../../model/resource-type';
 import { ResourceUtils } from '../../util/resource.utils';
@@ -40,18 +39,18 @@ export class CommonResourceHttpService extends HttpExecutor {
   public customQuery(resourceName: string, method: HttpMethod, query: string, body?: any, options?: PagedGetOption): Observable<any> {
     ValidationUtils.validateInputParams({resourceName, method, query});
 
-    const url = UrlUtils.generateResourceUrl(LibConfig.config.http.baseApiUrl, resourceName, query);
+    const url = UrlUtils.generateResourceUrl(UrlUtils.getApiUrl(), resourceName, query);
 
     StageLogger.stageLog(Stage.PREPARE_URL, {
       result: url,
-      urlParts: `baseUrl: '${ LibConfig.config.http.baseApiUrl }', resource: '${ resourceName }', query: '${ query }'`
+      urlParts: `baseUrl: '${ UrlUtils.getApiUrl() }', resource: '${ resourceName }', query: '${ query }'`
     });
 
     const httpParams = UrlUtils.convertToHttpParams(options);
 
     StageLogger.stageLog(Stage.PREPARE_URL, {
       result: url,
-      urlParts: `baseUrl: '${ LibConfig.config.http.baseApiUrl }', resource: '${ resourceName }', query: '${ query }'`
+      urlParts: `baseUrl: '${ UrlUtils.getApiUrl() }', resource: '${ resourceName }', query: '${ query }'`
     });
 
     let result: Observable<any>;

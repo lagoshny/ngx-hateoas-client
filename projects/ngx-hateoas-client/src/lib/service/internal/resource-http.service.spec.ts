@@ -7,6 +7,7 @@ import { of } from 'rxjs';
 import { rawPagedResourceCollection, rawResource, rawResourceCollection, SimpleResource } from '../../model/resource/resources.test';
 import { HttpParams } from '@angular/common/http';
 import { LibConfig } from '../../config/lib-config';
+import { UrlUtils } from '../../util/url.utils';
 
 describe('ResourceHttpService', () => {
   let resourceHttpService: ResourceHttpService<BaseResource>;
@@ -196,7 +197,7 @@ describe('ResourceHttpService', () => {
 
     resourceHttpService.getResource('test', 10).subscribe(() => {
       const url = httpClientSpy.get.calls.argsFor(0)[0];
-      expect(url).toBe(`${ LibConfig.config.http.baseApiUrl }/test/10`);
+      expect(url).toBe(`${ UrlUtils.getApiUrl() }/test/10`);
     });
   });
 
@@ -238,7 +239,7 @@ describe('ResourceHttpService', () => {
 
     resourceHttpService.postResource('test', new SimpleResource()).subscribe(() => {
       const url = httpClientSpy.post.calls.argsFor(0)[0];
-      expect(url).toBe(`${ LibConfig.config.http.baseApiUrl }/test`);
+      expect(url).toBe(`${ UrlUtils.getApiUrl() }/test`);
     });
   });
 
@@ -285,7 +286,7 @@ describe('ResourceHttpService', () => {
 
     resourceHttpService.search('test', 'someQuery').subscribe(() => {
       const url = httpClientSpy.get.calls.argsFor(0)[0];
-      expect(url).toBe(`${ LibConfig.config.http.baseApiUrl }/test/search/someQuery`);
+      expect(url).toBe(`${ UrlUtils.getApiUrl() }/test/search/someQuery`);
     });
   });
 

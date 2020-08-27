@@ -1,7 +1,7 @@
 import { Injectable, Injector } from '@angular/core';
 import { DependencyInjector } from '../util/dependency-injector';
 import { LibConfig } from './lib-config';
-import { HalConfiguration } from './hal-configuration.interface';
+import { HateoasConfiguration } from './hateoas-configuration.interface';
 import { ConsoleLogger } from '../logger/console-logger';
 import { ResourceUtils } from '../util/resource.utils';
 import { Resource } from '../model/resource/resource';
@@ -17,7 +17,7 @@ import { ValidationUtils } from '../util/validation.utils';
  * configuration using {@link #configure()} method.
  */
 @Injectable()
-export class HalConfigurationService {
+export class HateoasConfigurationService {
 
   constructor(private injector: Injector) {
     DependencyInjector.injector = injector;
@@ -33,13 +33,13 @@ export class HalConfigurationService {
    *
    * @param config suitable client properties needed to properly library work
    */
-  public configure(config: HalConfiguration): void {
-    ValidationUtils.validateInputParams({config, baseApi: config?.http?.baseApiUrl});
+  public configure(config: HateoasConfiguration): void {
+    ValidationUtils.validateInputParams({config, baseApi: config?.http?.rootUrl});
 
     LibConfig.setConfig(config);
 
     ConsoleLogger.prettyInfo('HateoasClient was configured with options', {
-      baseApiUrl: config.http.baseApiUrl
+      rootUrl: config.http.rootUrl
     });
   }
 

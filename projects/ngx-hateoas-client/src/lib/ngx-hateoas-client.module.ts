@@ -1,6 +1,6 @@
 import { ModuleWithProviders, NgModule } from '@angular/core';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
-import { HalConfigurationService } from './config/hal-configuration.service';
+import { HateoasConfigurationService } from './config/hateoas-configuration.service';
 import { LibConfig } from './config/lib-config';
 import { HalResourceService } from './service/external/hal-resource.service';
 import { ResourceHttpService } from './service/internal/resource-http.service';
@@ -9,13 +9,13 @@ import { ResourceCollectionHttpService } from './service/internal/resource-colle
 import { CommonResourceHttpService } from './service/internal/common-resource-http.service';
 import { ResourceCacheService } from './service/internal/cache/resource-cache.service';
 
-export { HalConfiguration } from './config/hal-configuration.interface';
-export { HalConfigurationService } from './config/hal-configuration.service';
+export { HateoasConfiguration } from './config/hateoas-configuration.interface';
+export { HateoasConfigurationService } from './config/hateoas-configuration.service';
 export { Resource } from './model/resource/resource';
 export { EmbeddedResource } from './model/resource/embedded-resource';
 export { ResourceCollection } from './model/resource/resource-collection';
 export { PagedResourceCollection } from './model/resource/paged-resource-collection';
-export { SortOrder, Include, HttpMethod } from './model/declarations';
+export { Sort, SortOrder, Include, HttpMethod } from './model/declarations';
 export { HalResourceOperation } from './service/external/hal-resource-operation';
 export { HalResourceService } from './service/external/hal-resource.service';
 
@@ -42,7 +42,7 @@ export class NgxHateoasClientModule {
       ngModule: NgxHateoasClientModule,
       providers: [
         HttpClient,
-        HalConfigurationService
+        HateoasConfigurationService
       ]
     };
   }

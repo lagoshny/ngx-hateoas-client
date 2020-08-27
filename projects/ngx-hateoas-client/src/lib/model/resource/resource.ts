@@ -81,6 +81,31 @@ export class Resource extends BaseResource {
   }
 
   /**
+   * Update the passed entity by the relation name in this resource
+   *
+   * @param relationName with which should be updated
+   * @param entity new value of entity
+   * @throws error when required params are not valid or no link is found by passed relation name
+   */
+  public updateRelation<T extends Resource>(relationName: string, entity: T): Observable<HttpResponse<any>> {
+    StageLogger.resourceBeginLog(this, 'UPDATE_RELATION', {relationName, resourceLinks: this._links, entity});
+    ValidationUtils.validateInputParams({relationName, entity});
+
+    const relationLink = this.getRelationLink(relationName);
+    const url = relationLink.templated ? UrlUtils.removeTemplateParams(relationLink.href) : relationLink.href;
+    const resource = ResourceUtils.initResource(entity) as Resource;
+
+    return getResourceHttpService().put(url, resource.getSelfLinkHref(), {
+      observe: 'response',
+      headers: new HttpHeaders({'Content-Type': 'text/uri-list'})
+    }).pipe(
+      tap(() => {
+        StageLogger.resourceEndLog(this, 'UPDATE_RELATION', {result: `relation ${ relationName } was bind successful`});
+      })
+    );
+  }
+
+  /**
    * Bind the passed entity to this resource by the relation name.
    *
    * @param relationName with which will be associated passed entity to this resource
@@ -92,10 +117,9 @@ export class Resource extends BaseResource {
     ValidationUtils.validateInputParams({relationName, entity});
 
     const relationLink = this.getRelationLink(relationName);
-    const url = relationLink.templated ? UrlUtils.removeTemplateParams(relationLink.href) : relationLink.href;
     const resource = ResourceUtils.initResource(entity) as Resource;
 
-    return getResourceHttpService().put(url, resource.getSelfLinkHref(), {
+    return getResourceHttpService().put(UrlUtils.generateLinkUrl(relationLink), resource.getSelfLinkHref(), {
       observe: 'response',
       headers: new HttpHeaders({'Content-Type': 'text/uri-list'})
     }).pipe(

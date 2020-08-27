@@ -169,7 +169,7 @@ describe('PagedResourceCollectionHttpService', () => {
 
     pagedResourceCollectionHttpService.getResourcePage('test').subscribe(() => {
       const url = httpClientSpy.get.calls.argsFor(0)[0];
-      expect(url).toBe(`${ LibConfig.config.http.baseApiUrl }/test`);
+      expect(url).toBe(`${ UrlUtils.getApiUrl() }/test`);
     });
   });
 
@@ -288,7 +288,7 @@ describe('PagedResourceCollectionHttpService', () => {
 
     pagedResourceCollectionHttpService.search('test', 'someQuery').subscribe(() => {
       const url = httpClientSpy.get.calls.argsFor(0)[0];
-      expect(url).toBe(`${LibConfig.config.http.baseApiUrl }/test/search/someQuery`);
+      expect(url).toBe(`${UrlUtils.getApiUrl() }/test/search/someQuery`);
     });
   });
 

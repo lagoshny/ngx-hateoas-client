@@ -69,11 +69,11 @@ export class ResourceCollectionHttpService<T extends ResourceCollection<BaseReso
   public getResourceCollection(resourceName: string, options?: GetOption): Observable<T> {
     ValidationUtils.validateInputParams({resourceName});
 
-    const url = UrlUtils.generateResourceUrl(LibConfig.config.http.baseApiUrl, resourceName);
+    const url = UrlUtils.generateResourceUrl(UrlUtils.getApiUrl(), resourceName);
 
     StageLogger.stageLog(Stage.PREPARE_URL, {
       result: url,
-      urlParts: `baseUrl: '${ LibConfig.config.http.baseApiUrl }', resource: '${ resourceName }'`
+      urlParts: `baseUrl: '${ UrlUtils.getApiUrl() }', resource: '${ resourceName }'`
     });
 
     return this.get(url, options);
@@ -90,11 +90,11 @@ export class ResourceCollectionHttpService<T extends ResourceCollection<BaseReso
   public search(resourceName: string, searchQuery: string, options?: GetOption): Observable<T> {
     ValidationUtils.validateInputParams({resourceName, searchQuery});
 
-    const url = UrlUtils.generateResourceUrl(LibConfig.config.http.baseApiUrl, resourceName).concat('/search/' + searchQuery);
+    const url = UrlUtils.generateResourceUrl(UrlUtils.getApiUrl(), resourceName).concat('/search/' + searchQuery);
 
     StageLogger.stageLog(Stage.PREPARE_URL, {
       result: url,
-      urlParts: `baseUrl: '${ LibConfig.config.http.baseApiUrl }', resource: '${ resourceName }', searchQuery: '${ searchQuery }'`
+      urlParts: `baseUrl: '${ UrlUtils.getApiUrl() }', resource: '${ resourceName }', searchQuery: '${ searchQuery }'`
     });
 
     return this.get(url, options);

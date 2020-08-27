@@ -64,13 +64,13 @@ export class ResourceCacheService {
     ValidationUtils.validateInputParams({key});
 
     // Get resource name by url to evict all resource cache with collection/paged collection data
-    const resourceName = key.url.replace(`${ LibConfig.config.http.baseApiUrl }/`, '').split('/')[0];
+    const resourceName = key.url.replace(`${ UrlUtils.getApiUrl() }/`, '').split('/')[0];
     if (!resourceName) {
       return;
     }
     const evictedCache = [];
     for (const cacheKey of this.cacheMap.keys()) {
-      if (cacheKey.startsWith(`url=${ LibConfig.config.http.baseApiUrl }/${ resourceName }`)) {
+      if (cacheKey.startsWith(`url=${ UrlUtils.getApiUrl() }/${ resourceName }`)) {
         evictedCache.push({
           key: cacheKey
         });

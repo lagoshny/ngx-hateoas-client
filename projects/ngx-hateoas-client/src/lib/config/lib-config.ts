@@ -1,4 +1,4 @@
-import { HalConfiguration } from './hal-configuration.interface';
+import { HateoasConfiguration } from './hateoas-configuration.interface';
 
 /**
  * Contains all configuration lib params.
@@ -7,7 +7,8 @@ export class LibConfig {
 
   public static readonly DEFAULT_CONFIG = {
     http: {
-      baseApiUrl: 'http://localhost:8080/api/v1',
+      rootUrl: 'http://localhost:8080',
+      proxyUrl: 'http://localhost:8080/api/v1'
     },
     logs: {
       verboseLogs: false
@@ -18,9 +19,9 @@ export class LibConfig {
     }
   };
 
-  public static config: HalConfiguration = LibConfig.DEFAULT_CONFIG;
+  public static config: HateoasConfiguration = LibConfig.DEFAULT_CONFIG;
 
-  public static setConfig(halConfig: HalConfiguration) {
+  public static setConfig(halConfig: HateoasConfiguration) {
     LibConfig.config = {
       ...LibConfig.DEFAULT_CONFIG,
       ...halConfig

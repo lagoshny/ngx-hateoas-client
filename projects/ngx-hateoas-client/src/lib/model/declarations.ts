@@ -47,6 +47,10 @@ export interface GetOption {
     [paramName: string]: Resource | string | number | boolean;
     projection?: string;
   };
+  /**
+   * Sorting options.
+   */
+  sort?: Sort;
   useCache?: boolean;
 }
 
@@ -83,11 +87,6 @@ export interface PageParam {
    * Page size.
    */
   size?: number;
-
-  /**
-   * Sorting options for page data.
-   */
-  sort?: Sort;
 }
 
 export type SortOrder = 'DESC' | 'ASC';

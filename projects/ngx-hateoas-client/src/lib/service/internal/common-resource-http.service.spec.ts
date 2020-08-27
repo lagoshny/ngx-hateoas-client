@@ -68,7 +68,7 @@ describe('CommonResourceHttpService CUSTOM_QUERY', () => {
 
     commonHttpService.customQuery('test', HttpMethod.GET, 'someQuery').subscribe(() => {
       const url = httpClientSpy.get.calls.argsFor(0)[0];
-      expect(url).toBe(`${ LibConfig.config.http.baseApiUrl }/test/someQuery`);
+      expect(url).toBe(`${ UrlUtils.getApiUrl() }/test/someQuery`);
     });
   });
 

@@ -7,6 +7,7 @@ import * as _ from 'lodash';
 import { ValidationUtils } from '../../../util/validation.utils';
 import { ResourceIdentifiable } from '../../../model/declarations';
 import { LibConfig } from '../../../config/lib-config';
+import { UrlUtils } from '../../../util/url.utils';
 
 @Injectable()
 export class ResourceCacheService {

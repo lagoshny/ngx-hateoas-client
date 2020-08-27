@@ -4,7 +4,6 @@ import { Observable, throwError as observableThrowError } from 'rxjs';
 import { HttpMethod, PagedGetOption } from '../../model/declarations';
 import { UrlUtils } from '../../util/url.utils';
 import { HttpClient } from '@angular/common/http';
-import { LibConfig } from '../../config/lib-config';
 import { map } from 'rxjs/operators';
 import { isPagedResourceCollection, isResource, isResourceCollection } from '../../model/resource-type';
 import { ResourceUtils } from '../../util/resource.utils';

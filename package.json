@@ -47,6 +47,7 @@
     "ts-node": "~8.3.0",
     "tslint": "~6.1.0",
     "typescript": "~3.8.3",
-    "uri-templates": "^0.2.0"
+    "uri-templates": "^0.2.0",
+    "deprecated-decorator": "^0.1.6"
   }
 }

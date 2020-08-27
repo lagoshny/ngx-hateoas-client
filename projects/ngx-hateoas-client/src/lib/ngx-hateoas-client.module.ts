@@ -19,6 +19,8 @@ export { Sort, SortOrder, Include, HttpMethod } from './model/declarations';
 export { HalResourceOperation } from './service/external/hal-resource-operation';
 export { HalResourceService } from './service/external/hal-resource.service';
 
+export * from './_backwards/hal-client/hal-client-exports';
+
 @NgModule({
   imports: [
     HttpClientModule

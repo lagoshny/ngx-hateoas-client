@@ -3,7 +3,7 @@ import { BaseResource } from './base-resource';
 import { Observable, throwError as observableThrowError } from 'rxjs';
 import { getPagedResourceCollectionHttpService } from '../../service/internal/paged-resource-collection-http.service';
 import { UrlUtils } from '../../util/url.utils';
-import { PageData, PageParam } from '../declarations';
+import { LinkData, PageData, PageParam } from '../declarations';
 import * as _ from 'lodash';
 import { StageLogger } from '../../logger/stage-logger';
 import { Stage } from '../../logger/stage.enum';
@@ -15,11 +15,11 @@ import { ValidationUtils } from '../../util/validation.utils';
  */
 export class PagedResourceCollection<T extends BaseResource> extends ResourceCollection<T> {
 
-  private readonly selfUri: string;
-  private readonly nextUri: string;
-  private readonly prevUri: string;
-  private readonly firstUri: string;
-  private readonly lastUri: string;
+  private readonly selfUri: LinkData;
+  private readonly nextUri: LinkData;
+  private readonly prevUri: LinkData;
+  private readonly firstUri: LinkData;
+  private readonly lastUri: LinkData;
 
   public readonly totalElements: number;
   public readonly totalPages: number;
@@ -39,27 +39,27 @@ export class PagedResourceCollection<T extends BaseResource> extends ResourceCol
     this.pageSize = _.result(pageData, 'page.size', 20);
     this.pageNumber = _.result(pageData, 'page.number', 0);
 
-    this.selfUri = _.result(pageData, '_links.self.href', null);
-    this.nextUri = _.result(pageData, '_links.next.href', null);
-    this.prevUri = _.result(pageData, '_links.prev.href', null);
-    this.firstUri = _.result(pageData, '_links.first.href', null);
-    this.lastUri = _.result(pageData, '_links.last.href', null);
+    this.selfUri = _.result(pageData, '_links.self', null);
+    this.nextUri = _.result(pageData, '_links.next', null);
+    this.prevUri = _.result(pageData, '_links.prev', null);
+    this.firstUri = _.result(pageData, '_links.first', null);
+    this.lastUri = _.result(pageData, '_links.last', null);
   }
 
   public hasFirst(): boolean {
-    return !!this.firstUri;
+    return !!this.firstUri && !!this.firstUri.href;
   }
 
   public hasLast(): boolean {
-    return !!this.lastUri;
+    return !!this.lastUri && !!this.lastUri.href;
   }
 
   public hasNext(): boolean {
-    return !!this.nextUri;
+    return !!this.nextUri && !!this.nextUri.href;
   }
 
   public hasPrev(): boolean {
-    return !!this.prevUri;
+    return !!this.prevUri && !!this.prevUri.href;
   }
 
   public first(options?: { useCache: true }): Observable<PagedResourceCollection<T>> {
@@ -167,10 +167,10 @@ export class PagedResourceCollection<T extends BaseResource> extends ResourceCol
 
 }
 
-function doRequest<T extends BaseResource>(url: string,
+function doRequest<T extends BaseResource>(requestLink: LinkData,
                                            useCache: boolean = true,
                                            pageParams?: PageParam): Observable<PagedResourceCollection<T>> {
-  ValidationUtils.validateInputParams({url});
+  ValidationUtils.validateInputParams({requestLink});
 
   let httpParams;
   if (!_.isEmpty(pageParams)) {
@@ -178,5 +178,5 @@ function doRequest<T extends BaseResource>(url: string,
   }
 
   return getPagedResourceCollectionHttpService()
-    .get(UrlUtils.removeTemplateParams(url), {params: httpParams, useCache}) as Observable<PagedResourceCollection<T>>;
+    .get(UrlUtils.generateLinkUrl(requestLink), {params: httpParams, useCache}) as Observable<PagedResourceCollection<T>>;
 }

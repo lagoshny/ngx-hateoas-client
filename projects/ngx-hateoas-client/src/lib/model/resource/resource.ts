@@ -62,7 +62,6 @@ export class Resource extends BaseResource {
     ValidationUtils.validateInputParams({relationName, entities});
 
     const relationLink = this.getRelationLink(relationName);
-    const url = relationLink.templated ? UrlUtils.removeTemplateParams(relationLink.href) : relationLink.href;
 
     const body = entities
       .map(entity => {
@@ -70,7 +69,7 @@ export class Resource extends BaseResource {
       })
       .join('\n\r');
 
-    return getResourceHttpService().post(url, body, {
+    return getResourceHttpService().post(UrlUtils.generateLinkUrl(relationLink), body, {
       observe: 'response',
       headers: new HttpHeaders({'Content-Type': 'text/uri-list'})
     }).pipe(
@@ -92,10 +91,9 @@ export class Resource extends BaseResource {
     ValidationUtils.validateInputParams({relationName, entity});
 
     const relationLink = this.getRelationLink(relationName);
-    const url = relationLink.templated ? UrlUtils.removeTemplateParams(relationLink.href) : relationLink.href;
     const resource = ResourceUtils.initResource(entity) as Resource;
 
-    return getResourceHttpService().put(url, resource.getSelfLinkHref(), {
+    return getResourceHttpService().put(UrlUtils.generateLinkUrl(relationLink), resource.getSelfLinkHref(), {
       observe: 'response',
       headers: new HttpHeaders({'Content-Type': 'text/uri-list'})
     }).pipe(
@@ -140,9 +138,8 @@ export class Resource extends BaseResource {
     ValidationUtils.validateInputParams({relationName});
 
     const relationLink = this.getRelationLink(relationName);
-    const url = relationLink.templated ? UrlUtils.removeTemplateParams(relationLink.href) : relationLink.href;
 
-    return getResourceHttpService().put(url, '', {
+    return getResourceHttpService().put(UrlUtils.generateLinkUrl(relationLink), '', {
       observe: 'response',
       headers: new HttpHeaders({'Content-Type': 'text/uri-list'})
     }).pipe(
@@ -167,7 +164,6 @@ export class Resource extends BaseResource {
     ValidationUtils.validateInputParams({relationName, entity});
 
     const relationLink = this.getRelationLink(relationName);
-    const url = relationLink.templated ? UrlUtils.removeTemplateParams(relationLink.href) : relationLink.href;
     const resource = ResourceUtils.initResource(entity) as Resource;
     const resourceId = _.last(_.split(resource.getSelfLinkHref(), '/'));
 
@@ -185,7 +181,7 @@ export class Resource extends BaseResource {
       result: resourceId
     });
 
-    return getResourceHttpService().delete(url + '/' + resourceId, {
+    return getResourceHttpService().delete(UrlUtils.generateLinkUrl(relationLink) + '/' + resourceId, {
       observe: 'response'
     }).pipe(
       tap(() => {

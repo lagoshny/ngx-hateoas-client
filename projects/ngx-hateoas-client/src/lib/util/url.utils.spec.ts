@@ -29,11 +29,6 @@ describe('UrlUtils', () => {
       .toThrowError('Please, pass page params in page object key, not with params object!');
   });
 
-  it('CONVERT_TO_HTTP_PARAMS should throw error when option.params has sort param', () => {
-    expect(() => UrlUtils.convertToHttpParams({params: {sort: 'test'}}))
-      .toThrowError('Please, pass page params in page object key, not with params object!');
-  });
-
   it('CONVERT_TO_HTTP_PARAMS should adds resource param as self href link', () => {
     const simpleResource = new SimpleResource();
     const result = UrlUtils.convertToHttpParams({params: {res: simpleResource}});
@@ -59,11 +54,11 @@ describe('UrlUtils', () => {
     const result = UrlUtils.convertToHttpParams({
       pageParams: {
         page: 1,
-        size: 20,
-        sort: {
-          abs: 'ASC',
-          dce: 'DESC'
-        }
+        size: 20
+      },
+      sort: {
+        abs: 'ASC',
+        dce: 'DESC'
       }
     });
 
@@ -174,11 +169,11 @@ describe('UrlUtils', () => {
       },
       pageParams: {
         page: 2,
-        size: 30,
-        sort: {
-          first: 'ASC',
-          second: 'DESC'
-        }
+        size: 30
+      },
+      sort: {
+        first: 'ASC',
+        second: 'DESC'
       }
     }))
       .toBe('http://localhost:8080/api/v1/pagedResourceCollection?page=2&size=30&projection=testProjection&any=123&sort=first,ASC&sort=second,DESC');

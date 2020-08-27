@@ -7,6 +7,7 @@ import { ResourceUtils } from '../../util/resource.utils';
 import { HttpParams } from '@angular/common/http';
 import { Resource } from '../../model/resource/resource';
 import { LibConfig } from '../../config/lib-config';
+import { UrlUtils } from '../../util/url.utils';
 
 /* tslint:disable:no-string-literal */
 describe('ResourceCollectionHttpService', () => {

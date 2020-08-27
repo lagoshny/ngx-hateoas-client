@@ -89,6 +89,20 @@ export interface PageParam {
   size?: number;
 }
 
+/**
+ * Page params with sort option.
+ */
+export interface SortedPageParam {
+  /**
+   * Page content params.
+   */
+  pageParams: PageParam;
+  /**
+   * Sorting options.
+   */
+  sort?: Sort;
+}
+
 export type SortOrder = 'DESC' | 'ASC';
 
 export interface Sort {

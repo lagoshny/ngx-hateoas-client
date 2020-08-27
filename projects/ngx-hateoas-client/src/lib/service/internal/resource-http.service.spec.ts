@@ -7,6 +7,7 @@ import { of } from 'rxjs';
 import { rawPagedResourceCollection, rawResource, rawResourceCollection, SimpleResource } from '../../model/resource/resources.test';
 import { HttpParams } from '@angular/common/http';
 import { LibConfig } from '../../config/lib-config';
+import { UrlUtils } from '../../util/url.utils';
 
 describe('ResourceHttpService', () => {
   let resourceHttpService: ResourceHttpService<BaseResource>;

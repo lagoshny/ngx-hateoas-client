@@ -112,7 +112,7 @@ describe('PagedResourceCollection', () => {
     pagedResourceCollectionHttpServiceSpy.get.and.returnValue(of(new PagedResourceCollection(new ResourceCollection())));
 
     const pagedResourceCollection = new PagedResourceCollection(new SimpleResourceCollection(), pageDataWithLinks);
-    pagedResourceCollection.customPage({page: 2, size: 8, sort: {first: 'ASC', second: 'DESC'}})
+    pagedResourceCollection.customPage({pageParams: {page: 2, size: 8}, sort: {first: 'ASC', second: 'DESC'}})
       .subscribe(() => {
         const httpParams = pagedResourceCollectionHttpServiceSpy.get.calls.argsFor(0)[1].params;
         expect(httpParams.has('page')).toBeTrue();
@@ -130,8 +130,8 @@ describe('PagedResourceCollection', () => {
   it('CUSTOM_PAGE should throw exception when passed pageParam is empty', () => {
     const pagedResourceCollection = new PagedResourceCollection(new SimpleResourceCollection(), pageDataWithLinks);
 
-    expect(() => pagedResourceCollection.customPage({}))
-      .toThrowError(`Passed param(s) 'pageParam = {}' is not valid`);
+    expect(() => pagedResourceCollection.customPage({pageParams: {}}))
+      .toThrowError(`Passed param(s) 'pageParams = {}' is not valid`);
   });
 
 

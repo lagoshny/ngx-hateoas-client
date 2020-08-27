@@ -3,7 +3,7 @@ import { BaseResource } from './base-resource';
 import { Observable, throwError as observableThrowError } from 'rxjs';
 import { getPagedResourceCollectionHttpService } from '../../service/internal/paged-resource-collection-http.service';
 import { UrlUtils } from '../../util/url.utils';
-import { LinkData, PageData, PageParam } from '../declarations';
+import { LinkData, PageData, SortedPageParam } from '../declarations';
 import * as _ from 'lodash';
 import { StageLogger } from '../../logger/stage-logger';
 import { Stage } from '../../logger/stage.enum';
@@ -122,23 +122,23 @@ export class PagedResourceCollection<T extends BaseResource> extends ResourceCol
    * Perform query with custom page data.
    * That allows you change page size, current page or sort options.
    *
-   * @param pageParam contains data about new characteristics of the page.
+   * @param params contains data about new characteristics of the page.
    * @param options (optional) additional options that will be applied to the request
    * @throws error when required params are not valid or when passed inconsistent data
    */
-  public customPage(pageParam: PageParam, options?: { useCache: true }): Observable<PagedResourceCollection<T>> {
-    StageLogger.resourceBeginLog(this.resources[0], 'CustomPage', {pageParam});
-    ValidationUtils.validateInputParams({pageParam});
+  public customPage(params: SortedPageParam, options?: { useCache: true }): Observable<PagedResourceCollection<T>> {
+    StageLogger.resourceBeginLog(this.resources[0], 'CustomPage', {pageParam: params.pageParams});
+    ValidationUtils.validateInputParams({pageParams: params.pageParams});
 
-    if (pageParam.page < 0) {
-      pageParam.page = this.pageNumber;
+    if (params.pageParams.page < 0) {
+      params.pageParams.page = this.pageNumber;
       StageLogger.stageLog(Stage.PREPARE_PARAMS, {
         message: 'Page number is not passed will be used current value',
         currentPageNumber: this.pageNumber
       });
     }
-    if (pageParam.size < 0) {
-      pageParam.size = this.pageSize;
+    if (params.pageParams.size < 0) {
+      params.pageParams.size = this.pageSize;
       StageLogger.stageLog(Stage.PREPARE_PARAMS, {
         message: 'Page size is not passed will be used current value',
         currentPageSize: this.pageSize
@@ -146,19 +146,19 @@ export class PagedResourceCollection<T extends BaseResource> extends ResourceCol
     }
 
     const maxPageNumber = (this.totalElements / this.pageSize) - 1;
-    if (pageParam.page > maxPageNumber) {
+    if (params.pageParams.page > maxPageNumber) {
       const errMsg = `Error page number. Max page number is ${ maxPageNumber }`;
       StageLogger.stageErrorLog(Stage.PREPARE_PARAMS, {error: errMsg});
       return observableThrowError(errMsg);
     }
     const maxPageSize = this.totalElements / (this.pageSize + 1);
-    if (pageParam.page !== 0 && pageParam.size > maxPageSize) {
+    if (params.pageParams.page !== 0 && params.pageParams.size > maxPageSize) {
       const errMsg = `Error page size. Max page size is ${ maxPageSize }`;
       StageLogger.stageErrorLog(Stage.PREPARE_PARAMS, {error: errMsg});
       return observableThrowError(errMsg);
     }
 
-    return doRequest<T>(this.selfUri, options?.useCache, pageParam).pipe(
+    return doRequest<T>(this.selfUri, options?.useCache, params).pipe(
       tap(() => {
         StageLogger.resourceEndLog(this.resources[0], 'CustomPage', {result: 'custom page was performed successful'});
       })
@@ -169,12 +169,12 @@ export class PagedResourceCollection<T extends BaseResource> extends ResourceCol
 
 function doRequest<T extends BaseResource>(requestLink: LinkData,
                                            useCache: boolean = true,
-                                           pageParams?: PageParam): Observable<PagedResourceCollection<T>> {
+                                           params?: SortedPageParam): Observable<PagedResourceCollection<T>> {
   ValidationUtils.validateInputParams({requestLink});
 
   let httpParams;
-  if (!_.isEmpty(pageParams)) {
-    httpParams = UrlUtils.convertToHttpParams({pageParams});
+  if (!_.isEmpty(params)) {
+    httpParams = UrlUtils.convertToHttpParams({pageParams: params.pageParams, sort: params.sort});
   }
 
   return getPagedResourceCollectionHttpService()

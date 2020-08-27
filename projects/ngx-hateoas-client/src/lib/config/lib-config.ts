@@ -7,8 +7,7 @@ export class LibConfig {
 
   public static readonly DEFAULT_CONFIG = {
     http: {
-      rootUrl: 'http://localhost:8080',
-      proxyUrl: 'http://localhost:8080/api/v1'
+      rootUrl: 'http://localhost:8080/api/v1'
     },
     logs: {
       verboseLogs: false

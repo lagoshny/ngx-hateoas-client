@@ -68,6 +68,9 @@ export class UrlUtils {
     return url;
   }
 
+  /**
+   * Return server api url based on proxy url when it is not empty or root url otherwise.
+   */
   public static getApiUrl(): string {
     if (LibConfig.config.http.proxyUrl) {
       return LibConfig.config.http.proxyUrl;

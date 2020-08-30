@@ -1,21 +1,21 @@
 import { Observable, throwError as observableThrowError } from 'rxjs';
-import { HalOptions, HalParam, Include, SubTypeBuilder } from './model/interfaces';
+import { HalOptions, HalParam, Include, OldSubTypeBuilder } from './model/interfaces';
 import { DependencyInjector } from '../../util/dependency-injector';
 import { OptionUtils } from './util/option.utils';
 import { map } from 'rxjs/operators';
 import { OldResource } from './model/old-resource';
-import { HalResourceService } from '../../service/external/hal-resource.service';
 import { ResourceCollection } from '../../model/resource/resource-collection';
 import { PagedResourceCollection } from '../../model/resource/paged-resource-collection';
 import { HttpMethod } from '../../model/declarations';
 import deprecated from 'deprecated-decorator';
+import { HateoasResourceService } from '../../service/external/hateoas-resource.service';
 
 function getHateoasResourceService() {
-  return DependencyInjector.get(HalResourceService);
+  return DependencyInjector.get(HateoasResourceService);
 }
 
 /* tslint:disable:no-string-literal */
-@deprecated('HalResourceOperation')
+@deprecated('HateoasResourceOperation')
 export class OldRestService<T extends OldResource | any> {
   private readonly type: any;
   private readonly resource: string;
@@ -31,7 +31,7 @@ export class OldRestService<T extends OldResource | any> {
     return observableThrowError(error);
   }
 
-  public getAll(options?: HalOptions, subType?: SubTypeBuilder): Observable<T[]> {
+  public getAll(options?: HalOptions, subType?: OldSubTypeBuilder): Observable<T[]> {
     return getHateoasResourceService()
       .getCollection(this.resource, OptionUtils.convertToGetOption(options))
       .pipe(
@@ -52,7 +52,7 @@ export class OldRestService<T extends OldResource | any> {
       );
   }
 
-  public getAllPage(options?: HalOptions, subType?: SubTypeBuilder): Observable<PagedResourceCollection<T | any>> {
+  public getAllPage(options?: HalOptions, subType?: OldSubTypeBuilder): Observable<PagedResourceCollection<T | any>> {
     return getHateoasResourceService().getPage(this.resource, OptionUtils.convertToPagedGetOption(options))
       .pipe(
         map(value => {
@@ -86,7 +86,7 @@ export class OldRestService<T extends OldResource | any> {
     throw new Error('It is not provided any more use getResource method to replace this one');
   }
 
-  public search(query: string, options?: HalOptions, subType?: SubTypeBuilder): Observable<T[]> {
+  public search(query: string, options?: HalOptions, subType?: OldSubTypeBuilder): Observable<T[]> {
     return getHateoasResourceService().searchCollection(this.resource, query, OptionUtils.convertToGetOption(options))
       .pipe(
         map(value => {
@@ -106,7 +106,7 @@ export class OldRestService<T extends OldResource | any> {
       );
   }
 
-  public searchPage(query: string, options?: HalOptions, subType?: SubTypeBuilder): Observable<PagedResourceCollection<T | any>> {
+  public searchPage(query: string, options?: HalOptions, subType?: OldSubTypeBuilder): Observable<PagedResourceCollection<T | any>> {
     return getHateoasResourceService().searchPage(this.resource, query, OptionUtils.convertToPagedGetOption(options))
       .pipe(
         map(value => {
@@ -136,7 +136,7 @@ export class OldRestService<T extends OldResource | any> {
       );
   }
 
-  public customQuery(query: string, options?: HalOptions, subType?: SubTypeBuilder): Observable<T[]> {
+  public customQuery(query: string, options?: HalOptions, subType?: OldSubTypeBuilder): Observable<T[]> {
     return getHateoasResourceService()
       .customQuery<ResourceCollection<any>>(this.resource, HttpMethod.GET, query, null, OptionUtils.convertToPagedGetOption(options))
       .pipe(
@@ -157,7 +157,7 @@ export class OldRestService<T extends OldResource | any> {
       );
   }
 
-  public customQueryPost(query: string, options?: HalOptions, body?: any, subType?: SubTypeBuilder): Observable<T[]> {
+  public customQueryPost(query: string, options?: HalOptions, body?: any, subType?: OldSubTypeBuilder): Observable<T[]> {
     return getHateoasResourceService()
       .customQuery<ResourceCollection<any>>(this.resource, HttpMethod.POST, query, {body}, OptionUtils.convertToPagedGetOption(options))
       .pipe(
@@ -178,7 +178,7 @@ export class OldRestService<T extends OldResource | any> {
       );
   }
 
-  public getByRelationArray(relation: string, builder?: SubTypeBuilder): Observable<T[]> {
+  public getByRelationArray(relation: string, builder?: OldSubTypeBuilder): Observable<T[]> {
     throw new Error('It is not provided any more use Resource.getRelatedCollection method to replace this one');
   }
 

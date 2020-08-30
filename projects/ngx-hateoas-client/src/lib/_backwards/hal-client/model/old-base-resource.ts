@@ -1,6 +1,6 @@
 /* tslint:disable */
 import { Link } from '../../../model/declarations';
-import { HalOptions, LinkOptions, SubTypeBuilder } from './interfaces';
+import { HalOptions, LinkOptions, OldSubTypeBuilder } from './interfaces';
 import { Observable } from 'rxjs';
 import { UrlUtils } from '../../../util/url.utils';
 import { BaseResourceImpl, ResourceImpl } from '../../resources-impl';
@@ -9,9 +9,10 @@ import { BaseResource } from '../../../model/resource/base-resource';
 import * as _ from 'lodash';
 import { DependencyInjector } from '../../../util/dependency-injector';
 import { OptionUtils } from '../util/option.utils';
-import { HalResourceService } from '../../../service/external/hal-resource.service';
 import deprecated from 'deprecated-decorator';
 import { Resource } from '../../../model/resource/resource';
+import { HateoasResourceOperation } from '../../../service/external/hateoas-resource-operation';
+import { HateoasResourceService } from '../../../service/external/hateoas-resource.service';
 
 @deprecated('BaseResource')
 export class OldBaseResource {
@@ -35,7 +36,7 @@ export class OldBaseResource {
 
   public getRelation<T extends OldBaseResource>(type: { new(): T },
                                             relation: string,
-                                            builder?: SubTypeBuilder,
+                                            builder?: OldSubTypeBuilder,
                                             expireMs: number = 0,
                                             isCacheActive: boolean = true): Observable<OldBaseResource> {
     const currentBaseResource = new BaseResourceImpl(this);
@@ -57,8 +58,8 @@ export class OldBaseResource {
                                               projectionName: string,
                                               expireMs: number = 0,
                                               isCacheActive: boolean = true): Observable<OldBaseResource> {
-    const halResourceService = DependencyInjector.get(HalResourceService);
-    return halResourceService.getResource(resource, id, {params: {projection: projectionName}})
+    const hateoasResourceService = DependencyInjector.get(HateoasResourceService);
+    return hateoasResourceService.getResource(resource, id, {params: {projection: projectionName}})
       .pipe(
         map(value => {
           return new OldBaseResource(value);
@@ -71,7 +72,7 @@ export class OldBaseResource {
                                                  relation: string,
                                                  options?: HalOptions,
                                                  embedded?: string,
-                                                 builder?: SubTypeBuilder,
+                                                 builder?: OldSubTypeBuilder,
                                                  expireMs: number = 0,
                                                  isCacheActive: boolean = true): Observable<T[]> {
 
@@ -99,8 +100,8 @@ export class OldBaseResource {
                                                    projectionName: string,
                                                    expireMs: number = 0,
                                                    isCacheActive: boolean = true): Observable<T[]> {
-    const halResourceService = DependencyInjector.get(HalResourceService);
-    return halResourceService.getCollection(resource, {params: {projection: projectionName}})
+    const hateoasResourceService = DependencyInjector.get(HateoasResourceService);
+    return hateoasResourceService.getCollection(resource, {params: {projection: projectionName}})
       .pipe(
         map(value => {
           const result = [];

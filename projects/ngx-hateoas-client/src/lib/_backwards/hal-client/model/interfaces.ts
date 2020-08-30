@@ -37,6 +37,6 @@ export interface OldSort {
   order: OldSortOrder;
 }
 
-export interface SubTypeBuilder {
+export interface OldSubTypeBuilder {
   subtypes: Map<string, any>;
 }

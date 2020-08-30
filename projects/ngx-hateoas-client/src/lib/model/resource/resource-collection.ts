@@ -1,12 +1,13 @@
 import { AbstractResource } from './abstract-resource';
 import { BaseResource } from './base-resource';
+import { OldBaseResource } from '../../_backwards/hal-client/model/old-base-resource';
 
 /**
  * Collection of resources without pagination.
  *
  * If you want to have a pagination {@see PagedResourceCollection}.
  */
-export class ResourceCollection<T extends BaseResource> extends AbstractResource {
+export class ResourceCollection<T extends BaseResource | OldBaseResource> extends AbstractResource {
 
   public resources: Array<T> = [];
 

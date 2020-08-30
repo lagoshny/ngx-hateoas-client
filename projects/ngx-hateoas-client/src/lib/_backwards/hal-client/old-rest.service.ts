@@ -14,8 +14,9 @@ function getHateoasResourceService() {
   return DependencyInjector.get(HalResourceService);
 }
 
+/* tslint:disable:no-string-literal */
 @deprecated('HalResourceOperation')
-export class RestService<T extends OldResource | any> {
+export class OldRestService<T extends OldResource | any> {
   private readonly type: any;
   private readonly resource: string;
   public resourceArray: ResourceCollection<T | any>;
@@ -38,7 +39,12 @@ export class RestService<T extends OldResource | any> {
           const result = [];
           if (value.resources) {
             value.resources.forEach(resource => {
-              result.push(new OldResource(resource));
+              if (subType && subType.subtypes && subType.subtypes.size > 0) {
+                const subtype = subType.subtypes.get(value['resourceName']);
+                result.push(new subtype(value));
+              } else {
+                result.push(new OldResource(resource));
+              }
             });
           }
           return result;
@@ -53,7 +59,12 @@ export class RestService<T extends OldResource | any> {
           const resourceCollection = new ResourceCollection<any>();
           if (value.resources) {
             value.resources.forEach(resource => {
-              resourceCollection.resources.push(new OldResource(resource));
+              if (subType && subType.subtypes && subType.subtypes.size > 0) {
+                const subtype = subType.subtypes.get(value['resourceName']);
+                resourceCollection.resources.push(new subtype(value));
+              } else {
+                resourceCollection.resources.push(new OldResource(resource));
+              }
             });
           }
           resourceCollection.resources = value.resources;
@@ -82,7 +93,12 @@ export class RestService<T extends OldResource | any> {
           const result = [];
           if (value.resources) {
             value.resources.forEach(resource => {
-              result.push(new OldResource(resource));
+              if (subType && subType.subtypes && subType.subtypes.size > 0) {
+                const subtype = subType.subtypes.get(value['resourceName']);
+                result.push(new subtype(value));
+              } else {
+                result.push(new OldResource(resource));
+              }
             });
           }
           return result;
@@ -97,7 +113,12 @@ export class RestService<T extends OldResource | any> {
           const resourceCollection = new ResourceCollection<any>();
           if (value.resources) {
             value.resources.forEach(resource => {
-              resourceCollection.resources.push(new OldResource(resource));
+              if (subType && subType.subtypes && subType.subtypes.size > 0) {
+                const subtype = subType.subtypes.get(value['resourceName']);
+                resourceCollection.resources.push(new subtype(value));
+              } else {
+                resourceCollection.resources.push(new OldResource(resource));
+              }
             });
           }
           resourceCollection.resources = value.resources;
@@ -123,7 +144,12 @@ export class RestService<T extends OldResource | any> {
           const result = [];
           if (value.resources) {
             value.resources.forEach(resource => {
-              result.push(new OldResource(resource));
+              if (subType && subType.subtypes && subType.subtypes.size > 0) {
+                const subtype = subType.subtypes.get(value['resourceName']);
+                result.push(new subtype(value));
+              } else {
+                result.push(new OldResource(resource));
+              }
             });
           }
           return result;
@@ -139,7 +165,12 @@ export class RestService<T extends OldResource | any> {
           const result = [];
           if (value.resources) {
             value.resources.forEach(resource => {
-              result.push(new OldResource(resource));
+              if (subType && subType.subtypes && subType.subtypes.size > 0) {
+                const subtype = subType.subtypes.get(value['resourceName']);
+                result.push(new subtype(value));
+              } else {
+                result.push(new OldResource(resource));
+              }
             });
           }
           return result;
@@ -164,11 +195,11 @@ export class RestService<T extends OldResource | any> {
     return getHateoasResourceService().createResource(this.resource, {body: entity});
   }
 
-  public update(entity: any | T): Observable<any>  {
+  public update(entity: any | T): Observable<any> {
     return getHateoasResourceService().updateResource(entity);
   }
 
-  public patch(entity: any | T, include?: Include): Observable<any>  {
+  public patch(entity: any | T, include?: Include): Observable<any> {
     return getHateoasResourceService().patchResource(entity, {body: entity, valuesOption: {include}});
   }
 

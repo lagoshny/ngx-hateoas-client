@@ -11,6 +11,7 @@ import { DependencyInjector } from '../../../util/dependency-injector';
 import { OptionUtils } from '../util/option.utils';
 import { HalResourceService } from '../../../service/external/hal-resource.service';
 import deprecated from 'deprecated-decorator';
+import { Resource } from '../../../model/resource/resource';
 
 @deprecated('BaseResource')
 export class OldBaseResource {
@@ -39,8 +40,13 @@ export class OldBaseResource {
                                             isCacheActive: boolean = true): Observable<OldBaseResource> {
     const currentBaseResource = new BaseResourceImpl(this);
     return currentBaseResource.getRelation(relation).pipe(
-      map(value => {
-        return new OldBaseResource(value);
+      map((value: Resource) => {
+        if (builder && builder.subtypes && builder.subtypes.size > 0) {
+          const subtype = builder.subtypes.get(value['resourceName']);
+          return new subtype(value);
+        } else {
+          return new OldBaseResource(value);
+        }
       })
     );
   }
@@ -75,7 +81,12 @@ export class OldBaseResource {
         const result = [];
         if (value.resources) {
           value.resources.forEach(resource => {
-            result.push(new OldBaseResource(resource));
+            if (builder && builder.subtypes && builder.subtypes.size > 0) {
+              const subtype = builder.subtypes.get(value['resourceName']);
+              result.push(new subtype(value));
+            } else {
+              result.push(new OldBaseResource(resource));
+            }
           });
         }
         return result;
@@ -143,12 +154,19 @@ export class OldBaseResource {
     return currentBaseResource.postRelation(relation, {body: body}, OptionUtils.convertToRequestOption(options));
   }
 
-
   protected getRelationLinkHref(relation: string) {
     if (this._links[relation].templated) {
       return UrlUtils.removeTemplateParams(this._links[relation].href);
     }
     return this._links[relation].href;
+  }
+
+  protected existRelationLink(relation: string): boolean {
+    return !(_.isEmpty(this._links) || _.isEmpty(this._links[relation]));
+  }
+
+  protected getResourceUrl(resource?: string): string {
+    return UrlUtils.generateResourceUrl(UrlUtils.getApiUrl(), resource);
   }
 
 }

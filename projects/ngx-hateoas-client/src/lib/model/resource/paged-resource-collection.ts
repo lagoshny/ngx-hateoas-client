@@ -9,11 +9,12 @@ import { StageLogger } from '../../logger/stage-logger';
 import { Stage } from '../../logger/stage.enum';
 import { tap } from 'rxjs/operators';
 import { ValidationUtils } from '../../util/validation.utils';
+import { OldBaseResource } from '../../_backwards/hal-client/model/old-base-resource';
 
 /**
  * Collection of resources with pagination.
  */
-export class PagedResourceCollection<T extends BaseResource> extends ResourceCollection<T> {
+export class PagedResourceCollection<T extends BaseResource | OldBaseResource> extends ResourceCollection<T> {
 
   private readonly selfUri: LinkData;
   private readonly nextUri: LinkData;
@@ -167,9 +168,9 @@ export class PagedResourceCollection<T extends BaseResource> extends ResourceCol
 
 }
 
-function doRequest<T extends BaseResource>(requestLink: LinkData,
-                                           useCache: boolean = true,
-                                           params?: SortedPageParam): Observable<PagedResourceCollection<T>> {
+function doRequest<T extends BaseResource | OldBaseResource>(requestLink: LinkData,
+                                                             useCache: boolean = true,
+                                                             params?: SortedPageParam): Observable<PagedResourceCollection<T>> {
   ValidationUtils.validateInputParams({requestLink});
 
   let httpParams;

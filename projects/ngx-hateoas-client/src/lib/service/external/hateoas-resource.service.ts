@@ -23,7 +23,7 @@ import { HttpResponse } from '@angular/common/http';
 
 /* tslint:disable:no-string-literal */
 @Injectable()
-export class HalResourceService<T extends Resource> {
+export class HateoasResourceService<T extends Resource> {
 
   constructor(private commonHttpService: CommonResourceHttpService,
               private resourceHttpService: ResourceHttpService<T>,
@@ -108,7 +108,7 @@ export class HalResourceService<T extends Resource> {
 
   /**
    * Updating all resource properties at the time to passed body properties. If some properties are not passed then will be used null value.
-   * If you need update some part resource properties, use {@link HalResourceService#patchResource} method.
+   * If you need update some part resource properties, use {@link HateoasResourceService#patchResource} method.
    *
    * @param entity to update
    * @param requestBody that contains the body directly and optional body values option {@link ValuesOption}
@@ -131,7 +131,7 @@ export class HalResourceService<T extends Resource> {
   /**
    * Update resource by id.
    * Updating all resource properties at the time to passed body properties. If some properties are not passed then will be used null value.
-   * If you need update some part resource properties, use {@link HalResourceService#patchResource} method.
+   * If you need update some part resource properties, use {@link HateoasResourceService#patchResource} method.
    *
    * @param resourceName to update
    * @param id resource id
@@ -305,7 +305,7 @@ export class HalResourceService<T extends Resource> {
   }
 
   /**
-   * Differences between {@link HalResourceService#customQuery} and this method
+   * Differences between {@link HateoasResourceService#customQuery} and this method
    * that this one puts 'search' path to the result url automatically.
    *
    * {@see CommonResourceHttpService#customQuery}

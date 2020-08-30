@@ -1,6 +1,6 @@
 import { Observable } from 'rxjs';
 import { DependencyInjector } from '../../util/dependency-injector';
-import { HalResourceService } from './hal-resource.service';
+import { HateoasResourceService } from './hateoas-resource.service';
 import { GetOption, HttpMethod, PagedGetOption, RequestBody, RequestOption } from '../../model/declarations';
 import { Resource } from '../../model/resource/resource';
 import { PagedResourceCollection } from '../../model/resource/paged-resource-collection';
@@ -11,106 +11,106 @@ import { HttpResponse } from '@angular/common/http';
  * Main resource operation class.
  * Extend this class to create resource service.
  */
-export class HalResourceOperation<T extends Resource> {
+export class HateoasResourceOperation<T extends Resource> {
 
   private readonly resourceName: string;
 
-  private halResourceService: HalResourceService<T>;
+  private hateoasResourceService: HateoasResourceService<T>;
 
   constructor(resourceName: string) {
     this.resourceName = resourceName;
-    this.halResourceService = DependencyInjector.get(HalResourceService) as HalResourceService<T>;
+    this.hateoasResourceService = DependencyInjector.get(HateoasResourceService) as HateoasResourceService<T>;
   }
 
   /**
-   * {@link HalResourceService#getResource}.
+   * {@link HateoasResourceService#getResource}.
    */
   public getResource(id: number | string, options?: GetOption): Observable<T> {
-    return this.halResourceService.getResource(this.resourceName, id, options) as Observable<T>;
+    return this.hateoasResourceService.getResource(this.resourceName, id, options) as Observable<T>;
   }
 
   /**
-   * {@link HalResourceService#getCollection}.
+   * {@link HateoasResourceService#getCollection}.
    */
   public getCollection(options?: GetOption): Observable<ResourceCollection<T>> {
-    return this.halResourceService.getCollection(this.resourceName, options);
+    return this.hateoasResourceService.getCollection(this.resourceName, options);
   }
 
   /**
-   * {@link HalResourceService#getPage}.
+   * {@link HateoasResourceService#getPage}.
    */
   public getPage(options?: PagedGetOption): Observable<PagedResourceCollection<T>> {
-    return this.halResourceService.getPage(this.resourceName, options);
+    return this.hateoasResourceService.getPage(this.resourceName, options);
   }
 
   /**
-   * {@link HalResourceService#createResource}.
+   * {@link HateoasResourceService#createResource}.
    */
   public createResource(requestBody: RequestBody<T>): Observable<T> {
-    return this.halResourceService.createResource(this.resourceName, requestBody);
+    return this.hateoasResourceService.createResource(this.resourceName, requestBody);
   }
 
   /**
-   * {@link HalResourceService#updateResource}.
+   * {@link HateoasResourceService#updateResource}.
    */
   public updateResource(entity: T, requestBody?: RequestBody<any>): Observable<T | any> {
-    return this.halResourceService.updateResource(entity, requestBody);
+    return this.hateoasResourceService.updateResource(entity, requestBody);
   }
 
   /**
-   * {@link HalResourceService#updateResourceById}.
+   * {@link HateoasResourceService#updateResourceById}.
    */
   public updateResourceById(id: number | string, requestBody: RequestBody<any>): Observable<T | any> {
-    return this.halResourceService.updateResourceById(this.resourceName, id, requestBody);
+    return this.hateoasResourceService.updateResourceById(this.resourceName, id, requestBody);
   }
 
   /**
-   * {@link HalResourceService#patchResource}.
+   * {@link HateoasResourceService#patchResource}.
    */
   public patchResource(entity: T, requestBody?: RequestBody<any>): Observable<T | any> {
-    return this.halResourceService.patchResource(entity, requestBody);
+    return this.hateoasResourceService.patchResource(entity, requestBody);
   }
 
   /**
-   * {@link HalResourceService#patchResourceById}.
+   * {@link HateoasResourceService#patchResourceById}.
    */
   public patchResourceById(id: number | string, requestBody: RequestBody<any>): Observable<T | any> {
-    return this.halResourceService.patchResourceById(this.resourceName, id, requestBody);
+    return this.hateoasResourceService.patchResourceById(this.resourceName, id, requestBody);
   }
 
   /**
-   * {@link HalResourceService#deleteResource}.
+   * {@link HateoasResourceService#deleteResource}.
    */
   public deleteResource(entity: T, options?: RequestOption): Observable<HttpResponse<any> | any> {
-    return this.halResourceService.deleteResource(entity, options);
+    return this.hateoasResourceService.deleteResource(entity, options);
   }
 
   /**
-   * {@link HalResourceService#deleteResourceById}.
+   * {@link HateoasResourceService#deleteResourceById}.
    */
   public deleteResourceById(id: number | string, options?: RequestOption): Observable<HttpResponse<any> | any> {
-    return this.halResourceService.deleteResourceById(this.resourceName, id, options);
+    return this.hateoasResourceService.deleteResourceById(this.resourceName, id, options);
   }
 
   /**
    * {@see ResourceCollectionHttpService#search}
    */
   public searchCollection(query: string, options?: GetOption): Observable<ResourceCollection<T>> {
-    return this.halResourceService.searchCollection(this.resourceName, query, options);
+    return this.hateoasResourceService.searchCollection(this.resourceName, query, options);
   }
 
   /**
    * {@see PagedResourceCollection#search}
    */
   public searchPage(query: string, options?: PagedGetOption): Observable<PagedResourceCollection<T>> {
-    return this.halResourceService.searchPage(this.resourceName, query, options);
+    return this.hateoasResourceService.searchPage(this.resourceName, query, options);
   }
 
   /**
    * {@see ResourceHttpService#search}
    */
   public searchSingle(query: string, options?: GetOption): Observable<T> {
-    return this.halResourceService.searchSingle(this.resourceName, query, options);
+    return this.hateoasResourceService.searchSingle(this.resourceName, query, options);
   }
 
   /**
@@ -120,7 +120,7 @@ export class HalResourceOperation<T extends Resource> {
                         query: string,
                         requestBody?: RequestBody<any>,
                         options?: PagedGetOption): Observable<R> {
-    return this.halResourceService.customQuery(this.resourceName, method, query, requestBody, options);
+    return this.hateoasResourceService.customQuery(this.resourceName, method, query, requestBody, options);
   }
 
   /**
@@ -130,7 +130,7 @@ export class HalResourceOperation<T extends Resource> {
                               searchQuery: string,
                               requestBody?: RequestBody<any>,
                               options?: PagedGetOption): Observable<R> {
-    return this.halResourceService.customSearchQuery(this.resourceName, method, searchQuery, requestBody, options);
+    return this.hateoasResourceService.customSearchQuery(this.resourceName, method, searchQuery, requestBody, options);
   }
 
 }

@@ -20,10 +20,10 @@ export class LibConfig {
 
   public static config: HateoasConfiguration = LibConfig.DEFAULT_CONFIG;
 
-  public static setConfig(halConfig: HateoasConfiguration) {
+  public static setConfig(hateoasConfiguration: HateoasConfiguration) {
     LibConfig.config = {
       ...LibConfig.DEFAULT_CONFIG,
-      ...halConfig
+      ...hateoasConfiguration
     };
   }
 

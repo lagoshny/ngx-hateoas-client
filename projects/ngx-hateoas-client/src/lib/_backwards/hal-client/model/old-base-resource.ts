@@ -8,13 +8,10 @@ import { map } from 'rxjs/operators';
 import { BaseResource } from '../../../model/resource/base-resource';
 import * as _ from 'lodash';
 import { DependencyInjector } from '../../../util/dependency-injector';
-import { OptionUtils } from '../util/option.utils';
-import deprecated from 'deprecated-decorator';
+import { OldUtils } from '../util/old.utils';
 import { Resource } from '../../../model/resource/resource';
-import { HateoasResourceOperation } from '../../../service/external/hateoas-resource-operation';
 import { HateoasResourceService } from '../../../service/external/hateoas-resource.service';
 
-@deprecated('BaseResource')
 export class OldBaseResource {
 
   public proxyUrl: string;
@@ -35,59 +32,57 @@ export class OldBaseResource {
   }
 
   public getRelation<T extends OldBaseResource>(type: { new(): T },
-                                            relation: string,
-                                            builder?: OldSubTypeBuilder,
-                                            expireMs: number = 0,
-                                            isCacheActive: boolean = true): Observable<OldBaseResource> {
+                                                relation: string,
+                                                builder?: OldSubTypeBuilder,
+                                                expireMs: number = 0,
+                                                isCacheActive: boolean = true): Observable<OldBaseResource> {
     const currentBaseResource = new BaseResourceImpl(this);
     return currentBaseResource.getRelation(relation).pipe(
       map((value: Resource) => {
-        if (builder && builder.subtypes && builder.subtypes.size > 0) {
-          const subtype = builder.subtypes.get(value['resourceName']);
-          return new subtype(value);
+        if (_.isArray(value)) {
+          const result = [];
+          value.forEach(resource => {
+            result.push(OldUtils.instantiateResource(builder, resource, type));
+            return result;
+          });
         } else {
-          return new OldBaseResource(value);
+          return OldUtils.instantiateResource(builder, value, type);
         }
       })
     );
   }
 
   public getProjection<T extends OldBaseResource>(type: { new(): T },
-                                              resource: string,
-                                              id: string,
-                                              projectionName: string,
-                                              expireMs: number = 0,
-                                              isCacheActive: boolean = true): Observable<OldBaseResource> {
+                                                  resource: string,
+                                                  id: string,
+                                                  projectionName: string,
+                                                  expireMs: number = 0,
+                                                  isCacheActive: boolean = true): Observable<OldBaseResource> {
     const hateoasResourceService = DependencyInjector.get(HateoasResourceService);
     return hateoasResourceService.getResource(resource, id, {params: {projection: projectionName}})
       .pipe(
         map(value => {
-          return new OldBaseResource(value);
+          return OldUtils.instantiateResource(null, value, type);
         })
       );
   }
 
   // Get collection of related resources
   public getRelationArray<T extends OldBaseResource>(type: { new(): T },
-                                                 relation: string,
-                                                 options?: HalOptions,
-                                                 embedded?: string,
-                                                 builder?: OldSubTypeBuilder,
-                                                 expireMs: number = 0,
-                                                 isCacheActive: boolean = true): Observable<T[]> {
+                                                     relation: string,
+                                                     options?: HalOptions,
+                                                     embedded?: string,
+                                                     builder?: OldSubTypeBuilder,
+                                                     expireMs: number = 0,
+                                                     isCacheActive: boolean = true): Observable<T[]> {
 
     const currentBaseResource = new BaseResourceImpl(this);
-    return currentBaseResource.getRelatedCollection(relation, OptionUtils.convertToGetOption(options)).pipe(
+    return currentBaseResource.getRelatedCollection(relation, OldUtils.convertToGetOption(options)).pipe(
       map(value => {
         const result = [];
         if (value.resources) {
           value.resources.forEach(resource => {
-            if (builder && builder.subtypes && builder.subtypes.size > 0) {
-              const subtype = builder.subtypes.get(value['resourceName']);
-              result.push(new subtype(value));
-            } else {
-              result.push(new OldBaseResource(resource));
-            }
+            result.push(OldUtils.instantiateResource(builder, resource, type));
           });
         }
         return result;
@@ -96,10 +91,10 @@ export class OldBaseResource {
   }
 
   public getProjectionArray<T extends OldBaseResource>(type: { new(): T },
-                                                   resource: string,
-                                                   projectionName: string,
-                                                   expireMs: number = 0,
-                                                   isCacheActive: boolean = true): Observable<T[]> {
+                                                       resource: string,
+                                                       projectionName: string,
+                                                       expireMs: number = 0,
+                                                       isCacheActive: boolean = true): Observable<T[]> {
     const hateoasResourceService = DependencyInjector.get(HateoasResourceService);
     return hateoasResourceService.getCollection(resource, {params: {projection: projectionName}})
       .pipe(
@@ -107,7 +102,7 @@ export class OldBaseResource {
           const result = [];
           if (value.resources) {
             value.resources.forEach(resource => {
-              result.push(new OldBaseResource(resource));
+              result.push(OldUtils.instantiateResource(null, resource, type));
             });
           }
           return result;
@@ -119,40 +114,70 @@ export class OldBaseResource {
   public addRelation<T extends OldBaseResource>(relation: string, resource: T): Observable<any> {
     const currentBaseResource = new ResourceImpl(this);
     const paramResource = new ResourceImpl(resource);
-    return currentBaseResource.addRelation(relation, [paramResource]);
+    return currentBaseResource.bindRelation(relation, paramResource)
+      .pipe(
+        map(value => {
+          return value.body;
+        })
+      );
   }
 
   // Bind the given resource to this resource by the given relation
   public updateRelation<T extends OldBaseResource>(relation: string, resource: T): Observable<any> {
     const currentBaseResource = new ResourceImpl(this);
     const paramResource = new ResourceImpl(resource);
-    return currentBaseResource.updateRelation(relation, paramResource);
+    return currentBaseResource.updateRelation(relation, paramResource)
+      .pipe(
+        map(value => {
+          return value.body;
+        })
+      );
   }
 
   // Bind the given resource to this resource by the given relation
   public substituteRelation<T extends OldBaseResource>(relation: string, resource: T): Observable<any> {
     const currentBaseResource = new ResourceImpl(this);
     const paramResource = new ResourceImpl(resource);
-    return currentBaseResource.bindRelation(relation, paramResource);
+    return currentBaseResource.bindRelation(relation, paramResource)
+      .pipe(
+        map(value => {
+          return value.body;
+        })
+      );
   }
 
   // Unbind the resource with the given relation from this resource
   public deleteRelation<T extends OldBaseResource>(relation: string, resource: T): Observable<any> {
     const currentBaseResource = new ResourceImpl(this);
     const paramResource = new ResourceImpl(resource);
-    return currentBaseResource.deleteRelation(relation, paramResource);
+    return currentBaseResource.deleteRelation(relation, paramResource)
+      .pipe(
+        map(value => {
+          return value.body;
+        })
+      );
   }
 
   // Perform post request for relation with body and url params
   public postRelation(relation: string, body: any, options?: LinkOptions): Observable<any> {
     const currentBaseResource = new ResourceImpl(this);
-    return currentBaseResource.postRelation(relation, {body: body}, OptionUtils.convertToRequestOption(options));
+    return currentBaseResource.postRelation(relation, {body: body}, OldUtils.convertToRequestOption(options))
+      .pipe(
+        map(value => {
+          return OldUtils.instantiateResource(null, value, OldBaseResource);
+        })
+      );
   }
 
   // Perform patch request for relation with body and url params
   public patchRelation(relation: string, body: any, options?: LinkOptions): Observable<any> {
     const currentBaseResource = new ResourceImpl(this);
-    return currentBaseResource.postRelation(relation, {body: body}, OptionUtils.convertToRequestOption(options));
+    return currentBaseResource.patchRelation(relation, {body: body}, OldUtils.convertToRequestOption(options))
+      .pipe(
+        map(value => {
+          return OldUtils.instantiateResource(null, value, OldBaseResource);
+        })
+      );
   }
 
   protected getRelationLinkHref(relation: string) {

@@ -45,7 +45,9 @@ export class ResourceCollectionHttpService<T extends ResourceCollection<BaseReso
     return super.getHttp(url, httpOptions)
       .pipe(
         map((data: any) => {
-          if (!isResourceCollection(data)) {
+          if (LibConfig.config.comparable.ngxHalClient) {
+            return ResourceUtils.instantiateResourceCollection(data) as T;
+          } else if (!isResourceCollection(data)) {
             if (LibConfig.config.cache.enabled) {
               this.cacheService.evictResource(CacheKey.of(url, httpOptions));
             }

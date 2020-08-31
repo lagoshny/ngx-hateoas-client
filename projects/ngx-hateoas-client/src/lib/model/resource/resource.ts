@@ -93,7 +93,7 @@ export class Resource extends BaseResource {
     const relationLink = this.getRelationLink(relationName);
     const resource = ResourceUtils.initResource(entity) as Resource;
 
-    return getResourceHttpService().put(UrlUtils.generateLinkUrl(relationLink), resource.getSelfLinkHref(), {
+    return getResourceHttpService().patch(UrlUtils.generateLinkUrl(relationLink), resource.getSelfLinkHref(), {
       observe: 'response',
       headers: new HttpHeaders({'Content-Type': 'text/uri-list'})
     }).pipe(

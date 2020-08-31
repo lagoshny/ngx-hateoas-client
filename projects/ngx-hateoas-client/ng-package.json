@@ -5,8 +5,7 @@
     "entryFile": "src/public-api.ts",
     "umdModuleIds": {
       "lodash": "lodash",
-      "uri-templates": "uri-templates",
-      "deprecated-decorator": "deprecated-decorator"
+      "uri-templates": "uri-templates"
     }
   }
 }

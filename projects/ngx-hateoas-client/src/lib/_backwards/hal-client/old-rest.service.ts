@@ -1,29 +1,32 @@
 import { Observable, throwError as observableThrowError } from 'rxjs';
 import { HalOptions, HalParam, Include, OldSubTypeBuilder } from './model/interfaces';
 import { DependencyInjector } from '../../util/dependency-injector';
-import { OptionUtils } from './util/option.utils';
+import { OldUtils } from './util/old.utils';
 import { map } from 'rxjs/operators';
 import { OldResource } from './model/old-resource';
 import { ResourceCollection } from '../../model/resource/resource-collection';
 import { PagedResourceCollection } from '../../model/resource/paged-resource-collection';
 import { HttpMethod } from '../../model/declarations';
-import deprecated from 'deprecated-decorator';
 import { HateoasResourceService } from '../../service/external/hateoas-resource.service';
+import { Resource } from '../../model/resource/resource';
+import { EmbeddedResource } from '../../model/resource/embedded-resource';
+import { BaseResource } from '../../model/resource/base-resource';
+import { getResourceCollectionHttpService } from '../../service/internal/resource-collection-http.service';
+import { getResourceHttpService } from '../../service/internal/resource-http.service';
+import { HttpResponse } from '@angular/common/http';
 
 function getHateoasResourceService() {
   return DependencyInjector.get(HateoasResourceService);
 }
 
 /* tslint:disable:no-string-literal */
-@deprecated('HateoasResourceOperation')
 export class OldRestService<T extends OldResource | any> {
   private readonly type: any;
   private readonly resource: string;
   public resourceArray: ResourceCollection<T | any>;
 
-  private embedded = '_embedded';
-
-  constructor(resource: string) {
+  constructor(type: new() => T, resource: string) {
+    this.type = type;
     this.resource = resource;
   }
 
@@ -33,18 +36,13 @@ export class OldRestService<T extends OldResource | any> {
 
   public getAll(options?: HalOptions, subType?: OldSubTypeBuilder): Observable<T[]> {
     return getHateoasResourceService()
-      .getCollection(this.resource, OptionUtils.convertToGetOption(options))
+      .getCollection(this.resource, OldUtils.convertToGetOption(options))
       .pipe(
         map(value => {
           const result = [];
           if (value.resources) {
             value.resources.forEach(resource => {
-              if (subType && subType.subtypes && subType.subtypes.size > 0) {
-                const subtype = subType.subtypes.get(value['resourceName']);
-                result.push(new subtype(value));
-              } else {
-                result.push(new OldResource(resource));
-              }
+              result.push(OldUtils.instantiateResource(subType, resource, this.type));
             });
           }
           return result;
@@ -53,18 +51,13 @@ export class OldRestService<T extends OldResource | any> {
   }
 
   public getAllPage(options?: HalOptions, subType?: OldSubTypeBuilder): Observable<PagedResourceCollection<T | any>> {
-    return getHateoasResourceService().getPage(this.resource, OptionUtils.convertToPagedGetOption(options))
+    return getHateoasResourceService().getPage(this.resource, OldUtils.convertToPagedGetOption(options))
       .pipe(
         map(value => {
           const resourceCollection = new ResourceCollection<any>();
           if (value.resources) {
             value.resources.forEach(resource => {
-              if (subType && subType.subtypes && subType.subtypes.size > 0) {
-                const subtype = subType.subtypes.get(value['resourceName']);
-                resourceCollection.resources.push(new subtype(value));
-              } else {
-                resourceCollection.resources.push(new OldResource(resource));
-              }
+              resourceCollection.resources.push(OldUtils.instantiateResource(subType, resource, this.type));
             });
           }
           resourceCollection.resources = value.resources;
@@ -74,10 +67,10 @@ export class OldRestService<T extends OldResource | any> {
   }
 
   public get(id: any, params?: HalParam[]): Observable<T | any> {
-    return getHateoasResourceService().getResource(this.resource, id, OptionUtils.halParamToGetOption(params))
+    return getHateoasResourceService().getResource(this.resource, id, OldUtils.halParamToGetOption(params))
       .pipe(
         map(value => {
-          return new OldResource(value);
+          return OldUtils.instantiateResource(null, value, this.type);
         })
       );
   }
@@ -87,18 +80,13 @@ export class OldRestService<T extends OldResource | any> {
   }
 
   public search(query: string, options?: HalOptions, subType?: OldSubTypeBuilder): Observable<T[]> {
-    return getHateoasResourceService().searchCollection(this.resource, query, OptionUtils.convertToGetOption(options))
+    return getHateoasResourceService().searchCollection(this.resource, query, OldUtils.convertToGetOption(options))
       .pipe(
         map(value => {
           const result = [];
           if (value.resources) {
             value.resources.forEach(resource => {
-              if (subType && subType.subtypes && subType.subtypes.size > 0) {
-                const subtype = subType.subtypes.get(value['resourceName']);
-                result.push(new subtype(value));
-              } else {
-                result.push(new OldResource(resource));
-              }
+              result.push(OldUtils.instantiateResource(subType, resource, this.type));
             });
           }
           return result;
@@ -107,18 +95,13 @@ export class OldRestService<T extends OldResource | any> {
   }
 
   public searchPage(query: string, options?: HalOptions, subType?: OldSubTypeBuilder): Observable<PagedResourceCollection<T | any>> {
-    return getHateoasResourceService().searchPage(this.resource, query, OptionUtils.convertToPagedGetOption(options))
+    return getHateoasResourceService().searchPage(this.resource, query, OldUtils.convertToPagedGetOption(options))
       .pipe(
         map(value => {
           const resourceCollection = new ResourceCollection<any>();
           if (value.resources) {
             value.resources.forEach(resource => {
-              if (subType && subType.subtypes && subType.subtypes.size > 0) {
-                const subtype = subType.subtypes.get(value['resourceName']);
-                resourceCollection.resources.push(new subtype(value));
-              } else {
-                resourceCollection.resources.push(new OldResource(resource));
-              }
+              resourceCollection.resources.push(OldUtils.instantiateResource(subType, resource, this.type));
             });
           }
           resourceCollection.resources = value.resources;
@@ -128,28 +111,23 @@ export class OldRestService<T extends OldResource | any> {
   }
 
   public searchSingle(query: string, options?: HalOptions): Observable<T | any> {
-    return getHateoasResourceService().searchSingle(this.resource, query, OptionUtils.convertToGetOption(options))
+    return getHateoasResourceService().searchSingle(this.resource, query, OldUtils.convertToGetOption(options))
       .pipe(
         map(value => {
-          return new OldResource(value);
+          return OldUtils.instantiateResource(null, value, this.type);
         })
       );
   }
 
   public customQuery(query: string, options?: HalOptions, subType?: OldSubTypeBuilder): Observable<T[]> {
     return getHateoasResourceService()
-      .customQuery<ResourceCollection<any>>(this.resource, HttpMethod.GET, query, null, OptionUtils.convertToPagedGetOption(options))
+      .customQuery<ResourceCollection<any>>(this.resource, HttpMethod.GET, query, null, OldUtils.convertToPagedGetOption(options))
       .pipe(
         map(value => {
           const result = [];
           if (value.resources) {
             value.resources.forEach(resource => {
-              if (subType && subType.subtypes && subType.subtypes.size > 0) {
-                const subtype = subType.subtypes.get(value['resourceName']);
-                result.push(new subtype(value));
-              } else {
-                result.push(new OldResource(resource));
-              }
+              result.push(OldUtils.instantiateResource(subType, resource, this.type));
             });
           }
           return result;
@@ -159,18 +137,13 @@ export class OldRestService<T extends OldResource | any> {
 
   public customQueryPost(query: string, options?: HalOptions, body?: any, subType?: OldSubTypeBuilder): Observable<T[]> {
     return getHateoasResourceService()
-      .customQuery<ResourceCollection<any>>(this.resource, HttpMethod.POST, query, {body}, OptionUtils.convertToPagedGetOption(options))
+      .customQuery<ResourceCollection<any>>(this.resource, HttpMethod.POST, query, {body}, OldUtils.convertToPagedGetOption(options))
       .pipe(
         map(value => {
           const result = [];
           if (value.resources) {
             value.resources.forEach(resource => {
-              if (subType && subType.subtypes && subType.subtypes.size > 0) {
-                const subtype = subType.subtypes.get(value['resourceName']);
-                result.push(new subtype(value));
-              } else {
-                result.push(new OldResource(resource));
-              }
+              result.push(OldUtils.instantiateResource(subType, resource, this.type));
             });
           }
           return result;
@@ -179,32 +152,74 @@ export class OldRestService<T extends OldResource | any> {
   }
 
   public getByRelationArray(relation: string, builder?: OldSubTypeBuilder): Observable<T[]> {
-    throw new Error('It is not provided any more use Resource.getRelatedCollection method to replace this one');
+    // throw new Error('It is not provided any more use Resource.getRelatedCollection method to replace this one');
+    return getResourceCollectionHttpService().get(relation)
+      .pipe(
+        map(value => {
+          const result = [];
+          if (value.resources) {
+            value.resources.forEach(resource => {
+              result.push(OldUtils.instantiateResource(builder, resource, this.type));
+            });
+          }
+          return result;
+        })
+      );
   }
 
   public getByRelation(relation: string): Observable<T> {
-    throw new Error('It is not provided any more use Resource.getRelation method to replace this one');
+    // throw new Error('It is not provided any more use Resource.getRelation method to replace this one');
+    return getResourceHttpService().get(relation)
+      .pipe(
+        map(value => {
+          return OldUtils.instantiateResource(null, value, this.type);
+        })
+      );
   }
 
   public count(query?: string, options?: HalOptions): Observable<number> {
     return getHateoasResourceService()
-      .customQuery<number>(this.resource, HttpMethod.GET, query, null, OptionUtils.convertToPagedGetOption(options));
+      .customQuery<number>(this.resource, HttpMethod.GET, `/search${ query.startsWith('/') ? query : '/' + query }`,
+        null, OldUtils.convertToPagedGetOption(options));
   }
 
   public create(entity: any | T): Observable<any> {
-    return getHateoasResourceService().createResource(this.resource, {body: entity});
+    return getHateoasResourceService().createResource(this.resource, {body: entity})
+      .pipe(
+        map(value => {
+          return OldUtils.instantiateResource(null, value, this.type);
+        })
+      );
   }
 
   public update(entity: any | T): Observable<any> {
-    return getHateoasResourceService().updateResource(entity);
+    return getHateoasResourceService().updateResource(entity)
+      .pipe(
+        map(value => {
+          return OldUtils.instantiateResource(null, value, this.type);
+        })
+      );
   }
 
   public patch(entity: any | T, include?: Include): Observable<any> {
-    return getHateoasResourceService().patchResource(entity, {body: entity, valuesOption: {include}});
+    return getHateoasResourceService().patchResource(entity, {body: entity, valuesOption: {include}})
+      .pipe(
+        map(value => {
+          return OldUtils.instantiateResource(null, value, this.type);
+        })
+      );
   }
 
   public delete(entity: any | T): Observable<object> {
-    return getHateoasResourceService().deleteResource(entity);
+    return getHateoasResourceService().deleteResource(entity)
+      .pipe(
+        map((value: HttpResponse<any>) => {
+          if (value.body instanceof Resource || value.body instanceof BaseResource || value.body instanceof EmbeddedResource) {
+            return OldUtils.instantiateResource(null, value, this.type);
+          }
+          return value.body;
+        })
+      );
   }
 
   public totalElement(): number {
@@ -232,22 +247,22 @@ export class OldRestService<T extends OldResource | any> {
   }
 
   public next(): Observable<T[]> {
-    return observableThrowError('Use PagedResourceCollection to do page next requests');
+    throw new Error('Use PagedResourceCollection to do page next requests');
   }
 
   public prev(): Observable<T[]> {
-    return observableThrowError('Use PagedResourceCollection to do page prev requests');
+    throw new Error('Use PagedResourceCollection to do page prev requests');
   }
 
   public first(): Observable<T[]> {
-    return observableThrowError('Use PagedResourceCollection to do page first requests');
+    throw new Error('Use PagedResourceCollection to do page first requests');
   }
 
   public last(): Observable<T[]> {
-    return observableThrowError('Use PagedResourceCollection to do page last requests');
+    throw new Error('Use PagedResourceCollection to do page last requests');
   }
 
   public page(pageNumber: number): Observable<T[]> {
-    return observableThrowError('Use PagedResourceCollection to do page requests');
+    throw new Error('Use PagedResourceCollection to do page requests');
   }
 }

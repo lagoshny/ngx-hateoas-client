@@ -5,8 +5,7 @@
     "@angular/common": "^9.1.12",
     "@angular/core": "^9.1.12",
     "lodash": "^4.17.19",
-    "uri-templates": "^0.2.0",
-    "deprecated-decorator": "deprecated-decorator"
+    "uri-templates": "^0.2.0"
   },
   "dependencies": {
     "tslib": "^1.10.0"

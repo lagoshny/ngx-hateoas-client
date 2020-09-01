@@ -3,7 +3,7 @@ import { BaseResource } from './base-resource';
 import { Observable, throwError as observableThrowError } from 'rxjs';
 import { getPagedResourceCollectionHttpService } from '../../service/internal/paged-resource-collection-http.service';
 import { UrlUtils } from '../../util/url.utils';
-import { LinkData, PageData, SortedPageParam } from '../declarations';
+import { LinkData, PageData, Sort, SortedPageParam } from '../declarations';
 import * as _ from 'lodash';
 import { StageLogger } from '../../logger/stage-logger';
 import { Stage } from '../../logger/stage.enum';
@@ -16,11 +16,11 @@ import { OldBaseResource } from '../../_backwards/hal-client/model/old-base-reso
  */
 export class PagedResourceCollection<T extends BaseResource | OldBaseResource> extends ResourceCollection<T> {
 
-  private readonly selfUri: LinkData;
-  private readonly nextUri: LinkData;
-  private readonly prevUri: LinkData;
-  private readonly firstUri: LinkData;
-  private readonly lastUri: LinkData;
+  private readonly selfLink: LinkData;
+  private readonly nextLink: LinkData;
+  private readonly prevLink: LinkData;
+  private readonly firstLink: LinkData;
+  private readonly lastLink: LinkData;
 
   public readonly totalElements: number;
   public readonly totalPages: number;
@@ -40,27 +40,27 @@ export class PagedResourceCollection<T extends BaseResource | OldBaseResource> e
     this.pageSize = _.result(pageData, 'page.size', 20);
     this.pageNumber = _.result(pageData, 'page.number', 0);
 
-    this.selfUri = _.result(pageData, '_links.self', null);
-    this.nextUri = _.result(pageData, '_links.next', null);
-    this.prevUri = _.result(pageData, '_links.prev', null);
-    this.firstUri = _.result(pageData, '_links.first', null);
-    this.lastUri = _.result(pageData, '_links.last', null);
+    this.selfLink = _.result(pageData, '_links.self', null);
+    this.nextLink = _.result(pageData, '_links.next', null);
+    this.prevLink = _.result(pageData, '_links.prev', null);
+    this.firstLink = _.result(pageData, '_links.first', null);
+    this.lastLink = _.result(pageData, '_links.last', null);
   }
 
   public hasFirst(): boolean {
-    return !!this.firstUri && !!this.firstUri.href;
+    return !!this.firstLink && !!this.firstLink.href;
   }
 
   public hasLast(): boolean {
-    return !!this.lastUri && !!this.lastUri.href;
+    return !!this.lastLink && !!this.lastLink.href;
   }
 
   public hasNext(): boolean {
-    return !!this.nextUri && !!this.nextUri.href;
+    return !!this.nextLink && !!this.nextLink.href;
   }
 
   public hasPrev(): boolean {
-    return !!this.prevUri && !!this.prevUri.href;
+    return !!this.prevLink && !!this.prevLink.href;
   }
 
   public first(options?: { useCache: true }): Observable<PagedResourceCollection<T>> {
@@ -70,7 +70,7 @@ export class PagedResourceCollection<T extends BaseResource | OldBaseResource> e
       StageLogger.stageErrorLog(Stage.PREPARE_URL, {error: errMsg});
       return observableThrowError(new Error(errMsg));
     }
-    return doRequest<T>(this.firstUri, options?.useCache).pipe(
+    return doRequest<T>(this.firstLink, options?.useCache).pipe(
       tap(() => {
         StageLogger.resourceEndLog(this.resources[0], 'GET_FIRST_PAGE', {result: 'get first page was performed successful'});
       })
@@ -84,7 +84,7 @@ export class PagedResourceCollection<T extends BaseResource | OldBaseResource> e
       StageLogger.stageErrorLog(Stage.PREPARE_URL, {error: errMsg});
       return observableThrowError(new Error(errMsg));
     }
-    return doRequest<T>(this.lastUri, options?.useCache).pipe(
+    return doRequest<T>(this.lastLink, options?.useCache).pipe(
       tap(() => {
         StageLogger.resourceEndLog(this.resources[0], 'GET_LAST_PAGE', {result: 'get last page was performed successful'});
       })
@@ -98,7 +98,7 @@ export class PagedResourceCollection<T extends BaseResource | OldBaseResource> e
       StageLogger.stageErrorLog(Stage.PREPARE_URL, {error: errMsg});
       return observableThrowError(new Error(errMsg));
     }
-    return doRequest<T>(this.nextUri, options?.useCache).pipe(
+    return doRequest<T>(this.nextLink, options?.useCache).pipe(
       tap(() => {
         StageLogger.resourceEndLog(this.resources[0], 'GET_NEXT_PAGE', {result: 'get next page was performed successful'});
       })
@@ -112,11 +112,24 @@ export class PagedResourceCollection<T extends BaseResource | OldBaseResource> e
       StageLogger.stageErrorLog(Stage.PREPARE_URL, {error: errMsg});
       return observableThrowError(new Error(errMsg));
     }
-    return doRequest<T>(this.prevUri, options?.useCache).pipe(
+    return doRequest<T>(this.prevLink, options?.useCache).pipe(
       tap(() => {
         StageLogger.resourceEndLog(this.resources[0], 'GET_PREV_PAGE', {result: 'get prev page was performed successful'});
       })
     );
+  }
+
+  // TODO: add tests
+  public page(pageNumber: number, options?: { useCache: true }): Observable<PagedResourceCollection<T>> {
+    return this.customPage({pageParams: {page: pageNumber}}, options);
+  }
+
+  public size(size: number, options?: { useCache: true }): Observable<PagedResourceCollection<T>> {
+    return this.customPage({pageParams: {size}}, options);
+  }
+
+  public sortElements(sortParam: Sort, options?: { useCache: true }): Observable<PagedResourceCollection<T>> {
+    return this.customPage({sort: sortParam}, options);
   }
 
   /**
@@ -129,8 +142,12 @@ export class PagedResourceCollection<T extends BaseResource | OldBaseResource> e
    */
   public customPage(params: SortedPageParam, options?: { useCache: true }): Observable<PagedResourceCollection<T>> {
     StageLogger.resourceBeginLog(this.resources[0], 'CustomPage', {pageParam: params.pageParams});
-    ValidationUtils.validateInputParams({pageParams: params.pageParams});
 
+    if (!params.pageParams || _.isEmpty(params.pageParams)) {
+      params.pageParams = {};
+      params.pageParams.page = this.pageNumber;
+      params.pageParams.size = this.pageSize;
+    }
     if (params.pageParams.page < 0) {
       params.pageParams.page = this.pageNumber;
       StageLogger.stageLog(Stage.PREPARE_PARAMS, {
@@ -159,7 +176,7 @@ export class PagedResourceCollection<T extends BaseResource | OldBaseResource> e
       return observableThrowError(errMsg);
     }
 
-    return doRequest<T>(this.selfUri, options?.useCache, params).pipe(
+    return doRequest<T>(this.selfLink, options?.useCache, params).pipe(
       tap(() => {
         StageLogger.resourceEndLog(this.resources[0], 'CustomPage', {result: 'custom page was performed successful'});
       })

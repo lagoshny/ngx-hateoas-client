@@ -96,7 +96,7 @@ export interface SortedPageParam {
   /**
    * Page content params.
    */
-  pageParams: PageParam;
+  pageParams?: PageParam;
   /**
    * Sorting options.
    */

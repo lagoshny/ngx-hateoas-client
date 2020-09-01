@@ -273,7 +273,7 @@ export class HateoasResourceService<T extends Resource> {
   /**
    * {@see ResourceHttpService#search}
    */
-  public searchSingle(resourceName: string, searchQuery: string, options?: GetOption): Observable<T> {
+  public searchResource(resourceName: string, searchQuery: string, options?: GetOption): Observable<T> {
     StageLogger.resourceBeginLog(resourceName, 'ResourceService SEARCH_SINGLE', {query: searchQuery, options});
     ValidationUtils.validateInputParams({resourceName, searchQuery});
 

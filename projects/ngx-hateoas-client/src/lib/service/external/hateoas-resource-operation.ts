@@ -109,8 +109,8 @@ export class HateoasResourceOperation<T extends Resource> {
   /**
    * {@see ResourceHttpService#search}
    */
-  public searchSingle(query: string, options?: GetOption): Observable<T> {
-    return this.hateoasResourceService.searchSingle(this.resourceName, query, options);
+  public searchResource(query: string, options?: GetOption): Observable<T> {
+    return this.hateoasResourceService.searchResource(this.resourceName, query, options);
   }
 
   /**

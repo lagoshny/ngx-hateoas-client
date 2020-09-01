@@ -473,23 +473,23 @@ describe('HateoasResourceService', () => {
       .toThrowError(`Passed param(s) 'resourceName = null', 'searchQuery = null' are not valid`);
   });
 
-  it('SEARCH_SINGLE should throw error when passed resourceName is empty', () => {
-    expect(() => hateoasResourceService.searchSingle('', 'any'))
+  it('SEARCH_RESOURCE should throw error when passed resourceName is empty', () => {
+    expect(() => hateoasResourceService.searchResource('', 'any'))
       .toThrowError(`Passed param(s) 'resourceName = ' is not valid`);
   });
 
-  it('SEARCH_SINGLE should throw error when passed searchQuery is empty', () => {
-    expect(() => hateoasResourceService.searchSingle('any', ''))
+  it('SEARCH_RESOURCE should throw error when passed searchQuery is empty', () => {
+    expect(() => hateoasResourceService.searchResource('any', ''))
       .toThrowError(`Passed param(s) 'searchQuery = ' is not valid`);
   });
 
-  it('SEARCH_SINGLE should throw error when passed resourceName,searchQuery are undefined', () => {
-    expect(() => hateoasResourceService.searchSingle(undefined, undefined))
+  it('SEARCH_RESOURCE should throw error when passed resourceName,searchQuery are undefined', () => {
+    expect(() => hateoasResourceService.searchResource(undefined, undefined))
       .toThrowError(`Passed param(s) 'resourceName = undefined', 'searchQuery = undefined' are not valid`);
   });
 
-  it('SEARCH_SINGLE should throw error when passed resourceName,searchQuery are null', () => {
-    expect(() => hateoasResourceService.searchSingle(null, null))
+  it('SEARCH_RESOURCE should throw error when passed resourceName,searchQuery are null', () => {
+    expect(() => hateoasResourceService.searchResource(null, null))
       .toThrowError(`Passed param(s) 'resourceName = null', 'searchQuery = null' are not valid`);
   });
 

@@ -609,60 +609,6 @@ constructor() {
 
 5) You need change all old `RestService` / `Resource` method call согласно this change description LINK. 
 
-5) Where was used `Service` that extended `RestService` and if that `Service` overrrided\used some `RestService` methods need to do the next `RestService` methods changes:
+May be add git app example
 
-- delete all usages `protected handleError(error: any): Observable<never>;` method it was removed in `HateoasResourceOperation` class
-  it didn't some hard logic it only throws observable error you can add the same name in your app and use it.
-  
-- Change `getAll(options?: HalOptions, subType?: SubTypeBuilder): Observable<T[]>;` method to `getCollection(options?: GetOption): Observable<ResourceCollection<T>>;`
-
-Before:
-````
-this.someServiceExtendRestService.getAll({
-    size: 10,
-    params: [
-      {
-        key: 'param',
-        value: 'testParam'
-      }
-    ],
-    sort: [
-      {path: 'test', order: 'DESC'}
-    ],
-    notPaged: false
-  },
-  {subtypes: new Map<string, any>().set('someTypeName', SomeType)}
-).subscribe((result: Array) => {
-    return result;
-});
-````
-
-After:
-````
-this.someServiceExtendRestService.getCollection({
-    params: {
-      param: 'testParam'
-    },
-    sort: {
-      test: 'DESC'
-    }
-  }
-).subscribe((result: ResourceCollection) => {
-   return result.resources;
-});
-````
-
-As you can see we reduce params and sort code when migrate to `getCollection` method from `HateoasResourceOperation`.
-The `HateoasResourceOperation` has changed params and sort delcaration from arrays to object style.
-Was remove `notPaged` param, because `notPaged` was deleted from `ngx-hateoas-client` because now all separation whould be result paged or not resolves with different
-`HateoasResourceOperation` methods (when you need simple collection use `getCollection` method or use `getPagedCollection` when you need collection as page).
-
-Remove `size` param because we will get the `collection of the resources` and this params is not affect to the result this param 
-should be used with `getPagedCollection` method (LINK)
-
-Remove `SubTypeBuilder` param, bacause `SubTypeBuilder` was removed from `ngx-hateoas-client`. To know what is subtype of the resource
-you can use new `Resource` method `isResourceOf()` and pass to this method or subtype type or subtype string name when subtype type is not equals to subtype name.
-If `isResourceOf()` return `true` then you can cast this resource to passed subtype type.
-
-In `getCollection` return type is `ResourceCollection` object and it holds resource array in `resources` property.
-
+If you found some bugs please make an issue here.

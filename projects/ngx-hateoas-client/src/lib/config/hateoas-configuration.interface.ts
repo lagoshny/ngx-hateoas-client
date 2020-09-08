@@ -15,7 +15,7 @@ export interface HateoasConfiguration {
     rootUrl: string;
     /**
      * Proxy url on which to send requests.
-     * If passed then it uses to change baseUrl to proxyUrl when get relation link.
+     * If passed then it uses to change rootUrl to proxyUrl when get relation link.
      *
      * For default Spring application it looks like: http://localhost:8080/api/v1.
      */
@@ -41,7 +41,7 @@ export interface HateoasConfiguration {
      */
     enabled: boolean;
     /**
-     * Time in seconds after which cache need to be expired.
+     * Time in milliseconds after which cache need to be expired.
      */
     lifeTime?: number;
   };

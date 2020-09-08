@@ -30,7 +30,7 @@ export class ResourceCacheService {
     }
 
     const cacheExpiredTime = new Date(cacheValue.cachedTime);
-    cacheExpiredTime.setSeconds(cacheExpiredTime.getSeconds() + LibConfig.config.cache.lifeTime);
+    cacheExpiredTime.setMilliseconds(cacheExpiredTime.getMilliseconds() + LibConfig.config.cache.lifeTime);
     if (cacheExpiredTime.getTime() < new Date().getTime()) {
       this.evictResource(key);
       StageLogger.stageLog(Stage.CACHE_GET, {cacheKey: key.value, message: 'cache was expired', result: null});

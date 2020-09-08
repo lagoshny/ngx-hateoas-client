@@ -92,7 +92,6 @@ export abstract class BaseResource extends AbstractResource {
 
   /**
    *  Perform POST request to the relation with the body and url params.
-   *  By default return {@link HttpResponse<any>} if you want change it, pass observe type in options.
    *
    * @param relationName used to get the specific relation link
    * @param requestBody that contains the body directly and optional body values option {@link ValuesOption}
@@ -122,7 +121,6 @@ export abstract class BaseResource extends AbstractResource {
 
   /**
    * Perform PATCH request to relation with body and url params.
-   * By default return {@link HttpResponse<any>} if you want change it, pass observe type in options.
    *
    * @param relationName used to get the specific relation link
    * @param requestBody contains the body directly and body values option {@link ValuesOption}
@@ -153,7 +151,6 @@ export abstract class BaseResource extends AbstractResource {
 
   /**
    * Perform PUT request to relation with body and url params.
-   * By default return {@link HttpResponse<any>} if you want change it, pass observe type in options.
    *
    * @param relationName used to get the specific relation link
    * @param requestBody contains the body directly and body values option {@link ValuesOption}

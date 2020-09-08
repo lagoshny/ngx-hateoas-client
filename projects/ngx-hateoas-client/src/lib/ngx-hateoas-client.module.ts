@@ -9,7 +9,6 @@ import { ResourceCollectionHttpService } from './service/internal/resource-colle
 import { CommonResourceHttpService } from './service/internal/common-resource-http.service';
 import { ResourceCacheService } from './service/internal/cache/resource-cache.service';
 
-export { HateoasConfiguration } from './config/hateoas-configuration.interface';
 export { HateoasConfigurationService } from './config/hateoas-configuration.service';
 export { Resource } from './model/resource/resource';
 export { EmbeddedResource } from './model/resource/embedded-resource';

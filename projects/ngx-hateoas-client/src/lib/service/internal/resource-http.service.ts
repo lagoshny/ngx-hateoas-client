@@ -203,7 +203,7 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
    * @param body resource to create
    * @throws error when required params are not valid
    */
-  public postResource(resourceName: string, body: BaseResource): Observable<T> {
+  public postResource(resourceName: string, body: BaseResource): Observable<T | any> {
     ValidationUtils.validateInputParams({resourceName, body});
 
     const url = UrlUtils.generateResourceUrl(UrlUtils.getApiUrl(), resourceName);

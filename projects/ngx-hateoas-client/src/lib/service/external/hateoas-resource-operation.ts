@@ -46,7 +46,7 @@ export class HateoasResourceOperation<T extends Resource> {
   /**
    * {@link HateoasResourceService#createResource}.
    */
-  public createResource(requestBody: RequestBody<T>): Observable<T> {
+  public createResource(requestBody: RequestBody<T>): Observable<T | any> {
     return this.hateoasResourceService.createResource(this.resourceName, requestBody);
   }
 

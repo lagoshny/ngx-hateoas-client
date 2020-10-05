@@ -93,7 +93,7 @@ export class HateoasResourceService<T extends Resource> {
    * @param requestBody that contains the body directly and optional body values option {@link ValuesOption}
    * @throws error when required params are not valid
    */
-  public createResource(resourceName: string, requestBody: RequestBody<T>): Observable<T> {
+  public createResource(resourceName: string, requestBody: RequestBody<T>): Observable<T | any> {
     StageLogger.resourceBeginLog(resourceName, 'ResourceService CREATE_RESOURCE', {requestBody});
     ValidationUtils.validateInputParams({resourceName, requestBody});
 

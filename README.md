@@ -1,28 +1,28 @@
 # NgxHateoasClient
 
-## Вступление..
+**Compatible with Angular 10.**
 
-## Changelog
+This client can be used to develop `Angular 4.3+` applications working with RESTful server API. 
+By `RESTful API` means when the server application implements all the layers of the [Richardson Maturity Model](https://martinfowler.com/articles/richardsonMaturityModel.html) 
+and the server provides [HAL/JSON](http://stateless.co/hal_specification.html) response type.
 
+This client compatible with Java server-side applications based on [Spring HATEOAS](https://spring.io/projects/spring-hateoas) or [Spring Data REST](https://docs.spring.io/spring-data/rest/docs/current/reference/html/#reference).
 
-## Migration guide
+>This client is a continuation of the [@lagoshny/ngx-hal-client](https://github.com/lagoshny/ngx-hal-client).
+You can find out about the motivation to create a new client [here]().
+To migrate from `@lagoshny/ngx-hal-client` to this client you can use the [migration guide](https://github.com/lagoshny/ngx-hateoas-client/blob/master/migration.md).
 
-If you use now `@lagoshny/ngx-hal-client` library then you can use migration guide that help you migrate.
-You can found more about migration guide here (LINK)
+## Getting-started
 
-### Getting-started
+### Installation
 
-To start work you need install npm dependency for this lib and pass configuration about your API url.
+To install the client use the next command `npm i @lagoshny/ngx-hateoas-client --save` 
 
-#### Instalation
+### Configuration
 
-To install lib run the next command `npm i @lagoshny/ngx-hateoas-client --save` 
+To configure the client you need doing two actions:
 
-#### Configuration
-
-To configure library you need:
-
-- In your app root module import `NgxHalClientModule`:
+1) In you app root module import `NgxHalClientModule`:
 
 ````
 import { NgxHateoasClientModule } from '@lagoshny/ngx-hateoas-client';
@@ -43,7 +43,7 @@ export class AppModule {
 }
 ````
 
-- In constructor app root module inject `HalConfigurationService` and pass your configuration:
+2) In constructor app root module inject `HalConfigurationService` and pass you configuration:
 
 ````
 import { ..., HateoasConfigurationService } from '@lagoshny/ngx-hateoas-client';
@@ -63,17 +63,17 @@ export class AppModule {
 }
 ````
 
-Configuration has only one required param is `rootUrl` for your backend API.
-Also you can pass `proxyUrl` if you use it in your resource links.
-About more configuration params (logging, caching etc) you can found here (LINK) 
+>Configuration has only one required param is `rootUrl` that mapped to the server API URL.
+Also, you can pass `proxyUrl` if you use it in resource links.
+You can read more about a configuration params [here](). 
 
-#### Usage
+### Usages
 
+#### Define resource classes
 
-##### Define resources
-Now when you finished configure library you need extend `Resource` class in you model classes that represents backend entitites.
+Now you need to define resource classes by extending you `model` classes that mapped to the server-side entities with the `Resource` class.
 
-For example you have some `Product` model that use to fetch data from backend:
+Suppose you have some `Product` model class:
 
 ```
 export class Product {
@@ -85,12 +85,10 @@ export class Product {
 }
 ``` 
 
-No you need extend it with `Resource` class:
+When extending it with `Resource` class it will look like:
 
 ```
 import { Resource } from '@lagoshny/ngx-hateoas-client';
-
-...
 
 export class Product extend Resource {
 
@@ -101,14 +99,20 @@ export class Product extend Resource {
 }
 ``` 
 
-After that all you `product` instancies will be have `Resource` behaviour with methods to manipulate in their links.
-To see more about `Resource` here (LINK)
+Thereafter, the `Product` class will have `Resource` methods to work with the product's relations through resource links.
 
-##### Using HateoasResourceService
+>Also, you can extend model classes with the `EmbeddedResource` class when the model class used as an [embeddable](https://docs.oracle.com/javaee/6/api/javax/persistence/Embeddable.html) entity. 
+You can read more about `EmbeddedResource` [here]().
 
-Now you are ready to do your first request to fetch you `Resource` from a server.
-In you component or service class inject `HateoasResourceService` and pass in generic param you resource type.
 
+To perform resource requests you can use built-in [HateoasResourceService]() or create [custom resource service]().
+
+#### Built-in HateoasResourceService
+
+For convenience, library has built-in `HateoasResourceService`.
+It's a simple service with methods to fetch/create/update/delete resources.
+
+To work with it inject `HateoasResourceService` to a component or a service class and set resource type in generic param.
 ```
 @Component({
   ...
@@ -131,23 +135,24 @@ export class YouComponent {
 
 ```
 
-In `HateoasResourceService` the first param is always resource name that should be equals to resource name in you backend API
-because this name uses to built url for resource request.
+Each `HateoasResourceService` method has as the first param is the resource name that should be equals to the resource name in backend API because this is a common service that can be used for any resource type passed in generic param.
+The resource name uses to build a URL for resource requests.
 
-NOTE!
-`HateoasResourceService` is the best choise for simple resources that has not extra logic for requests because you don't need to create own service to do simple resource requests.
-But if you have some logic that should be preparing resource before request or another logics or you don't want always pass resource name as first methods param
-you can create own service that extends `HateoasResourceOperation` see below about this.
+More about available methods to work with resources [here]().
 
-##### Create own service extending HateoasResourceOperation
+>`HateoasResourceService` is the best choice for simple resources that has not extra logic for requests.
+When you have some logic that should be preparing resource before a request, or you don't want always pass the resource name as first methods param
+you can create a custom resource service that extends `HateoasResourceOperation` to see more about this [here]().
 
-To make you service to work with resources you need extend service with `HateoasResourceOperation` class:
+#### Create custom Resource service
+
+To create custom resource service you need extends it with `HateoasResourceOperation` and pass resource name to parent constructor.
 
 ```
 import { HateoasResourceOperation } from '@lagoshny/ngx-hateoas-client';
 
 @Injectable({providedIn: 'root'})
-export class ProductService extends HateoasResourceOperation<Supplier> {
+export class ProductService extends HateoasResourceOperation<Product> {
 
   constructor() {
     super('product');
@@ -157,11 +162,1071 @@ export class ProductService extends HateoasResourceOperation<Supplier> {
 
 ```
 
-`HateoasResourceOperation` required single construct param is resource name that will be used to generate resource url when perform requests.
+After that `ProductService` will have resource methods that you can use in service methods.
 
-Now you can use you service as `HateoasResourceService` but you don't need pass resource name every time because you pass it in `HateoasResourceOperation` constructor param.
+More about available methods to work with resources [here]().
 
-### Lib API
+## Library features
+
+This section describes the popular library features.
+
+### Resource service 
+
+As described before to work with resources you can use built-in [HateoasResourceService]()  or create [custom resource service]().
+
+>Only difference in methods signature between built-in HateoasResourceService and custom resource service is built-in service always has a resource name as the first method param.
+
+**No matter which a service you choose you will have the same resource methods.**
+
+___
+#### Presets for examples
+
+Examples of usage resource service methods rely on this presets.
+
+
+- Server root url = http://localhost:8080/api/v1
+- Resource class is
+  ```
+  import { Resource } from '@lagoshny/ngx-hal-client';
+  
+  export class Product extends Resource {
+  
+      public name: string;
+  
+      public cost: number;
+  
+      public description: string;
+  
+  }
+  ```
+  
+- Resource service as built-in [HateoasResourceService]() is
+  ```
+  @Component({ ... })
+  export class AppComponent {
+      constructor(private productHateoasService: HateoasResourceService<Product>) {
+      }
+  }
+  ```  
+  
+- Resource service as [custom resource service]() is
+  ```
+  import { HalResourceOperation } from '@lagoshny/ngx-hal-client';
+  import { Product } from '../model/product.model';
+  
+  @Injectable({providedIn: 'root'})
+  export class ProductService extends HalResourceOperation<Product> {
+    constructor() {
+      super('products');
+    }
+  }
+  
+  @Component({ ... })
+  export class AppComponent {
+      constructor(private productService: ProductService) {
+      }
+  }
+  ```
+___
+
+#### Get resource
+
+This method uses for getting a single resource [Resource]().
+With `GetOption` you can pass `projection` param (see below).
+
+Method signature:
+
+````
+getResource(id: number | string, options?: GetOption): Observable<T>;
+````
+
+- `id` - resource id to get
+- `options` - you can pass additional options that will be applied to the request, more about `GetOption` see [here]().
+- `return value` - [Resource]() with type `T`
+- `throws error` when returned value is not [Resource]()
+
+Example of usage ([given the presets]()):
+
+```
+// Will be perform GET request to the http://localhost:8080/api/v1/products/1 
+productService.getResource(1)
+    .subscribe((product: Product) => {
+        // some logic
+    }
+productHateoasService.getResource('products', 1)
+    .subscribe((product: Product) => {
+        // some logic
+    }
+
+
+// Will be perform GET request to the http://localhost:8080/api/v1/products/1?testParam=test&projection=productProjection&sort=cost,ASC
+productService.getResource(1, {
+  params: {
+    testParam: 'test',
+    projection: 'productProjection',
+  },
+  sort: {
+    cost: 'ASC'
+  },
+  // useCache: true | false, when cache is enable then by default true, false otherwise
+}).subscribe((product: Product) => {
+    // some logic
+});
+productHateoasService.getResource('products', 1, {
+  params: {
+    testParam: 'test',
+    projection: 'productProjection',
+  },
+  sort: {
+    cost: 'ASC'
+  },
+  // useCache: true | false, when cache is enable then by default true, false otherwise
+}).subscribe((product: Product) => {
+    // some logic
+});
+
+```
+
+#### Get resource collection
+
+This method uses for getting a collection of resources [ResourceCollection]().
+With `GetOption` you can pass `projection` param (see below).
+
+Method signature:
+
+````
+getCollection(options?: GetOption): Observable<ResourceCollection<T>>;
+````
+
+- `options` - you can pass additional options that will be applied to the request, more about `GetOption` see [here]().
+- `return value` - [ResourceCollection]() collection of resources with type `T` 
+- `throws error` when returned value is not [ResourceCollection]() 
+
+Example of usage ([given the presets]()):
+
+```
+// Will be perform GET request to the http://localhost:8080/api/v1/products
+productService.getCollection()
+    .subscribe((collection: ResourceCollection<Product>) => {
+        const products: Array<Product> = collection.resources;
+        // some logic
+    }
+productHateoasService.getCollection('products')
+    .subscribe((collection: ResourceCollection<Product>) => {
+        const products: Array<Product> = collection.resources;
+        // some logic
+    }
+
+// Will be perform GET request to the http://localhost:8080/api/v1/products?testParam=test&projection=productProjection&sort=cost,ASC
+productService.getCollection({
+  params: {
+    testParam: 'test',
+    projection: 'productProjection',
+  },
+  sort: {
+    cost: 'ASC'
+  },
+  // useCache: true | false, when cache is enable then by default true, false otherwise
+}).subscribe((collection: ResourceCollection<Product>) => {
+    const products: Array<Product> = collection.resources;
+    // some logic
+});
+productHateoasService.getCollection('products', {
+  params: {
+    testParam: 'test',
+    projection: 'productProjection',
+  },
+  sort: {
+    cost: 'ASC'
+  },
+  // useCache: true | false, when cache is enable then by default true, false otherwise
+}).subscribe((collection: ResourceCollection<Product>) => {
+    const products: Array<Product> = collection.resources;
+    // some logic
+});
+
+```
+
+#### Get resource page
+
+This method uses for getting a paged collection of resources [PagedResourceCollection]().
+With `PagedGetOption` you can pass `projection` param (see below).
+
+Method signature:
+
+````
+getPage(options?: PagedGetOption): Observable<PagedResourceCollection<T>>;
+````
+
+- `options` - you can pass additional options that will be applied to the request, if not passed page params will be used [default page params](), more about `PagedGetOption` see [here]().
+- `return value` - [PagedResourceCollection]() paged collection of resources with type `T` 
+- `throws error` when returned value is not [PagedResourceCollection]() 
+
+Example of usage ([given the presets]()):
+
+```
+// Will be perform GET request to the http://localhost:8080/api/v1/products?page=0&size=20
+productService.getPage()
+    .subscribe((pagedCollection: PagedResourceCollection<Product>) => {
+        const products: Array<Product> = pagedCollection.resources;
+        // some logic
+    }
+productHateoasService.getPage('products')
+    .subscribe((pagedCollection: PagedResourceCollection<Product>) => {
+        const products: Array<Product> = pagedCollection.resources;
+        // some logic
+    }
+
+
+// Will be perform GET request to the http://localhost:8080/api/v1/products?testParam=test&projection=productProjection&page=1&size=40&sort=cost,ASC
+productService.getPage({
+  pageParams: {
+    page: 1,
+    size: 40
+  },
+  params: {
+    testParam: 'test',
+    projection: 'productProjection',
+  },
+  sort: {
+    cost: 'ASC'
+  },
+  // useCache: true | false, when cache is enable then by default true, false otherwise
+}).subscribe((pagedCollection: PagedResourceCollection<Product>) => {
+    const products: Array<Product> = pagedCollection.resources;
+    // some logic
+});
+productHateoasService.getPage('products', {
+  pageParams: {
+    page: 1,
+    size: 40
+  },
+  params: {
+    testParam: 'test',
+    projection: 'productProjection',
+  },
+  sort: {
+    cost: 'ASC'
+  },
+  // useCache: true | false, when cache is enable then by default true, false otherwise
+}).subscribe((pagedCollection: PagedResourceCollection<Product>) => {
+    const products: Array<Product> = pagedCollection.resources;
+    // some logic
+});
+
+```
+
+#### Create resource
+
+This method uses for create a new resource entity [Resource]().
+
+Method signature:
+
+````
+createResource(requestBody: RequestBody<T>): Observable<T | any>;
+````
+
+- `requestBody` - object that contains resource as body and additional body options, more about `RequestBody` see [here]().
+- `return value` - [Resource]() with type `T` or raw response data when it's not a resource object. 
+
+Example of usage ([given the presets]()):
+
+```
+/*
+Will be perform POST request to the http://localhost:8080/api/v1/products
+Request body:
+{
+  "name": "Apple",
+  "cost": 100
+}
+Note: description is not passed because by default null values ignore. If you want pass description = null value then need to pass additional valuesOption params.
+*/
+const newProduct = new Product();
+newProduct.cost = 100;
+newProduct.name = 'Apple';
+newProduct.description = null;
+productService.createResource({
+  body: newProduct
+}).subscribe((createdProduct: Product) => {
+    // some logic 
+});
+productHateoasService.createResource('products', {
+  body: newProduct
+}).subscribe((createdProduct: Product) => {
+    // some logic 
+});
+
+/*
+Will be perform POST request to the http://localhost:8080/api/v1/products
+Request body:
+{
+  "name": "Apple",
+  "cost": 100,
+  "description": null
+}
+Note: description is passed with null value because valuesOption = Include.NULL_VALUES was passed.
+*/ 
+const newProduct = new Product();
+newProduct.cost = 100;
+newProduct.name = 'Apple';
+newProduct.description = null;
+productService.createResource({
+  body: newProduct,
+  valuesOption: {
+    include: Include.NULL_VALUES
+  }
+}).subscribe((createdProduct: Product) => {
+    // some logic 
+});
+productHateoasService.createResource('products', {
+  body: newProduct,
+  valuesOption: {
+    include: Include.NULL_VALUES
+  }
+}).subscribe((createdProduct: Product) => {
+    // some logic 
+});
+```
+
+#### Update resource
+
+This method uses to updating **all** a resource values at once.
+If you want update only part of resource values then use [PatchResource]() method.
+> It means if you pass only part of resource value in requestBody then all not passed resource values will be overwritten on null values. 
+
+Method signature:
+
+````
+updateResource(entity: T, requestBody?: RequestBody<any>): Observable<T | any>;
+````
+
+- `entity` - resource entity that should be updated, when passed only this param then passed `entity` values will be used to update a resource values.
+- `requestBody` - object that contains a new resource values to update and additional body options, more about `RequestBody` see [here]().
+- `return value` - [Resource]() with type `T` or raw response data when it's not a resource object. 
+
+>In this case to update a resource performs a PUT request by URL equals to resource self link passed in `entity` param.
+You can update a resource entity by an id directly, see more [here]().
+
+Example of usage ([given the presets]()):
+
+```
+/*
+Suppose exitsProduct has a self link = http://localhost:8080/api/v1/products/1
+Will be perform PUT request to the http://localhost:8080/api/v1/products/1
+Request body:
+{
+  "name" = exitsProduct.name,
+  "cost": 500
+}
+Note: 
+1) Description is not passed because by default null values ignore. If you want pass description = null value then need to pass additional valuesOption params.
+2) Since update resource updating all resource values at once and for description value is not passing then the server-side can overwrite description to null. 
+*/
+const exitsProduct = ...;
+exitsProduct.cost = 500;
+exitsProduct.description = null;
+productService.updateResource(exitsProduct)
+  .subscribe((updatedProduct: Product) => {
+    // some logic 
+});
+// For productHateoasService this snippet is identical
+
+/*
+Suppose exitsProduct has a self link = http://localhost:8080/api/v1/products/1
+Will be perform PUT request to the http://localhost:8080/api/v1/products/1
+Request body:
+{
+  "name": null,
+  "cost": 500
+}
+Note: 
+1) Name was passed with null value because valuesOption = Include.NULL_VALUES was passed.
+2) Since update resource updating all resource values at once and for description value is not passing then the server-side can overwrite description to null. 
+*/
+const exitsProduct = ...;
+productService.updateResource(exitsProduct, {
+  body: {
+    name: null,
+    cost: 500
+  },
+  valuesOption: {
+    include: Include.NULL_VALUES
+  }
+}).subscribe((updatedProduct: Product) => {
+    // some logic 
+});
+// For productHateoasService this snippet is identical
+
+```
+
+#### Update resource by id
+
+This method uses to updating **all** a resource values at once by resource id.
+If you want update only part of resource values then use [PatchResource]() method.
+> It means if you pass only part of resource value in requestBody then all not passed resource values will be overwritten on null values. 
+
+Method signature:
+
+````
+updateResourceById(id: number | string, requestBody: RequestBody<any>): Observable<T | any>;
+````
+
+- `id` - resource id that should be updated
+- `requestBody` - object that contains a new resource values to update and additional body options, more about `RequestBody` see [here]().
+- `return value` - [Resource]() with type `T` or raw response data when it's not a resource object. 
+
+>You can update a resource entity by a resource self link without passing an id param directly, see more [here]().
+
+Example of usage ([given the presets]()):
+
+```
+/*
+Suppose exitsProduct has an id = 1
+Will be perform PUT request to the http://localhost:8080/api/v1/products/1
+Request body:
+{
+  "name" = exitsProduct.name,
+  "cost": 500
+}
+Note: 
+1) Description is not passed because by default null values ignore. If you want pass description = null value then need to pass additional valuesOption params.
+2) Since update resource updating all resource values at once and for description value is not passing then the server-side can overwrite description to null. 
+*/
+const exitsProduct = ...;
+exitsProduct.cost = 500;
+exitsProduct.description = null;
+productService.updateResourceById(1, {
+  body: {
+    ...exitsProduct
+  }
+})
+  .subscribe((updatedProduct: Product) => {
+    // some logic 
+});
+productHateoasService.updateResourceById('products', 1, {
+  body: {
+    ...exitsProduct
+  }
+})
+  .subscribe((updatedProduct: Product) => {
+    // some logic 
+});
+
+/*
+Suppose exitsProduct has an id = 1
+Will be perform PUT request to the http://localhost:8080/api/v1/products/1
+Request body:
+{
+  "name": null,
+  "cost": 500
+}
+Note: 
+1) Name was passed with null value because valuesOption = Include.NULL_VALUES was passed.
+2) Since update resource updating all resource values at once and for description value is not passing then the server-side can overwrite description to null.
+*/
+productService.updateResourceById(1, {
+  body: {
+    name: null,
+    cost: 500
+  },
+  valuesOption: {
+    include: Include.NULL_VALUES
+  }
+})
+  .subscribe((updatedProduct: Product) => {
+    // some logic 
+});
+productHateoasService.updateResourceById('products', 1, {
+  body: {
+    name: null,
+    cost: 500
+  },
+  valuesOption: {
+    include: Include.NULL_VALUES
+  }
+})
+  .subscribe((updatedProduct: Product) => {
+    // some logic 
+});
+
+```
+
+#### Patch resource
+
+This method uses to patch **part** of resource values.
+If you want patching all resource values then use [UpdateResource]() method.
+> It means if you pass only part of resource values in requestBody then only passed values will be overwritten. 
+
+Method signature:
+
+````
+patchResource(entity: T, requestBody?: RequestBody<any>): Observable<T | any>;
+````
+
+- `entity` - resource entity that should be patched, when passed only this param then passed `entity` values will be used to patch a resource values.
+- `requestBody` - object that contains a new resource values to patch and additional body options, more about `RequestBody` see [here]().
+- `return value` - [Resource]() with type `T` or raw response data when it's not a resource object. 
+
+>In this case to patch a resource performs a PATCH request by URL equals to resource self link passed in `entity` param.
+You can patch a resource entity by an id directly, see more [here]().
+
+Example of usage ([given the presets]()):
+
+```
+/*
+Suppose exitsProduct has a self link = http://localhost:8080/api/v1/products/1
+Will be perform PATCH request to the http://localhost:8080/api/v1/products/1
+Request body:
+{
+  "name" = exitsProduct.name,
+  "cost": 500
+}
+Note: 
+1) Description is not passed because by default null values ignore. If you want pass description = null value then need to pass additional valuesOption params.
+2) Since patch resource updating only part of resource values at once then all not passed values will have the old values.
+*/
+const exitsProduct = ...;
+exitsProduct.cost = 500;
+exitsProduct.description = null;
+productService.patchResource(exitsProduct)
+  .subscribe((patchedProduct: Product) => {
+    // some logic 
+});
+// For productHateoasService this snippet is identical
+
+/*
+Suppose exitsProduct has a self link = http://localhost:8080/api/v1/products/1
+Will be perform PATCH request to the http://localhost:8080/api/v1/products/1
+Request body:
+{
+  "name": null,
+  "cost": 500
+}
+Note: 
+1) Name was passed with null value because valuesOption = Include.NULL_VALUES was passed.
+2) Since patch resource updating only part of resource values at once then all not passed values will have the old values.
+*/
+const exitsProduct = ...;
+productService.patchResource(exitsProduct, {
+  body: {
+    name: null,
+    cost: 500
+  },
+  valuesOption: {
+    include: Include.NULL_VALUES
+  }
+}).subscribe((patchedProduct: Product) => {
+    // some logic 
+});
+// For productHateoasService this snippet is identical
+
+```
+
+#### Patch resource by id
+
+This method uses to patch **part** of resource values by resource id.
+If you want patching all resource values then use [UpdateResourceById]() method.
+> It means if you pass only part of resource values in requestBody then only passed values will be overwritten. 
+
+Method signature:
+
+````
+patchResourceById(id: number | string, requestBody: RequestBody<any>): Observable<T | any>;
+````
+
+- `id` - resource id that should be patched
+- `requestBody` - object that contains a new resource values to patch and additional body options, more about `RequestBody` see [here]().
+- `return value` - [Resource]() with type `T` or raw response data when it's not a resource object. 
+
+>You can patch a resource entity by a resource self link without passing an id param directly, see more [here]().
+
+Example of usage ([given the presets]()):
+
+```
+/*
+Suppose exitsProduct has an id = 1
+Will be perform PATCH request to the http://localhost:8080/api/v1/products/1
+Request body:
+{
+  "name" = existProduct.name,
+  "cost": 500
+}
+Note: 
+1) Description is not passed because by default null values ignore. If you want pass description = null value then need to pass additional valuesOption params.
+2) Since patch resource updating only part of resource values at once then all not passed values will have the old values.
+*/
+const exitsProduct = ...;
+exitsProduct.cost = 500;
+exitsProduct.description = null;
+productService.patchResourceById(1, {
+  body: {
+    ...exitsProduct
+  }
+})
+  .subscribe((patchedProduct: Product) => {
+    // some logic 
+});
+productHateoasService.patchResourceById('products', 1, {
+  body: {
+    ...exitsProduct
+  }
+})
+  .subscribe((patchedProduct: Product) => {
+    // some logic 
+});
+
+/*
+Suppose exitsProduct has an id = 1
+Will be perform PUT request to the http://localhost:8080/api/v1/products/1
+Request body:
+{
+  "name": null,
+  "cost": 500
+}
+Note: 
+1) Name was passed with null value because valuesOption = Include.NULL_VALUES was passed.
+2) Since patch resource updating only part of resource values at once then all not passed values will have the old values.
+*/
+productService.patchResourceById(1, {
+  body: {
+    name: null,
+    cost: 500
+  },
+  valuesOption: {
+    include: Include.NULL_VALUES
+  }
+})
+  .subscribe((patchedProduct: Product) => {
+    // some logic 
+});
+productHateoasService.patchResourceById('products', 1, {
+  body: {
+    name: null,
+    cost: 500
+  },
+  valuesOption: {
+    include: Include.NULL_VALUES
+  }
+})
+  .subscribe((patchedProduct: Product) => {
+    // some logic 
+});
+
+```
+
+#### Delete resource
+This method uses to delete resource by a resource self link URL.
+
+Method signature:
+
+````
+deleteResource(entity: T, options?: RequestOption): Observable<HttpResponse<any> | any>;
+````
+
+- `entity` - resource entity that should be deleted
+- `options` - you can pass additional options that will be applied to the request, more about `RequestOption` see [here]().
+- `return value` - by default raw response data or Angular `HttpResponse` when `options` param has `observe: 'response'` value. 
+
+>In this case to delete a resource performs DELETE request by URL equals to resource self link passed in `entity` param.
+You can delete a resource entity by an id directly, see more [here]().
+
+Example of usage ([given the presets]()):
+
+```
+/*
+Suppose exitsProduct has a self link = http://localhost:8080/api/v1/products/1
+Will be perform DELETE request to the http://localhost:8080/api/v1/products/1
+*/
+productService.deleteResource(exitsProduct)
+  .subscribe((result: any) => {
+    // some logic     
+  });
+// For productHateoasService this snippet is identical
+
+/*
+Suppose exitsProduct has a self link = http://localhost:8080/api/v1/products/1
+Will be perform DELETE request to the http://localhost:8080/api/v1/products/1?testParam=test
+*/
+const exitsProduct = ...;
+productService.deleteResource(exitsProduct, {
+  observe: 'response',
+  params: {
+    testParam: 'test'
+  }
+})
+  .subscribe((result: HttpResponse<any>) => {
+    // some logic     
+  });
+// For productHateoasService this snippet is identical
+```
+
+#### Delete resource by id
+This method uses to delete resource by a resource id.
+
+Method signature:
+
+````
+deleteResourceById(id: number | string, options?: RequestOption): Observable<HttpResponse<any> | any>;
+````
+
+- `id` - resource id that should be deleted
+- `options` - you can pass additional options that will be applied to the request, more about `RequestOption` see [here]().
+- `return value` - by default raw response data or Angular `HttpResponse` when `options` param has `observe: 'response'` value. 
+
+>You can delete a resource entity by a resource self link without passing an id param directly, see more [here]().
+
+Example of usage ([given the presets]()):
+
+```
+/*
+Suppose exitsProduct has an id = 1
+Will be perform DELETE request to the http://localhost:8080/api/v1/products/1
+*/
+productService.deleteResourceById(1)
+  .subscribe((result: any) => {
+    // some logic     
+  });
+productHateoasService.deleteResourceById('products', 1)
+  .subscribe((result: any) => {
+    // some logic     
+  });
+
+/*
+Suppose exitsProduct has an id = 1
+Will be perform DELETE request to the http://localhost:8080/api/v1/products/1?testParam=test
+*/
+const exitsProduct = ...;
+productService.deleteResourceById(1, {
+  observe: 'response',
+  params: {
+    testParam: 'test'
+  }
+})
+  .subscribe((result: HttpResponse<any>) => {
+    // some logic     
+  });
+productHateoasService.deleteResourceById('products', 1, {
+  observe: 'response',
+  params: {
+    testParam: 'test'
+  }
+})
+  .subscribe((result: HttpResponse<any>) => {
+    // some logic     
+  });
+```
+
+#### Search resource
+This method uses for search a single resource.
+You don't need to specify `/search` part of the URL it will be added automatically
+
+With `GetOption` you can pass `projection` param (see below).
+
+Method signature:
+
+````
+searchResource(searchQuery: string, options?: GetOption): Observable<T>;
+````
+
+- `searchQuery` - additional part of the url that wll be follow after `/search/` resource url.
+- `options` - you can pass additional options that will be applied to the request, more about `GetOption` see [here]().
+- `return value` - resource with type `T`
+- `throws error` when returned value is not [Resource]()
+
+Example of usage ([given the presets]()):
+
+```
+// Will be perform GET request to the http://localhost:8080/api/v1/products/search/searchQuery 
+productService.searchResource('searchQuery')
+    .subscribe((product: Product) => {
+        // some logic
+    }
+productHateoasService.searchResource('products', 'searchQuery')
+    .subscribe((product: Product) => {
+        // some logic
+    }
+
+// Will be perform GET request to the http://localhost:8080/api/v1/products/search/byName?name=Fruit&projection=productProjection&sort=name,ASC
+productService.searchResource('byName', {
+  params: {
+    projection: 'productProjection',
+    name: 'Fruit'
+  },
+  sort: {
+    name: 'ASC'
+  },
+  // useCache: true | false, when cache is enable then by default true, false otherwise
+})
+  .subscribe((product: Product) => {
+    // some logic
+  });
+productHateoasService.searchResource('products', 'byName', {
+  params: {
+    projection: 'productProjection',
+    name: 'Fruit'
+  },
+  sort: {
+    name: 'ASC'
+  },
+  // useCache: true | false, when cache is enable then by default true, false otherwise
+})
+  .subscribe((product: Product) => {
+    // some logic
+  });
+
+```
+
+#### Search resource collection
+
+This method uses for searching a collection of resources.
+You don't need to specify `/search` part of the URL it will be added automatically
+
+With `GetOption` you can pass `projection` param (see below).
+
+Method signature:
+
+````
+searchCollection(searchQuery: string, options?: GetOption): Observable<ResourceCollection<T>>;
+````
+
+- `searchQuery` - additional part of the url that wll be follow after `/search/` resource url.
+- `options` - you can pass additional options that will be applied to the request, more about `GetOption` see [here]().
+- `return value` - collection of resources with type `T` 
+- `throws error` when returned value is not [ResourceCollection]()
+
+Example of usage ([given the presets]()):
+
+```
+// Will be perform GET request to the http://localhost:8080/api/v1/products/search/searchQuery 
+productService.searchCollection('searchQuery')
+    .subscribe((collection: ResourceCollection<Product>) => {
+        const products: Array<Product> = collection.resources;
+        // some logic
+    }
+productHateoasService.searchCollection('products', 'searchQuery')
+    .subscribe((collection: ResourceCollection<Product>) => {
+        const products: Array<Product> = collection.resources;
+        // some logic
+    }
+
+// Will be perform GET request to the http://localhost:8080/api/v1/products/search/byName?name=Fruit&projection=productProjection&sort=name,ASC
+productService.searchCollection('byName', {
+  params: {
+    name: 'Fruit'
+    projection: 'productProjection',
+  },
+  sort: {
+    name: 'ASC'
+  },
+  // useCache: true | false, when cache is enable then by default true, false otherwise
+}).subscribe((collection: ResourceCollection<Product>) => {
+    const products: Array<Product> = collection.resources;
+    // some logic
+});
+productHateoasService.searchCollection('products', 'byName', {
+  params: {
+    name: 'Fruit'
+    projection: 'productProjection',
+  },
+  sort: {
+    name: 'ASC'
+  },
+  // useCache: true | false, when cache is enable then by default true, false otherwise
+}).subscribe((collection: ResourceCollection<Product>) => {
+    const products: Array<Product> = collection.resources;
+    // some logic
+});
+
+```
+
+#### Search resource page
+This method uses for searching a paged collection of resources.
+You don't need to specify `/search` part of the URL it will be added automatically
+
+With `PagedGetOption` you can pass `projection` param (see below).
+
+Method signature:
+
+````
+searchPage(searchQuery: string, options?: PagedGetOption): Observable<PagedResourceCollection<T>>;
+````
+
+- `searchQuery` - additional part of the url that wll be follow after `/search/` resource url.
+- `options` - you can pass additional options that will be applied to the request, more about `PagedGetOption` see [here]()
+- `return value` - [PagedResourceCollection]() paged collection of resources with type `T` 
+- `throws error` when returned value is not [PagedResourceCollection]()
+
+Example of usage ([given the presets]()):
+
+```
+// Will be perform GET request to the http://localhost:8080/api/v1/products/search/searchQuery?page=0&size=20
+productService.searchPage('searchQuery')
+    .subscribe((pagedCollection: PagedResourceCollection<Product>) => {
+        const products: Array<Product> = pagedCollection.resources;
+        // some logic
+    }
+productHateoasService.searchPage('products', 'searchQuery')
+    .subscribe((pagedCollection: PagedResourceCollection<Product>) => {
+        const products: Array<Product> = pagedCollection.resources;
+        // some logic
+    }
+
+// Will be perform GET request to the http://localhost:8080/api/v1/products/search/byName?name=Fruit&projection=productProjection&page=1&size=30&sort=name,ASC
+productService.searchPage('byName', {
+  pageParams: {
+    page: 1,
+    size: 30
+  },
+  params: {
+    name: 'Fruit',
+    projection: 'productProjection',
+  },
+  sort: {
+    name: 'ASC'
+  },
+  // useCache: true | false, when cache is enable then by default true, false otherwise
+}).subscribe((pagedCollection: PagedResourceCollection<Product>) => {
+    const products: Array<Product> = pagedCollection.resources;
+    // some logic
+});
+productHateoasService.searchPage('products', 'byName', {
+  pageParams: {
+    page: 1,
+    size: 40
+  },
+  params: {
+    testParam: 'test',
+    projection: 'productProjection',
+  },
+  sort: {
+    cost: 'ASC'
+  },
+  // useCache: true | false, when cache is enable then by default true, false otherwise
+}).subscribe((pagedCollection: PagedResourceCollection<Product>) => {
+    const products: Array<Product> = pagedCollection.resources;
+    // some logic
+});
+
+```
+
+#### Custom query
+
+This method uses to perform a custom HTTP requests for a resource.
+For example, you can perform a count query use this method (see example below). 
+
+Method signature:
+
+````
+customQuery<R>(method: HttpMethod, query: string, requestBody?: RequestBody<any>, options?: PagedGetOption): Observable<R>;
+````
+
+- `method` - HTTP request method (GET/POST/PUT/PATCH), 
+- `query` - additional part of the url that wll be follow after root resource url.
+- `requestBody` - it uses when `method` is `POST`, `PATCH`, `PUT` to pass request body. See more see about RequestBody [here]().
+- `options` - you can pass additional options that will be applied to the request, more about `GetOption` see [here]()
+- `return value` - generic type `<R>` define return query type. 
+
+Example of usage ([given the presets]()):
+
+```
+// Will be perform GET request to the http://localhost:8080/api/v1/products/search/countAll
+productService.customQuery<number>(HttpMethod.GET, '/search/countAllBy')
+  .subscribe((count: number) => {
+    // some logic        
+  });
+productHateoasService.customQuery<number>('products', HttpMethod.GET, '/search/countAllBy')
+  .subscribe((count: number) => {
+    // some logic        
+  });
+````
+
+#### Custom search query
+This method uses to perform a custom HTTP search requests for a resource.
+For example, you can perform a count query use this method (see example below). 
+
+Method signature:
+
+````
+customSearchQuery<R>(method: HttpMethod, searchQuery: string, requestBody?: RequestBody<any>, options?: PagedGetOption): Observable<R>;
+````
+
+- `method` - HTTP request method (GET/POST/PUT/PATCH), 
+- `searchQuery` - additional part of the url that wll be follow after `/search/` resource url.
+- `requestBody` - it uses when `method` is `POST`, `PATCH`, `PUT` to pass request body. See more see about RequestBody [here]().
+- `options` - you can pass additional options that will be applied to the request, more about `GetOption` see [here]()
+- `return value` - generic type `<R>` define return query type. 
+
+Example of usage ([given the presets]()):
+
+```
+// Will be perform GET request to the http://localhost:8080/api/v1/products/search/countAll
+productService.customSearchQuery<number>(HttpMethod.GET, '/countAllBy')
+  .subscribe((count: number) => {
+    // some logic        
+  });
+productHateoasService.customSearchQuery<number>('products', HttpMethod.GET, '/countAllBy')
+  .subscribe((count: number) => {
+    // some logic        
+  });
+````
+
+### Resource types
+
+#### Resource
+
+#### EmbeddedResource
+
+#### PagedResourceCollection
+
+#### Subtypes support
+
+
+### Resource methods
+
+#### Resource / EmbeddedResource methods
+
+##### Get relation
+
+##### Get related collection
+
+##### Get related page
+
+##### Post relation
+
+##### Patch relation
+
+##### Put relation
+
+#### Resource methods
+
+##### isResourceOf
+
+##### Add relation
+
+##### Update relation
+
+##### Clear collection relation
+
+##### Delete relation
+
+### Library settings
+
+#### Configuration
+
+#### Cache
+
+#### Logging
+
+### Public classes
+
+#### GetOption
+#### GetPagedOption
+#### RequestOption
+#### RequestBody
+#### Sort
+#### SortedPageParam
+
+### Library API
 
 This section describes classes and methods that you can use it you application.
 

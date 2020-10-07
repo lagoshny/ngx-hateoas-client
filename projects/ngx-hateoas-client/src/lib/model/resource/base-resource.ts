@@ -23,7 +23,7 @@ export abstract class BaseResource extends AbstractResource {
    *
    * @param relationName used to get the specific relation link
    * @param options (optional) options that should be applied to the request
-   * @throws error when required params are not valid or no link is found by passed relation name
+   * @throws error when required params are not valid or link not found by relation name
    */
   public getRelation<T extends BaseResource>(relationName: string,
                                              options?: GetOption
@@ -47,7 +47,7 @@ export abstract class BaseResource extends AbstractResource {
    *
    * @param relationName used to get the specific relation link
    * @param options (optional) options that will be applied to the request
-   * @throws error when required params are not valid or no link is found by passed relation name
+   * @throws error when required params are not valid or link not found by relation name
    */
   public getRelatedCollection<T extends ResourceCollection<BaseResource>>(relationName: string,
                                                                           options?: GetOption
@@ -72,7 +72,7 @@ export abstract class BaseResource extends AbstractResource {
    * @param relationName used to get the specific relation link
    * @param options (optional) additional options that should be applied to the request
    *        if options didn't contains {@link PageParam} then will be used default page params.
-   * @throws error when required params are not valid or no link is found by passed relation name
+   * @throws error when required params are not valid or link not found by relation name
    */
   public getRelatedPage<T extends PagedResourceCollection<BaseResource>>(relationName: string,
                                                                          options?: PagedGetOption): Observable<T> {
@@ -96,11 +96,11 @@ export abstract class BaseResource extends AbstractResource {
    * @param relationName used to get the specific relation link
    * @param requestBody that contains the body directly and optional body values option {@link ValuesOption}
    * @param options (optional) request options that will be applied to the request
-   * @throws error when required params are not valid or no link is found by passed relation name
+   * @throws error when required params are not valid or link not found by relation name
    */
   public postRelation(relationName: string,
                       requestBody: RequestBody<any>,
-                      options?: RequestOption): Observable<any> {
+                      options?: RequestOption): Observable<HttpResponse<any> | any> {
     StageLogger.resourceBeginLog(this, 'POST_RELATION', {relationName, requestBody, options});
     ValidationUtils.validateInputParams({relationName, requestBody});
 
@@ -126,11 +126,11 @@ export abstract class BaseResource extends AbstractResource {
    * @param requestBody contains the body directly and body values option {@link ValuesOption}
    *        to clarify what specific values need to be included or not included in result request body
    * @param options (optional) request options that will be applied to the request
-   * @throws error when required params are not valid or no link is found by passed relation name
+   * @throws error when required params are not valid or link not found by relation name
    */
   public patchRelation(relationName: string,
                        requestBody: RequestBody<any>,
-                       options?: RequestOption): Observable<any> {
+                       options?: RequestOption): Observable<HttpResponse<any> | any> {
     StageLogger.resourceBeginLog(this, 'PATCH_RELATION', {relationName, requestBody, options});
     ValidationUtils.validateInputParams({relationName, requestBody});
 
@@ -156,11 +156,11 @@ export abstract class BaseResource extends AbstractResource {
    * @param requestBody contains the body directly and body values option {@link ValuesOption}
    *        to clarify what specific values need to be included or not included in result request body
    * @param options (optional) request options that will be applied to the request
-   * @throws error when required params are not valid or no link is found by passed relation name
+   * @throws error when required params are not valid or link not found by relation name
    */
   public putRelation(relationName: string,
                      requestBody: RequestBody<any>,
-                     options?: RequestOption): Observable<any> {
+                     options?: RequestOption): Observable<HttpResponse<any> | any> {
     StageLogger.resourceBeginLog(this, 'PUT_RELATION', {relationName, requestBody, options});
     ValidationUtils.validateInputParams({relationName, requestBody});
 

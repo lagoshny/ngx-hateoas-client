@@ -55,7 +55,7 @@ export class Resource extends BaseResource {
    *
    * @param relationName used to get the specific resource relation link to the resource collection
    * @param entities one or more entities that should be added to the resource collection
-   * @throws error when required params are not valid or no link is found by passed relation name
+   * @throws error when required params are not valid or link not found by relation name
    */
   public addRelation<T extends Resource>(relationName: string, entities: Array<T>): Observable<HttpResponse<any>> {
     StageLogger.resourceBeginLog(this, 'ADD_RELATION', {relationName, resourceLinks: this._links, entities});
@@ -84,7 +84,7 @@ export class Resource extends BaseResource {
    *
    * @param relationName with which should be updated
    * @param entity new value of entity
-   * @throws error when required params are not valid or no link is found by passed relation name
+   * @throws error when required params are not valid or link not found by relation name
    */
   public updateRelation<T extends Resource>(relationName: string, entity: T): Observable<HttpResponse<any>> {
     StageLogger.resourceBeginLog(this, 'UPDATE_RELATION', {relationName, resourceLinks: this._links, entity});
@@ -108,7 +108,7 @@ export class Resource extends BaseResource {
    *
    * @param relationName with which will be associated passed entity to this resource
    * @param entity that should be bind to this resource
-   * @throws error when required params are not valid or no link is found by passed relation name
+   * @throws error when required params are not valid or link not found by relation name
    */
   public bindRelation<T extends Resource>(relationName: string, entity: T): Observable<HttpResponse<any>> {
     StageLogger.resourceBeginLog(this, 'BIND_RELATION', {relationName, resourceLinks: this._links, entity});
@@ -131,7 +131,7 @@ export class Resource extends BaseResource {
    * Unbind all resources from collection by the relation name.
    *
    * @param relationName used to get relation link to unbind
-   * @throws error when required params are not valid or no link is found by passed relation name
+   * @throws error when required params are not valid or link not found by relation name
    */
   public clearCollectionRelation<T extends Resource>(relationName: string): Observable<HttpResponse<any>> {
     StageLogger.resourceBeginLog(this, 'CLEAR_COLLECTION_RELATION', {relationName, resourceLinks: this._links});
@@ -157,7 +157,7 @@ export class Resource extends BaseResource {
    *
    * @param relationName used to get relation link to unbind
    * @param entity that should be unbind from this resource
-   * @throws error when required params are not valid or no link is found by passed relation name
+   * @throws error when required params are not valid or link not found by relation name
    */
   public deleteRelation<T extends Resource>(relationName: string, entity: T): Observable<HttpResponse<any>> {
     StageLogger.resourceBeginLog(this, 'DELETE_RELATION', {relationName, resourceLinks: this._links, entity});

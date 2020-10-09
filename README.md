@@ -1634,6 +1634,53 @@ cart.putRelation('putExample', {
 
 #### Resource
 
+This is the main resource class. You need to extend model classes with this class to have the ability to use resource methods.
+
+The difference between this type and [EmbeddedResource]() is resource class has a self link therefore it has an id property.
+Usually, resource class is `@Entity` server-side classes and [EmbeddedResource]() is `@Embeddable` entities that have not an id properties.
+
+Resource class extend [BaseResource]() with additional resource relations methods that can be used only with `resource type`.
+
+##### IsResourceOf
+
+This method uses when resource has sub-types, and you want to know what type current resource has.
+You can read more about sub-types [here]().
+
+>Each [Resource]() has private property is `resourceName` that calculated by the URL which resource was get.
+Suppose to get `Cart` resource will be used the next URL: `http://localhost:8080/api/v1/carts/1`.
+Then `Cart.resourceName` will be equals to `carts` because this part of the URL represents the resource name.
+
+Method signature:
+
+````
+isResourceOf<T extends Resource>(typeOrName: (new () => T) | string): boolean
+````
+- `typeOrName` - can be as a resource type or the simple string that represent resource name.
+                 If you pass resource type for example `someResource.isResourceOf(CartPayment)` then class name will be used to compare with the resource name (ignoring letter case).
+                 If you pass resource name as a string then it will be used to compare with resource name with (ignoring letter case).
+- `return value` - `true` when resource name equals passed value, `false` otherwise. 
+
+Example of usage ([given the presets]()):
+
+```
+// Suppose was perform GET request to get the Cart resource by the url http://localhost:8080/api/v1/carts/1
+
+cart.isResourceOf('carts'); // return TRUE
+cart.isResourceOf('cart'); // return FALSE
+cart.isResourceOf(Cart); // return FALSE because Cart class name = 'cart'
+
+```
+
+##### AddRelation
+
+##### UpdateRelation
+
+##### ClearCollectionRelation
+
+##### DeleteRelation
+
+
+
 #### EmbeddedResource
 
 #### ResourceCollection
@@ -1647,15 +1694,6 @@ cart.putRelation('putExample', {
 
 #### Resource methods
 
-##### isResourceOf
-
-##### Add relation
-
-##### Update relation
-
-##### Clear collection relation
-
-##### Delete relation
 
 ### Library settings
 

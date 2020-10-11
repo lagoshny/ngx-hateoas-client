@@ -1673,13 +1673,163 @@ cart.isResourceOf(Cart); // return FALSE because Cart class name = 'cart'
 
 ##### AddRelation
 
+This method uses to add passed entities (they should exist) to the resource collection behind the relation name.
+
+Method signature:
+
+````
+addRelation<T extends Resource>(relationName: string, entities: Array<T>): Observable<HttpResponse<any>>;
+````
+
+- `relationName` - resource relation name that should be used to get resource collection for add new entities.
+- `entities` - an array of entities that should be added 
+- `return value` - Angular `HttpResponse` with operation result.
+
+Request URL is a relation link URL for passed relation name. As a request body, an array of entities' self-link will be used.
+
+Example of usage ([given the presets]()):
+
+```
+/* 
+ Will be perform POST request to the http://localhost:8080/api/v1/carts/1/products
+ Content-type: 'text/uri-list'
+ Body: [http://localhost:8080/api/v1/products/1, http://localhost:8080/api/v1/products/2]
+*/
+// Suppose product1 already exists and it has an id = 1
+const product1 = ...;
+// Suppose product2 already exists and it has an id = 2
+const product2 = ...;
+
+cart.addRelation('products', [product1, product2])
+  .subscribe((result: HttpResponse<any>) => {
+     // some logic            
+  });
+```
+
 ##### UpdateRelation
 
+This method uses to update exist resource relation value.
+
+Method signature:
+
+````
+updateRelation<T extends Resource>(relationName: string, entity: T): Observable<HttpResponse<any>>;
+````
+
+- `relationName` - resource relation name that should be used to get resource relation for value update.
+- `entity` - new entity 
+- `return value` - Angular `HttpResponse` with operation result.
+
+Request URL is a relation link URL for passed relation name. 
+As a request body passed entity self-link will be used.
+
+Example of usage ([given the presets]()):
+
+```
+/* 
+ Will be perform PATCH request to the http://localhost:8080/api/v1/carts/1/shop
+ Content-type: 'text/uri-list'
+ Body: http://localhost:8080/api/v1/shops/2
+*/
+// Suppose newShop already exists and it has an id = 2
+const newShop = ...;
+cart.updateRelation('shop', newShop)
+  .subscribe((result: HttpResponse<any>) => {
+     // some logic            
+  });
+
+```
+##### BindRelation
+
+This method uses to bind the passed entity to this resource for passed relation name.
+
+Method signature:
+
+````
+bindRelation<T extends Resource>(relationName: string, entity: T): Observable<HttpResponse<any>>;
+````
+
+- `relationName` - resource relation name that should be used to get resource relation for bind an entity.
+- `entity` - entity to bind
+- `return value` - Angular `HttpResponse` with operation result.
+
+Request URL is a relation link URL for passed relation name. 
+As a request body passed entity self-link will be used.
+
+Example of usage ([given the presets]()):
+
+```
+/* 
+ Will be perform PUT request to the http://localhost:8080/api/v1/carts/1/shop
+ Content-type: 'text/uri-list'
+ Body: http://localhost:8080/api/v1/shops/1
+*/
+// Suppose shopToBind already exists and it has an id = 1
+const shopToBind = ...;
+cart.bindRelation('shop', shopToBind)
+  .subscribe((result: HttpResponse<any>) => {
+     // some logic            
+  });
+
+```
+
 ##### ClearCollectionRelation
+This method uses to unbind all resources from resource collection behind resource name.
+
+Method signature:
+
+````
+clearCollectionRelation<T extends Resource>(relationName: string): Observable<HttpResponse<any>>;
+````
+
+- `relationName` - resource relation name that should be used to get resource collection for unbind all entities.
+- `return value` - Angular `HttpResponse` with operation result.
+
+Request URL is a relation link URL for passed relation name. 
+
+Example of usage ([given the presets]()):
+
+```
+/* 
+ Will be perform PUT request to the http://localhost:8080/api/v1/carts/1/products
+ Content-type: 'text/uri-list'
+ Body: ''
+*/
+cart.clearCollectionRelation('products')
+  .subscribe((result: HttpResponse<any>) => {
+     // some logic            
+  });
+
+```
 
 ##### DeleteRelation
+This method uses to unbind all resources from resource collection behind resource name.
 
+Method signature:
 
+````
+deleteRelation<T extends Resource>(relationName: string, entity: T): Observable<HttpResponse<any>>;
+````
+
+- `relationName` - resource relation name that should be used to get resource relation for unbind an entity.
+- `entity` - entity to delete
+- `return value` - Angular `HttpResponse` with operation result.
+
+Request URL is a relation link URL for passed relation name. 
+As a request body passed entity self-link will be used.
+
+Example of usage ([given the presets]()):
+
+```
+// Will be perform DELETE request to the http://localhost:8080/api/v1/carts/1/shop/1
+// Suppose shopToDelete already exists and it has an id = 1
+const shopToDelete = ...;
+cart.deleteRelation('shop', shopToDelete)
+  .subscribe((result: HttpResponse<any>) => {
+     // some logic            
+  });
+
+```
 
 #### EmbeddedResource
 

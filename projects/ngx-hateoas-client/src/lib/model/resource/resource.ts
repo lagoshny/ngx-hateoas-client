@@ -80,7 +80,7 @@ export class Resource extends BaseResource {
   }
 
   /**
-   * Update the passed entity by the relation name in this resource
+   * Update exist resource relation value.
    *
    * @param relationName with which should be updated
    * @param entity new value of entity

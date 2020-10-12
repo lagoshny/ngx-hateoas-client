@@ -2311,11 +2311,81 @@ This section describes library configuration params, and some library features t
 
 #### Configuration
 
+You can pass the next params to configure the library.
 
+````
+  http: {
+    rootUrl: string;
+    proxyUrl?: string;
+  };
+  logs?: {
+    verboseLogs?: boolean;
+  };
+  cache?: {
+    enabled: boolean;
+    lifeTime?: number;
+  };
+````
+##### Http params
+
+`rootUrl` (required) - defines root server URL that will be used to perform resource requests.
+`proxyUrl` (optional) -  defines proxy URL that uses to change rootUrl to proxyUrl when getting a relation link.
+
+##### Logging params
+
+`verboseLogs` - to debug lib requests you can enable logging to the console. When logging is enabling then all resource request stages will be printed.
+
+> See more about logging [here]().
+
+##### Cache params
+
+`enabled` - when passed `true` then will be use cache for `GET` requests, `false` by default.
+`lifeTime` - by default cache lifetime is 300 000 seconds (=5 minutes) after which the cache will be expired.
+
+> See more about caching [here]().
 
 #### Cache
+The library supports caching `GET` request response values.
+By default, the cache disabled. 
+To enable you need to pass `cache.enabled = true` with library configuration. Also, you can manage the cache expired time with `cache.lifeTime` param.
+
+> More about the cache configuration see [here](). 
+
+Methods with options types `GetOption` or `PagedGetOption` has additional param `useCache` that allows to manage the cache.
+By default `useCache` has `true` value, but when the cache disabled then it param ignored.
+
+##### How it works?
+After performs `GET` request to get the resource or resource collection or paged resource collection response value will be put to the cache map.
+The cache map key is `CacheKey` object that holds full request url and all request options.  
+The cache map value is `raw hal-json` response.
+
+When you perform the same `GET` request twice (to get resource or resource collection or paged resource collection). The first request hits the server to get the result, but  the second request doesn't hit the server and result got from the cache.
+When you perform `POST`, `PATCH`, `PUT`, `DELETE` requests for some resource than all saved cache values for this resource will be evicted.
+
+> You can know when resource result got from the server or got from the cache enable the library [verboseLogs]() param.
+> See more about logging [here]().                                                                                                                      
 
 #### Logging
+
+You can use library logging to debug library.
+To enable logging set `logs.verboseLogs` to `true` value see more [here]().
+
+There are several logging stages:
+
+- `BEGIN` - the first stage, logs when method invoked
+- `CHECK_PARAMS` - on this stage logs input params validation errors
+- `PREPARE_URL` - on this stage logs parts of generated request URL from `rootUrl`/`proxyUrl`, `resource name` and passed options
+- `PREPARE_PARAMS` - on this stage logs applying default request params
+- `INIT_RESOURCE` - logs when on initializing resource from a response errors occurs
+- `RESOLVE_VALUES` - logs stage when resolve request body resource relations from resource object to resource link url.
+- `CACHE_PUT` - logs a value saved to the cache
+- `CACHE_GET` - logs a received value from the cache
+- `CACHE_EVICT` - logs an evicted value from the cache
+- `HTTP_REQUEST` - logs HTTP request params
+- `HTTP_RESPONSE` - logs raw HTTP response data 
+- `END` - the last stage, logs when method invoke was successful
+
+With logging, you can find out was a value fetched from the cache or the server, how resource relationships resolved etc.
 
 ### Public classes
 

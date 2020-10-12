@@ -2307,7 +2307,11 @@ cart.getRelation('client')
 
 ### Library settings
 
+This section describes library configuration params, and some library features that you can enable/disable when you need it.
+
 #### Configuration
+
+
 
 #### Cache
 

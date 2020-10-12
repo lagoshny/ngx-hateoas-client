@@ -351,7 +351,7 @@ productHateoasService.getCollection('products', {
 
 This method uses for getting a paged collection of resources [PagedResourceCollection]().
 With `PagedGetOption` you can pass `projection` param (see below).
->If you don't pass `pageParams` with `PagedGetOption` then will be used default page options: page = 0, size = 20. 
+>If you don't pass `pageParams` with `PagedGetOption` then will be used [default page options](). 
 
 Method signature:
 
@@ -1444,7 +1444,7 @@ cart.getRelatedCollection<ResourceCollection<Product>>('products', {
 ##### GetRelatedPage
 This method uses to get related resource collection by relation name.
 With `PagedGetOption` you can pass `projection` param (see below).
->If you don't pass `pageParams` with `PagedGetOption` then will be used default page options: page = 0, size = 20. 
+>If you don't pass `pageParams` with `PagedGetOption` then will be used [default page options](). 
 
 Method signature:
 
@@ -1832,18 +1832,392 @@ cart.deleteRelation('shop', shopToDelete)
 ```
 
 #### EmbeddedResource
+This resource type uses when a server-side entity is [@Embeddable](https://docs.jboss.org/hibernate/orm/5.0/userguide/html_single/chapters/domain/embeddables.html).
+It means that this entity has not an id property and can't exist standalone.
+Because embedded resources have not an id then it can use only [BaseResource]() methods.
 
 #### ResourceCollection
+This resource type represents collection of resources.
+You can get this type as result [GetRelatedCollection](), [GetResourceCollection]() or perform [CustomQuery]()/[CustomSearchQuery]() with passed return type as ResourceCollection.
+
+Resource collection holds resources in the public property with the name `resources`.
 
 #### PagedResourceCollection
+This resource type represents paged collection of resources.
+You can get this type as result [GetRelatedPage](), [GetResourcePage]() or perform [CustomQuery]()/[CustomSearchQuery]() with passed return type as PagedResourceCollection.
+
+PagedResourceCollection extends [ResourceCollection]() type and adds methods to work with a page.  
+
+##### Default page values
+
+In any page methods when you don't pass `page` or `size` params then will be used the next default values: `page = 0`, `size = 20`.
+
+> When you already used custom value for `page` or `size` param then it will be used for the next page request if you don't pass it. 
+
+##### HasFirst
+
+Method checks that `PagedResourceCollection` has the link to get the first page result.
+
+Method signature:
+
+````
+hasFirst(): boolean;
+````
+
+return `true` when the link to get the first page is exist, `false` otherwise.
+
+##### HasLast
+
+Method checks that `PagedResourceCollection` has the link to get the last page result.
+
+Method signature:
+
+````
+hasLast(): boolean;
+````
+
+return `true` when the link to get the last page is exist, `false` otherwise.
+
+##### HasNext
+
+Method checks that `PagedResourceCollection` has the link to get the next page result.
+
+Method signature:
+
+````
+hasNext(): boolean;
+````
+
+return `true` when the link to get the next page is exist, `false` otherwise.
+
+##### HasPrev
+
+Method checks that `PagedResourceCollection` has the link to get the previous page result.
+
+Method signature:
+
+````
+hasPrev(): boolean;
+````
+
+return `true` when the link to get the previous page is exist, `false` otherwise.
+
+##### First
+This method performs a request to get the first-page result by the first-page link.
+
+Method signature:
+
+````
+first(options?: {useCache: true;}): Observable<PagedResourceCollection<T>>;
+````
+
+- `options` - you can pass additional options that influence to use of cache when get result or not (by default will be used a cache)
+- `return value` - [PagedResourceCollection]() paged collection of resources with type `T` 
+- `throws error` - when a link to get the first-page result is not exist
+
+Example of usage:
+
+Suppose we have 3 pages with 20 resources per page. We are now on the page = 2 and want to get the first page of `product` resource.
+In this case, the `first method` passes only page param = 0, for size param used previous value or [default value]() it depends on was passed size param before or not. 
+
+```ts
+// Will be perform GET request to the http://localhost:8080/api/v1/products?page=0&size=20
+const pagedProductCollection = ...;
+pagedProductCollection.first()
+  .subscribe((firstPageResult: PagedResourceCollection<Product>) => {
+     // firstPageResult can be fetched from a cache if before was performing the same request
+     // some logic        
+  });
+
+// Will be perform GET request to the http://localhost:8080/api/v1/products?page=0&size=20
+const pagedProductCollection = ...;
+pagedProductCollection.first({useCache: false})
+  .subscribe((firstPageResult: PagedResourceCollection<Product>) => {
+     // firstPageResult always will be fetched from the server because we disable a cache for this request
+     // some logic        
+  });
+```
+
+##### Last
+This method performs a request to get the last-page result by the last-page link.
+
+Method signature:
+
+````
+last(options?: {useCache: true;}): Observable<PagedResourceCollection<T>>;
+````
+
+- `options` - you can pass additional options that influence to use of cache when get result or not (by default will be used a cache)
+- `return value` - [PagedResourceCollection]() paged collection of resources with type `T` 
+- `throws error` - when a link to get the last-page result is not exist
+
+Example of usage:
+
+Suppose we have 3 pages with 20 resources per page. We are now on the page = 0 and want to get the last page of `product` resource.
+In this case, the `last method` passes only page param = 2, for size param used previous value or [default value]() it depends on was passed size param before or not. 
+
+```ts
+// Will be perform GET request to the http://localhost:8080/api/v1/products?page=2&size=20
+const pagedProductCollection = ...;
+pagedProductCollection.last()
+  .subscribe((lastPageResult: PagedResourceCollection<Product>) => {
+     // lastPageResult can be fetched from a cache if before was performing the same request
+     // some logic        
+  });
+
+// Will be perform GET request to the http://localhost:8080/api/v1/products?page=2&size=20
+const pagedProductCollection = ...;
+pagedProductCollection.last({useCache: false})
+  .subscribe((lastPageResult: PagedResourceCollection<Product>) => {
+     // lastPageResult always will be fetched from the server because we disable a cache for this request
+     // some logic        
+  });
+```
+
+##### Next
+This method performs a request to get the next-page result by the next-page link.
+
+Method signature:
+
+````
+next(options?: {useCache: true;}): Observable<PagedResourceCollection<T>>;
+````
+
+- `options` - you can pass additional options that influence to use of cache when get result or not (by default will be used a cache)
+- `return value` - [PagedResourceCollection]() paged collection of resources with type `T` 
+- `throws error` - when a link to get the next-page result is not exist
+
+Example of usage:
+
+Suppose we have 3 pages with 20 resources per page. We are now on the page = 0 and want to get the next page of `product` resource.
+In this case, the `next method` passes only page param = 1, for size param used previous value or [default value]() it depends on was passed size param before or not. 
+
+```ts
+// Will be perform GET request to the http://localhost:8080/api/v1/products?page=1&size=20
+const pagedProductCollection = ...;
+pagedProductCollection.next()
+  .subscribe((nextPageResult: PagedResourceCollection<Product>) => {
+     // nextPageResult can be fetched from a cache if before was performing the same request
+     // some logic        
+  });
+
+// Will be perform GET request to the http://localhost:8080/api/v1/products?page=1&size=20
+const pagedProductCollection = ...;
+pagedProductCollection.next({useCache: false})
+  .subscribe((nextPageResult: PagedResourceCollection<Product>) => {
+     // nextPageResult always will be fetched from the server because we disable a cache for this request
+     // some logic        
+  });
+```
+
+##### Prev
+This method performs a request to get the prev-page result by the prev-page link.
+
+Method signature:
+
+````
+prev(options?: {useCache: true;}): Observable<PagedResourceCollection<T>>;
+````
+
+- `options` - you can pass additional options that influence to use of cache when get result or not (by default will be used a cache)
+- `return value` - [PagedResourceCollection]() paged collection of resources with type `T` 
+- `throws error` - when a link to get the prev-page result is not exist
+
+Example of usage:
+
+Suppose we have 3 pages with 20 resources per page. We are now on the page = 1 and want to get the prev page of `product` resource.
+In this case, the `prev method` passes only page param = 1, for size param used previous value or [default value]() it depends on was passed size param before or not. 
+
+```ts
+// Will be perform GET request to the http://localhost:8080/api/v1/products?page=0&size=20
+const pagedProductCollection = ...;
+pagedProductCollection.prev()
+  .subscribe((prevPageResult: PagedResourceCollection<Product>) => {
+     // prevPageResult can be fetched from a cache if before was performing the same request
+     // some logic        
+  });
+
+// Will be perform GET request to the http://localhost:8080/api/v1/products?page=0&size=20
+const pagedProductCollection = ...;
+pagedProductCollection.prev({useCache: false})
+  .subscribe((prevPageResult: PagedResourceCollection<Product>) => {
+     // prevPageResult always will be fetched from the server because we disable a cache for this request
+     // some logic        
+  });
+```
+
+##### Page
+This method performs a request to get the page with passed page number and current page size.
+
+>If you need with a page param pass custom size or sort params then use [customPage]() method.
+
+Method signature:
+
+````
+page(pageNumber: number, options?: {useCache: true;}): Observable<PagedResourceCollection<T>>;
+````
+
+- `pageNumber` - number of the page to need to get
+- `options` - you can pass additional options that influence to use of cache when get result or not (by default will be used a cache)
+- `return value` - [PagedResourceCollection]() paged collection of resources with type `T` 
+- `throws error` - when you pass page number great than total pages
+
+Example of usage:
+
+Suppose we have 5 pages with 20 resources per page. We are now on the page = 1 and want to get the page = 3 of `product` resource.
+In this case, the `page method` passes only page param = 3, for size param used previous value or [default value]() it depends on was passed size param before or not. 
+
+```ts
+// Will be perform GET request to the http://localhost:8080/api/v1/products?page=3&size=20
+const pagedProductCollection = ...;
+pagedProductCollection.page(3)
+  .subscribe((customPageResult: PagedResourceCollection<Product>) => {
+     // customPageResult can be fetched from a cache if before was performing the same request
+     // some logic        
+  });
+
+// Will be perform GET request to the http://localhost:8080/api/v1/products?page=3&size=20
+const pagedProductCollection = ...;
+pagedProductCollection.page(3, {useCache: false})
+  .subscribe((customPageResult: PagedResourceCollection<Product>) => {
+     // customPageResult always will be fetched from the server because we disable a cache for this request
+     // some logic        
+  });
+```
+##### Size
+This method performs a request to get the page with passed page size and current page number.
+
+>If you need with size param pass custom page or sort params then use [customPage]() method.
+
+Method signature:
+
+````
+size(size: number, options?: {useCache: true;}): Observable<PagedResourceCollection<T>>;
+````
+
+- `size` - number of resources for current page
+- `options` - you can pass additional options that influence to use of cache when get result or not (by default will be used a cache)
+- `return value` - [PagedResourceCollection]() paged collection of resources with type `T` 
+- `throws error` - when you pass page size greater than total count resources
+
+Example of usage:
+
+Suppose we have 5 pages with 20 resources per page. We are now on the page = 1, size = 20  and want to get more `product` resources for the current page for example 50.
+In this case, the `size method` passes only size param = 50, for a page param used previous value or [default value]() it depends on was passed a page param before or not. 
+
+```ts
+// Will be perform GET request to the http://localhost:8080/api/v1/products?page=1&size=50
+const pagedProductCollection = ...;
+pagedProductCollection.size(50)
+  .subscribe((customPageResult: PagedResourceCollection<Product>) => {
+     // customPageResult can be fetched from a cache if before was performing the same request
+     // some logic        
+  });
+
+// Will be perform GET request to the http://localhost:8080/api/v1/products?page=1&size=50
+const pagedProductCollection = ...;
+pagedProductCollection.size(50, {useCache: false})
+  .subscribe((customPageResult: PagedResourceCollection<Product>) => {
+     // customPageResult always will be fetched from the server because we disable a cache for this request
+     // some logic        
+  });
+```
+
+##### SortElements
+This method allows sort current page result.
+
+>If you need with sort param pass custom page or size params then use [customPage]() method.
+
+Method signature:
+
+````
+sortElements(sortParam: Sort, options?: {useCache: true;}): Observable<PagedResourceCollection<T>>;
+````
+
+- `sortParam` - [sort]() params
+- `options` - you can pass additional options that influence to use of cache when get result or not (by default will be used a cache)
+- `return value` - [PagedResourceCollection]() paged collection of resources with type `T` 
+
+Example of usage:
+
+Suppose we have 5 pages with 20 resources per page. We are now on the page = 1, size = 20  and want to sort `product` resources for the current page.
+In this case, the `sortElements method` passes the same size and page values and added sort params.
+
+```ts
+// Will be perform GET request to the http://localhost:8080/api/v1/products?page=1&size=20&sort=cost,ASC&sort=name,DESC
+const pagedProductCollection = ...;
+pagedProductCollection.sortElements({cost: 'ASC', name: 'DESC'})
+  .subscribe((customPageResult: PagedResourceCollection<Product>) => {
+     // customPageResult can be fetched from a cache if before was performing the same request
+     // some logic        
+  });
+
+// Will be perform GET request to the http://localhost:8080/api/v1/products?page=1&size=20&sort=cost,ASC&sort=name,DESC
+const pagedProductCollection = ...;
+pagedProductCollection.sortElements({cost: 'ASC', name: 'DESC'}, {useCache: false})
+  .subscribe((customPageResult: PagedResourceCollection<Product>) => {
+     // customPageResult always will be fetched from the server because we disable a cache for this request
+     // some logic        
+  });
+```
+
+##### CustomPage
+This method allows pass custom values for page, size, sort params.
+
+Method signature:
+
+````
+customPage(params: SortedPageParam, options?: {useCache: true;}): Observable<PagedResourceCollection<T>>;
+````
+
+- `params` - contains page, sort, size params, more see [here]()
+- `options` - you can pass additional options that influence to use of cache when get result or not (by default will be used a cache)
+- `return value` - [PagedResourceCollection]() paged collection of resources with type `T` 
+- `throws error` - when you pass page size, greater than total count resources or page number greater than total pages.
+
+> When you pass only part of the `params` the [default page params]() will be used for not passed.
+
+Example of usage:
+
+Suppose we have 5 pages with 20 resources per page. We are now on the page = 1, size = 20. We want to get page = 2 with size = 30 and sort result by name.
+
+```ts
+// Will be perform GET request to the http://localhost:8080/api/v1/products?page=2&size=30&sort=name,ASC
+const pagedProductCollection = ...;
+pagedProductCollection.customPage({
+    pageParams: {
+      page: 2,
+      size: 30
+    },
+    sort: {
+      name: 'ASC'
+    }
+  })
+  .subscribe(value1 => {
+     // customPageResult can be fetched from a cache if before was performing the same request
+     // some logic      
+  });
+
+// Will be perform GET request to the http://localhost:8080/api/v1/products?page=2&size=30&sort=name,ASC
+const pagedProductCollection = ...;
+pagedProductCollection.customPage({
+    pageParams: {
+      page: 2,
+      size: 30
+    },
+    sort: {
+      name: 'ASC'
+    }
+  },
+  {useCache: true})
+  .subscribe(value1 => {
+     // customPageResult always will be fetched from the server because we disable a cache for this request
+     // some logic  
+  });
+
+```
 
 #### Subtypes support
-
-
-### Resource methods
-
-#### Resource methods
-
 
 ### Library settings
 

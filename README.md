@@ -2219,6 +2219,92 @@ pagedProductCollection.customPage({
 
 #### Subtypes support
 
+Library allows you work with entities hierarchy.
+Suppose you have the next resources:
+
+```
+ import { Resource } from '@lagoshny/ngx-hal-client';
+  
+  export class Cart extends Resource {
+  
+      public client: Client;
+  
+  }
+  
+  export class Client extends Resource {
+  
+    public address: string;
+  
+  }
+  
+  export class PhysicalClient extends Client {
+  
+    public fio: string;
+  
+  }
+  
+  export class JuridicalClient extends Client {
+  
+    public inn: string;
+  
+  }
+ 
+  ```
+
+And their `hal-json` representation:
+  
+  ```
+  Cart:
+  {
+    "status": "New",
+    "_links": {
+      "self": {
+        "href": "http://localhost:8080/api/v1/carts/1"
+      },
+      "cart": {
+        "href": "http://localhost:8080/api/v1/carts/1{?projection}",
+        "templated": true
+      },
+      "client": {
+        "href": "http://localhost:8080/api/v1/carts/1/physicalClient"
+      }
+    }
+  }
+  
+  PhysicalClient:
+  {
+    "fio": "Some fio",
+    "_links": {
+      "self": {
+        "href": "http://localhost:8080/api/v1/physicalClients/1"
+      },
+      "physicalClient": {
+        "href": "http://localhost:8080/api/v1/physicalClients/1"
+      }
+    }
+  }
+  ```  
+From example below you can note that the `Cart` resource has the `client` property with type `Client`.
+In its turn `client` can have one of types `PhysicalClient` or `JuridicalClient`.
+You can use [Resource.isResourceOf]() method to know what `client` resource type you got.
+
+Example of usage ([given the presets]()):
+
+```
+// Suppose we have some cart resource and we want to get client relation and know what is the client type
+const cart = ...
+cart.getRelation('client')
+  .subscribe((client: Client) => {
+    if (client.isResourceOf('physicalClients')) {
+      const physicalClient = client as PhysicalClient;
+    // some logic        
+    } else if (client.isResourceOf('juridicalClients')) {
+      const juridicalClient = client as JuridicalClient;
+    // some logic        
+    }
+  });
+```
+
 ### Library settings
 
 #### Configuration

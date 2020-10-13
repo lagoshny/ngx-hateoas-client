@@ -12,7 +12,84 @@ This client compatible with Java server-side applications based on [Spring HATEO
 You can find out about the motivation to create a new client [here]().
 To migrate from `@lagoshny/ngx-hal-client` to this client you can use the [migration guide](https://github.com/lagoshny/ngx-hateoas-client/blob/master/migration.md).
 
-## Getting-started
+## Contents
+1. [Changelog](#Changelog)
+2. [Getting started](#Getting started)
+   1. [Installation](#Installation)
+   2. [Configuration](#Configuration)
+   3. [Usage](#Usage)
+      1. [Define resource classes](#Define resource classes)
+      2. [Universal HateoasResourceService](Universal HateoasResourceService)
+      3. [Create custom Resource service](#Create custom Resource service)
+3. [Library features](#Library features)
+   1. [Resource service](#Resource service)
+      1. [GetResource](#GetResource)
+      2. [GetResourceCollection](#GetResourceCollection)
+      3. [GetResourcePage](#GetResourcePage)
+      4. [CreateResource](#CreateResource)
+      5. [UpdateResource](#UpdateResource)
+      6. [UpdateResourceById](#UpdateResourceById)
+      7. [PatchResource](#PatchResource)
+      8. [PatchResourceById](#PatchResourceById)
+      9. [DeleteResource](#DeleteResource)
+      10. [DeleteResourceById](#DeleteResourceById)
+      11. [SearchResource](#SearchResource)
+      12. [SearchResourceCollection](#SearchResourceCollection)
+      13. [SearchResourcePage](#SearchResourcePage)
+      14. [CustomQuery](#CustomQuery)
+      15. [CustomSearchQuery](#CustomSearchQuery)
+4. [Resource types](#Resource types)        
+   1. [BaseResource](#BaseResource)
+      1. [GetRelation](#GetRelation)
+      2. [GetRelatedCollection](#GetRelatedCollection)
+      3. [GetRelatedPage](#GetRelatedPage)
+      4. [PostRelation](#PostRelation)
+      5. [PatchRelation](#PatchRelation)
+      6. [PutRelation](#PutRelation)
+   2. [Resource](#Resource)
+      1. [IsResourceOf](#IsResourceOf)
+      2. [AddRelation](#AddRelation)
+      3. [UpdateRelation](#UpdateRelation)
+      4. [BindRelation](#BindRelation)
+      5. [ClearCollectionRelation](#ClearCollectionRelation)
+      6. [DeleteRelation](#DeleteRelation)
+   3. [EmbeddedResource](#EmbeddedResource)
+   4. [ResourceCollection](#ResourceCollection)
+   5. [PagedResourceCollection](#PagedResourceCollection)
+      1. [Default page values](#Default page values)
+      2. [HasFirst](#HasFirst)
+      3. [HasLast](#HasLast)
+      4. [HasNext](#HasNext)
+      5. [HasPrev](#HasPrev)
+      6. [First](#First)
+      7. [Last](#Last)
+      8. [Next](#Next)
+      9. [Prev](#Prev)
+      10. [Page](#Page)
+      11. [Size](#Size)
+      12. [SortElements](#SortElements)
+      13. [CustomPage](#CustomPage)
+   6. [Subtypes support](#Subtypes support)
+5. [Library settings](#Library settings)        
+    1. [Configuration params](#Configuration params)      
+       1. [Http params](#Http params)  
+       2. [Logging params](#Logging params)  
+       3. [Cache params](#Cache params)  
+    2. [Cache](#Cache)        
+       1. [How it works?](#How it works?)
+    3. [Logging](#Logging)
+6. [Public classes](#Public classes)     
+    1. [GetOption](#GetOption)        
+    2. [GetPagedOption](#GetPagedOption)        
+    3. [RequestOption](#RequestOption)        
+    4. [RequestBody](#RequestBody)        
+    5. [Sort](#Sort)        
+    6. [SortedPageParam](#SortedPageParam)        
+
+## Changelog
+[Learn about the latest improvements](https://github.com/lagoshny/ngx-hateoas-client/blob/master/CHANGELOG.md).
+
+## Getting started
 
 ### Installation
 
@@ -67,7 +144,7 @@ export class AppModule {
 Also, you can pass `proxyUrl` if you use it in resource links.
 You can read more about a configuration params [here](). 
 
-### Usages
+### Usage
 
 #### Define resource classes
 
@@ -107,7 +184,7 @@ You can read more about `EmbeddedResource` [here]().
 
 To perform resource requests you can use built-in [HateoasResourceService]() or create [custom resource service]().
 
-#### Built-in HateoasResourceService
+#### Universal HateoasResourceService
 
 For convenience, library has built-in `HateoasResourceService`.
 It's a simple service with methods to fetch/create/update/delete resources.
@@ -229,7 +306,7 @@ Examples of usage resource service methods rely on this presets.
   ```
 ___
 
-#### Get resource
+#### GetResource
 
 This method uses for getting a single resource [Resource]().
 With `GetOption` you can pass `projection` param (see below).
@@ -287,7 +364,7 @@ productHateoasService.getResource('products', 1, {
 
 ```
 
-#### Get resource collection
+#### GetResourceCollection
 
 This method uses for getting a collection of resources [ResourceCollection]().
 With `GetOption` you can pass `projection` param (see below).
@@ -347,7 +424,7 @@ productHateoasService.getCollection('products', {
 
 ```
 
-#### Get resource page
+#### GetResourcePage
 
 This method uses for getting a paged collection of resources [PagedResourceCollection]().
 With `PagedGetOption` you can pass `projection` param (see below).
@@ -441,7 +518,7 @@ productHateoasService.getPage('products', {
 
 ```
 
-#### Create resource
+#### CreateResource
 
 This method uses for create a new resource entity [Resource]().
 
@@ -513,7 +590,7 @@ productHateoasService.createResource('products', {
 });
 ```
 
-#### Update resource
+#### UpdateResource
 
 This method uses to updating **all** a resource values at once.
 If you want update only part of resource values then use [PatchResource]() method.
@@ -584,7 +661,7 @@ productService.updateResource(exitsProduct, {
 
 ```
 
-#### Update resource by id
+#### UpdateResourceById
 
 This method uses to updating **all** a resource values at once by resource id.
 If you want update only part of resource values then use [PatchResource]() method.
@@ -676,7 +753,7 @@ productHateoasService.updateResourceById('products', 1, {
 
 ```
 
-#### Patch resource
+#### PatchResource
 
 This method uses to patch **part** of resource values.
 If you want patching all resource values then use [UpdateResource]() method.
@@ -747,7 +824,7 @@ productService.patchResource(exitsProduct, {
 
 ```
 
-#### Patch resource by id
+#### PatchResourceById
 
 This method uses to patch **part** of resource values by resource id.
 If you want patching all resource values then use [UpdateResourceById]() method.
@@ -839,7 +916,7 @@ productHateoasService.patchResourceById('products', 1, {
 
 ```
 
-#### Delete resource
+#### DeleteResource
 This method uses to delete resource by a resource self link URL.
 
 Method signature:
@@ -885,7 +962,7 @@ productService.deleteResource(exitsProduct, {
 // For productHateoasService this snippet is identical
 ```
 
-#### Delete resource by id
+#### DeleteResourceById
 This method uses to delete resource by a resource id.
 
 Method signature:
@@ -941,7 +1018,7 @@ productHateoasService.deleteResourceById('products', 1, {
   });
 ```
 
-#### Search resource
+#### SearchResource
 This method uses for search a single resource.
 You don't need to specify `/search` part of the URL it will be added automatically
 
@@ -1001,7 +1078,7 @@ productHateoasService.searchResource('products', 'byName', {
 
 ```
 
-#### Search resource collection
+#### SearchResourceCollection
 
 This method uses for searching a collection of resources.
 You don't need to specify `/search` part of the URL it will be added automatically
@@ -1064,7 +1141,7 @@ productHateoasService.searchCollection('products', 'byName', {
 
 ```
 
-#### Search resource page
+#### SearchResourcePage
 This method uses for searching a paged collection of resources.
 You don't need to specify `/search` part of the URL it will be added automatically
 
@@ -1134,7 +1211,7 @@ productHateoasService.searchPage('products', 'byName', {
 
 ```
 
-#### Custom query
+#### CustomQuery
 
 This method uses to perform a custom HTTP requests for a resource.
 For example, you can perform a count query use this method (see example below). 
@@ -1165,7 +1242,7 @@ productHateoasService.customQuery<number>('products', HttpMethod.GET, '/search/c
   });
 ````
 
-#### Custom search query
+#### CustomSearchQuery
 This method uses to perform a custom HTTP search requests for a resource.
 For example, you can perform a count query use this method (see example below). 
 
@@ -2309,7 +2386,7 @@ cart.getRelation('client')
 
 This section describes library configuration params, and some library features that you can enable/disable when you need it.
 
-#### Configuration
+#### Configuration params
 
 You can pass the next params to configure the library.
 

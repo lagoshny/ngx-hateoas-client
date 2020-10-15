@@ -104,7 +104,7 @@ Before start, configure `NgxHateoasClientModule` and pass configuration through 
 
 1) `NgxHalClientModule` configuration:
 
-````ts
+```ts
 import { NgxHateoasClientModule } from '@lagoshny/ngx-hateoas-client';
 
 ...
@@ -121,11 +121,11 @@ import { NgxHateoasClientModule } from '@lagoshny/ngx-hateoas-client';
 export class AppModule {
   ...
 }
-````
+```
 
 2) In constructor app root module inject `HalConfigurationService` and pass a configuration:
 
-````ts
+```ts
 import { ..., HateoasConfigurationService } from '@lagoshny/ngx-hateoas-client';
 
 ...
@@ -141,7 +141,7 @@ export class AppModule {
   }
 
 }
-````
+```
 
 >Configuration has only one required param is `rootUrl` mapped to the server API URL.
 Also, you can configure `proxyUrl` when use it in resource links.
@@ -193,7 +193,7 @@ It is a simple service with methods to get/create/update/delete resources.
 
 To use it injecting `HateoasResourceService` to a component or a service class and set the resource type to a generic param.
 
-````ts
+```ts
 @Component({
   ...
 })
@@ -214,7 +214,7 @@ export class SomeComponent {
   };
 
 }
-````
+```
 
 Each `HateoasResourceService` method has the first param is the resource name that should be equals to the resource name in backend API.
 The resource name uses to build a URL for resource requests.
@@ -222,7 +222,7 @@ The resource name uses to build a URL for resource requests.
 More about available `HateoasResourceService` methods see [here](#resource-service).
 
 >`HateoasResourceService` is the best choice for simple resources that has not extra logic for requests.
-When you have some logic that should be preparing resource before a request, or you don't want always pass the resource name as first method param
+When you have some logic that should be preparing resource before a request, or you do not want always pass the resource name as first method param
 you can create a custom resource service extends `HateoasResourceOperation` to see more about this [here](#create-custom-resource-service).
 
 ### Create custom Resource service
@@ -245,7 +245,7 @@ export class ProductService extends HateoasResourceOperation<Product> {
 
 `HateoasResourceOperation` has the same [methods](#resource-service) as `HateoasResourceService` without `resourceName` as the first param.
 
-### Resource types
+## Resource types
 
 There are several types of resources, the main resource type is [Resource](#resource) represents the server-side entity model class.
 If the server-side model has Embeddable entity type then use [EmbeddedResource](#embeddedresource) type instead [Resource](#resource) type. 
@@ -409,7 +409,7 @@ Contains common resource methods to work with resource relations through resourc
 ### GetRelation
 Getting resource relation object by relation name.
 
-Takes [GetOption](#getoption) parameter with it you can pass `projection` param (see below).
+This method takes [GetOption](#getoption) parameter with it you can pass `projection` param
 
 Method signature:
 
@@ -422,7 +422,7 @@ getRelation<T extends BaseResource>(relationName: string, options?: GetOption): 
 - `return value` - [Resource](#resource) with type `T`.
 - `throws error` - when required params are not valid or link not found by relation name or returned value is not [Resource](#resource).
 
-Examples of usage ([given the presets](#resource-presets)):
+##### Examples of usage ([given the presets](#resource-presets)):
 
 ```ts
 // Performing GET request by the URL: http://localhost:8080/api/v1/carts/1/shop
@@ -444,7 +444,7 @@ cart.getRelation<Shop>('shop', {
   sort: {
     name: 'ASC'
   },
-  // useCache: true | false, when cache is enable then by default true, false otherwise
+  // useCache: true | false, when the cache is enabled then by default true, false otherwise
 })
   .subscribe((shop: Shop) => {
     // some logic        
@@ -454,7 +454,7 @@ cart.getRelation<Shop>('shop', {
 ### GetRelatedCollection
 Getting related resource collection by relation name.
 
-Takes [GetOption](#getoption) parameter with it you can pass `projection` param (see below).
+This method takes [GetOption](#getoption) parameter with it you can pass `projection` param.
 
 Method signature:
 
@@ -467,7 +467,7 @@ getRelatedCollection<T extends ResourceCollection<BaseResource>>(relationName: s
 - `return value` - [ResourceCollection](#resourcecollection) collection of resources with type `T`.
 - `throws error` - when required params are not valid or link not found by relation name or returned value is not [ResourceCollection](#resourcecollection).
 
-Examples of usage ([given the presets](#resource-presets)):
+##### Examples of usage ([given the presets](#resource-presets)):
 
 ```ts
 // Performing GET request by the URL: http://localhost:8080/api/v1/carts/1/products
@@ -490,7 +490,7 @@ cart.getRelatedCollection<ResourceCollection<Product>>('products', {
   sort: {
     name: 'ASC'
   },
-  // useCache: true | false, when cache is enable then by default true, false otherwise
+  // useCache: true | false, when the cache is enabled then by default true, false otherwise
 })
   .subscribe((collection: ResourceCollection<Product>) => {
     const products: Array<Product> = collection.resources;
@@ -500,24 +500,24 @@ cart.getRelatedCollection<ResourceCollection<Product>>('products', {
 ```
 
 ### GetRelatedPage
-Getting related resource collection by relation name.
+Getting related resource collection with pagination by relation name.
 
-Takes [PagedGetOption](#pagedgetoption) parameter with it you can pass `projection` param (see below).
+This method takes [PagedGetOption](#pagedgetoption) parameter with it you can pass `projection` param (see below).
 
->If don't pass `pageParams` with `PagedGetOption` then will be used [default page options](#default-page-values). 
+>If do not pass `pageParams` with `PagedGetOption` then will be used [default page options](#default-page-values). 
 
 Method signature:
 
-````
+```
 getRelatedPage<T extends PagedResourceCollection<BaseResource>>(relationName: string, options?: PagedGetOption): Observable<T>;
-````
+```
 
 - `relationName` - resource relation name used to get request URL.
 - `options` - [PagedGetOption](#pagedgetoption) additional options applied to the request, if not passed `pageParams` then used [default page params](#default-page-values).
-- `return value` - [PagedResourceCollection]() paged collection of resources with type `T`.
+- `return value` - [PagedResourceCollection](#pagedresourcecollection) paged collection of resources with type `T`.
 - `throws error` - when required params are not valid or link not found by relation name or returned value is not [PagedResourceCollection]().
 
-Examples of usage ([given the presets](#resource-presets)):
+##### Examples of usage ([given the presets](#resource-presets)):
 
 ```ts
 // Performing GET request by the URL: http://localhost:8080/api/v1/carts/1/productPage?page=0&size=20
@@ -578,7 +578,7 @@ postRelation(relationName: string, requestBody: RequestBody<any>, options?: Requ
 - `options` - [RequestOption](#requestoption) additional options applied to the request.
 - `return value` - by default `raw response data` or Angular `HttpResponse` when `options` param has a `observe: 'response'` value. 
 
-Examples of usage ([given the presets](#resource-presets)):
+##### Examples of usage ([given the presets](#resource-presets)):
 
 ```ts
 // Performing POST request by the URL: http://localhost:8080/api/v1/cart/1/postExample
@@ -626,7 +626,7 @@ patchRelation(relationName: string, requestBody: RequestBody<any>, options?: Req
 - `options` - [RequestOption](#requestoption) additional options applied to the request.
 - `return value` - by default `raw response data` or Angular `HttpResponse` when `options` param has a `observe: 'response'` value. 
 
-Examples of usage ([given the presets](#resource-presets)):
+##### Examples of usage ([given the presets](#resource-presets)):
 
 ```ts
 // Performing PATCH request by the URL: http://localhost:8080/api/v1/cart/1/patchExample
@@ -675,7 +675,7 @@ putRelation(relationName: string, requestBody: RequestBody<any>, options?: Reque
 - `options` - [RequestOption](#requestoption) additional options applied to the request.
 - `return value` - by default `raw response data` or Angular `HttpResponse` when `options` param has a `observe: 'response'` value. 
 
-Examples of usage ([given the presets](#resource-presets)):
+##### Examples of usage ([given the presets](#resource-presets)):
 
 ```ts
 // Performing PUT request by the URL: http://localhost:8080/api/v1/cart/1/putExample
@@ -711,70 +711,67 @@ cart.putRelation('putExample', {
 
 ## Resource
 
-This is the main resource class. You need to extend model classes with this class to have the ability to use resource methods.
+Main resource class. Extend model classes with `Resource` class to have the ability to use resource methods.
 
-The difference between this type and [EmbeddedResource]() is resource class has a self link therefore it has an id property.
-Usually, resource class is `@Entity` server-side classes and [EmbeddedResource]() is `@Embeddable` entities that have not an id properties.
+The difference between the `Resource` type and [EmbeddedResource](#embeddedresource) is `Resource` class has a self link therefore it has an id property, `EmbeddedResource` has not.
+`Resource` classes are `@Entity` server-side classes. [EmbeddedResource](#embeddedresource) classes are `@Embeddable` entities.
 
-Resource class extend [BaseResource]() with additional resource relations methods that can be used only with `resource type`.
+`Resource` class extend [BaseResource](#baseresource) with additional resource relations methods that used only with `Resource` type.
 
-#### IsResourceOf
+### IsResourceOf
+Uses when resource has sub-types, and you want to know what subtype current resource has.
+Read more about sub-types [here](#subtypes-support).
 
-This method uses when resource has sub-types, and you want to know what type current resource has.
-You can read more about sub-types [here]().
-
->Each [Resource]() has private property is `resourceName` that calculated by the URL which resource was get.
-Suppose to get `Cart` resource will be used the next URL: `http://localhost:8080/api/v1/carts/1`.
+>Each [Resource](#resource) has a private property is `resourceName` that calculated by the URL which resource was get.
+Suppose to get `Cart` resource used the next URL: `http://localhost:8080/api/v1/carts/1`.
 Then `Cart.resourceName` will be equals to `carts` because this part of the URL represents the resource name.
 
 Method signature:
 
-````
-isResourceOf<T extends Resource>(typeOrName: (new () => T) | string): boolean
-````
-- `typeOrName` - can be as a resource type or the simple string that represent resource name.
+```
+isResourceOf<T extends Resource>(typeOrName: (new () => T) | string): boolean;
+```
+- `typeOrName` - resource type, or string that represent resource name.
                  If you pass resource type for example `someResource.isResourceOf(CartPayment)` then class name will be used to compare with the resource name (ignoring letter case).
                  If you pass resource name as a string then it will be used to compare with resource name with (ignoring letter case).
 - `return value` - `true` when resource name equals passed value, `false` otherwise. 
 
-Example of usage ([given the presets]()):
+##### Examples of usage ([given the presets](#resource-presets)):
 
-```
-// Suppose was Performing GET request to get the Cart resource by the url http://localhost:8080/api/v1/carts/1
+```ts
+// Suppose was perform GET request to get the Cart resource by the URL: http://localhost:8080/api/v1/carts/1
 
 cart.isResourceOf('carts'); // return TRUE
 cart.isResourceOf('cart'); // return FALSE
-cart.isResourceOf(Cart); // return FALSE because Cart class name = 'cart'
+cart.isResourceOf(Cart); // return FALSE because Cart class constructor name is 'cart'
 
 ```
 
-##### AddRelation
-
-This method uses to add passed entities (they should exist) to the resource collection behind the relation name.
+### AddRelation
+Adding passed entities (they should exist on the server) to the resource collection behind the relation name.
 
 Method signature:
 
-````
-addRelation<T extends Resource>(relationName: string, entities: Array<T>): Observable<HttpResponse<any>>;
-````
-
-- `relationName` - resource relation name that should be used to get resource collection for add new entities.
-- `entities` - an array of entities that should be added 
-- `return value` - Angular `HttpResponse` with operation result.
-
-Request URL is a relation link URL for passed relation name. As a request body, an array of entities' self-link will be used.
-
-Example of usage ([given the presets]()):
-
 ```
+addRelation<T extends Resource>(relationName: string, entities: Array<T>): Observable<HttpResponse<any>>;
+```
+
+- `relationName` - resource relation name used to get request URL mapped to resource collection.
+- `entities` - an array of entities that should be added to resource collection.
+- `return value` - Angular `HttpResponse` result.
+
+
+##### Examples of usage ([given the presets](#resource-presets)):
+
+```ts
 /* 
  Performing POST request by the URL: http://localhost:8080/api/v1/carts/1/products
  Content-type: 'text/uri-list'
  Body: [http://localhost:8080/api/v1/products/1, http://localhost:8080/api/v1/products/2]
 */
-// Suppose product1 already exists and it has an id = 1
+// Suppose product1 already exists with id = 1
 const product1 = ...;
-// Suppose product2 already exists and it has an id = 2
+// Suppose product2 already exists with id = 2
 const product2 = ...;
 
 cart.addRelation('products', [product1, product2])
@@ -783,32 +780,28 @@ cart.addRelation('products', [product1, product2])
   });
 ```
 
-##### UpdateRelation
-
-This method uses to update exist resource relation value.
+### UpdateRelation
+Updating an entity value by relation link URL.
 
 Method signature:
 
-````
-updateRelation<T extends Resource>(relationName: string, entity: T): Observable<HttpResponse<any>>;
-````
-
-- `relationName` - resource relation name that should be used to get resource relation for value update.
-- `entity` - new entity 
-- `return value` - Angular `HttpResponse` with operation result.
-
-Request URL is a relation link URL for passed relation name. 
-As a request body passed entity self-link will be used.
-
-Example of usage ([given the presets]()):
-
 ```
+updateRelation<T extends Resource>(relationName: string, entity: T): Observable<HttpResponse<any>>;
+```
+
+- `relationName` - resource relation name used to get request URL.
+- `entity` - new entity value.
+- `return value` - Angular `HttpResponse` result.
+
+##### Examples of usage ([given the presets](#resource-presets)):
+
+```ts
 /* 
  Performing PATCH request by the URL: http://localhost:8080/api/v1/carts/1/shop
  Content-type: 'text/uri-list'
  Body: http://localhost:8080/api/v1/shops/2
 */
-// Suppose newShop already exists and it has an id = 2
+// Suppose newShop already exists with id = 2
 const newShop = ...;
 cart.updateRelation('shop', newShop)
   .subscribe((result: HttpResponse<any>) => {
@@ -816,32 +809,29 @@ cart.updateRelation('shop', newShop)
   });
 
 ```
-##### BindRelation
 
-This method uses to bind the passed entity to this resource for passed relation name.
+### BindRelation
+Binding the passed entity to this resource by relation link URL.
 
 Method signature:
 
-````
-bindRelation<T extends Resource>(relationName: string, entity: T): Observable<HttpResponse<any>>;
-````
-
-- `relationName` - resource relation name that should be used to get resource relation for bind an entity.
-- `entity` - entity to bind
-- `return value` - Angular `HttpResponse` with operation result.
-
-Request URL is a relation link URL for passed relation name. 
-As a request body passed entity self-link will be used.
-
-Example of usage ([given the presets]()):
-
 ```
+bindRelation<T extends Resource>(relationName: string, entity: T): Observable<HttpResponse<any>>;
+```
+
+- `relationName` - resource relation name used to get request URL.
+- `entity` - entity to bind.
+- `return value` - Angular `HttpResponse` result.
+
+##### Examples of usage ([given the presets](#resource-presets)):
+
+```ts
 /* 
  Performing PUT request by the URL: http://localhost:8080/api/v1/carts/1/shop
  Content-type: 'text/uri-list'
  Body: http://localhost:8080/api/v1/shops/1
 */
-// Suppose shopToBind already exists and it has an id = 1
+// Suppose shopToBind already exists with id = 1
 const shopToBind = ...;
 cart.bindRelation('shop', shopToBind)
   .subscribe((result: HttpResponse<any>) => {
@@ -850,23 +840,21 @@ cart.bindRelation('shop', shopToBind)
 
 ```
 
-##### ClearCollectionRelation
-This method uses to unbind all resources from resource collection behind resource name.
+### ClearCollectionRelation
+Unbinding all resources from resource collection behind resource name.
 
 Method signature:
 
-````
-clearCollectionRelation<T extends Resource>(relationName: string): Observable<HttpResponse<any>>;
-````
-
-- `relationName` - resource relation name that should be used to get resource collection for unbind all entities.
-- `return value` - Angular `HttpResponse` with operation result.
-
-Request URL is a relation link URL for passed relation name. 
-
-Example of usage ([given the presets]()):
-
 ```
+clearCollectionRelation<T extends Resource>(relationName: string): Observable<HttpResponse<any>>;
+```
+
+- `relationName` - resource relation name used to get request URL.
+- `return value` - Angular `HttpResponse` result.
+
+##### Examples of usage ([given the presets](#resource-presets)):
+
+```ts
 /* 
  Performing PUT request by the URL: http://localhost:8080/api/v1/carts/1/products
  Content-type: 'text/uri-list'
@@ -879,27 +867,24 @@ cart.clearCollectionRelation('products')
 
 ```
 
-##### DeleteRelation
-This method uses to unbind all resources from resource collection behind resource name.
+### DeleteRelation
+Unbinding resource relation entity by relation link URL.
 
 Method signature:
 
-````
-deleteRelation<T extends Resource>(relationName: string, entity: T): Observable<HttpResponse<any>>;
-````
-
-- `relationName` - resource relation name that should be used to get resource relation for unbind an entity.
-- `entity` - entity to delete
-- `return value` - Angular `HttpResponse` with operation result.
-
-Request URL is a relation link URL for passed relation name. 
-As a request body passed entity self-link will be used.
-
-Example of usage ([given the presets]()):
-
 ```
-// Will be perform DELETE request to the http://localhost:8080/api/v1/carts/1/shop/1
-// Suppose shopToDelete already exists and it has an id = 1
+deleteRelation<T extends Resource>(relationName: string, entity: T): Observable<HttpResponse<any>>;
+```
+
+- `relationName` - resource relation name used to get request URL.
+- `entity` - entity to unbind.
+- `return value` - Angular `HttpResponse` result.
+
+##### Examples of usage ([given the presets](#resource-presets)):
+
+```ts
+// Performing DELETE request by the URL: http://localhost:8080/api/v1/carts/1/shop/1
+// Suppose shopToDelete already exists with id = 1
 const shopToDelete = ...;
 cart.deleteRelation('shop', shopToDelete)
   .subscribe((result: HttpResponse<any>) => {
@@ -908,355 +893,388 @@ cart.deleteRelation('shop', shopToDelete)
 
 ```
 
-#### EmbeddedResource
+## EmbeddedResource
 This resource type uses when a server-side entity is [@Embeddable](https://docs.jboss.org/hibernate/orm/5.0/userguide/html_single/chapters/domain/embeddables.html).
 It means that this entity has not an id property and can't exist standalone.
-Because embedded resources have not an id then it can use only [BaseResource]() methods.
 
-#### ResourceCollection
+Because embedded resources have not an id then it can use only [BaseResource](#baseresource) methods.
+
+## ResourceCollection
 This resource type represents collection of resources.
-You can get this type as result [GetRelatedCollection](), [GetResourceCollection]() or perform [CustomQuery]()/[CustomSearchQuery]() with passed return type as ResourceCollection.
+You can get this type as result [GetRelatedCollection](#getrelatedcollection), [GetResourceCollection](#getresourcecollection) or perform [CustomQuery](#customquery)/[CustomSearchQuery](#customsearchquery) with passed return type as `ResourceCollection`.
 
 Resource collection holds resources in the public property with the name `resources`.
 
-#### PagedResourceCollection
+## PagedResourceCollection
 This resource type represents paged collection of resources.
 You can get this type as result [GetRelatedPage](), [GetResourcePage]() or perform [CustomQuery]()/[CustomSearchQuery]() with passed return type as PagedResourceCollection.
 
 PagedResourceCollection extends [ResourceCollection]() type and adds methods to work with a page.  
 
-##### Default page values
+### Default page values
+When you do not pass `page` or `size` params in methods with [PagedGetOption](#pagedgetoption) then used default values: `page = 0`, `size = 20`.
 
-In any page methods when you don't pass `page` or `size` params then will be used the next default values: `page = 0`, `size = 20`.
+### HasFirst
 
-> When you already used custom value for `page` or `size` param then it will be used for the next page request if you don't pass it. 
-
-##### HasFirst
-
-Method checks that `PagedResourceCollection` has the link to get the first page result.
+Checks that `PagedResourceCollection` has the link to get the first-page result.
 
 Method signature:
 
-````
+```
 hasFirst(): boolean;
-````
+```
 
-return `true` when the link to get the first page is exist, `false` otherwise.
+- `return value` - `true` when the link to get the first page exists, `false` otherwise.
 
-##### HasLast
+### HasLast
 
-Method checks that `PagedResourceCollection` has the link to get the last page result.
+Checks that `PagedResourceCollection` has the link to get the last page result.
 
 Method signature:
 
-````
+```
 hasLast(): boolean;
-````
+```
 
-return `true` when the link to get the last page is exist, `false` otherwise.
+- `return value` - `true` when the link to get the last page exists, `false` otherwise.
 
-##### HasNext
+### HasNext
 
-Method checks that `PagedResourceCollection` has the link to get the next page result.
+Checks that `PagedResourceCollection` has the link to get the next page result.
 
 Method signature:
 
-````
+```
 hasNext(): boolean;
-````
+```
 
-return `true` when the link to get the next page is exist, `false` otherwise.
+- `return value` - `true` when the link to get the next page exists, `false` otherwise.
 
-##### HasPrev
+### HasPrev
 
-Method checks that `PagedResourceCollection` has the link to get the previous page result.
+Checks that `PagedResourceCollection` has the link to get the previous page result.
 
 Method signature:
 
-````
+```
 hasPrev(): boolean;
-````
+```
 
-return `true` when the link to get the previous page is exist, `false` otherwise.
+- `return value` - `true` when the link to get the prev page exists, `false` otherwise.
 
-##### First
-This method performs a request to get the first-page result by the first-page link.
+### First
+Performing a request to get the first-page result by the first-page link.
 
 Method signature:
 
-````
+```
 first(options?: {useCache: true;}): Observable<PagedResourceCollection<T>>;
-````
+```
 
-- `options` - you can pass additional options that influence to use of cache when get result or not (by default will be used a cache)
-- `return value` - [PagedResourceCollection]() paged collection of resources with type `T` 
-- `throws error` - when a link to get the first-page result is not exist
+- `options` - additional options to manipulate the cache when getting a result (by default will be used the cache if it enabled in the [configuration](#cache-params)).
+- `return value` - [PagedResourceCollection](#pagedresourcecollection) with resource types `T`.
+- `throws error` - when the link to get the first-page result is not exist.
 
-Example of usage:
+##### Examples of usage:
 
-Suppose we have 3 pages with 20 resources per page. We are now on the page = 2 and want to get the first page of `product` resource.
-In this case, the `first method` passes only page param = 0, for size param used previous value or [default value]() it depends on was passed size param before or not. 
+Suppose products have 3 pages with 20 resources per page, and the previous request was to get products with a page number = 1.
+
+To get the first products page, will perform request to page number = 0 with current or [default page size](#default-page-values) (if before page size not passed).
 
 ```ts
 // Performing GET request by the URL: http://localhost:8080/api/v1/products?page=0&size=20
 const pagedProductCollection = ...;
 pagedProductCollection.first()
   .subscribe((firstPageResult: PagedResourceCollection<Product>) => {
-     // firstPageResult can be fetched from a cache if before was performing the same request
-     // some logic        
-  });
-
-// Performing GET request by the URL: http://localhost:8080/api/v1/products?page=0&size=20
-const pagedProductCollection = ...;
-pagedProductCollection.first({useCache: false})
-  .subscribe((firstPageResult: PagedResourceCollection<Product>) => {
-     // firstPageResult always will be fetched from the server because we disable a cache for this request
+     // firstPageResult can be fetched from the cache if before was performing the same request
      // some logic        
   });
 ```
 
-##### Last
-This method performs a request to get the last-page result by the last-page link.
+With options:
+
+```ts
+// Performing GET request by the URL: http://localhost:8080/api/v1/products?page=0&size=20
+const pagedProductCollection = ...;
+pagedProductCollection.first({useCache: false})
+  .subscribe((firstPageResult: PagedResourceCollection<Product>) => {
+     // firstPageResult always will be fetched from the server because the cache is disabled for this request
+     // some logic        
+  });
+```
+
+### Last
+Performing a request to get the last-page result by the last-page link.
 
 Method signature:
 
-````
+```
 last(options?: {useCache: true;}): Observable<PagedResourceCollection<T>>;
-````
+```
 
-- `options` - you can pass additional options that influence to use of cache when get result or not (by default will be used a cache)
-- `return value` - [PagedResourceCollection]() paged collection of resources with type `T` 
-- `throws error` - when a link to get the last-page result is not exist
+- `options` - additional options to manipulate the cache when getting a result (by default will be used the cache if it enabled in the [configuration](#cache-params)).
+- `return value` - [PagedResourceCollection](#pagedresourcecollection) with resource types `T`.
+- `throws error` - when the link to get the last-page result is not exist.
 
-Example of usage:
+##### Examples of usage:
 
-Suppose we have 3 pages with 20 resources per page. We are now on the page = 0 and want to get the last page of `product` resource.
-In this case, the `last method` passes only page param = 2, for size param used previous value or [default value]() it depends on was passed size param before or not. 
+Suppose products have 3 pages with 20 resources per page, and the previous request was to get products with a page number = 1.
+
+To get the last products page, will perform request to page number = 2 with current or [default page size](#default-page-values) (if before page size not passed).
 
 ```ts
 // Performing GET request by the URL: http://localhost:8080/api/v1/products?page=2&size=20
 const pagedProductCollection = ...;
 pagedProductCollection.last()
   .subscribe((lastPageResult: PagedResourceCollection<Product>) => {
-     // lastPageResult can be fetched from a cache if before was performing the same request
-     // some logic        
-  });
-
-// Performing GET request by the URL: http://localhost:8080/api/v1/products?page=2&size=20
-const pagedProductCollection = ...;
-pagedProductCollection.last({useCache: false})
-  .subscribe((lastPageResult: PagedResourceCollection<Product>) => {
-     // lastPageResult always will be fetched from the server because we disable a cache for this request
+     // lastPageResult can be fetched from the cache if before was performing the same request
      // some logic        
   });
 ```
 
-##### Next
-This method performs a request to get the next-page result by the next-page link.
+With options:
+
+```ts
+// Performing GET request by the URL: http://localhost:8080/api/v1/products?page=2&size=20
+const pagedProductCollection = ...;
+pagedProductCollection.last({useCache: false})
+  .subscribe((lastPageResult: PagedResourceCollection<Product>) => {
+     // lastPageResult always will be fetched from the server because the cache is disabled for this request
+     // some logic        
+  });
+```
+
+### Next
+Performing a request to get the next-page result by the next-page link.
 
 Method signature:
 
-````
+```
 next(options?: {useCache: true;}): Observable<PagedResourceCollection<T>>;
-````
+```
 
-- `options` - you can pass additional options that influence to use of cache when get result or not (by default will be used a cache)
-- `return value` - [PagedResourceCollection]() paged collection of resources with type `T` 
-- `throws error` - when a link to get the next-page result is not exist
+- `options` - additional options to manipulate the cache when getting a result (by default will be used the cache if it enabled in the [configuration](#cache-params)).
+- `return value` - [PagedResourceCollection](#pagedresourcecollection) with resource types `T`.
+- `throws error` - when the link to get the next-page result is not exist.
 
-Example of usage:
+##### Examples of usage:
 
-Suppose we have 3 pages with 20 resources per page. We are now on the page = 0 and want to get the next page of `product` resource.
-In this case, the `next method` passes only page param = 1, for size param used previous value or [default value]() it depends on was passed size param before or not. 
+Suppose products have 3 pages with 20 resources per page, and the previous request was to get products with a page number = 1.
+
+To get the next products page, will perform request to page number = 2 with current or [default page size](#default-page-values) (if before page size not passed).
 
 ```ts
 // Performing GET request by the URL: http://localhost:8080/api/v1/products?page=1&size=20
 const pagedProductCollection = ...;
 pagedProductCollection.next()
   .subscribe((nextPageResult: PagedResourceCollection<Product>) => {
-     // nextPageResult can be fetched from a cache if before was performing the same request
-     // some logic        
-  });
-
-// Performing GET request by the URL: http://localhost:8080/api/v1/products?page=1&size=20
-const pagedProductCollection = ...;
-pagedProductCollection.next({useCache: false})
-  .subscribe((nextPageResult: PagedResourceCollection<Product>) => {
-     // nextPageResult always will be fetched from the server because we disable a cache for this request
+     // nextPageResult can be fetched from the cache if before was performing the same request
      // some logic        
   });
 ```
 
-##### Prev
-This method performs a request to get the prev-page result by the prev-page link.
+With options:
+
+```ts
+// Performing GET request by the URL: http://localhost:8080/api/v1/products?page=1&size=20
+const pagedProductCollection = ...;
+pagedProductCollection.next({useCache: false})
+  .subscribe((nextPageResult: PagedResourceCollection<Product>) => {
+     // nextPageResult always will be fetched from the server because the cache is disabled for this request
+     // some logic        
+  });
+```
+
+### Prev
+Performing a request to get the prev-page result by the prev-page link.
 
 Method signature:
 
-````
+```
 prev(options?: {useCache: true;}): Observable<PagedResourceCollection<T>>;
-````
+```
 
-- `options` - you can pass additional options that influence to use of cache when get result or not (by default will be used a cache)
-- `return value` - [PagedResourceCollection]() paged collection of resources with type `T` 
-- `throws error` - when a link to get the prev-page result is not exist
+- `options` - additional options to manipulate the cache when getting a result (by default will be used the cache if it enabled in the [configuration](#cache-params)).
+- `return value` - [PagedResourceCollection](#pagedresourcecollection) with resource types `T`.
+- `throws error` - when the link to get the prev-page result is not exist.
 
-Example of usage:
+##### Examples of usage:
 
-Suppose we have 3 pages with 20 resources per page. We are now on the page = 1 and want to get the prev page of `product` resource.
-In this case, the `prev method` passes only page param = 1, for size param used previous value or [default value]() it depends on was passed size param before or not. 
+Suppose products have 3 pages with 20 resources per page, and the previous request was to get products with a page number = 1.
+
+To get the prev products page, will perform request to page number = 0 with current or [default page size](#default-page-values) (if before page size not passed).
+
 
 ```ts
 // Performing GET request by the URL: http://localhost:8080/api/v1/products?page=0&size=20
 const pagedProductCollection = ...;
 pagedProductCollection.prev()
   .subscribe((prevPageResult: PagedResourceCollection<Product>) => {
-     // prevPageResult can be fetched from a cache if before was performing the same request
-     // some logic        
-  });
-
-// Performing GET request by the URL: http://localhost:8080/api/v1/products?page=0&size=20
-const pagedProductCollection = ...;
-pagedProductCollection.prev({useCache: false})
-  .subscribe((prevPageResult: PagedResourceCollection<Product>) => {
-     // prevPageResult always will be fetched from the server because we disable a cache for this request
+     // prevPageResult can be fetched from the cache if before was performing the same request
      // some logic        
   });
 ```
 
-##### Page
-This method performs a request to get the page with passed page number and current page size.
+With options:
 
->If you need with a page param pass custom size or sort params then use [customPage]() method.
+```ts
+// Performing GET request by the URL: http://localhost:8080/api/v1/products?page=0&size=20
+const pagedProductCollection = ...;
+pagedProductCollection.prev({useCache: false})
+  .subscribe((prevPageResult: PagedResourceCollection<Product>) => {
+     // prevPageResult always will be fetched from the server because the cache is disabled for this request
+     // some logic        
+  });
+```
+
+### Page
+Performing a request to get the page with passed page number and current or [default page size](#default-page-values) (if before page size not passed).
+
+>To pass page number, page size, sort params together use [customPage](#custompage) method.
 
 Method signature:
 
-````
+```
 page(pageNumber: number, options?: {useCache: true;}): Observable<PagedResourceCollection<T>>;
-````
+```
 
-- `pageNumber` - number of the page to need to get
-- `options` - you can pass additional options that influence to use of cache when get result or not (by default will be used a cache)
-- `return value` - [PagedResourceCollection]() paged collection of resources with type `T` 
-- `throws error` - when you pass page number great than total pages
+- `pageNumber` - number of the page to get.
+- `options` - additional options to manipulate the cache when getting a result (by default will be used the cache if it enabled in the [configuration](#cache-params)).
+- `return value` - [PagedResourceCollection](#pagedresourcecollection) with resource types `T`.
+- `throws error` - when `pageNumber` greater than total pages.
 
-Example of usage:
+##### Examples of usage:
 
-Suppose we have 5 pages with 20 resources per page. We are now on the page = 1 and want to get the page = 3 of `product` resource.
-In this case, the `page method` passes only page param = 3, for size param used previous value or [default value]() it depends on was passed size param before or not. 
+Suppose products have 5 pages with 20 resources per page, and the previous request was to get products with a page number = 1.
+
+To get the products page = 3, will perform request to page number = 3 with current or [default page size](#default-page-values) (if before page size not passed).
 
 ```ts
 // Performing GET request by the URL: http://localhost:8080/api/v1/products?page=3&size=20
 const pagedProductCollection = ...;
 pagedProductCollection.page(3)
   .subscribe((customPageResult: PagedResourceCollection<Product>) => {
-     // customPageResult can be fetched from a cache if before was performing the same request
+     // customPageResult can be fetched from the cache if before was performing the same request
      // some logic        
   });
+```
 
+With options:
+
+```ts
 // Performing GET request by the URL: http://localhost:8080/api/v1/products?page=3&size=20
 const pagedProductCollection = ...;
 pagedProductCollection.page(3, {useCache: false})
   .subscribe((customPageResult: PagedResourceCollection<Product>) => {
-     // customPageResult always will be fetched from the server because we disable a cache for this request
+     // customPageResult always will be fetched from the server because the cache is disabled for this request
      // some logic        
   });
 ```
-##### Size
-This method performs a request to get the page with passed page size and current page number.
 
->If you need with size param pass custom page or sort params then use [customPage]() method.
+### Size
+Performing a request to get the page with passed page size and current or [default page number](#default-page-values) (if before page number not passed).
+
+>To pass page number, page size, sort params together use [customPage](#custompage) method.
 
 Method signature:
 
-````
+```
 size(size: number, options?: {useCache: true;}): Observable<PagedResourceCollection<T>>;
-````
+```
 
-- `size` - number of resources for current page
-- `options` - you can pass additional options that influence to use of cache when get result or not (by default will be used a cache)
-- `return value` - [PagedResourceCollection]() paged collection of resources with type `T` 
-- `throws error` - when you pass page size greater than total count resources
+- `size` - count of resources to page.
+- `options` - additional options to manipulate the cache when getting a result (by default will be used the cache if it enabled in the [configuration](#cache-params)).
+- `return value` - [PagedResourceCollection](#pagedresourcecollection) with resource types `T`. 
+- `throws error` - when `size` greater than total count resources.
 
-Example of usage:
+##### Examples of usage:
 
-Suppose we have 5 pages with 20 resources per page. We are now on the page = 1, size = 20  and want to get more `product` resources for the current page for example 50.
-In this case, the `size method` passes only size param = 50, for a page param used previous value or [default value]() it depends on was passed a page param before or not. 
+Suppose products have 5 pages with 20 resources per page, and the previous request was to get products with a page number = 1, size = 20.
+
+To increase the current page size to 50, will perform a request to the current page number with page size = 50.
 
 ```ts
 // Performing GET request by the URL: http://localhost:8080/api/v1/products?page=1&size=50
 const pagedProductCollection = ...;
 pagedProductCollection.size(50)
   .subscribe((customPageResult: PagedResourceCollection<Product>) => {
-     // customPageResult can be fetched from a cache if before was performing the same request
-     // some logic        
-  });
-
-// Performing GET request by the URL: http://localhost:8080/api/v1/products?page=1&size=50
-const pagedProductCollection = ...;
-pagedProductCollection.size(50, {useCache: false})
-  .subscribe((customPageResult: PagedResourceCollection<Product>) => {
-     // customPageResult always will be fetched from the server because we disable a cache for this request
+     // customPageResult can be fetched from the cache if before was performing the same request
      // some logic        
   });
 ```
 
-##### SortElements
-This method allows sort current page result.
+With options:
 
->If you need with sort param pass custom page or size params then use [customPage]() method.
+```ts
+// Performing GET request by the URL: http://localhost:8080/api/v1/products?page=1&size=50
+const pagedProductCollection = ...;
+pagedProductCollection.size(50, {useCache: false})
+  .subscribe((customPageResult: PagedResourceCollection<Product>) => {
+     // customPageResult always will be fetched from the server because the cache is disabled for this request
+     // some logic        
+  });
+```
+
+### SortElements
+Sorting the current page result.
+
+>To pass page number, page size, sort params together use [customPage](#custompage) method.
 
 Method signature:
 
-````
+```
 sortElements(sortParam: Sort, options?: {useCache: true;}): Observable<PagedResourceCollection<T>>;
-````
+```
 
-- `sortParam` - [sort]() params
-- `options` - you can pass additional options that influence to use of cache when get result or not (by default will be used a cache)
-- `return value` - [PagedResourceCollection]() paged collection of resources with type `T` 
+- `sortParam` - [Sort](#sort) params.
+- `options` - additional options to manipulate the cache when getting a result (by default will be used the cache if it enabled in the [configuration](#cache-params)).
+- `return value` - [PagedResourceCollection](#pagedresourcecollection) with resource types `T`. 
 
-Example of usage:
+##### Examples of usage:
 
-Suppose we have 5 pages with 20 resources per page. We are now on the page = 1, size = 20  and want to sort `product` resources for the current page.
-In this case, the `sortElements method` passes the same size and page values and added sort params.
+Suppose products have 5 pages with 20 resources per page, and the previous request was to get products with a page number = 1, size = 20.
+
+To sort the current page result, will perform a request to the current page number with the current page size and passed sort params.
 
 ```ts
 // Performing GET request by the URL: http://localhost:8080/api/v1/products?page=1&size=20&sort=cost,ASC&sort=name,DESC
 const pagedProductCollection = ...;
 pagedProductCollection.sortElements({cost: 'ASC', name: 'DESC'})
   .subscribe((customPageResult: PagedResourceCollection<Product>) => {
-     // customPageResult can be fetched from a cache if before was performing the same request
-     // some logic        
-  });
-
-// Performing GET request by the URL: http://localhost:8080/api/v1/products?page=1&size=20&sort=cost,ASC&sort=name,DESC
-const pagedProductCollection = ...;
-pagedProductCollection.sortElements({cost: 'ASC', name: 'DESC'}, {useCache: false})
-  .subscribe((customPageResult: PagedResourceCollection<Product>) => {
-     // customPageResult always will be fetched from the server because we disable a cache for this request
+     // customPageResult can be fetched from the cache if before was performing the same request
      // some logic        
   });
 ```
 
-##### CustomPage
-This method allows pass custom values for page, size, sort params.
+With options:
+
+```ts
+// Performing GET request by the URL: http://localhost:8080/api/v1/products?page=1&size=20&sort=cost,ASC&sort=name,DESC
+const pagedProductCollection = ...;
+pagedProductCollection.sortElements({cost: 'ASC', name: 'DESC'}, {useCache: false})
+  .subscribe((customPageResult: PagedResourceCollection<Product>) => {
+     // customPageResult always will be fetched from the server because the cache is disabled for this request
+     // some logic        
+  });
+```
+
+### CustomPage
+Performing a request to get the page with custom page number, page size, and sort params.
 
 Method signature:
 
-````
+```
 customPage(params: SortedPageParam, options?: {useCache: true;}): Observable<PagedResourceCollection<T>>;
-````
+```
 
-- `params` - contains page, sort, size params, more see [here]()
-- `options` - you can pass additional options that influence to use of cache when get result or not (by default will be used a cache)
-- `return value` - [PagedResourceCollection]() paged collection of resources with type `T` 
-- `throws error` - when you pass page size, greater than total count resources or page number greater than total pages.
+- `params` - [SortedPageParam](#sortedpageparam) page and sort params.
+- `options` - additional options to manipulate the cache when getting a result (by default will be used the cache if it enabled in the [configuration](#cache-params)).
+- `return value` - [PagedResourceCollection](#pagedresourcecollection) with resource types `T`.
+- `throws error` - when the page size, greater than total count resources or page number greater than total pages.
 
-> When you pass only part of the `params` the [default page params]() will be used for not passed.
+> When pass only part of the `params` then used [default page params]() for not passed ones.
 
-Example of usage:
-
-Suppose we have 5 pages with 20 resources per page. We are now on the page = 1, size = 20. We want to get page = 2 with size = 30 and sort result by name.
+##### Examples of usage:
 
 ```ts
 // Performing GET request by the URL: http://localhost:8080/api/v1/products?page=2&size=30&sort=name,ASC
@@ -1271,10 +1289,14 @@ pagedProductCollection.customPage({
     }
   })
   .subscribe(value1 => {
-     // customPageResult can be fetched from a cache if before was performing the same request
+     // customPageResult can be fetched from the cache if before was performing the same request
      // some logic      
   });
+```
 
+With options:
+
+```ts
 // Performing GET request by the URL: http://localhost:8080/api/v1/products?page=2&size=30&sort=name,ASC
 const pagedProductCollection = ...;
 pagedProductCollection.customPage({
@@ -1288,18 +1310,19 @@ pagedProductCollection.customPage({
   },
   {useCache: true})
   .subscribe(value1 => {
-     // customPageResult always will be fetched from the server because we disable a cache for this request
+     // customPageResult always will be fetched from the server because the cache is disabled for this request
      // some logic  
   });
 
 ```
 
-#### Subtypes support
+## Subtypes support
 
-Library allows you work with entities hierarchy.
-Suppose you have the next resources:
+The library allows work with entities hierarchy.
 
-```
+Suppose exists the next resource's hierarchy:
+
+```ts
  import { Resource } from '@lagoshny/ngx-hal-client';
   
   export class Cart extends Resource {
@@ -1326,11 +1349,11 @@ Suppose you have the next resources:
   
   }
  
-  ```
+```
 
-And their `hal-json` representation:
+With `hal-json` representation:
   
-  ```
+```json
   Cart:
   {
     "status": "New",
@@ -1360,15 +1383,16 @@ And their `hal-json` representation:
       }
     }
   }
-  ```  
-From example below you can note that the `Cart` resource has the `client` property with type `Client`.
-In its turn `client` can have one of types `PhysicalClient` or `JuridicalClient`.
-You can use [Resource.isResourceOf]() method to know what `client` resource type you got.
+```  
+From the example, above can note that the `Cart` resource has the `client` property with type `Client`.
+In its turn, `client` can have one of the types `PhysicalClient` or `JuridicalClient`.
 
-Example of usage ([given the presets]()):
+You can use [Resource.isResourceOf](#isresourceof) method to know what `client` resource type you got.
 
-```
-// Suppose we have some cart resource and we want to get client relation and know what is the client type
+##### Examples of usage:
+
+```ts
+// Suppose exists cart resource and after getting client relation need to know what is the client type
 const cart = ...
 cart.getRelation('client')
   .subscribe((client: Client) => {
@@ -1386,12 +1410,9 @@ cart.getRelation('client')
 
 As described before to work with resources you can use built-in [HateoasResourceService](#built-in-hateoasresourceservice)  or create [custom resource service](#resource-service).
 
->Only difference in methods signature between built-in HateoasResourceService and custom resource service is built-in service always has a resource name as the first method param.
+>Difference in methods signature between built-in HateoasResourceService and custom resource service is built-in service always has a resource name as the first method param but can use without creating custom resource service
 
-**No matter which a service you choose you will have the same resource methods.**
-
-___
-#### Resource service presets
+### Resource service presets
 
 Examples of usage resource service methods rely on this presets.
 
@@ -1439,25 +1460,26 @@ Examples of usage resource service methods rely on this presets.
       }
   }
   ```
-___
 
-#### GetResource
+**No matter which service used both have the same resource methods.**
 
-This method uses for getting a single resource [Resource](#resource).
-With `GetOption` you can pass `projection` param (see below).
+### GetResource
+Getting one resource [Resource](#resource).
+
+This method takes [GetOption](#getoption) parameter with it you can pass `projection` param.
 
 Method signature:
 
-````
+```
 getResource(id: number | string, options?: GetOption): Observable<T>;
-````
+```
 
-- `id` - resource id to get
-- `options` - you can pass additional options that will be applied to the request, more about `GetOption` see [here](#getoption).
-- `return value` - [Resource](#resource) with type `T`
-- `throws error` when returned value is not [Resource](#resource)
+- `id` - resource id to get.
+- `options` - [GetOption](#getoption) additional options applied to the request.
+- `return value` - [Resource](#resource) with type `T`.
+- `throws error` when returned value is not [Resource](#resource).
 
-Example of usage ([given the presets](#resource-service-presets)):
+##### Example of usage ([given the presets](#resource-service-presets)):
 
 ```ts
 // Performing GET request by the URL: http://localhost:8080/api/v1/products/1
@@ -1465,12 +1487,16 @@ this.productService.getResource(1)
     .subscribe((product: Product) => {
         // some logic
     })
+
 this.productHateoasService.getResource('products', 1)
     .subscribe((product: Product) => {
         // some logic
     })
+```
 
+With options:
 
+```ts
 // Performing GET request by the URL: http://localhost:8080/api/v1/products/1?testParam=test&projection=productProjection&sort=cost,ASC
 this.productService.getResource(1, {
   params: {
@@ -1480,10 +1506,11 @@ this.productService.getResource(1, {
   sort: {
     cost: 'ASC'
   },
-  // useCache: true | false, when cache is enable then by default true, false otherwise
+  // useCache: true | false, when the cache is enabled then by default true, false otherwise
 }).subscribe((product: Product) => {
     // some logic
-});
+})
+
 this.productHateoasService.getResource('products', 1, {
   params: {
     testParam: 'test',
@@ -1492,29 +1519,27 @@ this.productHateoasService.getResource('products', 1, {
   sort: {
     cost: 'ASC'
   },
-  // useCache: true | false, when cache is enable then by default true, false otherwise
+  // useCache: true | false, when the cache is enabled then by default true, false otherwise
 }).subscribe((product: Product) => {
     // some logic
-});
-
+})
 ```
 
-#### GetResourceCollection
-
-This method uses for getting a collection of resources [ResourceCollection](#resourcecollection).
-With `GetOption` you can pass `projection` param (see below).
+### GetResourceCollection
+Getting collection of resources [ResourceCollection](#resourcecollection).
+This method takes [GetOption](#getoption) parameter with it you can pass `projection` param.
 
 Method signature:
 
-````
+```
 getCollection(options?: GetOption): Observable<ResourceCollection<T>>;
-````
+```
 
-- `options` - you can pass additional options that will be applied to the request, more about `GetOption` see [here](#getoption).
-- `return value` - [ResourceCollection](#resourcecollection) collection of resources with type `T` 
-- `throws error` when returned value is not [ResourceCollection](#resourcecollection) 
+- `options` - [GetOption](#getoption) additional options applied to the request.
+- `return value` - [ResourceCollection](#resourcecollection) collection of resources with type `T`.
+- `throws error` when returned value is not [ResourceCollection](#resourcecollection).
 
-Example of usage ([given the presets](#resource-service-presets)):
+##### Example of usage ([given the presets](#resource-service-presets)):
 
 ```ts
 // Performing GET request by the URL: http://localhost:8080/api/v1/products
@@ -1523,12 +1548,17 @@ this.productService.getCollection()
         const products: Array<Product> = collection.resources;
         // some logic
     })
+
 this.productHateoasService.getCollection('products')
     .subscribe((collection: ResourceCollection<Product>) => {
         const products: Array<Product> = collection.resources;
         // some logic
     })
+```
 
+With options:
+
+```ts
 // Performing GET request by the URL: http://localhost:8080/api/v1/products?testParam=test&projection=productProjection&sort=cost,ASC
 this.productService.getCollection({
   params: {
@@ -1538,11 +1568,12 @@ this.productService.getCollection({
   sort: {
     cost: 'ASC'
   },
-  // useCache: true | false, when cache is enable then by default true, false otherwise
+  // useCache: true | false, when the cache is enabled then by default true, false otherwise
 }).subscribe((collection: ResourceCollection<Product>) => {
     const products: Array<Product> = collection.resources;
     // some logic
-});
+})
+
 this.productHateoasService.getCollection('products', {
   params: {
     testParam: 'test',
@@ -1551,31 +1582,31 @@ this.productHateoasService.getCollection('products', {
   sort: {
     cost: 'ASC'
   },
-  // useCache: true | false, when cache is enable then by default true, false otherwise
+  // useCache: true | false, when the cache is enabled then by default true, false otherwise
 }).subscribe((collection: ResourceCollection<Product>) => {
     const products: Array<Product> = collection.resources;
     // some logic
-});
-
+})
 ```
 
-#### GetResourcePage
+### GetResourcePage
+Getting paged collection of resources [PagedResourceCollection](#pagedresourcecollection).
 
-This method uses for getting a paged collection of resources [PagedResourceCollection](#pagedresourcecollection).
-With `PagedGetOption` you can pass `projection` param (see below).
->If you don't pass `pageParams` with `PagedGetOption` then will be used [default page params](#default-page-values). 
+This method takes [PagedGetOption](#pagedgetoption) parameter with it you can pass `projection` param (see below).
+
+>If do not pass `pageParams` with `PagedGetOption` then will be used [default page options](#default-page-values). 
 
 Method signature:
 
-````
+```
 getPage(options?: PagedGetOption): Observable<PagedResourceCollection<T>>;
-````
+```
 
-- `options` - you can pass additional options that will be applied to the request, if not passed page params will be used [default page params](#default-page-values), more about `PagedGetOption` see [here](#pagedgetoption).
-- `return value` - [PagedResourceCollection](#pagedresourcecollection) paged collection of resources with type `T` 
+- `options` - [PagedGetOption](#pagedgetoption) additional options applied to the request, if not passed `pageParams` then used [default page params](#default-page-values).
+- `return value` - [PagedResourceCollection]() paged collection of resources with type `T`.
 - `throws error` when returned value is not [PagedResourceCollection](#pagedresourcecollection) 
 
-Example of usage ([given the presets](#resource-service-presets)):
+##### Example of usage ([given the presets](#resource-service-presets)):
 
 ```ts
 // Performing GET request by the URL: http://localhost:8080/api/v1/products?page=0&size=20
@@ -1589,7 +1620,8 @@ this.productService.getPage()
            page.prev();
            page.customPage();
         */    
-    })
+    });
+
 this.productHateoasService.getPage('products')
     .subscribe((page: PagedResourceCollection<Product>) => {
         const products: Array<Product> = page.resources;
@@ -1600,9 +1632,12 @@ this.productHateoasService.getPage('products')
            page.prev();
            page.customPage();
         */   
-    })
+    });
+```
 
+With options:
 
+```ts
 // Performing GET request by the URL: http://localhost:8080/api/v1/products?testParam=test&projection=productProjection&page=1&size=40&sort=cost,ASC
 this.productService.getPage({
   pageParams: {
@@ -1616,7 +1651,7 @@ this.productService.getPage({
   sort: {
     cost: 'ASC'
   },
-  // useCache: true | false, when cache is enable then by default true, false otherwise
+  // useCache: true | false, when the cache is enabled then by default true, false otherwise
 }).subscribe((page: PagedResourceCollection<Product>) => {
     const products: Array<Product> = page.resources;
     /* can use page methods
@@ -1627,6 +1662,7 @@ this.productService.getPage({
        page.customPage();
     */  
 });
+
 this.productHateoasService.getPage('products', {
   pageParams: {
     page: 1,
@@ -1639,7 +1675,7 @@ this.productHateoasService.getPage('products', {
   sort: {
     cost: 'ASC'
   },
-  // useCache: true | false, when cache is enable then by default true, false otherwise
+  // useCache: true | false, when the cache is enabled then by default true, false otherwise
 }).subscribe((page: PagedResourceCollection<Product>) => {
     const products: Array<Product> = page.resources;
     /* can use page methods
@@ -1650,23 +1686,21 @@ this.productHateoasService.getPage('products', {
        page.customPage();
     */  
 });
-
 ```
 
-#### CreateResource
-
-This method uses for create a new resource entity [Resource](#resource).
+### CreateResource
+Creating new resource [Resource](#resource).
 
 Method signature:
 
-````
+```
 createResource(requestBody: RequestBody<T>): Observable<T | any>;
-````
+```
 
-- `requestBody` - object that contains resource as body and additional body options, more about `RequestBody` see [here](#requestbody).
-- `return value` - [Resource](#resource) with type `T` or raw response data when it's not a resource object. 
+- `requestBody` - [RequestBody](#requestbody) contains request body (in this case resource object) and additional body options.
+- `return value` - [Resource](#resource) with type `T` or `raw response data` when returned value is not resource object. 
 
-Example of usage ([given the presets](#resource-service-presets)):
+##### Example of usage ([given the presets](#resource-service-presets)):
 
 ```ts
 /*
@@ -1687,12 +1721,17 @@ this.productService.createResource({
 }).subscribe((createdProduct: Product) => {
     // some logic 
 });
+
 this.productHateoasService.createResource('products', {
   body: newProduct
 }).subscribe((createdProduct: Product) => {
     // some logic 
 });
+```
 
+With options:
+
+```ts
 /*
 Performing POST request by the URL: http://localhost:8080/api/v1/products
 Request body:
@@ -1715,6 +1754,7 @@ this.productService.createResource({
 }).subscribe((createdProduct: Product) => {
     // some logic 
 });
+
 this.productHateoasService.createResource('products', {
   body: newProduct,
   valuesOption: {
@@ -1725,26 +1765,30 @@ this.productHateoasService.createResource('products', {
 });
 ```
 
-#### UpdateResource
+### UpdateResource
+Updating **all** values of an existing resource at once `by resource self link URL`.
 
-This method uses to updating **all** a resource values at once.
-If you want update only part of resource values then use [PatchResource](#patchresource) method.
-> It means if you pass only part of resource value in requestBody then all not passed resource values will be overwritten on null values. 
+>For not passed values of resource, `null` values will be used.
+
+To update a resource performs `PUT` request by the URL equals to `resource self link` passed in `entity` param.
+
+To update a resource by an `id` directly use [UpdateResourceById](#updateresourcebyid).
+
+>To update part of the values of resource use [PatchResource](#patchresource) method.
 
 Method signature:
 
-````
+```
 updateResource(entity: T, requestBody?: RequestBody<any>): Observable<T | any>;
-````
+```
 
-- `entity` - resource entity that should be updated, when passed only this param then passed `entity` values will be used to update a resource values.
-- `requestBody` - object that contains a new resource values to update and additional body options, more about `RequestBody` see [here](#requestbody).
-- `return value` - [Resource](#resource) with type `T` or raw response data when it's not a resource object. 
+- `entity` - resource to update. 
+- `requestBody` - [RequestBody](#requestbody) contains request body (in this case new values for resource) and additional body options.
+- `return value` - [Resource](#resource) with type `T` or `raw response data` when returned value is not resource object. 
 
->In this case to update a resource performs a PUT request by URL equals to resource self link passed in `entity` param.
-You can update a resource entity by an id directly, see more [here](#updateresourcebyid).
+>When passed only `entity` param then values of `entity` will be used to update values of resource.
 
-Example of usage ([given the presets](#resource-service-presets)):
+##### Example of usage ([given the presets](#resource-service-presets)):
 
 ```ts
 /*
@@ -1767,7 +1811,11 @@ this.productService.updateResource(exitsProduct)
     // some logic 
 });
 // For productHateoasService this snippet is identical
+```
 
+With options:
+
+```ts
 /*
 Suppose exitsProduct has a self link = http://localhost:8080/api/v1/products/1
 Performing PUT request by the URL: http://localhost:8080/api/v1/products/1
@@ -1793,28 +1841,27 @@ this.productService.updateResource(exitsProduct, {
     // some logic 
 });
 // For productHateoasService this snippet is identical
-
 ```
 
-#### UpdateResourceById
+### UpdateResourceById
+Updating **all** values of an existing resource at once `by resource id`.
 
-This method uses to updating **all** a resource values at once by resource id.
-If you want update only part of resource values then use [PatchResourceById](#patchresourcebyid) method.
-> It means if you pass only part of resource value in requestBody then all not passed resource values will be overwritten on null values. 
+To update a resource by resource `self link URL` use [UpdateResource](#updateresource).
+
+>To update part of the values of resource use [PatchResource](#patchresource) method.
+
 
 Method signature:
 
-````
+```
 updateResourceById(id: number | string, requestBody: RequestBody<any>): Observable<T | any>;
-````
+```
 
-- `id` - resource id that should be updated
-- `requestBody` - object that contains a new resource values to update and additional body options, more about `RequestBody` see [here](#requestbody).
-- `return value` - [Resource](#resource) with type `T` or raw response data when it's not a resource object. 
+- `id` - resource id to update.
+- `requestBody` - [RequestBody](#requestbody) contains request body (in this case new values for resource) and additional body options.
+- `return value` - [Resource](#resource) with type `T` or `raw response data` when returned value is not resource object. 
 
->You can update a resource entity by a resource self link without passing an id param directly, see more [here](#updateresource).
-
-Example of usage ([given the presets](#resource-service-presets)):
+##### Example of usage ([given the presets](#resource-service-presets)):
 
 ```ts
 /*
@@ -1840,6 +1887,7 @@ this.productService.updateResourceById(1, {
   .subscribe((updatedProduct: Product) => {
     // some logic 
 });
+
 this.productHateoasService.updateResourceById('products', 1, {
   body: {
     ...exitsProduct
@@ -1848,7 +1896,11 @@ this.productHateoasService.updateResourceById('products', 1, {
   .subscribe((updatedProduct: Product) => {
     // some logic 
 });
+```
 
+With options:
+
+```ts
 /*
 Suppose exitsProduct has an id = 1
 Performing PUT request by the URL: http://localhost:8080/api/v1/products/1
@@ -1873,6 +1925,7 @@ this.productService.updateResourceById(1, {
   .subscribe((updatedProduct: Product) => {
     // some logic 
 });
+
 this.productHateoasService.updateResourceById('products', 1, {
   body: {
     name: null,
@@ -1888,26 +1941,28 @@ this.productHateoasService.updateResourceById('products', 1, {
 
 ```
 
-#### PatchResource
+### PatchResource
+Patching **part** values of an existing resource `by resource self link URL`.
 
-This method uses to patch **part** of resource values.
-If you want patching all resource values then use [UpdateResource](#updateresource) method.
-> It means if you pass only part of resource values in requestBody then only passed values will be overwritten. 
+To patch a resource performs `PATCH` request by the URL equals to `resource self link` passed in `entity` param.
+
+To patch a resource by an `id` directly use [PatchResourceById](#patchresourcebyid).
+
+>To update all values of the resource at once use [UpdateResource](#updateresource) method.
 
 Method signature:
 
-````
+```
 patchResource(entity: T, requestBody?: RequestBody<any>): Observable<T | any>;
-````
+```
 
-- `entity` - resource entity that should be patched, when passed only this param then passed `entity` values will be used to patch a resource values.
-- `requestBody` - object that contains a new resource values to patch and additional body options, more about `RequestBody` see [here](#requestbody).
-- `return value` - [Resource](#resource) with type `T` or raw response data when it's not a resource object. 
+- `entity` - resource to patch. 
+- `requestBody` - [RequestBody](#requestbody) contains request body (in this case new values for resource) and additional body options.
+- `return value` - [Resource](#resource) with type `T` or `raw response data` when returned value is not resource object. 
 
->In this case to patch a resource performs a PATCH request by URL equals to resource self link passed in `entity` param.
-You can patch a resource entity by an id directly, see more [here](#patchresourcebyid).
+>When passed only `entity` param then values of `entity` will be used to patch values of resource.
 
-Example of usage ([given the presets](#resource-service-presets)):
+##### Example of usage ([given the presets](#resource-service-presets)):
 
 ```ts
 /*
@@ -1930,7 +1985,11 @@ this.productService.patchResource(exitsProduct)
     // some logic 
 });
 // For productHateoasService this snippet is identical
+```
 
+With options:
+
+```ts
 /*
 Suppose exitsProduct has a self link = http://localhost:8080/api/v1/products/1
 Performing PATCH request by the URL: http://localhost:8080/api/v1/products/1
@@ -1959,25 +2018,25 @@ this.productService.patchResource(exitsProduct, {
 
 ```
 
-#### PatchResourceById
+### PatchResourceById
+Patching **part** values of an existing resource `by resource id`.
 
-This method uses to patch **part** of resource values by resource id.
-If you want patching all resource values then use [UpdateResourceById](#updateresourcebyid) method.
-> It means if you pass only part of resource values in requestBody then only passed values will be overwritten. 
+To patch a resource by resource `self link URL` use [UpdateResource](#updateresource).
+
+>To update all values of the resource at once use [UpdateResource](#updateresource) method.
+
 
 Method signature:
 
-````
+```
 patchResourceById(id: number | string, requestBody: RequestBody<any>): Observable<T | any>;
-````
+```
 
-- `id` - resource id that should be patched
-- `requestBody` - object that contains a new resource values to patch and additional body options, more about `RequestBody` see [here](#requestbody).
-- `return value` - [Resource](#resource) with type `T` or raw response data when it's not a resource object. 
+- `id` - resource id to patch.
+- `requestBody` - [RequestBody](#requestbody) contains request body (in this case new values for resource) and additional body options.
+- `return value` - [Resource](#resource) with type `T` or `raw response data` when returned value is not resource object. 
 
->You can patch a resource entity by a resource self link without passing an id param directly, see more [here](#patchresource).
-
-Example of usage ([given the presets](#resource-service-presets)):
+##### Example of usage ([given the presets](#resource-service-presets)):
 
 ```ts
 /*
@@ -2003,6 +2062,7 @@ this.productService.patchResourceById(1, {
   .subscribe((patchedProduct: Product) => {
     // some logic 
 });
+
 this.productHateoasService.patchResourceById('products', 1, {
   body: {
     ...exitsProduct
@@ -2011,7 +2071,11 @@ this.productHateoasService.patchResourceById('products', 1, {
   .subscribe((patchedProduct: Product) => {
     // some logic 
 });
+```
 
+With options:
+
+```ts
 /*
 Suppose exitsProduct has an id = 1
 Performing PUT request by the URL: http://localhost:8080/api/v1/products/1
@@ -2036,6 +2100,7 @@ this.productService.patchResourceById(1, {
   .subscribe((patchedProduct: Product) => {
     // some logic 
 });
+
 this.productHateoasService.patchResourceById('products', 1, {
   body: {
     name: null,
@@ -2048,26 +2113,26 @@ this.productHateoasService.patchResourceById('products', 1, {
   .subscribe((patchedProduct: Product) => {
     // some logic 
 });
-
 ```
 
-#### DeleteResource
-This method uses to delete resource by a resource self link URL.
+### DeleteResource
+Deleting resource `by resource self link URL`.
+
+To delete a resource performs `DELETE` request by the URL equals to `resource self link` passed in `entity` param.
+
+>To delete a resource by an `id` directly use [DeleteResourceById](#deleteresourcebyid).
 
 Method signature:
 
-````
+```
 deleteResource(entity: T, options?: RequestOption): Observable<HttpResponse<any> | any>;
-````
+```
 
-- `entity` - resource entity that should be deleted
-- `options` - you can pass additional options that will be applied to the request, more about `RequestOption` see [here](#requestoption).
-- `return value` - by default raw response data or Angular `HttpResponse` when `options` param has `observe: 'response'` value. 
+- `entity` - resource to delete. 
+- `options` - [RequestOption](#requestoption) additional options applied to the request.
+- `return value` - by default `raw response data` or Angular `HttpResponse` when `options` param has a `observe: 'response'` value. 
 
->In this case to delete a resource performs DELETE request by URL equals to resource self link passed in `entity` param.
-You can delete a resource entity by an id directly, see more [here](#deleteresourcebyid).
-
-Example of usage ([given the presets](#resource-service-presets)):
+##### Example of usage ([given the presets](#resource-service-presets)):
 
 ```ts
 /*
@@ -2079,7 +2144,11 @@ this.productService.deleteResource(exitsProduct)
     // some logic     
   });
 // For productHateoasService this snippet is identical
+```
 
+With options:
+
+```ts
 /*
 Suppose exitsProduct has a self link = http://localhost:8080/api/v1/products/1
 Will be perform DELETE request to the http://localhost:8080/api/v1/products/1?testParam=test
@@ -2097,22 +2166,22 @@ this.productService.deleteResource(exitsProduct, {
 // For productHateoasService this snippet is identical
 ```
 
-#### DeleteResourceById
-This method uses to delete resource by a resource id.
+### DeleteResourceById
+Deleting resource `by resource id`.
+
+>To delete a resource by resource `self link URL` use [DeleteResource](#deleteresource).
 
 Method signature:
 
-````
+```
 deleteResourceById(id: number | string, options?: RequestOption): Observable<HttpResponse<any> | any>;
-````
+```
 
-- `id` - resource id that should be deleted
-- `options` - you can pass additional options that will be applied to the request, more about `RequestOption` see [here](#requestoption).
-- `return value` - by default raw response data or Angular `HttpResponse` when `options` param has `observe: 'response'` value. 
+- `id` - resource id to delete.
+- `options` - [RequestOption](#requestoption) additional options applied to the request.
+- `return value` - by default `raw response data` or Angular `HttpResponse` when `options` param has a `observe: 'response'` value. 
 
->You can delete a resource entity by a resource self link without passing an id param directly, see more [here](#deleteresource).
-
-Example of usage ([given the presets](#resource-service-presets)):
+##### Example of usage ([given the presets](#resource-service-presets)):
 
 ```ts
 /*
@@ -2123,11 +2192,16 @@ this.productService.deleteResourceById(1)
   .subscribe((result: any) => {
     // some logic     
   });
+
 this.productHateoasService.deleteResourceById('products', 1)
   .subscribe((result: any) => {
     // some logic     
   });
+```
 
+With options:
+
+```ts
 /*
 Suppose exitsProduct has an id = 1
 Will be perform DELETE request to the http://localhost:8080/api/v1/products/1?testParam=test
@@ -2142,6 +2216,7 @@ this.productService.deleteResourceById(1, {
   .subscribe((result: HttpResponse<any>) => {
     // some logic     
   });
+
 this.productHateoasService.deleteResourceById('products', 1, {
   observe: 'response',
   params: {
@@ -2153,36 +2228,42 @@ this.productHateoasService.deleteResourceById('products', 1, {
   });
 ```
 
-#### SearchResource
-This method uses for search a single resource.
-You don't need to specify `/search` part of the URL it will be added automatically
+### SearchResource
+Searching for one resource [Resource](#resource).
 
-With `GetOption` you can pass `projection` param (see below).
+This method takes [GetOption](#getoption) parameter with it you can pass `projection` param.
 
 Method signature:
 
-````
+```
 searchResource(searchQuery: string, options?: GetOption): Observable<T>;
-````
+```
 
-- `searchQuery` - additional part of the url that wll be follow after `/search/` resource url.
-- `options` - you can pass additional options that will be applied to the request, more about `GetOption` see [here](#getoption).
-- `return value` - resource with type `T`
+- `searchQuery` - additional part of the URL that follow after `/search/` resource URL.
+- `options` - [GetOption](#getoption) additional options applied to the request.
+- `return value` - [Resource](#resource) with type `T`.
 - `throws error` when returned value is not [Resource](#resource)
 
-Example of usage ([given the presets](#resource-service-presets)):
+>When using the method not need to pass `/search/` part of the URL in `searchQuery`.
+
+##### Example of usage ([given the presets](#resource-service-presets)):
 
 ```ts
 // Performing GET request by the URL: http://localhost:8080/api/v1/products/search/searchQuery 
 this.productService.searchResource('searchQuery')
     .subscribe((product: Product) => {
         // some logic
-    })
+    });
+
 this.productHateoasService.searchResource('products', 'searchQuery')
     .subscribe((product: Product) => {
         // some logic
-    })
+    });
+```
 
+With options:
+
+```ts
 // Performing GET request by the URL: http://localhost:8080/api/v1/products/search/byName?name=Fruit&projection=productProjection&sort=name,ASC
 this.productService.searchResource('byName', {
   params: {
@@ -2192,11 +2273,12 @@ this.productService.searchResource('byName', {
   sort: {
     name: 'ASC'
   },
-  // useCache: true | false, when cache is enable then by default true, false otherwise
+  // useCache: true | false, when the cache is enabled then by default true, false otherwise
 })
   .subscribe((product: Product) => {
     // some logic
   });
+
 this.productHateoasService.searchResource('products', 'byName', {
   params: {
     projection: 'productProjection',
@@ -2205,7 +2287,7 @@ this.productHateoasService.searchResource('products', 'byName', {
   sort: {
     name: 'ASC'
   },
-  // useCache: true | false, when cache is enable then by default true, false otherwise
+  // useCache: true | false, when the cache is enabled then by default true, false otherwise
 })
   .subscribe((product: Product) => {
     // some logic
@@ -2214,24 +2296,24 @@ this.productHateoasService.searchResource('products', 'byName', {
 ```
 
 #### SearchResourceCollection
+Searching for collection of resources [ResourceCollection](#resourcecollection).
 
-This method uses for searching a collection of resources.
-You don't need to specify `/search` part of the URL it will be added automatically
-
-With `GetOption` you can pass `projection` param (see below).
+This method takes [GetOption](#getoption) parameter with it you can pass `projection` param.
 
 Method signature:
 
-````
+```
 searchCollection(searchQuery: string, options?: GetOption): Observable<ResourceCollection<T>>;
-````
+```
 
-- `searchQuery` - additional part of the url that wll be follow after `/search/` resource url.
-- `options` - you can pass additional options that will be applied to the request, more about `GetOption` see [here](#getoption).
-- `return value` - collection of resources with type `T` 
+- `searchQuery` - additional part of the URL that follow after `/search/` resource URL.
+- `options` - [GetOption](#getoption) additional options applied to the request.
+- `return value` - [ResourceCollection](#resourcecollection) collection of resources with type `T`.
 - `throws error` when returned value is not [ResourceCollection](#resourcecollection)
 
-Example of usage ([given the presets](#resource-service-presets)):
+>When using the method not need to pass `/search/` part of the URL in `searchQuery`.
+
+##### Example of usage ([given the presets](#resource-service-presets)):
 
 ```ts
 // Performing GET request by the URL: http://localhost:8080/api/v1/products/search/searchQuery 
@@ -2239,13 +2321,18 @@ this.productService.searchCollection('searchQuery')
     .subscribe((collection: ResourceCollection<Product>) => {
         const products: Array<Product> = collection.resources;
         // some logic
-    })
+    });
+
 this.productHateoasService.searchCollection('products', 'searchQuery')
     .subscribe((collection: ResourceCollection<Product>) => {
         const products: Array<Product> = collection.resources;
         // some logic
-    })
+    });
+```
 
+With options:
+
+```ts
 // Performing GET request by the URL: http://localhost:8080/api/v1/products/search/byName?name=Fruit&projection=productProjection&sort=name,ASC
 this.productService.searchCollection('byName', {
   params: {
@@ -2255,11 +2342,12 @@ this.productService.searchCollection('byName', {
   sort: {
     name: 'ASC'
   },
-  // useCache: true | false, when cache is enable then by default true, false otherwise
+  // useCache: true | false, when the cache is enabled then by default true, false otherwise
 }).subscribe((collection: ResourceCollection<Product>) => {
     const products: Array<Product> = collection.resources;
     // some logic
 });
+
 this.productHateoasService.searchCollection('products', 'byName', {
   params: {
     name: 'Fruit',
@@ -2268,7 +2356,7 @@ this.productHateoasService.searchCollection('products', 'byName', {
   sort: {
     name: 'ASC'
   },
-  // useCache: true | false, when cache is enable then by default true, false otherwise
+  // useCache: true | false, when the cache is enabled then by default true, false otherwise
 }).subscribe((collection: ResourceCollection<Product>) => {
     const products: Array<Product> = collection.resources;
     // some logic
@@ -2277,23 +2365,26 @@ this.productHateoasService.searchCollection('products', 'byName', {
 ```
 
 #### SearchResourcePage
-This method uses for searching a paged collection of resources.
-You don't need to specify `/search` part of the URL it will be added automatically
+Searching for collection of resources with pagination[PagedResourceCollection](#pagedresourcecollection).
 
-With `PagedGetOption` you can pass `projection` param (see below).
+This method takes [PagedGetOption](#pagedgetoption) parameter with it you can pass `projection` param (see below).
+
+>If do not pass `pageParams` with `PagedGetOption` then will be used [default page options](#default-page-values). 
 
 Method signature:
 
-````
+```
 searchPage(searchQuery: string, options?: PagedGetOption): Observable<PagedResourceCollection<T>>;
-````
+```
 
-- `searchQuery` - additional part of the url that wll be follow after `/search/` resource url.
-- `options` - you can pass additional options that will be applied to the request, more about `PagedGetOption` see [here](#pagedgetoption)
-- `return value` - [PagedResourceCollection](#pagedresourcecollection) paged collection of resources with type `T` 
+- `searchQuery` - additional part of the URL that follow after `/search/` resource URL.
+- `options` - [PagedGetOption](#pagedgetoption) additional options applied to the request, if not passed `pageParams` then used [default page params](#default-page-values).
+- `return value` - [PagedResourceCollection](#pagedresourcecollection) paged collection of resources with type `T`.
 - `throws error` when returned value is not [PagedResourceCollection](#pagedresourcecollection)
 
-Example of usage ([given the presets](#resource-service-presets)):
+>When using the method not need to pass `/search/` part of the URL in `searchQuery`.
+
+##### Example of usage ([given the presets](#resource-service-presets)):
 
 ```ts
 // Performing GET request by the URL: http://localhost:8080/api/v1/products/search/searchQuery?page=0&size=20
@@ -2301,13 +2392,18 @@ this.productService.searchPage('searchQuery')
     .subscribe((pagedCollection: PagedResourceCollection<Product>) => {
         const products: Array<Product> = pagedCollection.resources;
         // some logic
-    })
+    });
+
 this.productHateoasService.searchPage('products', 'searchQuery')
     .subscribe((pagedCollection: PagedResourceCollection<Product>) => {
         const products: Array<Product> = pagedCollection.resources;
         // some logic
-    })
+    });
+```
 
+With options:
+
+```ts
 // Performing GET request by the URL: http://localhost:8080/api/v1/products/search/byName?name=Fruit&projection=productProjection&page=1&size=30&sort=name,ASC
 this.productService.searchPage('byName', {
   pageParams: {
@@ -2321,11 +2417,12 @@ this.productService.searchPage('byName', {
   sort: {
     name: 'ASC'
   },
-  // useCache: true | false, when cache is enable then by default true, false otherwise
+  // useCache: true | false, when the cache is enabled then by default true, false otherwise
 }).subscribe((pagedCollection: PagedResourceCollection<Product>) => {
     const products: Array<Product> = pagedCollection.resources;
     // some logic
 });
+
 this.productHateoasService.searchPage('products', 'byName', {
   pageParams: {
     page: 1,
@@ -2338,7 +2435,7 @@ this.productHateoasService.searchPage('products', 'byName', {
   sort: {
     cost: 'ASC'
   },
-  // useCache: true | false, when cache is enable then by default true, false otherwise
+  // useCache: true | false, when the cache is enabled then by default true, false otherwise
 }).subscribe((pagedCollection: PagedResourceCollection<Product>) => {
     const products: Array<Product> = pagedCollection.resources;
     // some logic
@@ -2347,23 +2444,23 @@ this.productHateoasService.searchPage('products', 'byName', {
 ```
 
 #### CustomQuery
+Performing custom HTTP request for resource.
 
-This method uses to perform a custom HTTP requests for a resource.
-For example, you can perform a count query use this method (see example below). 
+>For example, use this method to perform a count query (see example below). 
 
 Method signature:
 
-````
+```
 customQuery<R>(method: HttpMethod, query: string, requestBody?: RequestBody<any>, options?: PagedGetOption): Observable<R>;
-````
+```
 
-- `method` - HTTP request method (GET/POST/PUT/PATCH), 
-- `query` - additional part of the url that wll be follow after root resource url.
-- `requestBody` - it uses when `method` is `POST`, `PATCH`, `PUT` to pass request body. See more see about `RequestBody` [here](#requestbody).
-- `options` - you can pass additional options that will be applied to the request, more about `GetOption` see [here](#getoption)
-- `return value` - generic type `<R>` define return query type. 
+- `method` - HTTP request method (GET/POST/PUT/PATCH).
+- `query` - additional part of the URL, added after root resource URL.
+- `requestBody` - [RequestBody](#requestbody) uses when `method` is `POST`, `PATCH`, `PUT` to pass request body and additional body options.
+- `options` - [PagedGetOption](#pagedgetoption) additional options applied to the request.
+- `return value` - `any` object that equals to passed generic type `<R>` 
 
-Example of usage ([given the presets](#resource-service-presets)):
+##### Example of usage ([given the presets](#resource-service-presets)):
 
 ```ts
 // Performing GET request by the URL: http://localhost:8080/api/v1/products/search/countAll
@@ -2371,29 +2468,32 @@ this.productService.customQuery<number>(HttpMethod.GET, '/search/countAllBy')
   .subscribe((count: number) => {
     // some logic        
   });
+
 this.productHateoasService.customQuery<number>('products', HttpMethod.GET, '/search/countAllBy')
   .subscribe((count: number) => {
     // some logic        
   });
-````
+```
 
 #### CustomSearchQuery
-This method uses to perform a custom HTTP search requests for a resource.
-For example, you can perform a count query use this method (see example below). 
+Performing custom search HTTP request for resource.
+
+>For example, use this method to perform a count query (see example below). 
 
 Method signature:
 
-````
+```
 customSearchQuery<R>(method: HttpMethod, searchQuery: string, requestBody?: RequestBody<any>, options?: PagedGetOption): Observable<R>;
-````
+```
 
-- `method` - HTTP request method (GET/POST/PUT/PATCH), 
-- `searchQuery` - additional part of the url that wll be follow after `/search/` resource url.
-- `requestBody` - it uses when `method` is `POST`, `PATCH`, `PUT` to pass request body. See more see about `RequestBody` [here](#requestbody).
-- `options` - you can pass additional options that will be applied to the request, more about `GetOption` see [here](#getoption)
-- `return value` - generic type `<R>` define return query type. 
+- `method` - HTTP request method (GET/POST/PUT/PATCH).
+- `searchQuery` - additional part of the URL that follow after `/search/` resource URL.
+- `requestBody` - [RequestBody](#requestbody) uses when `method` is `POST`, `PATCH`, `PUT` to pass request body and additional body options.
+- `options` - [PagedGetOption](#pagedgetoption) additional options applied to the request.
+- `return value` - `any` object that equals to passed generic type `<R>` 
 
-Example of usage ([given the presets](#resource-service-presets)):
+
+##### Example of usage ([given the presets](#resource-service-presets)):
 
 ```ts
 // Performing GET request by the URL: http://localhost:8080/api/v1/products/search/countAll
@@ -2401,11 +2501,12 @@ this.productService.customSearchQuery<number>(HttpMethod.GET, '/countAllBy')
   .subscribe((count: number) => {
     // some logic        
   });
+
 this.productHateoasService.customSearchQuery<number>('products', HttpMethod.GET, '/countAllBy')
   .subscribe((count: number) => {
     // some logic        
   });
-````
+```
 
 ### Library settings
 
@@ -2415,7 +2516,7 @@ This section describes library configuration params, and some library features t
 
 You can pass the next params to configure the library.
 
-````
+```
   http: {
     rootUrl: string;
     proxyUrl?: string;
@@ -2427,7 +2528,7 @@ You can pass the next params to configure the library.
     enabled: boolean;
     lifeTime?: number;
   };
-````
+```
 ##### Http params
 
 `rootUrl` (required) - defines root server URL that will be used to perform resource requests.

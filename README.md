@@ -247,25 +247,26 @@ export class ProductService extends HateoasResourceOperation<Product> {
 
 ### Resource types
 
-There are several types of resources, main resource type is [Resource]() that represents server-side entity model class.
-When server-side model has Embeddable entity then you need use [EmbeddedResource]() type instead [Resource]() type. 
+There are several types of resources, the main resource type is [Resource](#resource) represents the server-side entity model class.
+If the server-side model has Embeddable entity type then use [EmbeddedResource](#embeddedresource) type instead [Resource](#resource) type. 
 
-Both [Resource]() and [EmbeddedResource]() have some the same methods therefore they have common parent [BaseResource]() class implements these methods. 
+Both [Resource](#resource) and [EmbeddedResource](#embeddedresource) have some the same methods therefore they have common parent [BaseResource](#baseresource) class implements these methods. 
 
-To work with resource collections provides [ResourceCollection]() type its holds array of the resources.
-When you have paged resource collection result then you need to use extension of [ResourceCollection]() is [PagedResourceCollection]() that allow you to navigate by pages and perform custom page requests.
+To work with resource collections uses [ResourceCollection](#resourcecollection) type its holds an array of the resources.
+When you have a paged resource collection result use an extension of [ResourceCollection](#resourcecollection) is [PagedResourceCollection](#pagedresourcecollection) that allows you to navigate by pages and perform custom page requests.
  
-In some cases server-side can have entity inheritance model how work with entity subtypes, you can found [here]().
+In some cases, the server-side can have an entity inheritance model how to work with entity subtypes, you can found [here](#subtypes-support).
 
 ___
-#### Presets for examples
+### Resource presets
 
-Examples of usage resource relation methods rely on this presets.
+Examples of usage resource relation methods rely on presets.
 
 
 - Server root url = http://localhost:8080/api/v1
+
 - Resource classes are
-  ```
+  ```ts
   import { Resource } from '@lagoshny/ngx-hal-client';
   
   export class Cart extends Resource {
@@ -320,7 +321,7 @@ Examples of usage resource relation methods rely on this presets.
   ```
   
 - Suppose we have existed resources:
-  ```
+  ```json
   Cart:
   {
     "status": "New",
@@ -402,37 +403,43 @@ Examples of usage resource relation methods rely on this presets.
 
 ___
 
-#### BaseResource
+### BaseResource
 
-Parent class for [Resource]() and [EmbeddedResource]() classes.
-
+Parent class for [Resource](#resource) and [EmbeddedResource](#embeddedresource) classes.
 Contains common resource methods to work with resource relations through resource links (see below).
 
-##### GetRelation
-This method uses to get relation resource objects by relation name.
-With `GetOption` you can pass `projection` param (see below).
+#### GetRelation
+___
+
+Getting resource relation object by relation name.
+
+Takes [GetOption](#getoption) parameter with it you can pass `projection` param (see below).
 
 Method signature:
 
-````
-getRelation<T extends BaseResource>(relationName: string, options?: GetOption): Observable<T>;
-````
-
-- `relationName` - resource relation name that should be used to get request URL.
-- `options` - you can pass additional options that will be applied to the request, more about `GetOption` see [here]()
-- `return value` - [Resource]() with type `T` 
-- `throws error` - when required params are not valid or link not found by relation name or returned value is not [Resource]().
-
-Example of usage ([given the presets]()):
-
 ```
-// Will be perform GET request to the http://localhost:8080/api/v1/carts/1/shop
+getRelation<T extends BaseResource>(relationName: string, options?: GetOption): Observable<T>;
+```
+
+- `relationName` - resource relation name used to get request URL.
+- `options` - [GetOption](#getoption) additional options applied to the request.
+- `return value` - [Resource](#resource) with type `T`.
+- `throws error` - when required params are not valid or link not found by relation name or returned value is not [Resource](#resource).
+
+Examples of usage ([given the presets](#resource-presets)):
+
+```ts
+// Performing GET request by the URL: http://localhost:8080/api/v1/carts/1/shop
 cart.getRelation<Shop>('shop')
   .subscribe((shop: Shop) => {
     // some logic        
   });
+```
 
-// Will be perform GET request to the http://localhost:8080/api/v1/carts/1/shop?projection=shopProjection&testParam=test&sort=name,ASC
+With options:
+
+```ts
+// Performing GET request by the URL: http://localhost:8080/api/v1/carts/1/shop?projection=shopProjection&testParam=test&sort=name,ASC
 cart.getRelation<Shop>('shop', {
   params: {
     testParam: 'test',
@@ -446,34 +453,40 @@ cart.getRelation<Shop>('shop', {
   .subscribe((shop: Shop) => {
     // some logic        
   });
-````
+```
 
-##### GetRelatedCollection
-This method uses to get related resource collection by relation name.
-With `GetOption` you can pass `projection` param (see below).
+#### GetRelatedCollection
+___
+Getting related resource collection by relation name.
+
+Takes [GetOption](#getoption) parameter with it you can pass `projection` param (see below).
 
 Method signature:
 
-````
-getRelatedCollection<T extends ResourceCollection<BaseResource>>(relationName: string, options?: GetOption): Observable<T>;
-````
-
-- `relationName` - resource relation name that should be used to get request URL.
-- `options` - you can pass additional options that will be applied to the request, more about `GetOption` see [here]()
-- `return value` - [ResourceCollection]() collection of resources with type `T` 
-- `throws error` - when required params are not valid or link not found by relation name or returned value is not [ResourceCollection]().
-
-Example of usage ([given the presets]()):
-
 ```
-// Will be perform GET request to the http://localhost:8080/api/v1/carts/1/products
+getRelatedCollection<T extends ResourceCollection<BaseResource>>(relationName: string, options?: GetOption): Observable<T>;
+```
+
+- `relationName` - resource relation name used to get request URL.
+- `options` - [GetOption](#getoption) additional options applied to the request.
+- `return value` - [ResourceCollection](#resourcecollection) collection of resources with type `T`.
+- `throws error` - when required params are not valid or link not found by relation name or returned value is not [ResourceCollection](#resourcecollection).
+
+Examples of usage ([given the presets](#resource-presets)):
+
+```ts
+// Performing GET request by the URL: http://localhost:8080/api/v1/carts/1/products
 cart.getRelatedCollection<ResourceCollection<Product>>('products')
   .subscribe((collection: ResourceCollection<Product>) => {
     const products: Array<Product> = collection.resources;
     // some logic        
   });
+```
 
-// Will be perform GET request to the http://localhost:8080/api/v1/carts/1/products?projection=productProjection&testParam=test&sort=name,ASC
+With options:
+
+```ts
+// Performing GET request by the URL: http://localhost:8080/api/v1/carts/1/products?projection=productProjection&testParam=test&sort=name,ASC
 cart.getRelatedCollection<ResourceCollection<Product>>('products', {
   params: {
     testParam: 'test',
@@ -489,12 +502,15 @@ cart.getRelatedCollection<ResourceCollection<Product>>('products', {
     // some logic        
   });
 
-````
+```
 
-##### GetRelatedPage
-This method uses to get related resource collection by relation name.
-With `PagedGetOption` you can pass `projection` param (see below).
->If you don't pass `pageParams` with `PagedGetOption` then will be used [default page options](). 
+#### GetRelatedPage
+___
+Getting related resource collection by relation name.
+
+Takes [PagedGetOption](#pagedgetoption) parameter with it you can pass `projection` param (see below).
+
+>If don't pass `pageParams` with `PagedGetOption` then will be used [default page options](#default-page-values). 
 
 Method signature:
 
@@ -502,15 +518,15 @@ Method signature:
 getRelatedPage<T extends PagedResourceCollection<BaseResource>>(relationName: string, options?: PagedGetOption): Observable<T>;
 ````
 
-- `relationName` - resource relation name that should be used to get request URL.
-- `options` - you can pass additional options that will be applied to the request, if not passed page params will be used [default page params](), more about `PagedGetOption` see [here]().
-- `return value` - [PagedResourceCollection]() paged collection of resources with type `T` 
+- `relationName` - resource relation name used to get request URL.
+- `options` - [PagedGetOption](#pagedgetoption) additional options applied to the request, if not passed `pageParams` then used [default page params](#default-page-values).
+- `return value` - [PagedResourceCollection]() paged collection of resources with type `T`.
 - `throws error` - when required params are not valid or link not found by relation name or returned value is not [PagedResourceCollection]().
 
-Example of usage ([given the presets]()):
+Examples of usage ([given the presets](#resource-presets)):
 
-```
-// Will be perform GET request to the http://localhost:8080/api/v1/carts/1/productPage?page=0&size=20
+```ts
+// Performing GET request by the URL: http://localhost:8080/api/v1/carts/1/productPage?page=0&size=20
 cart.getRelatedPage<PagedResourceCollection<Product>>('productsPage')
   .subscribe((page: PagedResourceCollection<Product>) => {
     const products: Array<Product> = page.resources;
@@ -522,8 +538,12 @@ cart.getRelatedPage<PagedResourceCollection<Product>>('productsPage')
        page.customPage();
     */
   });
+```
 
-// Will be perform GET request to the http://localhost:8080/api/v1/carts/1/productPage?page=1&size=40&projection=productProjection&testParam=test&sort=name,ASC
+With options:
+
+```ts
+// Performing GET request by the URL: http://localhost:8080/api/v1/carts/1/productPage?page=1&size=40&projection=productProjection&testParam=test&sort=name,ASC
 cart.getRelatedPage<PagedResourceCollection<Product>>('productsPage', {
   pageParams: {
     page: 1,
@@ -548,26 +568,27 @@ cart.getRelatedPage<PagedResourceCollection<Product>>('productsPage', {
        page.customPage();
     */
   });
-````
+```
 
-##### PostRelation
-This method uses to perform POST request with request body by relation link URL.
+#### PostRelation
+___
+Performing POST request with request body by relation link URL.
 
 Method signature:
 
-````
+```
 postRelation(relationName: string, requestBody: RequestBody<any>, options?: RequestOption): Observable<HttpResponse<any> | any>;
-````
-
-- `relationName` - resource relation name that should be used to get request URL.
-- `requestBody` - object that contains some request body and additional body options, more about `RequestBody` see [here]().
-- `options` - you can pass additional options that will be applied to the request, more about `RequestOption` see [here]().
-- `return value` - by default raw response data or Angular `HttpResponse` when `options` param has `observe: 'response'` value. 
-
-Example of usage ([given the presets]()):
-
 ```
-// Will be perform POST request to the http://localhost:8080/api/v1/cart/1/postExample
+
+- `relationName` - resource relation name used to get request URL.
+- `requestBody` - [RequestBody](#requestbody) contains request body and additional body options.
+- `options` - [RequestOption](#requestoption) additional options applied to the request.
+- `return value` - by default `raw response data` or Angular `HttpResponse` when `options` param has a `observe: 'response'` value. 
+
+Examples of usage ([given the presets](#resource-presets)):
+
+```ts
+// Performing POST request by the URL: http://localhost:8080/api/v1/cart/1/postExample
 cart.postRelation('postExample', {
   // In this case null values in someBody will be ignored
   body: someBody
@@ -575,8 +596,12 @@ cart.postRelation('postExample', {
   .subscribe((rawResult: any) => {
      // some logic        
   });
+```
 
-// Will be perform POST request to the http://localhost:8080/api/v1/cart/1/postExample?testParam=test
+With options:
+
+```ts
+// Performing POST request by the URL: http://localhost:8080/api/v1/cart/1/postExample?testParam=test
 cart.postRelation('postExample', {
   // In this case null values in someBody will be NOT ignored
   body: someBody,
@@ -594,24 +619,25 @@ cart.postRelation('postExample', {
   });
 ```
 
-##### PatchRelation
-This method uses to perform PATCH request with request body by relation link URL.
+#### PatchRelation
+___
+Performing PATCH request with request body by relation link URL.
 
 Method signature:
 
-````
+```
 patchRelation(relationName: string, requestBody: RequestBody<any>, options?: RequestOption): Observable<HttpResponse<any> | any>;
-````
-
-- `relationName` - resource relation name that should be used to get request URL.
-- `requestBody` - object that contains some request body and additional body options, more about `RequestBody` see [here]().
-- `options` - you can pass additional options that will be applied to the request, more about `RequestOption` see [here]().
-- `return value` - by default raw response data or Angular `HttpResponse` when `options` param has `observe: 'response'` value. 
-
-Example of usage ([given the presets]()):
-
 ```
-// Will be perform PATCH request to the http://localhost:8080/api/v1/cart/1/patchExample
+
+- `relationName` - resource relation name used to get request URL.
+- `requestBody` - [RequestBody](#requestbody) contains request body and additional body options.
+- `options` - [RequestOption](#requestoption) additional options applied to the request.
+- `return value` - by default `raw response data` or Angular `HttpResponse` when `options` param has a `observe: 'response'` value. 
+
+Examples of usage ([given the presets](#resource-presets)):
+
+```ts
+// Performing PATCH request by the URL: http://localhost:8080/api/v1/cart/1/patchExample
 cart.patchRelation('patchExample', {
   // In this case null values in someBody will be ignored
   body: someBody
@@ -620,7 +646,12 @@ cart.patchRelation('patchExample', {
      // some logic        
   });
 
-// Will be perform PATCH request to the http://localhost:8080/api/v1/cart/1/patchExample?testParam=test
+```
+
+With options:
+
+```ts
+// Performing PATCH request by the URL: http://localhost:8080/api/v1/cart/1/patchExample?testParam=test
 cart.patchRelation('patchExample', {
   // In this case null values in someBody will be NOT ignored
   body: someBody,
@@ -638,24 +669,25 @@ cart.patchRelation('patchExample', {
   });
 ```
 
-##### PutRelation
-This method uses to perform PUT request with request body by relation link URL.
+#### PutRelation
+___
+Performing PUT request with request body by relation link URL.
 
 Method signature:
 
-````
-putRelation(relationName: string, requestBody: RequestBody<any>, options?: RequestOption): Observable<HttpResponse<any> | any>;
-````
-
-- `relationName` - resource relation name that should be used to get request URL.
-- `requestBody` - object that contains some request body and additional body options, more about `RequestBody` see [here]().
-- `options` - you can pass additional options that will be applied to the request, more about `RequestOption` see [here]().
-- `return value` - by default raw response data or Angular `HttpResponse` when `options` param has `observe: 'response'` value. 
-
-Example of usage ([given the presets]()):
-
 ```
-// Will be perform PUT request to the http://localhost:8080/api/v1/cart/1/putExample
+putRelation(relationName: string, requestBody: RequestBody<any>, options?: RequestOption): Observable<HttpResponse<any> | any>;
+```
+
+- `relationName` - resource relation name used to get request URL.
+- `requestBody` - [RequestBody](#requestbody) contains request body and additional body options.
+- `options` - [RequestOption](#requestoption) additional options applied to the request.
+- `return value` - by default `raw response data` or Angular `HttpResponse` when `options` param has a `observe: 'response'` value. 
+
+Examples of usage ([given the presets](#resource-presets)):
+
+```ts
+// Performing PUT request by the URL: http://localhost:8080/api/v1/cart/1/putExample
 cart.putRelation('putExample', {
   // In this case null values in someBody will be ignored
   body: someBody
@@ -663,8 +695,12 @@ cart.putRelation('putExample', {
   .subscribe((rawResult: any) => {
      // some logic        
   });
+```
 
-// Will be perform PUT request to the http://localhost:8080/api/v1/cart/1/putExample?testParam=test
+With options:
+
+```ts
+// Performing PUT request by the URL: http://localhost:8080/api/v1/cart/1/putExample?testParam=test
 cart.putRelation('putExample', {
   // In this case null values in someBody will be NOT ignored
   body: someBody,
@@ -682,7 +718,7 @@ cart.putRelation('putExample', {
   });
 ```
 
-#### Resource
+### Resource
 
 This is the main resource class. You need to extend model classes with this class to have the ability to use resource methods.
 
@@ -691,7 +727,7 @@ Usually, resource class is `@Entity` server-side classes and [EmbeddedResource](
 
 Resource class extend [BaseResource]() with additional resource relations methods that can be used only with `resource type`.
 
-##### IsResourceOf
+#### IsResourceOf
 
 This method uses when resource has sub-types, and you want to know what type current resource has.
 You can read more about sub-types [here]().
@@ -713,7 +749,7 @@ isResourceOf<T extends Resource>(typeOrName: (new () => T) | string): boolean
 Example of usage ([given the presets]()):
 
 ```
-// Suppose was perform GET request to get the Cart resource by the url http://localhost:8080/api/v1/carts/1
+// Suppose was Performing GET request to get the Cart resource by the url http://localhost:8080/api/v1/carts/1
 
 cart.isResourceOf('carts'); // return TRUE
 cart.isResourceOf('cart'); // return FALSE
@@ -741,7 +777,7 @@ Example of usage ([given the presets]()):
 
 ```
 /* 
- Will be perform POST request to the http://localhost:8080/api/v1/carts/1/products
+ Performing POST request by the URL: http://localhost:8080/api/v1/carts/1/products
  Content-type: 'text/uri-list'
  Body: [http://localhost:8080/api/v1/products/1, http://localhost:8080/api/v1/products/2]
 */
@@ -777,7 +813,7 @@ Example of usage ([given the presets]()):
 
 ```
 /* 
- Will be perform PATCH request to the http://localhost:8080/api/v1/carts/1/shop
+ Performing PATCH request by the URL: http://localhost:8080/api/v1/carts/1/shop
  Content-type: 'text/uri-list'
  Body: http://localhost:8080/api/v1/shops/2
 */
@@ -810,7 +846,7 @@ Example of usage ([given the presets]()):
 
 ```
 /* 
- Will be perform PUT request to the http://localhost:8080/api/v1/carts/1/shop
+ Performing PUT request by the URL: http://localhost:8080/api/v1/carts/1/shop
  Content-type: 'text/uri-list'
  Body: http://localhost:8080/api/v1/shops/1
 */
@@ -841,7 +877,7 @@ Example of usage ([given the presets]()):
 
 ```
 /* 
- Will be perform PUT request to the http://localhost:8080/api/v1/carts/1/products
+ Performing PUT request by the URL: http://localhost:8080/api/v1/carts/1/products
  Content-type: 'text/uri-list'
  Body: ''
 */
@@ -971,7 +1007,7 @@ Suppose we have 3 pages with 20 resources per page. We are now on the page = 2 a
 In this case, the `first method` passes only page param = 0, for size param used previous value or [default value]() it depends on was passed size param before or not. 
 
 ```ts
-// Will be perform GET request to the http://localhost:8080/api/v1/products?page=0&size=20
+// Performing GET request by the URL: http://localhost:8080/api/v1/products?page=0&size=20
 const pagedProductCollection = ...;
 pagedProductCollection.first()
   .subscribe((firstPageResult: PagedResourceCollection<Product>) => {
@@ -979,7 +1015,7 @@ pagedProductCollection.first()
      // some logic        
   });
 
-// Will be perform GET request to the http://localhost:8080/api/v1/products?page=0&size=20
+// Performing GET request by the URL: http://localhost:8080/api/v1/products?page=0&size=20
 const pagedProductCollection = ...;
 pagedProductCollection.first({useCache: false})
   .subscribe((firstPageResult: PagedResourceCollection<Product>) => {
@@ -1007,7 +1043,7 @@ Suppose we have 3 pages with 20 resources per page. We are now on the page = 0 a
 In this case, the `last method` passes only page param = 2, for size param used previous value or [default value]() it depends on was passed size param before or not. 
 
 ```ts
-// Will be perform GET request to the http://localhost:8080/api/v1/products?page=2&size=20
+// Performing GET request by the URL: http://localhost:8080/api/v1/products?page=2&size=20
 const pagedProductCollection = ...;
 pagedProductCollection.last()
   .subscribe((lastPageResult: PagedResourceCollection<Product>) => {
@@ -1015,7 +1051,7 @@ pagedProductCollection.last()
      // some logic        
   });
 
-// Will be perform GET request to the http://localhost:8080/api/v1/products?page=2&size=20
+// Performing GET request by the URL: http://localhost:8080/api/v1/products?page=2&size=20
 const pagedProductCollection = ...;
 pagedProductCollection.last({useCache: false})
   .subscribe((lastPageResult: PagedResourceCollection<Product>) => {
@@ -1043,7 +1079,7 @@ Suppose we have 3 pages with 20 resources per page. We are now on the page = 0 a
 In this case, the `next method` passes only page param = 1, for size param used previous value or [default value]() it depends on was passed size param before or not. 
 
 ```ts
-// Will be perform GET request to the http://localhost:8080/api/v1/products?page=1&size=20
+// Performing GET request by the URL: http://localhost:8080/api/v1/products?page=1&size=20
 const pagedProductCollection = ...;
 pagedProductCollection.next()
   .subscribe((nextPageResult: PagedResourceCollection<Product>) => {
@@ -1051,7 +1087,7 @@ pagedProductCollection.next()
      // some logic        
   });
 
-// Will be perform GET request to the http://localhost:8080/api/v1/products?page=1&size=20
+// Performing GET request by the URL: http://localhost:8080/api/v1/products?page=1&size=20
 const pagedProductCollection = ...;
 pagedProductCollection.next({useCache: false})
   .subscribe((nextPageResult: PagedResourceCollection<Product>) => {
@@ -1079,7 +1115,7 @@ Suppose we have 3 pages with 20 resources per page. We are now on the page = 1 a
 In this case, the `prev method` passes only page param = 1, for size param used previous value or [default value]() it depends on was passed size param before or not. 
 
 ```ts
-// Will be perform GET request to the http://localhost:8080/api/v1/products?page=0&size=20
+// Performing GET request by the URL: http://localhost:8080/api/v1/products?page=0&size=20
 const pagedProductCollection = ...;
 pagedProductCollection.prev()
   .subscribe((prevPageResult: PagedResourceCollection<Product>) => {
@@ -1087,7 +1123,7 @@ pagedProductCollection.prev()
      // some logic        
   });
 
-// Will be perform GET request to the http://localhost:8080/api/v1/products?page=0&size=20
+// Performing GET request by the URL: http://localhost:8080/api/v1/products?page=0&size=20
 const pagedProductCollection = ...;
 pagedProductCollection.prev({useCache: false})
   .subscribe((prevPageResult: PagedResourceCollection<Product>) => {
@@ -1118,7 +1154,7 @@ Suppose we have 5 pages with 20 resources per page. We are now on the page = 1 a
 In this case, the `page method` passes only page param = 3, for size param used previous value or [default value]() it depends on was passed size param before or not. 
 
 ```ts
-// Will be perform GET request to the http://localhost:8080/api/v1/products?page=3&size=20
+// Performing GET request by the URL: http://localhost:8080/api/v1/products?page=3&size=20
 const pagedProductCollection = ...;
 pagedProductCollection.page(3)
   .subscribe((customPageResult: PagedResourceCollection<Product>) => {
@@ -1126,7 +1162,7 @@ pagedProductCollection.page(3)
      // some logic        
   });
 
-// Will be perform GET request to the http://localhost:8080/api/v1/products?page=3&size=20
+// Performing GET request by the URL: http://localhost:8080/api/v1/products?page=3&size=20
 const pagedProductCollection = ...;
 pagedProductCollection.page(3, {useCache: false})
   .subscribe((customPageResult: PagedResourceCollection<Product>) => {
@@ -1156,7 +1192,7 @@ Suppose we have 5 pages with 20 resources per page. We are now on the page = 1, 
 In this case, the `size method` passes only size param = 50, for a page param used previous value or [default value]() it depends on was passed a page param before or not. 
 
 ```ts
-// Will be perform GET request to the http://localhost:8080/api/v1/products?page=1&size=50
+// Performing GET request by the URL: http://localhost:8080/api/v1/products?page=1&size=50
 const pagedProductCollection = ...;
 pagedProductCollection.size(50)
   .subscribe((customPageResult: PagedResourceCollection<Product>) => {
@@ -1164,7 +1200,7 @@ pagedProductCollection.size(50)
      // some logic        
   });
 
-// Will be perform GET request to the http://localhost:8080/api/v1/products?page=1&size=50
+// Performing GET request by the URL: http://localhost:8080/api/v1/products?page=1&size=50
 const pagedProductCollection = ...;
 pagedProductCollection.size(50, {useCache: false})
   .subscribe((customPageResult: PagedResourceCollection<Product>) => {
@@ -1194,7 +1230,7 @@ Suppose we have 5 pages with 20 resources per page. We are now on the page = 1, 
 In this case, the `sortElements method` passes the same size and page values and added sort params.
 
 ```ts
-// Will be perform GET request to the http://localhost:8080/api/v1/products?page=1&size=20&sort=cost,ASC&sort=name,DESC
+// Performing GET request by the URL: http://localhost:8080/api/v1/products?page=1&size=20&sort=cost,ASC&sort=name,DESC
 const pagedProductCollection = ...;
 pagedProductCollection.sortElements({cost: 'ASC', name: 'DESC'})
   .subscribe((customPageResult: PagedResourceCollection<Product>) => {
@@ -1202,7 +1238,7 @@ pagedProductCollection.sortElements({cost: 'ASC', name: 'DESC'})
      // some logic        
   });
 
-// Will be perform GET request to the http://localhost:8080/api/v1/products?page=1&size=20&sort=cost,ASC&sort=name,DESC
+// Performing GET request by the URL: http://localhost:8080/api/v1/products?page=1&size=20&sort=cost,ASC&sort=name,DESC
 const pagedProductCollection = ...;
 pagedProductCollection.sortElements({cost: 'ASC', name: 'DESC'}, {useCache: false})
   .subscribe((customPageResult: PagedResourceCollection<Product>) => {
@@ -1232,7 +1268,7 @@ Example of usage:
 Suppose we have 5 pages with 20 resources per page. We are now on the page = 1, size = 20. We want to get page = 2 with size = 30 and sort result by name.
 
 ```ts
-// Will be perform GET request to the http://localhost:8080/api/v1/products?page=2&size=30&sort=name,ASC
+// Performing GET request by the URL: http://localhost:8080/api/v1/products?page=2&size=30&sort=name,ASC
 const pagedProductCollection = ...;
 pagedProductCollection.customPage({
     pageParams: {
@@ -1248,7 +1284,7 @@ pagedProductCollection.customPage({
      // some logic      
   });
 
-// Will be perform GET request to the http://localhost:8080/api/v1/products?page=2&size=30&sort=name,ASC
+// Performing GET request by the URL: http://localhost:8080/api/v1/products?page=2&size=30&sort=name,ASC
 const pagedProductCollection = ...;
 pagedProductCollection.customPage({
     pageParams: {
@@ -1433,7 +1469,7 @@ getResource(id: number | string, options?: GetOption): Observable<T>;
 Example of usage ([given the presets](#resource-service-presets)):
 
 ```ts
-// Will be perform GET request to the http://localhost:8080/api/v1/products/1
+// Performing GET request by the URL: http://localhost:8080/api/v1/products/1
 this.productService.getResource(1)
     .subscribe((product: Product) => {
         // some logic
@@ -1444,7 +1480,7 @@ this.productHateoasService.getResource('products', 1)
     })
 
 
-// Will be perform GET request to the http://localhost:8080/api/v1/products/1?testParam=test&projection=productProjection&sort=cost,ASC
+// Performing GET request by the URL: http://localhost:8080/api/v1/products/1?testParam=test&projection=productProjection&sort=cost,ASC
 this.productService.getResource(1, {
   params: {
     testParam: 'test',
@@ -1490,7 +1526,7 @@ getCollection(options?: GetOption): Observable<ResourceCollection<T>>;
 Example of usage ([given the presets](#resource-service-presets)):
 
 ```ts
-// Will be perform GET request to the http://localhost:8080/api/v1/products
+// Performing GET request by the URL: http://localhost:8080/api/v1/products
 this.productService.getCollection()
     .subscribe((collection: ResourceCollection<Product>) => {
         const products: Array<Product> = collection.resources;
@@ -1502,7 +1538,7 @@ this.productHateoasService.getCollection('products')
         // some logic
     })
 
-// Will be perform GET request to the http://localhost:8080/api/v1/products?testParam=test&projection=productProjection&sort=cost,ASC
+// Performing GET request by the URL: http://localhost:8080/api/v1/products?testParam=test&projection=productProjection&sort=cost,ASC
 this.productService.getCollection({
   params: {
     testParam: 'test',
@@ -1551,7 +1587,7 @@ getPage(options?: PagedGetOption): Observable<PagedResourceCollection<T>>;
 Example of usage ([given the presets](#resource-service-presets)):
 
 ```ts
-// Will be perform GET request to the http://localhost:8080/api/v1/products?page=0&size=20
+// Performing GET request by the URL: http://localhost:8080/api/v1/products?page=0&size=20
 this.productService.getPage()
     .subscribe((page: PagedResourceCollection<Product>) => {
         const products: Array<Product> = page.resources;
@@ -1576,7 +1612,7 @@ this.productHateoasService.getPage('products')
     })
 
 
-// Will be perform GET request to the http://localhost:8080/api/v1/products?testParam=test&projection=productProjection&page=1&size=40&sort=cost,ASC
+// Performing GET request by the URL: http://localhost:8080/api/v1/products?testParam=test&projection=productProjection&page=1&size=40&sort=cost,ASC
 this.productService.getPage({
   pageParams: {
     page: 1,
@@ -1643,7 +1679,7 @@ Example of usage ([given the presets](#resource-service-presets)):
 
 ```ts
 /*
-Will be perform POST request to the http://localhost:8080/api/v1/products
+Performing POST request by the URL: http://localhost:8080/api/v1/products
 Request body:
 {
   "name": "Apple",
@@ -1667,7 +1703,7 @@ this.productHateoasService.createResource('products', {
 });
 
 /*
-Will be perform POST request to the http://localhost:8080/api/v1/products
+Performing POST request by the URL: http://localhost:8080/api/v1/products
 Request body:
 {
   "name": "Apple",
@@ -1722,7 +1758,7 @@ Example of usage ([given the presets](#resource-service-presets)):
 ```ts
 /*
 Suppose exitsProduct has a self link = http://localhost:8080/api/v1/products/1
-Will be perform PUT request to the http://localhost:8080/api/v1/products/1
+Performing PUT request by the URL: http://localhost:8080/api/v1/products/1
 Request body:
 {
   "name" = exitsProduct.name,
@@ -1743,7 +1779,7 @@ this.productService.updateResource(exitsProduct)
 
 /*
 Suppose exitsProduct has a self link = http://localhost:8080/api/v1/products/1
-Will be perform PUT request to the http://localhost:8080/api/v1/products/1
+Performing PUT request by the URL: http://localhost:8080/api/v1/products/1
 Request body:
 {
   "name": null,
@@ -1792,7 +1828,7 @@ Example of usage ([given the presets](#resource-service-presets)):
 ```ts
 /*
 Suppose exitsProduct has an id = 1
-Will be perform PUT request to the http://localhost:8080/api/v1/products/1
+Performing PUT request by the URL: http://localhost:8080/api/v1/products/1
 Request body:
 {
   "name" = exitsProduct.name,
@@ -1824,7 +1860,7 @@ this.productHateoasService.updateResourceById('products', 1, {
 
 /*
 Suppose exitsProduct has an id = 1
-Will be perform PUT request to the http://localhost:8080/api/v1/products/1
+Performing PUT request by the URL: http://localhost:8080/api/v1/products/1
 Request body:
 {
   "name": null,
@@ -1885,7 +1921,7 @@ Example of usage ([given the presets](#resource-service-presets)):
 ```ts
 /*
 Suppose exitsProduct has a self link = http://localhost:8080/api/v1/products/1
-Will be perform PATCH request to the http://localhost:8080/api/v1/products/1
+Performing PATCH request by the URL: http://localhost:8080/api/v1/products/1
 Request body:
 {
   "name" = exitsProduct.name,
@@ -1906,7 +1942,7 @@ this.productService.patchResource(exitsProduct)
 
 /*
 Suppose exitsProduct has a self link = http://localhost:8080/api/v1/products/1
-Will be perform PATCH request to the http://localhost:8080/api/v1/products/1
+Performing PATCH request by the URL: http://localhost:8080/api/v1/products/1
 Request body:
 {
   "name": null,
@@ -1955,7 +1991,7 @@ Example of usage ([given the presets](#resource-service-presets)):
 ```ts
 /*
 Suppose exitsProduct has an id = 1
-Will be perform PATCH request to the http://localhost:8080/api/v1/products/1
+Performing PATCH request by the URL: http://localhost:8080/api/v1/products/1
 Request body:
 {
   "name" = existProduct.name,
@@ -1987,7 +2023,7 @@ this.productHateoasService.patchResourceById('products', 1, {
 
 /*
 Suppose exitsProduct has an id = 1
-Will be perform PUT request to the http://localhost:8080/api/v1/products/1
+Performing PUT request by the URL: http://localhost:8080/api/v1/products/1
 Request body:
 {
   "name": null,
@@ -2146,7 +2182,7 @@ searchResource(searchQuery: string, options?: GetOption): Observable<T>;
 Example of usage ([given the presets](#resource-service-presets)):
 
 ```ts
-// Will be perform GET request to the http://localhost:8080/api/v1/products/search/searchQuery 
+// Performing GET request by the URL: http://localhost:8080/api/v1/products/search/searchQuery 
 this.productService.searchResource('searchQuery')
     .subscribe((product: Product) => {
         // some logic
@@ -2156,7 +2192,7 @@ this.productHateoasService.searchResource('products', 'searchQuery')
         // some logic
     })
 
-// Will be perform GET request to the http://localhost:8080/api/v1/products/search/byName?name=Fruit&projection=productProjection&sort=name,ASC
+// Performing GET request by the URL: http://localhost:8080/api/v1/products/search/byName?name=Fruit&projection=productProjection&sort=name,ASC
 this.productService.searchResource('byName', {
   params: {
     projection: 'productProjection',
@@ -2207,7 +2243,7 @@ searchCollection(searchQuery: string, options?: GetOption): Observable<ResourceC
 Example of usage ([given the presets](#resource-service-presets)):
 
 ```ts
-// Will be perform GET request to the http://localhost:8080/api/v1/products/search/searchQuery 
+// Performing GET request by the URL: http://localhost:8080/api/v1/products/search/searchQuery 
 this.productService.searchCollection('searchQuery')
     .subscribe((collection: ResourceCollection<Product>) => {
         const products: Array<Product> = collection.resources;
@@ -2219,7 +2255,7 @@ this.productHateoasService.searchCollection('products', 'searchQuery')
         // some logic
     })
 
-// Will be perform GET request to the http://localhost:8080/api/v1/products/search/byName?name=Fruit&projection=productProjection&sort=name,ASC
+// Performing GET request by the URL: http://localhost:8080/api/v1/products/search/byName?name=Fruit&projection=productProjection&sort=name,ASC
 this.productService.searchCollection('byName', {
   params: {
     name: 'Fruit',
@@ -2269,7 +2305,7 @@ searchPage(searchQuery: string, options?: PagedGetOption): Observable<PagedResou
 Example of usage ([given the presets](#resource-service-presets)):
 
 ```ts
-// Will be perform GET request to the http://localhost:8080/api/v1/products/search/searchQuery?page=0&size=20
+// Performing GET request by the URL: http://localhost:8080/api/v1/products/search/searchQuery?page=0&size=20
 this.productService.searchPage('searchQuery')
     .subscribe((pagedCollection: PagedResourceCollection<Product>) => {
         const products: Array<Product> = pagedCollection.resources;
@@ -2281,7 +2317,7 @@ this.productHateoasService.searchPage('products', 'searchQuery')
         // some logic
     })
 
-// Will be perform GET request to the http://localhost:8080/api/v1/products/search/byName?name=Fruit&projection=productProjection&page=1&size=30&sort=name,ASC
+// Performing GET request by the URL: http://localhost:8080/api/v1/products/search/byName?name=Fruit&projection=productProjection&page=1&size=30&sort=name,ASC
 this.productService.searchPage('byName', {
   pageParams: {
     page: 1,
@@ -2339,7 +2375,7 @@ customQuery<R>(method: HttpMethod, query: string, requestBody?: RequestBody<any>
 Example of usage ([given the presets](#resource-service-presets)):
 
 ```ts
-// Will be perform GET request to the http://localhost:8080/api/v1/products/search/countAll
+// Performing GET request by the URL: http://localhost:8080/api/v1/products/search/countAll
 this.productService.customQuery<number>(HttpMethod.GET, '/search/countAllBy')
   .subscribe((count: number) => {
     // some logic        
@@ -2369,7 +2405,7 @@ customSearchQuery<R>(method: HttpMethod, searchQuery: string, requestBody?: Requ
 Example of usage ([given the presets](#resource-service-presets)):
 
 ```ts
-// Will be perform GET request to the http://localhost:8080/api/v1/products/search/countAll
+// Performing GET request by the URL: http://localhost:8080/api/v1/products/search/countAll
 this.productService.customSearchQuery<number>(HttpMethod.GET, '/countAllBy')
   .subscribe((count: number) => {
     // some logic        

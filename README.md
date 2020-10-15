@@ -257,7 +257,6 @@ When you have a paged resource collection result use an extension of [ResourceCo
  
 In some cases, the server-side can have an entity inheritance model how to work with entity subtypes, you can found [here](#subtypes-support).
 
-___
 ### Resource presets
 
 Examples of usage resource relation methods rely on presets.
@@ -401,16 +400,13 @@ Examples of usage resource relation methods rely on presets.
   }
   ```  
 
-___
 
-### BaseResource
+## BaseResource
 
 Parent class for [Resource](#resource) and [EmbeddedResource](#embeddedresource) classes.
 Contains common resource methods to work with resource relations through resource links (see below).
 
-#### GetRelation
-___
-
+### GetRelation
 Getting resource relation object by relation name.
 
 Takes [GetOption](#getoption) parameter with it you can pass `projection` param (see below).
@@ -455,8 +451,7 @@ cart.getRelation<Shop>('shop', {
   });
 ```
 
-#### GetRelatedCollection
-___
+### GetRelatedCollection
 Getting related resource collection by relation name.
 
 Takes [GetOption](#getoption) parameter with it you can pass `projection` param (see below).
@@ -504,8 +499,7 @@ cart.getRelatedCollection<ResourceCollection<Product>>('products', {
 
 ```
 
-#### GetRelatedPage
-___
+### GetRelatedPage
 Getting related resource collection by relation name.
 
 Takes [PagedGetOption](#pagedgetoption) parameter with it you can pass `projection` param (see below).
@@ -570,8 +564,7 @@ cart.getRelatedPage<PagedResourceCollection<Product>>('productsPage', {
   });
 ```
 
-#### PostRelation
-___
+### PostRelation
 Performing POST request with request body by relation link URL.
 
 Method signature:
@@ -619,8 +612,7 @@ cart.postRelation('postExample', {
   });
 ```
 
-#### PatchRelation
-___
+### PatchRelation
 Performing PATCH request with request body by relation link URL.
 
 Method signature:
@@ -669,8 +661,7 @@ cart.patchRelation('patchExample', {
   });
 ```
 
-#### PutRelation
-___
+### PutRelation
 Performing PUT request with request body by relation link URL.
 
 Method signature:
@@ -718,7 +709,7 @@ cart.putRelation('putExample', {
   });
 ```
 
-### Resource
+## Resource
 
 This is the main resource class. You need to extend model classes with this class to have the ability to use resource methods.
 

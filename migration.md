@@ -29,14 +29,14 @@ Some new features:
 ## Library changes
 This section describes the main library changes compare with `@lagoshny/ngx-hal-client` library.
 
-### Configuration
+## Configuration
 The next changes were in the lib configuration:
 
 The old configuration `ExternalConfigService` class was delete. 
 Added new `HateoasConfigurationService` class has the method `configure` to pass app configuration. 
 How configure library with `HateoasConfigurationService` see [here](https://github.com/lagoshny/ngx-hateoas-client#Configuration). 
 
-### Classes
+## Classes
 The next changes were in the classes:
 
 - Class `RestService` renamed to `HateoasResourceOperation`.
@@ -44,10 +44,10 @@ The next changes were in the classes:
 - Added [ResourceCollection](https://github.com/lagoshny/ngx-hateoas-client#ResourceCollection) class now it returns from methods where before was `Array<Resource>`.
 - Deleted `CacheHelper` class, use `HateoasConfigurationService` to configure [cache settings](https://github.com/lagoshny/ngx-hateoas-client#cache-params).
 
-### Methods
+## Methods
 The next changes were in the methods:
 
-#### RestService methods changes
+### RestService methods changes
 The next changes was in `RestService` (now is `HateoasResourceOperation` class):
 
 - Deleted constructor params: `injector` and `type`, now only `resourceName` param.
@@ -85,7 +85,7 @@ The next changes was in `RestService` (now is `HateoasResourceOperation` class):
   - Changed `options` type from `HalOptions` to [GetOption](https://github.com/lagoshny/ngx-hateoas-client#GetOption).
   - Deleted `subType` param, subtypes support, see [here](https://github.com/lagoshny/ngx-hateoas-client#Subtypes-support). 
 
-- Renamed `getAllPage` renamed to `getPage` and changed method signature:
+- Renamed `getAllPage` to `getPage` and changed method signature:
 
   Was: 
   ```
@@ -222,7 +222,7 @@ The next changes was in `RestService` (now is `HateoasResourceOperation` class):
   ```
 
 
-#### Resource class methods changes
+### Resource methods changes
 
 - `getRelation` method signature changes:
 
@@ -314,7 +314,7 @@ The next changes was in `RestService` (now is `HateoasResourceOperation` class):
    - Change `options` param type from `LinkOptions` to [RequestOption](https://github.com/lagoshny/ngx-hateoas-client#RequestOption).
 
 
-#### ResourcePage class methods changes
+### ResourcePage methods changes
 
 `ResourcePage` class renamed to `PagedResourceCollection` and has the next changes:
 
@@ -332,12 +332,18 @@ The next changes was in `RestService` (now is `HateoasResourceOperation` class):
   - Changed `sort` param type, new type is object, more see [here](https://github.com/lagoshny/ngx-hateoas-client#Sort).
 
 
-### Method params
-2) Changed `HalParam` to `GetOption`/`PagedGetOption`
+## Param classes changes
 
-Before `HalParam`:
+### HalParam changes
+`HalParam` class replaced to [GetOption](https://github.com/lagoshny/ngx-hateoas-client#GetOption) or [PagedGetOption](https://github.com/lagoshny/ngx-hateoas-client#PagedGetOption) classes.
 
-```
+Everywhere was used `HalParam` now need to use `GetOption` or `GetPagedOption` depends on return value when return value is `PagedResourceCollection` then will be `PagedGetOption`, `GetOption` otherwise.
+
+Example of migration from `HalParam` to `GetOption` or `PagedGetOption`:
+
+`HalParam` representation:
+
+```js
 params: [
   {
     key: 'projection',
@@ -354,23 +360,26 @@ params: [
 ]
 ```
 
-`HalParam` convert to `GetOption` or `PagedGetOption`:
+After converting to `GetOption` or `PagedGetOption`:
 
-```
+```js
 params: { 
    projection: 'testProjection',
    param1: 'value1',
-   param2: 'value2
+   param2: 'value2'
 }
 ```
 
-3) Changed `HalOptions` to `GetOption`/`PagedGetOption`
+### HalOptions changes
+`HalOptions` class replaced to [GetOption](https://github.com/lagoshny/ngx-hateoas-client#GetOption) or [PagedGetOption](https://github.com/lagoshny/ngx-hateoas-client#PagedGetOption) classes.
 
-When was used `HalOptions` now need to use `GetOption` or `GetPagedOption` depends on return value when return value is `PagedResourceCollection` then will be `PagedGetOption`, `GetOption` otherwise.
+Everywhere was used `HalOptions` now need to use `GetOption` or `GetPagedOption` depends on return value when return value is `PagedResourceCollection` then will be `PagedGetOption`, `GetOption` otherwise.
 
-Before `HalOptions`:
+Example of migration from `HalOptions` to `GetOption` or `PagedGetOption`:
 
-```
+`HalOptions` representation:
+
+```js
 {
   size: 20,
   params: [
@@ -394,9 +403,9 @@ Before `HalOptions`:
 }
 ```
 
-`HalOptions` convert to `GetOption`:
+After converting to `GetOption`:
 
-```
+```js
 {
  params: { 
     projection: 'testProjection',
@@ -409,11 +418,11 @@ Before `HalOptions`:
 }
 ```
 
-Note! `GetOption` doesn't contains `size` params, because this params applied to the page return value use `GetPageParam` to pass this param with properly methods.
+> Note! `GetOption` does not contain a `size` param because it is a page param.
 
-`HalOptions` convert to `PagedGetOption`:
+After converting to `PagedGetOption`:
 
-```
+```js
 {
  params: { 
     projection: 'testProjection',
@@ -429,12 +438,12 @@ Note! `GetOption` doesn't contains `size` params, because this params applied to
 }
 ```
 
-Note! `GetOption` and `PagedGetOption` didn't contains `notPaged` param any more, because now need to use properly merhods when need return paged or not collection.
+### Added new RequestBody param
+[RequestBody](https://github.com/lagoshny/ngx-hateoas-client#RequestBody) is new param type that used with methods where need to pass some request body (for example `createResource`, `patchResource` and so on).
 
+For example:
 
-4) Added `RequestOption` param and used where need to pass some request body (for example `createResource`, `patchResource` and так далее).
-
-Before `RestService.create(...)`:
+Was `RestService.create(...)`:
 
 ```
 this.extendedRestService.create(resource).subscrube(...);
@@ -446,13 +455,14 @@ Now `HateoasResourceOperation.createResource(...)`
 this.extendHateoasResourceOperationService.createResource({body: resource}).subscrube(...);
 ```
 
-Also `RequestOption` has optional param `valuesOption` that is `ValuesOption` object and allow to configure need to include null values from body as is or it shoul be ignored (by default).
+### LinkOptions changes
+`LinkOptions` replaced to `RequestOption` params. 
 
-5) Change `LinkOptions` to `RequestOption` params in `Resource` methods: `postRelation`, `patchRelation`, `putRelation` that allows to pass additional request params and manipulate return object.
+Example of migration from `LinkOptions` to `RequestOption`:
 
-Before:
+`LinkOptions` representation:
 
-```
+```js
 {
   strictParams?: boolean,
   params: {
@@ -462,8 +472,9 @@ Before:
 }
 ```
 
-Now:
-```
+After converting to `PagedGetOption`:
+
+```js
 {
   params: {
       param1: 'value1',
@@ -473,15 +484,14 @@ Now:
 }
 ```
 
-As you can see was deleted `strictParams` and added `observe`.
-Now if you pass nor all params nut your resource link is templated then only passed params will be replaced and other template params will be cleared.
+> `strictParams` was delete and `observe` was add that allows change response type from `raw body` to `Angular HttpResponse`.
 
+### Sort param changes
+Sort param was changed from array to object notation.
 
-6) Changed `Sort` param.
+Was:
 
-Before:
-
-```
+```js
 sort: [
   {path: 'test', order: 'DESC'}
 ]
@@ -489,126 +499,21 @@ sort: [
 
 Now:
 
-```
+```js
 sort: {
    test: 'DESC'
 }
 ```
 
-7) Param `SubTypeBuilder` is not using any more.
-The approach work with subtypes was changed. All methods that before accept `SubTypeBuilder` are not doing it any more
-insteat of it `Resource` class has a new property `resourceName` and public method `isResourceOf(...)`.
-Property `resourceName` holds information about resource type name.
-For example you have some inheritance:
+### SubTypeBuilder param changes
+`SubTypeBuilder` param is not exist anymore, use [Resource.isResourceOf](https://github.com/lagoshny/ngx-hateoas-client#IsResourceOf) method to know which resource type you got.
 
-```
-// Root object
-export class Cart extends Resource {
-  public status: string;
-  public payment: Payment;
-}
-
-// Inheritance
-export class Payment extends Resource {
-  public sum: number;
-}
-
-export class CashPayment extends Payment {
-  public nominal: number;
-}
-
-export class CartPayment extends Payment {
-  public cartNumber: string;
-}
-
-```
-
-And hateoas representation:
-
-Cart:
-```
-{
-  "status": "NEW",
-  "_links": {
-    "self": {
-      "href": "http://localhost:8080/api/v1/cart/1"
-    },
-    "cart": {
-      "href": "http://localhost:8080/api/v1/cart/1{?projection}",
-      "templated": true
-    }
-    "payments": {
-      "href": "http://localhost:8080/api/v1/cart/1/payments"
-    }
-  }
-}
-```
-
-Payments by link http://localhost:8080/api/v1/cart/1/payments will return the next representation:
-```
-{
-  "_embedded" : {
-    "cartPayments" : [ 
-        {
-          "id" : 2,
-          "sum" : 500,
-          "cartNumber" : "1233-1231-1332",
-          "_links" : {
-            "self" : {
-              "href" : "http://localhost:8080/api/v1/cartPayments/2"
-            },
-            "cartPayment" : {
-              "href" : "http://localhost:8080/api/v1/cartPayments/2"
-            }
-          }
-        },
-        {
-          "id" : 3,
-          "sum" : 100,
-          "nominal" : 100,
-          "_links" : {
-            "self" : {
-              "href" : "http://localhost:8080/api/v1/cashPayments/3"
-            },
-            "cartPayment" : {
-              "href" : "http://localhost:8080/api/v1/cashPayments/3"
-            }
-          }
-        } 
-    ]
-  },
-  "_links" : {
-    "self" : {
-      "href" : "http://localhost:8080/api/v1/cart/1/payments"
-    }
-  }
-}
-``` 
-
-Then when you will get payments relation from cart object in old style you was call: 
-```
-cart.getRelationArray(Payment, 'payments', null, null, {subtypes: new Map<string, any>().set('cartPayment', CartPayment).set('cashPayment', CashPayment)})
- .subscribe((result: Array<Resource>) => {
-   console.log(result[0] instanceof CartPayment); // print true
-   console.log(result[1] instanceof CashPayment); // print true
- })
-``` 
-
-In new style  without `SubTypeBuilder` the same code will be:
-
-```
-cart.getRelatedCollection('payments')
- .subscribe((result: ResourceCollection<Resource>) => {
-   console.log(result.resources[0].isResourceOf(CartPayment));   // print true
-   console.log(result.resources[0].isResourceOf('cartPayment')); // print true   
-
-   console.log(result.resources[1].isResourceOf(CashPayment));   // print true
-   console.log(result.resources[1].isResourceOf('cashPayment')); // print true
- })
-``` 
+See more about support subtypes [here](https://github.com/lagoshny/ngx-hateoas-client#Subtypes-support).
  
-8) Params `expireMs`, `isCacheActive` are not using any more.
-Now you can set cahce expire time to all cache see (CACHE_SETTINGS_LINK) and pass additional param `{useCache: false}` that was added to all get methods to do request without cache hit.
+ 
+### ExpireMs and IsCacheActive params changes
+`expireMs`, `isCacheActive` params are not exist anymore.
+How to manage the cache see [here](https://github.com/lagoshny/ngx-hateoas-client#cache-support).
 
 ...
 

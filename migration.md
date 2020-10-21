@@ -2,6 +2,27 @@
 This guide allows you to know how to migrate from `@lagoshny/ngx-hal-client` to `@lagoshny/ngx-hateoas-client`.
 Why you may need to do it see in the [motivation](#motivation) section.
 
+
+## Contents
+1. [Motivation](#Motivation)
+2. [Migration steps](#Migration-steps)
+3. [Library changes](#Library-changes)
+   - [Configuration](#Configuration)
+   - [RestService](#RestService)
+      - [Common changes](#Common-changes)
+      - [Get](#get-changes)
+      - [GetAll](#getall-changes)
+      - [GetAllPage](#getallpage-changes)
+      - [Search](#search-changes)
+      - [SearchPage](#searchpage-changes)
+      - [SearchSingle](#searchsingle-changes)
+      - [CustomQuery](#customquery-changes)
+      - [Create](#create-changes)
+      - [Update](#update-changes)
+      - [Patch](#patch-changes)
+      - [Delete](#delete-changes)
+      - [HandleError](#handleerror-changes)
+
 ## Motivation
 The main reason to create a new hateoas library is `@lagoshny/ngx-hal-client` was a fork from `angular4-hal` library and now `angular4-hal` is not supported.
 To adds new features or refactoring fork version `@lagoshny/ngx-hal-client` is not the right way because it inherits all code from parent `angular4-hal` and the main problem is `angular4-hal` has not a good documentation and has some not documented features.
@@ -36,19 +57,11 @@ The old configuration `ExternalConfigService` class was delete.
 Added new `HateoasConfigurationService` class has the method `configure` to pass app configuration. 
 How configure library with `HateoasConfigurationService` see [here](https://github.com/lagoshny/ngx-hateoas-client#Configuration). 
 
-## Classes
-The next changes were in the classes:
+## RestService
+Class `RestService` renamed to `HateoasResourceOperation`.
 
-- Class `RestService` renamed to `HateoasResourceOperation`.
-- Class `ResourcePage` renamed to [PagedCollectionResource](https://github.com/lagoshny/ngx-hateoas-client#PagedResourceCollection).
-- Added [ResourceCollection](https://github.com/lagoshny/ngx-hateoas-client#ResourceCollection) class now it returns from methods where before was `Array<Resource>`.
-- Deleted `CacheHelper` class, use `HateoasConfigurationService` to configure [cache settings](https://github.com/lagoshny/ngx-hateoas-client#cache-params).
-
-## Methods
-The next changes were in the methods:
-
-### RestService methods changes
-The next changes was in `RestService` (now is `HateoasResourceOperation` class):
+### Common changes
+The next common changes was in `RestService` (now is `HateoasResourceOperation` class):
 
 - Deleted constructor params: `injector` and `type`, now only `resourceName` param.
 - Deleted page methods:  `totalElement`, `totalPages`, `hasFirst`, `hasNext`, `hasPrev`, `hasLast`, `next`, `prev`, `first`, `last`, `page`. See [PagedResourceCollection](https://github.com/lagoshny/ngx-hateoas-client#PagedResourceCollection) to use these methods. 
@@ -57,169 +70,181 @@ The next changes was in `RestService` (now is `HateoasResourceOperation` class):
 - Deleted `count` use [customQuery](https://github.com/lagoshny/ngx-hateoas-client#CustomQuery) instead.
 - Deleted `getBySelfLink` use [getResource](https://github.com/lagoshny/ngx-hateoas-client#GetResource) instead
 
-- Renamed `get` to `getResource` and changed method signature:
+### Get changes
+Renamed `get` to `getResource` and changed method signature:
+
+Was: 
+```
+get(id: any, params?: HalParam[]): Observable<T>;
+```
+Now: 
+```
+getResource(id: number | string, options?: GetOption): Observable<T>;
+```
+
+- Changed `id` param type from `any` to `number|string`
+- Renamed `params` to `options` and changed type from `HalParam[]` to [GetOption](https://github.com/lagoshny/ngx-hateoas-client#GetOption).
+
+### GetAll changes
+Renamed `getAll` to `getCollection` and changed method signature:
+
+Was: 
+```
+getAll(options?: HalOptions, subType?: SubTypeBuilder): Observable<T[]>;
+```
+Now: 
+```
+getCollection(options?: GetOption): Observable<ResourceCollection<T>>;
+```
+
+- Changed `options` type from `HalOptions` to [GetOption](https://github.com/lagoshny/ngx-hateoas-client#GetOption).
+- Deleted `subType` param, subtypes support, see [here](https://github.com/lagoshny/ngx-hateoas-client#Subtypes-support). 
+
+### GetAllPage changes
+Renamed `getAllPage` to `getPage` and changed method signature:
+
+Was: 
+```
+getAllPage(options?: HalOptions, subType?: SubTypeBuilder): Observable<ResourcePage<T>>;
+```
+Now: 
+```
+getPage(options?: PagedGetOption): Observable<PagedResourceCollection<T>>;
+```
+
+- Changed `options` type from `HalOptions` to [PagedGetOption](https://github.com/lagoshny/ngx-hateoas-client#PagedGetOption).
+- Deleted `subType` param, subtypes support, see [here](https://github.com/lagoshny/ngx-hateoas-client#Subtypes-support).
+- Changed return value from `ResourcePage` to [PagedCollectionResource](https://github.com/lagoshny/ngx-hateoas-client#PagedResourceCollection) see [classes changes](#classes).
+
+### Search changes
+Renamed `search` to `searchCollection` and changed method signature:
+
+Was: 
+```
+search(query: string, options?: HalOptions, subType?: SubTypeBuilder): Observable<T[]>;
+```
+Now: 
+```
+searchCollection(query: string, options?: GetOption): Observable<ResourceCollection<T>>;
+```
+
+- Changed `options` type from `HalOptions` to [GetOption](https://github.com/lagoshny/ngx-hateoas-client#GetOption).
+- Deleted `subType` param, subtypes support, see [here](https://github.com/lagoshny/ngx-hateoas-client#Subtypes-support).
+- Changed return type  from `Array<Resource>` to [ResourceCollection](https://github.com/lagoshny/ngx-hateoas-client#ResourceCollection).
+
+### SearchPage changes
+`searchPage` changed method signature:
+
+Was: 
+```
+searchPage(query: string, options?: HalOptions, subType?: SubTypeBuilder): Observable<ResourcePage<T>>;
+```
+Now: 
+```
+searchPage(query: string, options?: PagedGetOption): Observable<PagedResourceCollection<T>>;
+```
+
+- Changed `options` type from `HalOptions` to [GetOption](https://github.com/lagoshny/ngx-hateoas-client#GetOption).
+- Deleted `subType` param, subtypes support, see [here](https://github.com/lagoshny/ngx-hateoas-client#Subtypes-support).
+- Changed return type  from `ResourcePage` to [PagedCollectionResource](https://github.com/lagoshny/ngx-hateoas-client#PagedResourceCollection).
+
+### SearchSingle changes
+Renamed `searchSingle` to `searchResource` and changed method signature:
+
+Was: 
+```
+searchSingle(query: string, options?: HalOptions): Observable<T>;
+```
+Now: 
+```
+searchResource(query: string, options?: GetOption): Observable<T>;
+```
+
+- Changed `options` type from `HalOptions` to [GetOption](https://github.com/lagoshny/ngx-hateoas-client#GetOption).
   
-  Was: 
-  ```
-  get(id: any, params?: HalParam[]): Observable<T>;
-  ```
-  Now: 
-  ```
-  getResource(id: number | string, options?: GetOption): Observable<T>;
-  ```
-  
-  - Changed `id` param type from `any` to `number|string`
-  - Renamed `params` to `options` and changed type from `HalParam[]` to [GetOption](https://github.com/lagoshny/ngx-hateoas-client#GetOption).
+### CustomQuery changes
+`customQuery` changed method signature:
 
-- Renamed `getAll` to `getCollection` and changed method signature:
+Was: 
+```
+customQuery(query: string, options?: HalOptions, subType?: SubTypeBuilder): Observable<T[]>;
+```
+Now: 
+```
+customQuery<R>(method: HttpMethod, query: string, requestBody?: RequestBody<any>, options?: PagedGetOption): Observable<R>;
+```
 
-  Was: 
-  ```
-  getAll(options?: HalOptions, subType?: SubTypeBuilder): Observable<T[]>;
-  ```
-  Now: 
-  ```
-  getCollection(options?: GetOption): Observable<ResourceCollection<T>>;
-  ```
-  
-  - Changed `options` type from `HalOptions` to [GetOption](https://github.com/lagoshny/ngx-hateoas-client#GetOption).
-  - Deleted `subType` param, subtypes support, see [here](https://github.com/lagoshny/ngx-hateoas-client#Subtypes-support). 
+- Added generic param `<R>` that define return type instead of old `Array<Resource>`.
+- Added `method` param that defined the HTTP query method.
+- Added [requestBody](https://github.com/lagoshny/ngx-hateoas-client#RequestBody) param allows pass request body (used with PATCH, PUT, POST methods).
+- Changed `options` type from `HalOptions` to [PagedGetOption](https://github.com/lagoshny/ngx-hateoas-client#PagedGetOption).
+- Deleted `subType` param, subtypes support, see [here](https://github.com/lagoshny/ngx-hateoas-client#Subtypes-support).
 
-- Renamed `getAllPage` to `getPage` and changed method signature:
+### Create changes
+Renamed `create` to `createResource` and changed method signature:
 
-  Was: 
-  ```
-  getAllPage(options?: HalOptions, subType?: SubTypeBuilder): Observable<ResourcePage<T>>;
-  ```
-  Now: 
-  ```
-  getPage(options?: PagedGetOption): Observable<PagedResourceCollection<T>>;
-  ```
+Was: 
+```
+create(entity: T);
+```
+Now: 
+```
+createResource(requestBody: RequestBody<T>): Observable<T>;
+```
 
-  - Changed `options` type from `HalOptions` to [PagedGetOption](https://github.com/lagoshny/ngx-hateoas-client#PagedGetOption).
-  - Deleted `subType` param, subtypes support, see [here](https://github.com/lagoshny/ngx-hateoas-client#Subtypes-support).
-  - Changed return value from `ResourcePage` to [PagedCollectionResource](https://github.com/lagoshny/ngx-hateoas-client#PagedResourceCollection) see [classes changes](#classes).
+- Changed `entity` param to [requestBody](https://github.com/lagoshny/ngx-hateoas-client#RequestBody).
 
-- Renamed `search` to `searchCollection` and changed method signature:
+### Update changes
+Renamed `update` to `updateResource` and changed method signature:
 
-  Was: 
-  ```
-  search(query: string, options?: HalOptions, subType?: SubTypeBuilder): Observable<T[]>;
-  ```
-  Now: 
-  ```
-  searchCollection(query: string, options?: GetOption): Observable<ResourceCollection<T>>;
-  ```
-  
-  - Changed `options` type from `HalOptions` to [GetOption](https://github.com/lagoshny/ngx-hateoas-client#GetOption).
-  - Deleted `subType` param, subtypes support, see [here](https://github.com/lagoshny/ngx-hateoas-client#Subtypes-support).
-  - Changed return type  from `Array<Resource>` to [ResourceCollection](https://github.com/lagoshny/ngx-hateoas-client#ResourceCollection).
+Was: 
+```
+update(entity: T);
+```
+Now: 
+```
+updateResource(entity: T, requestBody?: RequestBody<any>): Observable<T | any>;
+```
 
-- `searchPage` changed method signature:
+- Added [requestBody](https://github.com/lagoshny/ngx-hateoas-client#RequestBody) param to pass part of `entity` values to change.
 
-  Was: 
-  ```
-  searchPage(query: string, options?: HalOptions, subType?: SubTypeBuilder): Observable<ResourcePage<T>>;
-  ```
-  Now: 
-  ```
-  searchPage(query: string, options?: PagedGetOption): Observable<PagedResourceCollection<T>>;
-  ```
-  
-  - Changed `options` type from `HalOptions` to [GetOption](https://github.com/lagoshny/ngx-hateoas-client#GetOption).
-  - Deleted `subType` param, subtypes support, see [here](https://github.com/lagoshny/ngx-hateoas-client#Subtypes-support).
-  - Changed return type  from `ResourcePage` to [PagedCollectionResource](https://github.com/lagoshny/ngx-hateoas-client#PagedResourceCollection).
+### Patch changes
+Renamed `patch` to `patchResource` and changed method signature:
 
-- Renamed `searchSingle` to `searchResource` and changed method signature:
+Was: 
+```
+patch(entity: T, options?: Array<ResourceOptions> | Include);
+```
+Now: 
+```
+patchResource(entity: T, requestBody?: RequestBody<any>): Observable<T | any>;
+```
 
-  Was: 
-  ```
-  searchSingle(query: string, options?: HalOptions): Observable<T>;
-  ```
-  Now: 
-  ```
-  searchResource(query: string, options?: GetOption): Observable<T>;
-  ```
-  
-  - Changed `options` type from `HalOptions` to [GetOption](https://github.com/lagoshny/ngx-hateoas-client#GetOption).
-  
-- `customQuery` changed method signature:
+- Changed `options` type to [requestBody](https://github.com/lagoshny/ngx-hateoas-client#RequestBody).
 
-  Was: 
-  ```
-  customQuery(query: string, options?: HalOptions, subType?: SubTypeBuilder): Observable<T[]>;
-  ```
-  Now: 
-  ```
-  customQuery<R>(method: HttpMethod, query: string, requestBody?: RequestBody<any>, options?: PagedGetOption): Observable<R>;
-  ```
-  
-  - Added generic param `<R>` that define return type instead of old `Array<Resource>`.
-  - Added `method` param that defined the HTTP query method.
-  - Added [requestBody](https://github.com/lagoshny/ngx-hateoas-client#RequestBody) param allows pass request body (used with PATCH, PUT, POST methods).
-  - Changed `options` type from `HalOptions` to [PagedGetOption](https://github.com/lagoshny/ngx-hateoas-client#PagedGetOption).
-  - Deleted `subType` param, subtypes support, see [here](https://github.com/lagoshny/ngx-hateoas-client#Subtypes-support).
+### Delete changes  
+Renamed `delete` to `deleteResource` and changed method signature:
 
-- Renamed `create` to `createResource` and changed method signature:
+Was: 
+```
+delete(entity: T): Observable<object>;
+```
+Now: 
+```
+deleteResource(entity: T, options?: RequestOption): Observable<HttpResponse<any> | any>;
+```
 
-  Was: 
-  ```
-  create(entity: T);
-  ```
-  Now: 
-  ```
-  createResource(requestBody: RequestBody<T>): Observable<T>;
-  ```
-  
-  - Changed `entity` param to [requestBody](https://github.com/lagoshny/ngx-hateoas-client#RequestBody).
+- Added `options` param is allowed to define request return type `observe` or `response` and pass request params.
 
-- Renamed `update` to `updateResource` and changed method signature:
+### HandleError changes
+Deleted `handleError` method, if you need, define the same method in your project:
 
-  Was: 
-  ```
-  update(entity: T);
-  ```
-  Now: 
-  ```
-  updateResource(entity: T, requestBody?: RequestBody<any>): Observable<T | any>;
-  ```
-  
-  - Added [requestBody](https://github.com/lagoshny/ngx-hateoas-client#RequestBody) param to pass part of `entity` values to change.
-
-- Renamed `patch` to `patchResource` and changed method signature:
-
-  Was: 
-  ```
-  patch(entity: T, options?: Array<ResourceOptions> | Include);
-  ```
-  Now: 
-  ```
-  patchResource(entity: T, requestBody?: RequestBody<any>): Observable<T | any>;
-  ```
-  
-  - Changed `options` type to [requestBody](https://github.com/lagoshny/ngx-hateoas-client#RequestBody).
-  
-- Renamed `delete` to `deleteResource` and changed method signature:
-
-  Was: 
-  ```
-  delete(entity: T): Observable<object>;
-  ```
-  Now: 
-  ```
-  deleteResource(entity: T, options?: RequestOption): Observable<HttpResponse<any> | any>;
-  ```
-  
-  - Added `options` param is allowed to define request return type `observe` or `response` and pass request params.
-
-- Deleted `handleError` method, if you need, define the same method in your project:
-
-  `handleError` is simple wrapper:
-  ```
-      protected handleError(error: any): Observable<never> {
-        return observableThrowError(error);
-      }
-  ```
+`handleError` is simple wrapper:
+```
+    protected handleError(error: any): Observable<never> {
+      return observableThrowError(error);
+    }
+```
 
 
 ### Resource methods changes
@@ -314,9 +339,9 @@ The next changes was in `RestService` (now is `HateoasResourceOperation` class):
    - Change `options` param type from `LinkOptions` to [RequestOption](https://github.com/lagoshny/ngx-hateoas-client#RequestOption).
 
 
-### ResourcePage methods changes
+### ResourcePage changes
 
-`ResourcePage` class renamed to `PagedResourceCollection` and has the next changes:
+`ResourcePage` class renamed to [PagedCollectionResource](https://github.com/lagoshny/ngx-hateoas-client#PagedResourceCollection) and has the next changes:
 
 - `sortElements` changed method signature:
 
@@ -514,6 +539,9 @@ See more about support subtypes [here](https://github.com/lagoshny/ngx-hateoas-c
 ### ExpireMs and IsCacheActive params changes
 `expireMs`, `isCacheActive` params are not exist anymore.
 How to manage the cache see [here](https://github.com/lagoshny/ngx-hateoas-client#cache-support).
+
+## CacheHelper
+`CacheHelper` class is not exist anymore, use `HateoasConfigurationService` to configure [cache settings](https://github.com/lagoshny/ngx-hateoas-client#cache-params).
 
 ...
 

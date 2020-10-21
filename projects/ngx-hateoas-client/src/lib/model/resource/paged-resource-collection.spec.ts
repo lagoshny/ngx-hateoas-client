@@ -127,13 +127,5 @@ describe('PagedResourceCollection', () => {
       });
   });
 
-  it('CUSTOM_PAGE should throw exception when passed pageParam is empty', () => {
-    const pagedResourceCollection = new PagedResourceCollection(new SimpleResourceCollection(), pageDataWithLinks);
-
-    expect(() => pagedResourceCollection.customPage({pageParams: {}}))
-      .toThrowError(`Passed param(s) 'pageParams = {}' is not valid`);
-  });
-
-
 });
 

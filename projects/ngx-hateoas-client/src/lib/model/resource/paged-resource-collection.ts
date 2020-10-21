@@ -119,7 +119,6 @@ export class PagedResourceCollection<T extends BaseResource | OldBaseResource> e
     );
   }
 
-  // TODO: add tests
   public page(pageNumber: number, options?: { useCache: true }): Observable<PagedResourceCollection<T>> {
     return this.customPage({pageParams: {page: pageNumber}}, options);
   }

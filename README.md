@@ -69,12 +69,12 @@ To migrate from `@lagoshny/ngx-hal-client` to this client you can use the [migra
    - [SearchResourcePage](#SearchResourcePage)
    - [CustomQuery](#CustomQuery)
    - [CustomSearchQuery](#CustomSearchQuery)
-5. [Library settings](#Library-settings)        
+5. [Settings](#settings)        
     - [Configuration params](#Configuration-params)      
        - [Http params](#Http-params)  
        - [Logging params](#Logging-params)  
        - [Cache params](#Cache-params)  
-    - [Cache](#Cache)        
+    - [Cache support](#cache-support)        
        - [How it works?](#How-it-works?)
     - [Logging](#Logging)
 6. [Public classes](#Public-classes)     
@@ -2508,15 +2508,13 @@ this.productHateoasService.customSearchQuery<number>('products', HttpMethod.GET,
   });
 ```
 
-### Library settings
+## Settings
+This section describes library configuration params.
 
-This section describes library configuration params, and some library features that you can enable/disable when you need it.
+### Configuration params
+The library accepts configuration object:
 
-#### Configuration params
-
-You can pass the next params to configure the library.
-
-```
+```ts
   http: {
     rootUrl: string;
     proxyUrl?: string;
@@ -2529,72 +2527,73 @@ You can pass the next params to configure the library.
     lifeTime?: number;
   };
 ```
-##### Http params
+#### Http params
 
 `rootUrl` (required) - defines root server URL that will be used to perform resource requests.
 `proxyUrl` (optional) -  defines proxy URL that uses to change rootUrl to proxyUrl when getting a relation link.
 
-##### Logging params
+#### Logging params
 
-`verboseLogs` - to debug lib requests you can enable logging to the console. When logging is enabling then all resource request stages will be printed.
+`verboseLogs` - to debug lib works enable logging to the console. With enabled logging, all prepared resource stages will be printed.
 
-> See more about logging [here]().
+> See more about logging [here](#logging).
 
-##### Cache params
+#### Cache params
 
-`enabled` - when passed `true` then will be use cache for `GET` requests, `false` by default.
-`lifeTime` - by default cache lifetime is 300 000 seconds (=5 minutes) after which the cache will be expired.
+`enabled` - `true` to use cache for `GET` requests, `false` by default.
+`lifeTime` - by default cache lifetime is 300 000 seconds (=5 minutes) pass new value to change default one.
 
-> See more about caching [here]().
+> See more about caching [here](#cache-support).
 
-#### Cache
+### Cache support
 The library supports caching `GET` request response values.
-By default, the cache disabled. 
-To enable you need to pass `cache.enabled = true` with library configuration. Also, you can manage the cache expired time with `cache.lifeTime` param.
+By default, the cache `disabled`. 
 
-> More about the cache configuration see [here](). 
+To enable cache pass `cache.enabled = true` to library configuration. Also, you can manage the cache expired time with `cache.lifeTime` param.
 
-Methods with options types `GetOption` or `PagedGetOption` has additional param `useCache` that allows to manage the cache.
+> More about the cache configuration see [here](#cache-params). 
+
+Also, methods with options types `GetOption` or `PagedGetOption` has additional param `useCache` that allows to manage the cache.
 By default `useCache` has `true` value, but when the cache disabled then it param ignored.
 
-##### How it works?
-After performs `GET` request to get the resource or resource collection or paged resource collection response value will be put to the cache map.
-The cache map key is `CacheKey` object that holds full request url and all request options.  
-The cache map value is `raw hal-json` response.
+#### Under the hood
+After each successful GET request to get a resource or resource collection or paginated resource collection, response placed in the `cache map`.
+The `cache map` key is `CacheKey` object that holds full request url and all request options.  
+The `cache map` value is `raw hal-json` response.
 
-When you perform the same `GET` request twice (to get resource or resource collection or paged resource collection). The first request hits the server to get the result, but  the second request doesn't hit the server and result got from the cache.
-When you perform `POST`, `PATCH`, `PUT`, `DELETE` requests for some resource than all saved cache values for this resource will be evicted.
+When perform the same `GET` request twice (to get resource or resource collection or paginated resource collection). First request hits the server to get the result, second request does not hit the server and result got from the cache.
+When perform `POST`, `PATCH`, `PUT`, `DELETE` requests for some resource than all saved cache values for this resource will be evicted.
 
-> You can know when resource result got from the server or got from the cache enable the library [verboseLogs]() param.
-> See more about logging [here]().                                                                                                                      
+> You can know when resource result got from the server or got from the cache enable the library [verboseLogs](#logging-params) param.
+> See more about logging [here](#logging).                                                                                                                      
 
-#### Logging
-
-You can use library logging to debug library.
-To enable logging set `logs.verboseLogs` to `true` value see more [here]().
+### Logging
+To debug library use library logging. 
+To enable logging set `logs.verboseLogs` to `true` value see more [here](#logging-params).
 
 There are several logging stages:
 
-- `BEGIN` - the first stage, logs when method invoked
-- `CHECK_PARAMS` - on this stage logs input params validation errors
-- `PREPARE_URL` - on this stage logs parts of generated request URL from `rootUrl`/`proxyUrl`, `resource name` and passed options
-- `PREPARE_PARAMS` - on this stage logs applying default request params
+- `BEGIN` - first stage, when method invoked
+- `CHECK_PARAMS` - logs errors after validation input params
+- `PREPARE_URL` - logs parts of generated request URL from `rootUrl`/`proxyUrl`, `resource name` and passed options
+- `PREPARE_PARAMS` - logs applied default request params
 - `INIT_RESOURCE` - logs when on initializing resource from a response errors occurs
-- `RESOLVE_VALUES` - logs stage when resolve request body resource relations from resource object to resource link url.
+- `RESOLVE_VALUES` - logs stage when resolving resource relations converting related resource object to a link url
 - `CACHE_PUT` - logs a value saved to the cache
 - `CACHE_GET` - logs a received value from the cache
 - `CACHE_EVICT` - logs an evicted value from the cache
 - `HTTP_REQUEST` - logs HTTP request params
 - `HTTP_RESPONSE` - logs raw HTTP response data 
-- `END` - the last stage, logs when method invoke was successful
+- `END` - last stage, when method invoke was successful
 
 With logging, you can find out was a value fetched from the cache or the server, how resource relationships resolved etc.
 
-### Public classes
+## Public classes
+This section describes public classes available to use in client apps.
 
-This section describes public classes that can be used in client apps.
+### GetOption
+Uses as option type in methods that retrieve resource or resource collection from the server.
 
-#### GetOption
 `GetOption` is an interface that describes the next options:
 
 ```
@@ -2609,10 +2608,13 @@ export interface GetOption {
 ```
 
 - `params` is `key: value` values that will be added to the HTTP request as HTTP params
-- `sort` is [Sort]() object with response sort options
-- `useCache` is property allows to disable the cache for concrete request
+- `sort` is [Sort](#sort) object with response sort options
+- `useCache` is property allows to disable the cache for current request
 
-#### PagedGetOption
+
+### PagedGetOption
+Uses as option type in methods that retrieve paginated resource collection from the server.
+
 `PagedGetOption` extends `GetOption` and adds the page params.
 
 ```
@@ -2628,7 +2630,9 @@ export interface PageParam {
 - `page` is page number param
 - `size` is page size param
 
-#### RequestOption
+### RequestOption
+Uses as option type in methods that create, change or delete resource.
+
 With `RequestOption` you can change response type to `HttpResponse` passing `observe: 'response'`, by default used `observe: body`.
 Also, you can pass `params` that will be added to the HTTP request as HTTP params.
 
@@ -2643,8 +2647,10 @@ export interface RequestOption {
 - `params` is `key: value` values that will be added to the HTTP request as HTTP params
 - `observe` is response type param
 
-#### RequestBody
-`RequestBody` uses to pass a request body in `POST`, `PUT`, `PATCH` HTTP requests.
+### RequestBody
+Uses as request body type in methods that create or change resource.
+
+`RequestBody` is an interface that describes the next options:
 
 ```
 export interface RequestBody<T> {
@@ -2662,14 +2668,16 @@ export enum Include {
 ```
 
 - `body` is a request body object
-- `valuesOption` is additional options that allows manipulation body object values
+- `valuesOption` are additional options that allows manipulation body object values
 
-For example, you pass `{body: {name: 'Name', age: null}}` by default any properties that have `null` values will be ignored and will not pass.
-If you want to pass `null` values you need to pass `valuesOption: {include: Include.NULL_VALUES}`.
+For example, passed body as `{body: {name: 'Name', age: null}}` by default any properties that have `null` values will be ignored and will not pass.
+To pass `null` values, need to pass `valuesOption: {include: Include.NULL_VALUES}`.
 
 >When body object has `undefined` property then it will be ignored even you pass  `Include.NULL_VALUES`.
 
-#### Sort
+### Sort
+Uses as param type in methods that applied `GetOption`, `PagedGetOption` options.
+
 `Sort` params are `key: value` object where `key` is a property name to sort and `value` is sort order.
 
 ```
@@ -2681,6 +2689,8 @@ export type SortOrder = 'DESC' | 'ASC';
 ```
 
 #### SortedPageParam
+Uses as option type in [PagedResourceCollection](#pagedresourcecollection) in [customPage](#custompage) method.
+
 `SortedPageParam` is an interface with page and sort params.
 
 ```
@@ -2695,4 +2705,4 @@ export interface PageParam {
 }
 ```
 - `pageParams` is page number and page size params
-- `sort` is [Sort]() object with response sort options
+- `sort` is [Sort](#sort) object with response sort options

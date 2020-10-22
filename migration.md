@@ -21,7 +21,27 @@ Why you may need to do it see in the [motivation](#motivation) section.
       - [Update](#update-changes)
       - [Patch](#patch-changes)
       - [Delete](#delete-changes)
-      - [HandleError](#handleerror-changes)
+      - [HandleError](#handleerror-changes)   
+   - [Resource](#Resource)
+      - [GetRelation](#GetRelation-changes)
+      - [GetProjection](#GetProjection-changes)
+      - [GetRelationArray](#GetRelationArray-changes)
+      - [GetProjectionArray](#GetProjectionArray-changes)
+      - [AddRelation](#AddRelation-changes)
+      - [SubstituteRelation](#SubstituteRelation-changes)
+      - [DeleteRelation](#DeleteRelation-changes)
+      - [PostRelation](#PostRelation-changes)
+      - [PatchRelation](#PatchRelation-changes)
+   - [ResourcePage](#ResourcePage-changes)
+      - [SortElements](#SortElements-changes)     
+   - [Other classes](#Other-classes)
+      - [CacheHelper](#CacheHelper-changes)
+      - [HalParam](#HalParam-changes)
+      - [HalOptions](#HalOptions-changes)
+      - [LinkOptions](#LinkOptions-changes)
+      - [Sort](#Sort-changes)
+      - [SubTypeBuilder](#SubTypeBuilder-changes)
+      - [ExpireMs and IsCacheActive](#ExpireMs-and-IsCacheActive-changes)
 
 ## Motivation
 The main reason to create a new hateoas library is `@lagoshny/ngx-hal-client` was a fork from `angular4-hal` library and now `angular4-hal` is not supported.
@@ -269,117 +289,153 @@ Deleted `handleError` method, if you need, define the same method in your projec
 ```
 
 
-### Resource methods changes
+## Resource
+This section contains `Resource` class changes.
 
-- `getRelation` method signature changes:
+### GetRelation changes
+`getRelation` method signature changes:
 
-  Was: 
-  ```
-  getRelation<T extends BaseResource>(type: {new (): T;}, relation: string, builder?: SubTypeBuilder, expireMs?: number, isCacheActive?: boolean): Observable<T>;
-  ```
-  Now: 
-  ```
-  getRelation<T extends BaseResource>(relationName: string, options?: GetOption): Observable<T>;
-  ```
-  
-  - Renamed `relation` param to `relationName`.
-  - Deleted `type`, `builder` (more about subtypes [here](https://github.com/lagoshny/ngx-hateoas-client#Subtypes-support)), `expireMs`, `isCacheActive` (more about cache support [here](https://github.com/lagoshny/ngx-hateoas-client##cache-support)).
-  - Added `options` [GetOption](https://github.com/lagoshny/ngx-hateoas-client#GetOption) param.
+Was: 
+```
+getRelation<T extends BaseResource>(type: {new (): T;}, relation: string, builder?: SubTypeBuilder, expireMs?: number, isCacheActive?: boolean): Observable<T>;
+```
+Now: 
+```
+getRelation<T extends BaseResource>(relationName: string, options?: GetOption): Observable<T>;
+```
 
-- Removed a `getProjection` method, use [getRelation](https://github.com/lagoshny/ngx-hateoas-client#GetRelation) with options: `{params: {projection: 'projectionName'}}`.
+- Renamed `relation` param to `relationName`.
+- Deleted `type`, `builder` (more about subtypes [here](https://github.com/lagoshny/ngx-hateoas-client#Subtypes-support)), `expireMs`, `isCacheActive` (more about cache support [here](https://github.com/lagoshny/ngx-hateoas-client##cache-support)).
+- Added `options` [GetOption](https://github.com/lagoshny/ngx-hateoas-client#GetOption) param.
 
-- Renamed `getRelationArray` to `getResourceCollection` and changed method signature:
+> See more about `GetRelation` method [here](https://github.com/lagoshny/ngx-hateoas-client#GetRelation). 
 
-  Was: 
-  ```
-  getRelationArray<T extends BaseResource>(type: { new(): T }, relation: string, options?: HalOptions, embedded?: string, builder?: SubTypeBuilder, expireMs: number = 0, isCacheActive: boolean = true): Observable<T[]>;
-  ```
-  Now: 
-  ```
-  getRelatedCollection<T extends ResourceCollection<BaseResource>>(relationName: string, options?: GetOption): Observable<T>;
-  ```
-  
-  - Renamed `relation` param to `relationName`.
-  - Deleted `type`, `embedded` (is not supported anymore), `builder` (more about subtypes [here](https://github.com/lagoshny/ngx-hateoas-client#Subtypes-support)), `expireMs`, `isCacheActive`  (more about cache support [here](https://github.com/lagoshny/ngx-hateoas-client##cache-support)).
-  - Changed `options` type from `HalOptions` to [GetOption](https://github.com/lagoshny/ngx-hateoas-client#GetOption).
-  - Changed return type from `Array<Resource>` to [ResourceCollection<Resource>](https://github.com/lagoshny/ngx-hateoas-client#ResourceCollection).
+### GetProjection changes
+Removed `getProjection` method, use [getRelation](https://github.com/lagoshny/ngx-hateoas-client#GetRelation) with options: `{params: {projection: 'projectionName'}}`.
 
-- Removed `getProjectionArray` method, use [getRelatedCollection](https://github.com/lagoshny/ngx-hateoas-client#GetRelatedCollection) with options: `{params: {projection: 'projectionName'}}`. 
+> See more about `GetRelation` method [here](https://github.com/lagoshny/ngx-hateoas-client#GetRelation). 
 
-- `addRelation` changed method signature:
+### GetRelationArray changes
+Renamed `getRelationArray` to `getRelatedCollection` and changed method signature:
 
-  Was: 
-  ```
-  addRelation<T extends BaseResource>(relation: string, resource: T): Observable<any>;
-  ```
-  Now: 
-  ```
-  addRelation<T extends Resource>(relationName: string, entities: Array<T>): Observable<HttpResponse<any>>;
-  ```
-  
-  - Renamed `relation` param to `relationName`.
-  - Renamed `resource` param to `entities` and changed param type to an array.
- 
-- Renamed `substituteRelation` to `bindRelation` and some method changes:
+Was: 
+```
+getRelationArray<T extends BaseResource>(type: { new(): T }, relation: string, options?: HalOptions, embedded?: string, builder?: SubTypeBuilder, expireMs: number = 0, isCacheActive: boolean = true): Observable<T[]>;
+```
+Now: 
+```
+getRelatedCollection<T extends ResourceCollection<BaseResource>>(relationName: string, options?: GetOption): Observable<T>;
+```
 
-  - Renamed `relation` param to `relationName`.
-  - Renamed `resource` param to `entitiy`.
+- Renamed `relation` param to `relationName`.
+- Deleted `type`, `embedded` (is not supported anymore), `builder` (more about subtypes [here](https://github.com/lagoshny/ngx-hateoas-client#Subtypes-support)), `expireMs`, `isCacheActive`  (more about cache support [here](https://github.com/lagoshny/ngx-hateoas-client##cache-support)).
+- Changed `options` type from `HalOptions` to [GetOption](https://github.com/lagoshny/ngx-hateoas-client#GetOption).
+- Changed return type from `Array<Resource>` to [ResourceCollection<Resource>](https://github.com/lagoshny/ngx-hateoas-client#ResourceCollection).
 
-- `deleteRelation` method changes:
+> See more about `GetRelatedCollection` method [here](https://github.com/lagoshny/ngx-hateoas-client#GetRelatedCollection). 
 
-  - Renamed param `relation` to `relationName`
-  - Renamed param `resource` to `entitiy`
+### GetProjectionArray changes
+Removed `getProjectionArray` method, use [getRelatedCollection](https://github.com/lagoshny/ngx-hateoas-client#GetRelatedCollection) with options: `{params: {projection: 'projectionName'}}`. 
 
-- `postRelation` changed method signature:
+> See more about `GetRelatedCollection` method [here](https://github.com/lagoshny/ngx-hateoas-client#GetRelatedCollection). 
 
-   Was: 
-   ```
-   postRelation(relation: string, body: any, options?: LinkOptions): Observable<any>;
-   ```
-   Now: 
-   ```
-   postRelation(relationName: string, requestBody: RequestBody<any>, options?: RequestOption): Observable<any>;
-  ```
-   
-   - Renamed `relation` to `relationName`.
-   - Renamed `body` param to `requestBody` and change type from `any` to [RequestBody](https://github.com/lagoshny/ngx-hateoas-client#RequestBody).
-   - Change `options` param type from `LinkOptions` to [RequestOption](https://github.com/lagoshny/ngx-hateoas-client#RequestOption).
+### AddRelation changes
+`addRelation` changed method signature:
 
-- `patchRelation` changed method signature:
+Was: 
+```
+addRelation<T extends BaseResource>(relation: string, resource: T): Observable<any>;
+```
+Now: 
+```
+addRelation<T extends Resource>(relationName: string, entities: Array<T>): Observable<HttpResponse<any>>;
+```
 
-   Was: 
-   ```
-   patchRelation(relation: string, body: any, options?: LinkOptions): Observable<any>;
-   ```
-   Now: 
-   ```
-   patchRelation(relationName: string, requestBody: RequestBody<any>, options?: RequestOption): Observable<any>;
-   ```
-   
-   - Renamed `relation` to `relationName`.
-   - Renamed `body` param to `requestBody` and change type from `any` to [RequestBody](https://github.com/lagoshny/ngx-hateoas-client#RequestBody).
-   - Change `options` param type from `LinkOptions` to [RequestOption](https://github.com/lagoshny/ngx-hateoas-client#RequestOption).
+- Renamed `relation` param to `relationName`.
+- Renamed `resource` param to `entities` and changed param type to an array.
+
+> See more about `AddRelation` method [here](https://github.com/lagoshny/ngx-hateoas-client#AddRelation). 
+
+### SubstituteRelation changes
+Renamed `substituteRelation` to `bindRelation` and some method changes:
+
+- Renamed `relation` param to `relationName`.
+- Renamed `resource` param to `entitiy`.
+
+> See more about `BindRelation` method [here](https://github.com/lagoshny/ngx-hateoas-client#BindRelation). 
+
+### DeleteRelation changes
+`deleteRelation` method changes:
+
+- Renamed param `relation` to `relationName`
+- Renamed param `resource` to `entitiy`
+
+> See more about `DeleteRelation` method [here](https://github.com/lagoshny/ngx-hateoas-client#DeleteRelation). 
+
+### PostRelation changes
+`postRelation` changed method signature:
+
+Was: 
+```
+postRelation(relation: string, body: any, options?: LinkOptions): Observable<any>;
+```
+Now: 
+```
+postRelation(relationName: string, requestBody: RequestBody<any>, options?: RequestOption): Observable<any>;
+```
+
+- Renamed `relation` to `relationName`.
+- Renamed `body` param to `requestBody` and change type from `any` to [RequestBody](https://github.com/lagoshny/ngx-hateoas-client#RequestBody).
+- Change `options` param type from `LinkOptions` to [RequestOption](https://github.com/lagoshny/ngx-hateoas-client#RequestOption).
+
+> See more about `PostRelation` method [here](https://github.com/lagoshny/ngx-hateoas-client#PostRelation). 
+
+### PatchRelation changes
+
+`patchRelation` changed method signature:
+
+Was: 
+```
+patchRelation(relation: string, body: any, options?: LinkOptions): Observable<any>;
+```
+Now: 
+```
+patchRelation(relationName: string, requestBody: RequestBody<any>, options?: RequestOption): Observable<any>;
+```
+
+- Renamed `relation` to `relationName`.
+- Renamed `body` param to `requestBody` and change type from `any` to [RequestBody](https://github.com/lagoshny/ngx-hateoas-client#RequestBody).
+- Change `options` param type from `LinkOptions` to [RequestOption](https://github.com/lagoshny/ngx-hateoas-client#RequestOption).
+
+> See more about `PatchRelation` method [here](https://github.com/lagoshny/ngx-hateoas-client#PatchRelation). 
 
 
-### ResourcePage changes
+## ResourcePage changes
 
 `ResourcePage` class renamed to [PagedCollectionResource](https://github.com/lagoshny/ngx-hateoas-client#PagedResourceCollection) and has the next changes:
 
-- `sortElements` changed method signature:
+### SortElements changes
 
-  Was: 
-  ```
-  sortElements(...sort: Sort[]): Observable<ResourcePage<T>>;
-  ```
-  Now: 
-  ```
-  sortElements(sortParam: Sort, options?: { useCache: true }): Observable<PagedResourceCollection<T>>;
-  ``` 
-  
-  - Changed `sort` param type, new type is object, more see [here](https://github.com/lagoshny/ngx-hateoas-client#Sort).
+`sortElements` changed method signature:
+
+Was: 
+```
+sortElements(...sort: Sort[]): Observable<ResourcePage<T>>;
+```
+Now: 
+```
+sortElements(sortParam: Sort, options?: { useCache: true }): Observable<PagedResourceCollection<T>>;
+``` 
+
+- Changed `sort` param type, new type is object, more see [here](https://github.com/lagoshny/ngx-hateoas-client#Sort).
+
+> See more about `SortElements` method [here](https://github.com/lagoshny/ngx-hateoas-client#SortElements). 
 
 
-## Param classes changes
+## Other classes
+
+### CacheHelper changes
+`CacheHelper` class does not exist anymore, use `HateoasConfigurationService` to configure [cache settings](https://github.com/lagoshny/ngx-hateoas-client#cache-params).
 
 ### HalParam changes
 `HalParam` class replaced to [GetOption](https://github.com/lagoshny/ngx-hateoas-client#GetOption) or [PagedGetOption](https://github.com/lagoshny/ngx-hateoas-client#PagedGetOption) classes.
@@ -485,23 +541,6 @@ After converting to `PagedGetOption`:
 }
 ```
 
-### Added new RequestBody param
-[RequestBody](https://github.com/lagoshny/ngx-hateoas-client#RequestBody) is new param type that used with methods where need to pass some request body (for example `createResource`, `patchResource` and so on).
-
-For example:
-
-Was `RestService.create(...)`:
-
-```
-this.extendedRestService.create(resource).subscrube(...);
-```
-
-Now `HateoasResourceOperation.createResource(...)`
-
-```
-this.extendHateoasResourceOperationService.createResource({body: resource}).subscrube(...);
-```
-
 ### LinkOptions changes
 `LinkOptions` replaced to `RequestOption` params. 
 
@@ -533,7 +572,7 @@ After converting to `PagedGetOption`:
 
 > `strictParams` was delete and `observe` was add that allows change response type from `raw body` to `Angular HttpResponse`.
 
-### Sort param changes
+### Sort changes
 Sort param was changed from array to object notation.
 
 Was:
@@ -552,19 +591,15 @@ sort: {
 }
 ```
 
-### SubTypeBuilder param changes
+### SubTypeBuilder changes
 `SubTypeBuilder` param is not exist anymore, use [Resource.isResourceOf](https://github.com/lagoshny/ngx-hateoas-client#IsResourceOf) method to know which resource type you got.
 
 See more about support subtypes [here](https://github.com/lagoshny/ngx-hateoas-client#Subtypes-support).
  
  
-### ExpireMs and IsCacheActive params changes
+### ExpireMs and IsCacheActive changes
 `expireMs`, `isCacheActive` params are not exist anymore.
 How to manage the cache see [here](https://github.com/lagoshny/ngx-hateoas-client#cache-support).
-
-## CacheHelper
-`CacheHelper` class does not exist anymore, use `HateoasConfigurationService` to configure [cache settings](https://github.com/lagoshny/ngx-hateoas-client#cache-params).
-
 ...
 
 ### Migration from @lagoshny/ngx-hal-client

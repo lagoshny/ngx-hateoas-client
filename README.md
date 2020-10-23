@@ -42,8 +42,8 @@ To migrate from `@lagoshny/ngx-hal-client` to this client you can use the [migra
    - [Subtypes support](#Subtypes-support)      
 4. [Resource service](#Resource-service)
    - [GetResource](#GetResource)
-   - [GetResourceCollection](#GetResourceCollection)
-   - [GetResourcePage](#GetResourcePage)
+   - [GetCollection](#GetCollection)
+   - [GetPage](#GetPage)
    - [CreateResource](#CreateResource)
    - [UpdateResource](#UpdateResource)
    - [UpdateResourceById](#UpdateResourceById)
@@ -52,8 +52,8 @@ To migrate from `@lagoshny/ngx-hal-client` to this client you can use the [migra
    - [DeleteResource](#DeleteResource)
    - [DeleteResourceById](#DeleteResourceById)
    - [SearchResource](#SearchResource)
-   - [SearchResourceCollection](#SearchResourceCollection)
-   - [SearchResourcePage](#SearchResourcePage)
+   - [SearchCollection](#SearchCollection)
+   - [SearchPage](#SearchPage)
    - [CustomQuery](#CustomQuery)
    - [CustomSearchQuery](#CustomSearchQuery)
 5. [Settings](#settings)        
@@ -1508,7 +1508,7 @@ this.productHateoasService.getResource('products', 1, {
 })
 ```
 
-### GetResourceCollection
+### GetCollection
 Getting collection of resources [ResourceCollection](#resourcecollection).
 This method takes [GetOption](#getoption) parameter with it you can pass `projection` param.
 
@@ -1572,7 +1572,7 @@ this.productHateoasService.getCollection('products', {
 })
 ```
 
-### GetResourcePage
+### GetPage
 Getting paged collection of resources [PagedResourceCollection](#pagedresourcecollection).
 
 This method takes [PagedGetOption](#pagedgetoption) parameter with it you can pass `projection` param (see below).
@@ -2278,7 +2278,7 @@ this.productHateoasService.searchResource('products', 'byName', {
 
 ```
 
-#### SearchResourceCollection
+#### SearchCollection
 Searching for collection of resources [ResourceCollection](#resourcecollection).
 
 This method takes [GetOption](#getoption) parameter with it you can pass `projection` param.
@@ -2347,7 +2347,7 @@ this.productHateoasService.searchCollection('products', 'byName', {
 
 ```
 
-#### SearchResourcePage
+#### SearchPage
 Searching for collection of resources with pagination[PagedResourceCollection](#pagedresourcecollection).
 
 This method takes [PagedGetOption](#pagedgetoption) parameter with it you can pass `projection` param (see below).

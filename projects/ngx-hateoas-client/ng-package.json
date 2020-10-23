@@ -7,5 +7,9 @@
       "lodash": "lodash",
       "uri-templates": "uri-templates"
     }
-  }
+  },
+  "whitelistedNonPeerDependencies": [
+    "lodash",
+    "uri-templates"
+  ]
 }

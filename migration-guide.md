@@ -1,6 +1,6 @@
 # Migration guide
 This guide allows you to know how to migrate from `@lagoshny/ngx-hal-client` to `@lagoshny/ngx-hateoas-client`.
-Why you may need to do it see in the [motivation](#motivation) section.
+Why you may need does it see in the [motivation](#motivation) section.
 
 
 ## Contents
@@ -77,7 +77,7 @@ Some new features:
 
 - Now need change class imports from `@lagoshny/ngx-hal-client` to `@lagoshny/ngx-hateoas-client`. 
 
-  Use `replaceAll` command with code editor.
+  Use `replaceAll` command with a code editor.
 
 - Do all `RestService` changes described [below](#RestService).
 

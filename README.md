@@ -9,8 +9,8 @@ and the server provides [HAL/JSON](http://stateless.co/hal_specification.html) r
 This client compatible with Java server-side applications based on [Spring HATEOAS](https://spring.io/projects/spring-hateoas) or [Spring Data REST](https://docs.spring.io/spring-data/rest/docs/current/reference/html/#reference).
 
 >This client is a continuation of the [@lagoshny/ngx-hal-client](https://github.com/lagoshny/ngx-hal-client).
-You can find out about the motivation to create a new client [here]().
-To migrate from `@lagoshny/ngx-hal-client` to this client you can use the [migration guide](https://github.com/lagoshny/ngx-hateoas-client/blob/master/migration.md).
+You can find out about the motivation to create a new client [here](https://github.com/lagoshny/ngx-hateoas-client/blob/master/migration-guide.md#Motivation).
+To migrate from `@lagoshny/ngx-hal-client` to this client you can use the [migration guide](https://github.com/lagoshny/ngx-hateoas-client/blob/master/migration-guide.md#Motivation).
 
 ## Contents
 1. [Changelog](#Changelog)

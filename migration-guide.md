@@ -75,12 +75,6 @@ Some new features:
   
   See more about `@lagoshny/ngx-hateoas-client` configuration [here](https://github.com/lagoshny/ngx-hateoas-client#Configuration).
 
-- Rename the next classes:
-  - `RestService` to `HateoasResourceOperation`;
-  - `ResourcePage` to `PagedCollectionResource`;
-  
-  Use `replaceAll` command with code editor.
-  
 - Now need change class imports from `@lagoshny/ngx-hal-client` to `@lagoshny/ngx-hateoas-client`. 
 
   Use `replaceAll` command with code editor.
@@ -99,7 +93,7 @@ Some new features:
 
 Congratulations! It is all that you need to do to migrate to `@lagoshny/ngx-hateoas-client`.
 
->You can found an example of the migration process by this [commit]() of one of my applications.
+>You can found an example of the migration process by this [commit]() from one of my applications.
 
 **If you have some questions or found a bug you can create new issue [here](https://github.com/lagoshny/ngx-hateoas-client/issues).**
 

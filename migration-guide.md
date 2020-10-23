@@ -71,9 +71,7 @@ Some new features:
   npm i @lagoshny/ngx-hateoas-client --save
   ``` 
 
-- After that change `@lagoshny/ngx-hal-client` configuration to `@lagoshny/ngx-hateoas-client` using the same configuration params.
-  
-  See more about `@lagoshny/ngx-hateoas-client` configuration [here](https://github.com/lagoshny/ngx-hateoas-client#Configuration).
+- After that delete old `@lagoshny/ngx-hal-client` configuration and add a new `@lagoshny/ngx-hateoas-client` [configuration](https://github.com/lagoshny/ngx-hateoas-client#Configuration) using the same configuration params.
 
 - Now need change class imports from `@lagoshny/ngx-hal-client` to `@lagoshny/ngx-hateoas-client`. 
 
@@ -149,7 +147,7 @@ Now:
 getCollection(options?: GetOption): Observable<ResourceCollection<T>>;
 ```
 
-- Changed `options` type from `HalOptions` to [GetOption](https://github.com/lagoshny/ngx-hateoas-client#GetOption).
+- Changed `options` type from `HalOptions` to [GetOption](https://github.com/lagoshny/ngx-hateoas-client#GetOption), see [here](#haloptions-changes) how to change `HalOptions` to `GetOption`.
 - Deleted `subType` param, subtypes support, see [here](https://github.com/lagoshny/ngx-hateoas-client#Subtypes-support). 
 
 > See more about `GetCollection` method [here](https://github.com/lagoshny/ngx-hateoas-client#GetCollection). 
@@ -166,7 +164,7 @@ Now:
 getPage(options?: PagedGetOption): Observable<PagedResourceCollection<T>>;
 ```
 
-- Changed `options` type from `HalOptions` to [PagedGetOption](https://github.com/lagoshny/ngx-hateoas-client#PagedGetOption).
+- Changed `options` type from `HalOptions` to [PagedGetOption](https://github.com/lagoshny/ngx-hateoas-client#PagedGetOption), see [here](#haloptions-changes) how to change `HalOptions` to `PagedGetOption`.
 - Deleted `subType` param, subtypes support, see [here](https://github.com/lagoshny/ngx-hateoas-client#Subtypes-support).
 - Changed return value from `ResourcePage` to [PagedCollectionResource](https://github.com/lagoshny/ngx-hateoas-client#PagedResourceCollection) see [classes changes](#classes).
 
@@ -184,7 +182,7 @@ Now:
 searchCollection(query: string, options?: GetOption): Observable<ResourceCollection<T>>;
 ```
 
-- Changed `options` type from `HalOptions` to [GetOption](https://github.com/lagoshny/ngx-hateoas-client#GetOption).
+- Changed `options` type from `HalOptions` to [GetOption](https://github.com/lagoshny/ngx-hateoas-client#GetOption), see [here](#haloptions-changes) how to change `HalOptions` to `GetOption`.
 - Deleted `subType` param, subtypes support, see [here](https://github.com/lagoshny/ngx-hateoas-client#Subtypes-support).
 - Changed return type  from `Array<Resource>` to [ResourceCollection](https://github.com/lagoshny/ngx-hateoas-client#ResourceCollection).
 
@@ -202,7 +200,7 @@ Now:
 searchPage(query: string, options?: PagedGetOption): Observable<PagedResourceCollection<T>>;
 ```
 
-- Changed `options` type from `HalOptions` to [GetOption](https://github.com/lagoshny/ngx-hateoas-client#GetOption).
+- Changed `options` type from `HalOptions` to [PagedGetOption](https://github.com/lagoshny/ngx-hateoas-client#PagedGetOption), see [here](#haloptions-changes) how to change `HalOptions` to `PagedGetOption`.
 - Deleted `subType` param, subtypes support, see [here](https://github.com/lagoshny/ngx-hateoas-client#Subtypes-support).
 - Changed return type  from `ResourcePage` to [PagedCollectionResource](https://github.com/lagoshny/ngx-hateoas-client#PagedResourceCollection).
 
@@ -220,7 +218,7 @@ Now:
 searchResource(query: string, options?: GetOption): Observable<T>;
 ```
 
-- Changed `options` type from `HalOptions` to [GetOption](https://github.com/lagoshny/ngx-hateoas-client#GetOption).
+- Changed `options` type from `HalOptions` to [GetOption](https://github.com/lagoshny/ngx-hateoas-client#GetOption), see [here](#haloptions-changes) how to change `HalOptions` to `GetOption`.
 
 > See more about `SearchResource` method [here](https://github.com/lagoshny/ngx-hateoas-client#SearchResource). 
  
@@ -239,7 +237,7 @@ customQuery<R>(method: HttpMethod, query: string, requestBody?: RequestBody<any>
 - Added generic param `<R>` that define return type instead of old `Array<Resource>`.
 - Added `method` param that defined the HTTP query method.
 - Added [requestBody](https://github.com/lagoshny/ngx-hateoas-client#RequestBody) param allows pass request body (used with PATCH, PUT, POST methods).
-- Changed `options` type from `HalOptions` to [PagedGetOption](https://github.com/lagoshny/ngx-hateoas-client#PagedGetOption).
+- Changed `options` type from `HalOptions` to [PagedGetOption](https://github.com/lagoshny/ngx-hateoas-client#PagedGetOption), see [here](#haloptions-changes) how to change `HalOptions` to `PagedGetOption`.
 - Deleted `subType` param, subtypes support, see [here](https://github.com/lagoshny/ngx-hateoas-client#Subtypes-support).
 
 > See more about `CustomQuery` method [here](https://github.com/lagoshny/ngx-hateoas-client#CustomQuery). 
@@ -359,7 +357,7 @@ getRelatedCollection<T extends ResourceCollection<BaseResource>>(relationName: s
 
 - Renamed `relation` param to `relationName`.
 - Deleted `type`, `embedded` (is not supported anymore), `builder` (more about subtypes [here](https://github.com/lagoshny/ngx-hateoas-client#Subtypes-support)), `expireMs`, `isCacheActive`  (more about cache support [here](https://github.com/lagoshny/ngx-hateoas-client##cache-support)).
-- Changed `options` type from `HalOptions` to [GetOption](https://github.com/lagoshny/ngx-hateoas-client#GetOption).
+- Changed `options` type from `HalOptions` to [GetOption](https://github.com/lagoshny/ngx-hateoas-client#GetOption), see [here](#haloptions-changes) how to change `HalOptions` to `GetOption`.
 - Changed return type from `Array<Resource>` to [ResourceCollection<Resource>](https://github.com/lagoshny/ngx-hateoas-client#ResourceCollection).
 
 > See more about `GetRelatedCollection` method [here](https://github.com/lagoshny/ngx-hateoas-client#GetRelatedCollection). 

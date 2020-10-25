@@ -1,12 +1,43 @@
 {
   "name": "@lagoshny/ngx-hateoas-client",
   "version": "1.0.0-beta",
+  "description": "This client used to develop `Angular 6.0+` applications working with RESTful server API with HAL/JSON response type",
+  "readme": "README.md",
+  "license": "MIT",
+  "author": "Ilya Lagoshny",
   "peerDependencies": {
-    "@angular/common": "^4.3.4",
-    "@angular/core": "^4.3.4"
+    "@angular/common": "^6.0.0",
+    "@angular/core": "^6.0.0"
   },
   "dependencies": {
     "tslib": "^2.0.3",
     "uri-templates": "^0.2.0"
+  },
+  "keywords": [
+    "Spring Data Rest",
+    "Spring",
+    "HAL",
+    "hypermedia",
+    "REST",
+    "Angular 4",
+    "Angular 5",
+    "Angular 6",
+    "Angular 7",
+    "Angular 8",
+    "Angular 9",
+    "Angular 10",
+    "ngx hal client",
+    "ngx hateoas client",
+    "hateoas client",
+    "Angular hateoas client",
+    "Spring HATEOAS"
+  ],
+  "homepage": "https://github.com/lagoshny/ngx-hateoas-client",
+  "issues": {
+    "url": "https://github.com/lagoshny/ngx-hateoas-client/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lagoshny/ngx-hateoas-client"
   }
 }

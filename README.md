@@ -427,7 +427,7 @@ cart.getRelation<Shop>('shop', {
   sort: {
     name: 'ASC'
   },
-  // useCache: true | false, when the cache is enabled then by default true, false otherwise
+  // useCache: true | false, by default true
 })
   .subscribe((shop: Shop) => {
     // some logic        
@@ -473,7 +473,7 @@ cart.getRelatedCollection<ResourceCollection<Product>>('products', {
   sort: {
     name: 'ASC'
   },
-  // useCache: true | false, when the cache is enabled then by default true, false otherwise
+  // useCache: true | false, by default true
 })
   .subscribe((collection: ResourceCollection<Product>) => {
     const products: Array<Product> = collection.resources;
@@ -533,7 +533,7 @@ cart.getRelatedPage<PagedResourceCollection<Product>>('productsPage', {
   sort: {
     name: 'ASC'
   },
-  useCache
+  // useCache: true | false, by default true
 })
   .subscribe((page: PagedResourceCollection<Product>) => {
     const products: Array<Product> = page.resources;
@@ -1489,7 +1489,7 @@ this.productService.getResource(1, {
   sort: {
     cost: 'ASC'
   },
-  // useCache: true | false, when the cache is enabled then by default true, false otherwise
+  // useCache: true | false, by default true
 }).subscribe((product: Product) => {
     // some logic
 })
@@ -1502,7 +1502,7 @@ this.productHateoasService.getResource('products', 1, {
   sort: {
     cost: 'ASC'
   },
-  // useCache: true | false, when the cache is enabled then by default true, false otherwise
+  // useCache: true | false, by default true
 }).subscribe((product: Product) => {
     // some logic
 })
@@ -1551,7 +1551,7 @@ this.productService.getCollection({
   sort: {
     cost: 'ASC'
   },
-  // useCache: true | false, when the cache is enabled then by default true, false otherwise
+  // useCache: true | false, by default true
 }).subscribe((collection: ResourceCollection<Product>) => {
     const products: Array<Product> = collection.resources;
     // some logic
@@ -1565,7 +1565,7 @@ this.productHateoasService.getCollection('products', {
   sort: {
     cost: 'ASC'
   },
-  // useCache: true | false, when the cache is enabled then by default true, false otherwise
+  // useCache: true | false, by default true
 }).subscribe((collection: ResourceCollection<Product>) => {
     const products: Array<Product> = collection.resources;
     // some logic
@@ -1634,7 +1634,7 @@ this.productService.getPage({
   sort: {
     cost: 'ASC'
   },
-  // useCache: true | false, when the cache is enabled then by default true, false otherwise
+  // useCache: true | false, by default true
 }).subscribe((page: PagedResourceCollection<Product>) => {
     const products: Array<Product> = page.resources;
     /* can use page methods
@@ -1658,7 +1658,7 @@ this.productHateoasService.getPage('products', {
   sort: {
     cost: 'ASC'
   },
-  // useCache: true | false, when the cache is enabled then by default true, false otherwise
+  // useCache: true | false, by default true
 }).subscribe((page: PagedResourceCollection<Product>) => {
     const products: Array<Product> = page.resources;
     /* can use page methods
@@ -2256,7 +2256,7 @@ this.productService.searchResource('byName', {
   sort: {
     name: 'ASC'
   },
-  // useCache: true | false, when the cache is enabled then by default true, false otherwise
+  // useCache: true | false, by default true
 })
   .subscribe((product: Product) => {
     // some logic
@@ -2270,7 +2270,7 @@ this.productHateoasService.searchResource('products', 'byName', {
   sort: {
     name: 'ASC'
   },
-  // useCache: true | false, when the cache is enabled then by default true, false otherwise
+  // useCache: true | false, by default true
 })
   .subscribe((product: Product) => {
     // some logic
@@ -2325,7 +2325,7 @@ this.productService.searchCollection('byName', {
   sort: {
     name: 'ASC'
   },
-  // useCache: true | false, when the cache is enabled then by default true, false otherwise
+  // useCache: true | false, by default true
 }).subscribe((collection: ResourceCollection<Product>) => {
     const products: Array<Product> = collection.resources;
     // some logic
@@ -2339,7 +2339,7 @@ this.productHateoasService.searchCollection('products', 'byName', {
   sort: {
     name: 'ASC'
   },
-  // useCache: true | false, when the cache is enabled then by default true, false otherwise
+  // useCache: true | false, by default true
 }).subscribe((collection: ResourceCollection<Product>) => {
     const products: Array<Product> = collection.resources;
     // some logic
@@ -2400,7 +2400,7 @@ this.productService.searchPage('byName', {
   sort: {
     name: 'ASC'
   },
-  // useCache: true | false, when the cache is enabled then by default true, false otherwise
+  // useCache: true | false, by default true
 }).subscribe((pagedCollection: PagedResourceCollection<Product>) => {
     const products: Array<Product> = pagedCollection.resources;
     // some logic
@@ -2418,7 +2418,7 @@ this.productHateoasService.searchPage('products', 'byName', {
   sort: {
     cost: 'ASC'
   },
-  // useCache: true | false, when the cache is enabled then by default true, false otherwise
+  // useCache: true | false, by default true
 }).subscribe((pagedCollection: PagedResourceCollection<Product>) => {
     const products: Array<Product> = pagedCollection.resources;
     // some logic
@@ -2512,25 +2512,25 @@ The library accepts configuration object:
 ```
 #### Http params
 
-`rootUrl` (required) - defines root server URL that will be used to perform resource requests.
-`proxyUrl` (optional) -  defines proxy URL that uses to change rootUrl to proxyUrl when getting a relation link.
+- `rootUrl` (required) - defines root server URL that will be used to perform resource requests.
+- `proxyUrl` (optional) -  defines proxy URL that uses to change rootUrl to proxyUrl when getting a relation link.
 
 #### Logging params
 
-`verboseLogs` - to debug lib works enable logging to the console. With enabled logging, all prepared resource stages will be printed.
+- `verboseLogs` - to debug lib works enable logging to the console. With enabled logging, all prepared resource stages will be printed.
 
 > See more about logging [here](#logging).
 
 #### Cache params
 
-`enabled` - `true` to use cache for `GET` requests, `false` by default.
-`lifeTime` - by default cache lifetime is 300 000 seconds (=5 minutes) pass new value to change default one.
+- `enabled` - `true` to use cache for `GET` requests, `false` otherwise, default value is `true`.
+- `lifeTime` - default cache lifetime is 300 000 seconds (=5 minutes) pass new value to change default one.
 
 > See more about caching [here](#cache-support).
 
 ### Cache support
 The library supports caching `GET` request response values.
-By default, the cache `disabled`. 
+By default, the cache `enabled`. 
 
 To enable cache pass `cache.enabled = true` to library configuration. Also, you can manage the cache expired time with `cache.lifeTime` param.
 

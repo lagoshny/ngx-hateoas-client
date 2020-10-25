@@ -54,9 +54,7 @@ export class PagedResourceCollectionHttpService<T extends PagedResourceCollectio
     return super.getHttp(url, httpOptions, options?.useCache)
       .pipe(
         map((data: any) => {
-          if (LibConfig.config.comparable.ngxHalClient) {
-            return ResourceUtils.instantiatePagedResourceCollection(data) as T;
-          } else if (!isPagedResourceCollection(data)) {
+          if (!isPagedResourceCollection(data)) {
             if (LibConfig.config.cache.enabled) {
               this.cacheService.evictResource(CacheKey.of(url, httpOptions));
             }

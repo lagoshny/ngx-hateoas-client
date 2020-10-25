@@ -48,9 +48,7 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
     return super.getHttp(url, httpOptions, options?.useCache)
       .pipe(
         map((data: any) => {
-          if (LibConfig.config.comparable.ngxHalClient) {
-            return ResourceUtils.instantiateResource(data) as any;
-          } else if (!isResource(data)) {
+          if (!isResource(data)) {
             if (LibConfig.config.cache.enabled) {
               this.cacheService.evictResource(CacheKey.of(url, httpOptions));
             }

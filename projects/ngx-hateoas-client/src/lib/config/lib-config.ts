@@ -15,9 +15,6 @@ export class LibConfig {
     cache: {
       enabled: true,
       lifeTime: 5 * 60 * 1000
-    },
-    comparable: {
-      ngxHalClient: false
     }
   };
 

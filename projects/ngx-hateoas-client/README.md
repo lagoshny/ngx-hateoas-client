@@ -2,7 +2,7 @@
 
 **Compatible with Angular 10.**
 
-This client can be used to develop `Angular 4.3+` applications working with RESTful server API. 
+This client can be used to develop `Angular 6.0+` applications working with RESTful server API. 
 By `RESTful API` means when the server application implements all the layers of the [Richardson Maturity Model](https://martinfowler.com/articles/richardsonMaturityModel.html) 
 and the server provides [HAL/JSON](http://stateless.co/hal_specification.html) response type.
 
@@ -83,7 +83,7 @@ npm i @lagoshny/ngx-hateoas-client --save
 
 ### Configuration
 
-Before start, configure `NgxHateoasClientModule` and pass configuration through `HateoasConfigurationService`. 
+Before start, configure `NgxHateoasClientModule` and pass configuration through `NgxHateoasClientConfigurationService`. 
 
 1) `NgxHalClientModule` configuration:
 
@@ -109,13 +109,13 @@ export class AppModule {
 2) In constructor app root module inject `HalConfigurationService` and pass a configuration:
 
 ```ts
-import { ..., HateoasConfigurationService } from '@lagoshny/ngx-hateoas-client';
+import { ..., NgxHateoasClientConfigurationService } from '@lagoshny/ngx-hateoas-client';
 
 ...
 
 export class AppModule {
 
-  constructor(hateoasConfig: HateoasConfigurationService) {
+  constructor(hateoasConfig: NgxHateoasClientConfigurationService) {
     hateoasConfig.configure({
       http: {
         rootUrl: 'http://localhost:8080/api/v1'
@@ -236,7 +236,7 @@ If the server-side model has Embeddable entity type then use [EmbeddedResource](
 Both [Resource](#resource) and [EmbeddedResource](#embeddedresource) have some the same methods therefore they have common parent [BaseResource](#baseresource) class implements these methods. 
 
 To work with resource collections uses [ResourceCollection](#resourcecollection) type its holds an array of the resources.
-When you have a paged resource collection result use an extension of [ResourceCollection](#resourcecollection) is [PagedResourceCollection](#pagedresourcecollection) that allows you to navigate by pages and perform custom page requests.
+When you have a paged collection of resources result use an extension of [ResourceCollection](#resourcecollection) is [PagedResourceCollection](#pagedresourcecollection) that allows you to navigate by pages and perform custom page requests.
  
 In some cases, the server-side can have an entity inheritance model how to work with entity subtypes, you can found [here](#subtypes-support).
 
@@ -498,7 +498,7 @@ getRelatedPage<T extends PagedResourceCollection<BaseResource>>(relationName: st
 - `relationName` - resource relation name used to get request URL.
 - `options` - [PagedGetOption](#pagedgetoption) additional options applied to the request, if not passed `pageParams` then used [default page params](#default-page-values).
 - `return value` - [PagedResourceCollection](#pagedresourcecollection) paged collection of resources with type `T`.
-- `throws error` - when required params are not valid or link not found by relation name or returned value is not [PagedResourceCollection]().
+- `throws error` - when required params are not valid or link not found by relation name or returned value is not [PagedResourceCollection](#pagedresourcecollection).
 
 ##### Examples of usage ([given the presets](#resource-presets)):
 
@@ -890,9 +890,9 @@ Resource collection holds resources in the public property with the name `resour
 
 ## PagedResourceCollection
 This resource type represents paged collection of resources.
-You can get this type as result [GetRelatedPage](), [GetResourcePage]() or perform [CustomQuery]()/[CustomSearchQuery]() with passed return type as PagedResourceCollection.
+You can get this type as result [GetRelatedPage](#getrelatedpage), [GetPage](#getpage) or perform [CustomQuery](#customquery)/[CustomSearchQuery](#customsearchquery) with passed return type as PagedResourceCollection.
 
-PagedResourceCollection extends [ResourceCollection]() type and adds methods to work with a page.  
+PagedResourceCollection extends [ResourceCollection](#resourcecollection) type and adds methods to work with a page.  
 
 ### Default page values
 When you do not pass `page` or `size` params in methods with [PagedGetOption](#pagedgetoption) then used default values: `page = 0`, `size = 20`.
@@ -1255,7 +1255,7 @@ customPage(params: SortedPageParam, options?: {useCache: true;}): Observable<Pag
 - `return value` - [PagedResourceCollection](#pagedresourcecollection) with resource types `T`.
 - `throws error` - when the page size, greater than total count resources or page number greater than total pages.
 
-> When pass only part of the `params` then used [default page params]() for not passed ones.
+> When pass only part of the `params` then used [default page params](#default-page-values) for not passed ones.
 
 ##### Examples of usage:
 
@@ -1586,7 +1586,7 @@ getPage(options?: PagedGetOption): Observable<PagedResourceCollection<T>>;
 ```
 
 - `options` - [PagedGetOption](#pagedgetoption) additional options applied to the request, if not passed `pageParams` then used [default page params](#default-page-values).
-- `return value` - [PagedResourceCollection]() paged collection of resources with type `T`.
+- `return value` - [PagedResourceCollection](#pagedresourcecollection) paged collection of resources with type `T`.
 - `throws error` when returned value is not [PagedResourceCollection](#pagedresourcecollection) 
 
 ##### Example of usage ([given the presets](#resource-service-presets)):

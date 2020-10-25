@@ -102,8 +102,8 @@ This section describes the main library changes compare with `@lagoshny/ngx-hal-
 The next changes were in the lib configuration:
 
 The old configuration `ExternalConfigService` class was delete. 
-Added new `HateoasConfigurationService` class has the method `configure` to pass app configuration. 
-How configure library with `HateoasConfigurationService` see [here](https://github.com/lagoshny/ngx-hateoas-client#Configuration). 
+Added new `NgxHateoasClientConfigurationService` class has the method `configure` to pass app configuration. 
+How configure library with `NgxHateoasClientConfigurationService` see [here](https://github.com/lagoshny/ngx-hateoas-client#Configuration). 
 
 ## RestService
 Class `RestService` renamed to `HateoasResourceOperation`.
@@ -463,7 +463,7 @@ sortElements(sortParam: Sort, options?: { useCache: true }): Observable<PagedRes
 ## Other classes
 
 ### CacheHelper changes
-`CacheHelper` class does not exist anymore, use `HateoasConfigurationService` to configure [cache settings](https://github.com/lagoshny/ngx-hateoas-client#cache-params).
+`CacheHelper` class does not exist anymore, use `NgxHateoasClientConfigurationService` to configure [cache settings](https://github.com/lagoshny/ngx-hateoas-client#cache-params).
 
 ### HalParam changes
 `HalParam` class replaced to [GetOption](https://github.com/lagoshny/ngx-hateoas-client#GetOption) or [PagedGetOption](https://github.com/lagoshny/ngx-hateoas-client#PagedGetOption) classes.

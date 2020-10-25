@@ -1,6 +1,6 @@
 import { ModuleWithProviders, NgModule } from '@angular/core';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
-import { HateoasConfigurationService } from './config/hateoas-configuration.service';
+import { NgxHateoasClientConfigurationService } from './config/ngx-hateoas-client-configuration.service';
 import { LibConfig } from './config/lib-config';
 import { HateoasResourceService } from './service/external/hateoas-resource.service';
 import { ResourceHttpService } from './service/internal/resource-http.service';
@@ -9,7 +9,7 @@ import { ResourceCollectionHttpService } from './service/internal/resource-colle
 import { CommonResourceHttpService } from './service/internal/common-resource-http.service';
 import { ResourceCacheService } from './service/internal/cache/resource-cache.service';
 
-export { HateoasConfigurationService } from './config/hateoas-configuration.service';
+export { NgxHateoasClientConfigurationService } from './config/ngx-hateoas-client-configuration.service';
 export { Resource } from './model/resource/resource';
 export { EmbeddedResource } from './model/resource/embedded-resource';
 export { ResourceCollection } from './model/resource/resource-collection';
@@ -43,7 +43,7 @@ export class NgxHateoasClientModule {
       ngModule: NgxHateoasClientModule,
       providers: [
         HttpClient,
-        HateoasConfigurationService
+        NgxHateoasClientConfigurationService
       ]
     };
   }

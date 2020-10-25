@@ -2,7 +2,7 @@
 
 **Compatible with Angular 10.**
 
-This client can be used to develop `Angular 4.3+` applications working with RESTful server API. 
+This client can be used to develop `Angular 6.0+` applications working with RESTful server API. 
 By `RESTful API` means when the server application implements all the layers of the [Richardson Maturity Model](https://martinfowler.com/articles/richardsonMaturityModel.html) 
 and the server provides [HAL/JSON](http://stateless.co/hal_specification.html) response type.
 
@@ -83,7 +83,7 @@ npm i @lagoshny/ngx-hateoas-client --save
 
 ### Configuration
 
-Before start, configure `NgxHateoasClientModule` and pass configuration through `HateoasConfigurationService`. 
+Before start, configure `NgxHateoasClientModule` and pass configuration through `NgxHateoasClientConfigurationService`. 
 
 1) `NgxHalClientModule` configuration:
 
@@ -109,13 +109,13 @@ export class AppModule {
 2) In constructor app root module inject `HalConfigurationService` and pass a configuration:
 
 ```ts
-import { ..., HateoasConfigurationService } from '@lagoshny/ngx-hateoas-client';
+import { ..., NgxHateoasClientConfigurationService } from '@lagoshny/ngx-hateoas-client';
 
 ...
 
 export class AppModule {
 
-  constructor(hateoasConfig: HateoasConfigurationService) {
+  constructor(hateoasConfig: NgxHateoasClientConfigurationService) {
     hateoasConfig.configure({
       http: {
         rootUrl: 'http://localhost:8080/api/v1'

@@ -292,7 +292,12 @@ export class HateoasResourceService<T extends Resource> {
                         query: string,
                         requestBody?: RequestBody<any>,
                         options?: PagedGetOption): Observable<R> {
-    StageLogger.resourceBeginLog(resourceName, 'ResourceService CUSTOM_QUERY', {method: HttpMethod, query, requestBody, options});
+    StageLogger.resourceBeginLog(resourceName, 'ResourceService CUSTOM_QUERY', {
+      method: HttpMethod,
+      query,
+      requestBody,
+      options
+    });
     ValidationUtils.validateInputParams({resourceName, method, query});
 
     const body = ResourceUtils.resolveValues(requestBody);

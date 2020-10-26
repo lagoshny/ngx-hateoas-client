@@ -18,6 +18,9 @@ export { HateoasResourceOperation } from './service/external/hateoas-resource-op
 export { HateoasResourceService } from './service/external/hateoas-resource.service';
 
 @NgModule({
+  imports: [
+    HttpClientModule
+  ],
   providers: [
     NgxHateoasClientConfigurationService,
     CommonResourceHttpService,

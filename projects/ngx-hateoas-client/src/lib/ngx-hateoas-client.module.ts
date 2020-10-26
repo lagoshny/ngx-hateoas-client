@@ -22,15 +22,6 @@ export { HateoasResourceService } from './service/external/hateoas-resource.serv
     HttpClientModule
   ],
   declarations: [],
-  providers: [
-    HttpClient,
-    ResourceCacheService,
-    HateoasResourceService,
-    CommonResourceHttpService,
-    ResourceHttpService,
-    ResourceCollectionHttpService,
-    PagedResourceCollectionHttpService
-  ],
   exports: [HttpClientModule]
 })
 export class NgxHateoasClientModule {
@@ -39,7 +30,13 @@ export class NgxHateoasClientModule {
       ngModule: NgxHateoasClientModule,
       providers: [
         HttpClient,
-        NgxHateoasClientConfigurationService
+        NgxHateoasClientConfigurationService,
+        CommonResourceHttpService,
+        HateoasResourceService,
+        ResourceHttpService,
+        ResourceCollectionHttpService,
+        PagedResourceCollectionHttpService,
+        ResourceCacheService
       ]
     };
   }

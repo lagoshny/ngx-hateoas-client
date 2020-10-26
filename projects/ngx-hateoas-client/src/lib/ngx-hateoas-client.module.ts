@@ -1,7 +1,6 @@
 import { ModuleWithProviders, NgModule } from '@angular/core';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { NgxHateoasClientConfigurationService } from './config/ngx-hateoas-client-configuration.service';
-import { LibConfig } from './config/lib-config';
 import { HateoasResourceService } from './service/external/hateoas-resource.service';
 import { ResourceHttpService } from './service/internal/resource-http.service';
 import { PagedResourceCollectionHttpService } from './service/internal/paged-resource-collection-http.service';
@@ -18,8 +17,6 @@ export { Sort, SortOrder, Include, HttpMethod } from './model/declarations';
 export { HateoasResourceOperation } from './service/external/hateoas-resource-operation';
 export { HateoasResourceService } from './service/external/hateoas-resource.service';
 
-export * from './_backwards/hal-client/hal-client-exports';
-
 @NgModule({
   imports: [
     HttpClientModule
@@ -27,7 +24,6 @@ export * from './_backwards/hal-client/hal-client-exports';
   declarations: [],
   providers: [
     HttpClient,
-    LibConfig,
     ResourceCacheService,
     HateoasResourceService,
     CommonResourceHttpService,

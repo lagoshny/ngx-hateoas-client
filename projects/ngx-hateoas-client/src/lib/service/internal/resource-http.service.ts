@@ -20,7 +20,7 @@ import { ResourceCacheService } from './cache/resource-cache.service';
 /**
  * Get instance of the ResourceHttpService by Angular DependencyInjector.
  */
-export function getResourceHttpService(): ResourceHttpService<BaseResource> {
+export function getResourceHttpService(): ResourceHttpService {
   return DependencyInjector.get(ResourceHttpService);
 }
 
@@ -28,7 +28,7 @@ export function getResourceHttpService(): ResourceHttpService<BaseResource> {
  * Service to perform HTTP requests to get {@link Resource} type.
  */
 @Injectable()
-export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
+export class ResourceHttpService extends HttpExecutor {
 
   constructor(httpClient: HttpClient,
               cacheService: ResourceCacheService) {
@@ -42,8 +42,8 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
    * @param options request options
    * @throws error when required params are not valid or returned resource type is not resource
    */
-  public get(url: string,
-             options?: GetOption): Observable<T> {
+  public get<T extends BaseResource>(url: string,
+                                     options?: GetOption): Observable<T> {
     const httpOptions = {params: UrlUtils.convertToHttpParams(options)};
     return super.getHttp(url, httpOptions, options?.useCache)
       .pipe(
@@ -180,7 +180,9 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
    * @param options (optional) options that applied to the request
    * @throws error when required params are not valid
    */
-  public getResource(resourceName: string, id: number | string, options?: GetOption): Observable<T> {
+  public getResource<T extends BaseResource>(resourceName: string,
+                                             id: number | string,
+                                             options?: GetOption): Observable<T> {
     ValidationUtils.validateInputParams({resourceName, id});
 
     const url = UrlUtils.generateResourceUrl(UrlUtils.getApiUrl(), resourceName).concat('/', _.toString(id));
@@ -201,7 +203,8 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
    * @param body resource to create
    * @throws error when required params are not valid
    */
-  public postResource(resourceName: string, body: BaseResource): Observable<T | any> {
+  public postResource(resourceName: string,
+                      body: BaseResource): Observable<any> {
     ValidationUtils.validateInputParams({resourceName, body});
 
     const url = UrlUtils.generateResourceUrl(UrlUtils.getApiUrl(), resourceName);
@@ -222,7 +225,9 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
    * @param body contains data to patch resource properties
    * @throws error when required params are not valid
    */
-  public patchResource(resourceName: string, id: number | string, body: any): Observable<T | any> {
+  public patchResource(resourceName: string,
+                       id: number | string,
+                       body: any): Observable<any> {
     ValidationUtils.validateInputParams({resourceName, id, body});
 
     const url = UrlUtils.generateResourceUrl(UrlUtils.getApiUrl(), resourceName, _.toString(id));
@@ -243,7 +248,9 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
    * @param body contains data to replace resource properties
    * @throws error when required params are not valid
    */
-  public putResource(resourceName: string, id: number | string, body: any): Observable<T | any> {
+  public putResource(resourceName: string,
+                     id: number | string,
+                     body: any): Observable<any> {
     ValidationUtils.validateInputParams({resourceName, id, body});
 
     const url = UrlUtils.generateResourceUrl(UrlUtils.getApiUrl(), resourceName, _.toString(id));
@@ -264,13 +271,15 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
    * @param options (optional) additional options that will be applied to the request
    * @throws error when required params are not valid
    */
-  public deleteResource(resourceName: string, id: number | string, options?: {
-    headers?: HttpHeaders | {
-      [header: string]: string | string[];
-    };
-    observe?: 'body' | 'response';
-    params?: HttpParams
-  }): Observable<T | any> {
+  public deleteResource(resourceName: string,
+                        id: number | string,
+                        options?: {
+                          headers?: HttpHeaders | {
+                            [header: string]: string | string[];
+                          };
+                          observe?: 'body' | 'response';
+                          params?: HttpParams
+                        }): Observable<any> {
     ValidationUtils.validateInputParams({resourceName, id});
 
     const url = UrlUtils.generateResourceUrl(UrlUtils.getApiUrl(), resourceName, _.toString(id));
@@ -291,7 +300,9 @@ export class ResourceHttpService<T extends BaseResource> extends HttpExecutor {
    * @param options (optional) options that applied to the request
    * @throws error when required params are not valid
    */
-  public search(resourceName: string, searchQuery: string, options?: GetOption): Observable<T> {
+  public search<T extends BaseResource>(resourceName: string,
+                                        searchQuery: string,
+                                        options?: GetOption): Observable<T> {
     ValidationUtils.validateInputParams({resourceName, searchQuery});
 
     const url = UrlUtils.generateResourceUrl(UrlUtils.getApiUrl(), resourceName).concat('/search/' + searchQuery);

@@ -23,12 +23,12 @@ import { HttpResponse } from '@angular/common/http';
 
 /* tslint:disable:no-string-literal */
 @Injectable()
-export class HateoasResourceService<T extends Resource> {
+export class HateoasResourceService {
 
   constructor(private commonHttpService: CommonResourceHttpService,
-              private resourceHttpService: ResourceHttpService<T>,
-              private resourceCollectionHttpService: ResourceCollectionHttpService<ResourceCollection<T>>,
-              private pagedResourceCollectionHttpService: PagedResourceCollectionHttpService<PagedResourceCollection<T>>) {
+              private resourceHttpService: ResourceHttpService,
+              private resourceCollectionHttpService: ResourceCollectionHttpService,
+              private pagedResourceCollectionHttpService: PagedResourceCollectionHttpService) {
   }
 
   /**
@@ -39,15 +39,15 @@ export class HateoasResourceService<T extends Resource> {
    * @param options (optional) options that should be applied to the request
    * @throws error when required params are not valid
    */
-  public getResource(resourceName: string, id: number | string, options?: GetOption): Observable<T> {
+  public getResource<T extends Resource>(resourceName: string, id: number | string, options?: GetOption): Observable<T> {
     StageLogger.resourceBeginLog(resourceName, 'ResourceService GET_RESOURCE', {id, options});
     ValidationUtils.validateInputParams({resourceName, id});
 
-    return this.resourceHttpService.getResource(resourceName, id, options)
+    return this.resourceHttpService.getResource<T>(resourceName, id, options)
       .pipe(tap(() => {
         StageLogger.resourceEndLog(resourceName, 'ResourceService GET_RESOURCE',
           {result: `get resource '${ resourceName }' was successful`});
-      })) as Observable<T>;
+      }));
   }
 
   /**
@@ -57,11 +57,11 @@ export class HateoasResourceService<T extends Resource> {
    * @param options (optional) options that should be applied to the request
    * @throws error when required params are not valid
    */
-  public getCollection(resourceName: string, options?: GetOption): Observable<ResourceCollection<T>> {
+  public getCollection<T extends Resource>(resourceName: string, options?: GetOption): Observable<ResourceCollection<T>> {
     StageLogger.resourceBeginLog(resourceName, 'ResourceService GET_COLLECTION', {options});
     ValidationUtils.validateInputParams({resourceName});
 
-    return this.resourceCollectionHttpService.getResourceCollection(resourceName, options)
+    return this.resourceCollectionHttpService.getResourceCollection<ResourceCollection<T>>(resourceName, options)
       .pipe(tap(() => {
         StageLogger.resourceEndLog(resourceName, 'ResourceService GET_COLLECTION',
           {result: `get all resources by '${ resourceName }' was successful`});
@@ -75,11 +75,11 @@ export class HateoasResourceService<T extends Resource> {
    * @param options (optional) options that should be applied to the request
    * @throws error when required params are not valid
    */
-  public getPage(resourceName: string, options?: PagedGetOption): Observable<PagedResourceCollection<T>> {
+  public getPage<T extends Resource>(resourceName: string, options?: PagedGetOption): Observable<PagedResourceCollection<T>> {
     StageLogger.resourceBeginLog(resourceName, 'ResourceService GET_PAGE', {options});
     ValidationUtils.validateInputParams({resourceName});
 
-    return this.pagedResourceCollectionHttpService.getResourcePage(resourceName, options)
+    return this.pagedResourceCollectionHttpService.getResourcePage<PagedResourceCollection<T>>(resourceName, options)
       .pipe(tap(() => {
         StageLogger.resourceEndLog(resourceName, 'ResourceService GET_PAGE',
           {result: `get all page resources by '${ resourceName }' was successful`});
@@ -93,7 +93,7 @@ export class HateoasResourceService<T extends Resource> {
    * @param requestBody that contains the body directly and optional body values option {@link ValuesOption}
    * @throws error when required params are not valid
    */
-  public createResource(resourceName: string, requestBody: RequestBody<T>): Observable<T | any> {
+  public createResource<T extends Resource>(resourceName: string, requestBody: RequestBody<T>): Observable<T | any> {
     StageLogger.resourceBeginLog(resourceName, 'ResourceService CREATE_RESOURCE', {requestBody});
     ValidationUtils.validateInputParams({resourceName, requestBody});
 
@@ -114,7 +114,7 @@ export class HateoasResourceService<T extends Resource> {
    * @param requestBody that contains the body directly and optional body values option {@link ValuesOption}
    * @throws error when required params are not valid
    */
-  public updateResource(entity: T, requestBody?: RequestBody<any>): Observable<T | any> {
+  public updateResource<T extends Resource>(entity: T, requestBody?: RequestBody<any>): Observable<T | any> {
     StageLogger.resourceBeginLog(entity, 'ResourceService UPDATE_RESOURCE', {body: requestBody ? requestBody : entity});
     ValidationUtils.validateInputParams({entity});
 
@@ -138,7 +138,9 @@ export class HateoasResourceService<T extends Resource> {
    * @param requestBody that contains the body directly and optional body values option {@link ValuesOption}
    * @throws error when required params are not valid
    */
-  public updateResourceById(resourceName: string, id: number | string, requestBody: RequestBody<any>): Observable<T | any> {
+  public updateResourceById<T extends Resource>(resourceName: string,
+                                                id: number | string,
+                                                requestBody: RequestBody<any>): Observable<T | any> {
     StageLogger.resourceBeginLog(resourceName, 'ResourceService UPDATE_RESOURCE_BY_ID', {id, body: requestBody});
     ValidationUtils.validateInputParams({resourceName, id, requestBody});
 
@@ -161,7 +163,7 @@ export class HateoasResourceService<T extends Resource> {
    *        if not passed then entity will be passed as body directly
    * @throws error when required params are not valid
    */
-  public patchResource(entity: T, requestBody?: RequestBody<any>): Observable<T | any> {
+  public patchResource<T extends Resource>(entity: T, requestBody?: RequestBody<any>): Observable<T | any> {
     StageLogger.resourceBeginLog(entity, 'ResourceService PATCH_RESOURCE', {body: requestBody ? requestBody : entity});
     ValidationUtils.validateInputParams({entity});
 
@@ -185,7 +187,9 @@ export class HateoasResourceService<T extends Resource> {
    * @param requestBody that contains the body directly and optional body values option {@link ValuesOption}
    * @throws error when required params are not valid
    */
-  public patchResourceById(resourceName: string, id: number | string, requestBody: RequestBody<any>): Observable<T | any> {
+  public patchResourceById<T extends Resource>(resourceName: string,
+                                               id: number | string,
+                                               requestBody: RequestBody<any>): Observable<T | any> {
     StageLogger.resourceBeginLog(resourceName, 'ResourceService PATCH_RESOURCE_BY_ID', {id, body: requestBody});
     ValidationUtils.validateInputParams({resourceName, id, requestBody});
 
@@ -205,7 +209,7 @@ export class HateoasResourceService<T extends Resource> {
    * @param options (optional) options that should be applied to the request
    * @throws error when required params are not valid
    */
-  public deleteResource(entity: T, options?: RequestOption): Observable<HttpResponse<any> | any> {
+  public deleteResource<T extends Resource>(entity: T, options?: RequestOption): Observable<HttpResponse<any> | any> {
     StageLogger.resourceBeginLog(entity, 'ResourceService DELETE_RESOURCE', {options});
     ValidationUtils.validateInputParams({entity});
 
@@ -228,7 +232,9 @@ export class HateoasResourceService<T extends Resource> {
    * @param options (optional) options that should be applied to the request
    * @throws error when required params are not valid
    */
-  public deleteResourceById(resourceName: string, id: number | string, options?: RequestOption): Observable<HttpResponse<any> | any> {
+  public deleteResourceById(resourceName: string,
+                            id: number | string,
+                            options?: RequestOption): Observable<HttpResponse<any> | any> {
     StageLogger.resourceBeginLog(resourceName, 'ResourceService DELETE_RESOURCE_BY_ID', {id, options});
     ValidationUtils.validateInputParams({resourceName, id});
 
@@ -245,11 +251,13 @@ export class HateoasResourceService<T extends Resource> {
   /**
    * {@see ResourceCollectionHttpService#search}
    */
-  public searchCollection(resourceName: string, searchQuery: string, options?: GetOption): Observable<ResourceCollection<T>> {
+  public searchCollection<T extends Resource>(resourceName: string,
+                                              searchQuery: string,
+                                              options?: GetOption): Observable<ResourceCollection<T>> {
     StageLogger.resourceBeginLog(resourceName, 'ResourceService SEARCH_COLLECTION', {query: searchQuery, options});
     ValidationUtils.validateInputParams({resourceName, searchQuery});
 
-    return this.resourceCollectionHttpService.search(resourceName, searchQuery, options)
+    return this.resourceCollectionHttpService.search<ResourceCollection<T>>(resourceName, searchQuery, options)
       .pipe(tap(() => {
         StageLogger.resourceEndLog(resourceName, 'ResourceService SEARCH_COLLECTION',
           {result: `search collection by '${ resourceName }' was performed successful`});
@@ -259,11 +267,13 @@ export class HateoasResourceService<T extends Resource> {
   /**
    * {@see PagedResourceCollection#search}
    */
-  public searchPage(resourceName: string, searchQuery: string, options?: PagedGetOption): Observable<PagedResourceCollection<T>> {
+  public searchPage<T extends Resource>(resourceName: string,
+                                        searchQuery: string,
+                                        options?: PagedGetOption): Observable<PagedResourceCollection<T>> {
     StageLogger.resourceBeginLog(resourceName, 'ResourceService SEARCH_PAGE', {query: searchQuery, options});
     ValidationUtils.validateInputParams({resourceName, searchQuery});
 
-    return this.pagedResourceCollectionHttpService.search(resourceName, searchQuery, options)
+    return this.pagedResourceCollectionHttpService.search<PagedResourceCollection<T>>(resourceName, searchQuery, options)
       .pipe(tap(() => {
         StageLogger.resourceEndLog(resourceName, 'ResourceService SEARCH_PAGE',
           {result: `search page by '${ resourceName }' was performed successful`});
@@ -273,11 +283,11 @@ export class HateoasResourceService<T extends Resource> {
   /**
    * {@see ResourceHttpService#search}
    */
-  public searchResource(resourceName: string, searchQuery: string, options?: GetOption): Observable<T> {
+  public searchResource<T extends Resource>(resourceName: string, searchQuery: string, options?: GetOption): Observable<T> {
     StageLogger.resourceBeginLog(resourceName, 'ResourceService SEARCH_SINGLE', {query: searchQuery, options});
     ValidationUtils.validateInputParams({resourceName, searchQuery});
 
-    return this.resourceHttpService.search(resourceName, searchQuery, options)
+    return this.resourceHttpService.search<T>(resourceName, searchQuery, options)
       .pipe(tap(() => {
         StageLogger.resourceEndLog(resourceName, 'ResourceService SEARCH_SINGLE',
           {result: `search single by '${ resourceName }' was performed successful`});

@@ -15,11 +15,11 @@ export class HateoasResourceOperation<T extends Resource> {
 
   private readonly resourceName: string;
 
-  private hateoasResourceService: HateoasResourceService<T>;
+  private hateoasResourceService: HateoasResourceService;
 
   constructor(resourceName: string) {
     this.resourceName = resourceName;
-    this.hateoasResourceService = DependencyInjector.get(HateoasResourceService) as HateoasResourceService<T>;
+    this.hateoasResourceService = DependencyInjector.get(HateoasResourceService);
   }
 
   /**
@@ -46,7 +46,7 @@ export class HateoasResourceOperation<T extends Resource> {
   /**
    * {@link HateoasResourceService#createResource}.
    */
-  public createResource(requestBody: RequestBody<T>): Observable<T | any> {
+  public createResource(requestBody: RequestBody<T>): Observable<any> {
     return this.hateoasResourceService.createResource(this.resourceName, requestBody);
   }
 

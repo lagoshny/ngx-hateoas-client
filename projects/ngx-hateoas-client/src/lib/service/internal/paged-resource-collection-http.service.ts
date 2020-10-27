@@ -21,7 +21,7 @@ import { ResourceCacheService } from './cache/resource-cache.service';
 /**
  * Get instance of the PagedResourceCollectionHttpService by Angular DependencyInjector.
  */
-export function getPagedResourceCollectionHttpService(): PagedResourceCollectionHttpService<PagedResourceCollection<BaseResource>> {
+export function getPagedResourceCollectionHttpService(): PagedResourceCollectionHttpService {
   return DependencyInjector.get(PagedResourceCollectionHttpService);
 }
 
@@ -29,7 +29,7 @@ export function getPagedResourceCollectionHttpService(): PagedResourceCollection
  * Service to perform HTTP requests to get {@link PagedResourceCollection} type.
  */
 @Injectable()
-export class PagedResourceCollectionHttpService<T extends PagedResourceCollection<BaseResource>> extends HttpExecutor {
+export class PagedResourceCollectionHttpService extends HttpExecutor {
 
   private static readonly DEFAULT_PAGE: PageParam = {
     page: 0,
@@ -48,8 +48,8 @@ export class PagedResourceCollectionHttpService<T extends PagedResourceCollectio
    * @param options request options
    * @throws error when required params are not valid or returned resource type is not paged collection of the resources
    */
-  public get(url: string,
-             options?: PagedGetOption): Observable<T> {
+  public get<T extends PagedResourceCollection<BaseResource>>(url: string,
+                                                              options?: PagedGetOption): Observable<T> {
     const httpOptions = {params: UrlUtils.convertToHttpParams(options)};
     return super.getHttp(url, httpOptions, options?.useCache)
       .pipe(
@@ -75,7 +75,8 @@ export class PagedResourceCollectionHttpService<T extends PagedResourceCollectio
    * @param options (optional) options that applied to the request
    * @throws error when required params are not valid
    */
-  public getResourcePage(resourceName: string, options?: PagedGetOption): Observable<T> {
+  public getResourcePage<T extends PagedResourceCollection<BaseResource>>(resourceName: string,
+                                                                          options?: PagedGetOption): Observable<T> {
     ValidationUtils.validateInputParams({resourceName});
 
     const url = UrlUtils.removeTemplateParams(UrlUtils.generateResourceUrl(UrlUtils.getApiUrl(), resourceName));
@@ -104,7 +105,9 @@ export class PagedResourceCollectionHttpService<T extends PagedResourceCollectio
    * @param options (optional) options that applied to the request
    * @throws error when required params are not valid
    */
-  public search(resourceName: string, searchQuery: string, options?: PagedGetOption): Observable<T> {
+  public search<T extends PagedResourceCollection<BaseResource>>(resourceName: string,
+                                                                 searchQuery: string,
+                                                                 options?: PagedGetOption): Observable<T> {
     ValidationUtils.validateInputParams({resourceName, searchQuery});
 
     const url = UrlUtils.removeTemplateParams(

@@ -6,8 +6,8 @@
   "license": "MIT",
   "author": "Ilya Lagoshny",
   "peerDependencies": {
-    "@angular/common": "^6.0.0",
-    "@angular/core": "^6.0.0"
+    "@angular/common": ">=6.x.x <= 10.x.x",
+    "@angular/core": ">=6.x.x <= 10.x.x"
   },
   "dependencies": {
     "tslib": "^2.0.3",

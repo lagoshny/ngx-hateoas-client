@@ -1,5 +1,5 @@
-import * as _ from 'lodash';
 import { LibConfig } from '../config/lib-config';
+import { camelCase, capitalize, isEmpty } from 'lodash-es';
 
 /* tslint:disable:variable-name no-console */
 export class ConsoleLogger {
@@ -34,13 +34,13 @@ export class ConsoleLogger {
       'color: #201AB3;'
     ];
 
-    if (!_.isEmpty(params)) {
+    if (!isEmpty(params)) {
       for (const [key, value] of Object.entries(params)) {
         if (key.toLowerCase() === 'result') {
-          msg += `%c${ _.capitalize(key) }: %c${ value }\n`;
+          msg += `%c${ capitalize(key) }: %c${ value }\n`;
           color.push('color: #3AA6D0;', 'color: #00BA45;');
         } else {
-          msg += `%c${ _.camelCase(key) }: %c${ value }\n`;
+          msg += `%c${ camelCase(key) }: %c${ value }\n`;
           color.push('color: #3AA6D0;', 'color: default;');
         }
       }
@@ -67,13 +67,13 @@ export class ConsoleLogger {
       'color: #201AB3;'
     ];
 
-    if (!_.isEmpty(params)) {
+    if (!isEmpty(params)) {
       for (const [key, value] of Object.entries(params)) {
         if (key.toLowerCase() === 'result') {
-          msg += `%c${ _.capitalize(key) }: %c${ value }\n`;
+          msg += `%c${ capitalize(key) }: %c${ value }\n`;
           color.push('color: #3AA6D0;', 'color: #00BA45;');
         } else {
-          msg += `%c${ _.camelCase(key) }: %c${ value }\n`;
+          msg += `%c${ camelCase(key) }: %c${ value }\n`;
           color.push('color: #3AA6D0;', 'color: default;');
         }
       }
@@ -98,13 +98,13 @@ export class ConsoleLogger {
       'color: #df004f;'
     ];
 
-    if (!_.isEmpty(params)) {
+    if (!isEmpty(params)) {
       for (const [key, value] of Object.entries(params)) {
         if (key.toLowerCase() === 'error') {
-          msg += `%c${ _.capitalize(key) }: %c${ value }\n`;
+          msg += `%c${ capitalize(key) }: %c${ value }\n`;
           color.push('color: #df004f;', 'color: #ff0000;');
         } else {
-          msg += `%c${ _.capitalize(key) }: %c${ value }\n`;
+          msg += `%c${ capitalize(key) }: %c${ value }\n`;
           color.push('color: #3AA6D0;', 'color: #000;');
         }
       }

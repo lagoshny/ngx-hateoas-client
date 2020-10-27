@@ -3,11 +3,11 @@ import { CachedResource } from './model/cached-resource';
 import { StageLogger } from '../../../logger/stage-logger';
 import { Stage } from '../../../logger/stage.enum';
 import { CacheKey } from './model/cache-key';
-import * as _ from 'lodash';
 import { ValidationUtils } from '../../../util/validation.utils';
 import { ResourceIdentifiable } from '../../../model/declarations';
 import { LibConfig } from '../../../config/lib-config';
 import { UrlUtils } from '../../../util/url.utils';
+import { isNil } from 'lodash-es';
 
 @Injectable()
 export class ResourceCacheService {
@@ -24,7 +24,7 @@ export class ResourceCacheService {
     ValidationUtils.validateInputParams({key});
 
     const cacheValue = this.cacheMap.get(key.value);
-    if (_.isNil(cacheValue)) {
+    if (isNil(cacheValue)) {
       StageLogger.stageLog(Stage.CACHE_GET, {cacheKey: key.value, result: null});
       return null;
     }

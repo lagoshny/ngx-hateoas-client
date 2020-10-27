@@ -1,11 +1,11 @@
 import { HttpParams } from '@angular/common/http';
 import { isResource } from '../model/resource-type';
-import * as _ from 'lodash';
 import { Resource } from '../model/resource/resource';
 import uriTemplates from 'uri-templates';
 import { GetOption, LinkData, PagedGetOption, Sort } from '../model/declarations';
 import { ValidationUtils } from './validation.utils';
 import { LibConfig } from '../config/lib-config';
+import { isEmpty, isNil, isObject, toString } from 'lodash-es';
 
 export class UrlUtils {
 
@@ -17,12 +17,12 @@ export class UrlUtils {
    */
   public static convertToHttpParams(options: PagedGetOption, httpParams?: HttpParams): HttpParams {
     let resultParams = httpParams ? httpParams : new HttpParams();
-    if (_.isEmpty(options) || _.isNil(options)) {
+    if (isEmpty(options) || isNil(options)) {
       return resultParams;
     }
     UrlUtils.checkDuplicateParams(options);
 
-    if (_.isObject(options.params) && !_.isEmpty(options.params)) {
+    if (isObject(options.params) && !isEmpty(options.params)) {
       for (const [key, value] of Object.entries(options.params)) {
         if (options.params.hasOwnProperty(key)) {
           if (isResource(value)) {
@@ -36,11 +36,11 @@ export class UrlUtils {
       }
     }
 
-    if (!_.isEmpty(options.pageParams)) {
-      resultParams = resultParams.append('page', _.toString(options.pageParams.page));
-      resultParams = resultParams.append('size', _.toString(options.pageParams.size));
+    if (!isEmpty(options.pageParams)) {
+      resultParams = resultParams.append('page', toString(options.pageParams.page));
+      resultParams = resultParams.append('size', toString(options.pageParams.size));
     }
-    if (!_.isEmpty(options.sort)) {
+    if (!isEmpty(options.sort)) {
       resultParams = UrlUtils.generateSortParams(options.sort, resultParams);
     }
 
@@ -58,7 +58,7 @@ export class UrlUtils {
   public static generateLinkUrl(relationLink: LinkData, options?: PagedGetOption): string {
     ValidationUtils.validateInputParams({relationLink, linkUrl: relationLink?.href});
     let url;
-    if (options && !_.isEmpty(options)) {
+    if (options && !isEmpty(options)) {
       url = relationLink.templated ? UrlUtils.fillTemplateParams(relationLink.href, options) : relationLink.href;
     } else {
       url = relationLink.templated ? UrlUtils.removeTemplateParams(relationLink.href) : relationLink.href;
@@ -130,7 +130,7 @@ export class UrlUtils {
       sort: null
     };
 
-    const resultUrl = uriTemplates(url).fill(_.isNil(paramsWithoutSortParam) ? {} : paramsWithoutSortParam);
+    const resultUrl = uriTemplates(url).fill(isNil(paramsWithoutSortParam) ? {} : paramsWithoutSortParam);
     if (options?.sort) {
       const sortParams = UrlUtils.generateSortParams(options.sort);
       if (sortParams.keys().length > 0) {
@@ -143,7 +143,7 @@ export class UrlUtils {
 
   private static generateSortParams(sort: Sort, httpParams?: HttpParams): HttpParams {
     let resultParams = httpParams ? httpParams : new HttpParams();
-    if (!_.isEmpty(sort)) {
+    if (!isEmpty(sort)) {
       for (const [sortPath, sortOrder] of Object.entries(sort)) {
         resultParams = resultParams.append('sort', `${ sortPath },${ sortOrder }`);
       }
@@ -153,7 +153,7 @@ export class UrlUtils {
   }
 
   private static checkDuplicateParams(options: GetOption): void {
-    if (_.isEmpty(options) || _.isEmpty(options.params)) {
+    if (isEmpty(options) || isEmpty(options.params)) {
       return;
     }
     if ('page' in options.params || 'size' in options.params) {

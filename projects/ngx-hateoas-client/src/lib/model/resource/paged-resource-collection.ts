@@ -4,17 +4,16 @@ import { Observable, throwError as observableThrowError } from 'rxjs';
 import { getPagedResourceCollectionHttpService } from '../../service/internal/paged-resource-collection-http.service';
 import { UrlUtils } from '../../util/url.utils';
 import { LinkData, PageData, Sort, SortedPageParam } from '../declarations';
-import * as _ from 'lodash';
 import { StageLogger } from '../../logger/stage-logger';
 import { Stage } from '../../logger/stage.enum';
 import { tap } from 'rxjs/operators';
 import { ValidationUtils } from '../../util/validation.utils';
-import { OldBaseResource } from '../../_backwards/hal-client/model/old-base-resource';
+import { isEmpty, result } from 'lodash-es';
 
 /**
  * Collection of resources with pagination.
  */
-export class PagedResourceCollection<T extends BaseResource | OldBaseResource> extends ResourceCollection<T> {
+export class PagedResourceCollection<T extends BaseResource> extends ResourceCollection<T> {
 
   private readonly selfLink: LinkData;
   private readonly nextLink: LinkData;
@@ -35,16 +34,16 @@ export class PagedResourceCollection<T extends BaseResource | OldBaseResource> e
    */
   constructor(resourceCollection: ResourceCollection<T>, pageData?: PageData) {
     super(resourceCollection);
-    this.totalElements = _.result(pageData, 'page.totalElements', 0);
-    this.totalPages = _.result(pageData, 'page.totalPages', 1);
-    this.pageSize = _.result(pageData, 'page.size', 20);
-    this.pageNumber = _.result(pageData, 'page.number', 0);
+    this.totalElements = result(pageData, 'page.totalElements', 0);
+    this.totalPages = result(pageData, 'page.totalPages', 1);
+    this.pageSize = result(pageData, 'page.size', 20);
+    this.pageNumber = result(pageData, 'page.number', 0);
 
-    this.selfLink = _.result(pageData, '_links.self', null);
-    this.nextLink = _.result(pageData, '_links.next', null);
-    this.prevLink = _.result(pageData, '_links.prev', null);
-    this.firstLink = _.result(pageData, '_links.first', null);
-    this.lastLink = _.result(pageData, '_links.last', null);
+    this.selfLink = result(pageData, '_links.self', null);
+    this.nextLink = result(pageData, '_links.next', null);
+    this.prevLink = result(pageData, '_links.prev', null);
+    this.firstLink = result(pageData, '_links.first', null);
+    this.lastLink = result(pageData, '_links.last', null);
   }
 
   public hasFirst(): boolean {
@@ -142,7 +141,7 @@ export class PagedResourceCollection<T extends BaseResource | OldBaseResource> e
   public customPage(params: SortedPageParam, options?: { useCache: true }): Observable<PagedResourceCollection<T>> {
     StageLogger.resourceBeginLog(this.resources[0], 'CustomPage', {pageParam: params.pageParams});
 
-    if (!params.pageParams || _.isEmpty(params.pageParams)) {
+    if (!params.pageParams || isEmpty(params.pageParams)) {
       params.pageParams = {};
       params.pageParams.page = this.pageNumber;
       params.pageParams.size = this.pageSize;
@@ -184,16 +183,19 @@ export class PagedResourceCollection<T extends BaseResource | OldBaseResource> e
 
 }
 
-function doRequest<T extends BaseResource | OldBaseResource>(requestLink: LinkData,
-                                                             useCache: boolean = true,
-                                                             params?: SortedPageParam): Observable<PagedResourceCollection<T>> {
+function doRequest<T extends BaseResource>(requestLink: LinkData,
+                                           useCache: boolean = true,
+                                           params?: SortedPageParam): Observable<PagedResourceCollection<T>> {
   ValidationUtils.validateInputParams({requestLink});
 
   let httpParams;
-  if (!_.isEmpty(params)) {
+  if (!isEmpty(params)) {
     httpParams = UrlUtils.convertToHttpParams({pageParams: params.pageParams, sort: params.sort});
   }
 
   return getPagedResourceCollectionHttpService()
-    .get(UrlUtils.generateLinkUrl(requestLink), {params: httpParams, useCache}) as Observable<PagedResourceCollection<T>>;
+    .get(UrlUtils.generateLinkUrl(requestLink), {
+      params: httpParams,
+      useCache
+    }) as Observable<PagedResourceCollection<T>>;
 }

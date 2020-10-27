@@ -4,7 +4,6 @@ import { HttpClient } from '@angular/common/http';
 import { LibConfig } from '../../config/lib-config';
 import { PagedResourceCollection } from '../../model/resource/paged-resource-collection';
 import { catchError, map } from 'rxjs/operators';
-import * as _ from 'lodash';
 import { isPagedResourceCollection } from '../../model/resource-type';
 import { Observable, throwError as observableThrowError } from 'rxjs';
 import { ResourceUtils } from '../../util/resource.utils';
@@ -17,6 +16,7 @@ import { Stage } from '../../logger/stage.enum';
 import { ValidationUtils } from '../../util/validation.utils';
 import { CacheKey } from './cache/model/cache-key';
 import { ResourceCacheService } from './cache/resource-cache.service';
+import { isEmpty } from 'lodash-es';
 
 /**
  * Get instance of the PagedResourceCollectionHttpService by Angular DependencyInjector.
@@ -86,8 +86,8 @@ export class PagedResourceCollectionHttpService extends HttpExecutor {
       urlParts: `baseUrl: '${ UrlUtils.getApiUrl() }', resource: '${ resourceName }'`
     });
 
-    const pagedOption = !_.isEmpty(options) ? options : {};
-    if (_.isEmpty(pagedOption.pageParams)) {
+    const pagedOption = !isEmpty(options) ? options : {};
+    if (isEmpty(pagedOption.pageParams)) {
       pagedOption.pageParams = PagedResourceCollectionHttpService.DEFAULT_PAGE;
     } else if (!pagedOption.pageParams.size) {
       pagedOption.pageParams.size = PagedResourceCollectionHttpService.DEFAULT_PAGE.size;
@@ -118,8 +118,8 @@ export class PagedResourceCollectionHttpService extends HttpExecutor {
       urlParts: `baseUrl: '${ UrlUtils.getApiUrl() }', resource: '${ resourceName }'`
     });
 
-    const pagedOption = !_.isEmpty(options) ? options : {};
-    if (_.isEmpty(pagedOption.pageParams)) {
+    const pagedOption = !isEmpty(options) ? options : {};
+    if (isEmpty(pagedOption.pageParams)) {
       pagedOption.pageParams = PagedResourceCollectionHttpService.DEFAULT_PAGE;
     } else if (!pagedOption.pageParams.size) {
       pagedOption.pageParams.size = PagedResourceCollectionHttpService.DEFAULT_PAGE.size;

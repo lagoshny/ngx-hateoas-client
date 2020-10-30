@@ -5,11 +5,11 @@
     "entryFile": "src/public-api.ts",
     "umdModuleIds": {
       "lodash-es": "lodash-es",
-      "uri-templates": "uri-templates"
+      "uri-templates-es": "uri-templates-es"
     }
   },
   "whitelistedNonPeerDependencies": [
-    "uri-templates",
+    "uri-templates-es",
     "lodash-es"
   ]
 }

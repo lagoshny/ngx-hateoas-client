@@ -1,11 +1,11 @@
 import { HttpParams } from '@angular/common/http';
 import { isResource } from '../model/resource-type';
 import { Resource } from '../model/resource/resource';
-import uriTemplates from 'uri-templates';
 import { GetOption, LinkData, PagedGetOption, Sort } from '../model/declarations';
 import { ValidationUtils } from './validation.utils';
 import { LibConfig } from '../config/lib-config';
 import { isEmpty, isNil, isObject, toString } from 'lodash-es';
+import { UriTemplate } from 'uri-templates-es';
 
 export class UrlUtils {
 
@@ -130,7 +130,7 @@ export class UrlUtils {
       sort: null
     };
 
-    const resultUrl = uriTemplates(url).fill(isNil(paramsWithoutSortParam) ? {} : paramsWithoutSortParam);
+    const resultUrl = new UriTemplate(url).fill(isNil(paramsWithoutSortParam) ? {} : paramsWithoutSortParam);
     if (options?.sort) {
       const sortParams = UrlUtils.generateSortParams(options.sort);
       if (sortParams.keys().length > 0) {

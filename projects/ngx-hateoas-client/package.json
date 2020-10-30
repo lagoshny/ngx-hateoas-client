@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "tslib": "^2.0.3",
-    "uri-templates": "^0.2.0",
+    "uri-templates-es": "^1.0.0",
     "lodash-es": "4.17.15"
   },
   "keywords": [

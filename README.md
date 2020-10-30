@@ -1,4 +1,26 @@
 # NgxHateoasClient
+<a href="https://www.npmjs.com/package/@lagoshny/ngx-hateoas-client">
+  <img src="https://img.shields.io/npm/v/@lagoshny/ngx-hateoas-client" alt="Last released npm version" />
+</a>&nbsp;
+
+<a href="https://github.com/lagoshny/ngx-hateoas-client/actions?query=workflow%3ABuild">
+  <img src="https://img.shields.io/github/workflow/status/lagoshny/ngx-hateoas-client/Build/master" alt="Pipeline info" />
+</a>&nbsp;
+
+<a href="https://github.com/lagoshny/ngx-hateoas-client/issues">
+  <img src="https://img.shields.io/github/issues/lagoshny/ngx-hateoas-client" alt="Total open issues" />
+</a>&nbsp;
+
+<a href="https://www.npmjs.com/package/@lagoshny/ngx-hateoas-client">
+  <img src="https://img.shields.io/npm/dt/@lagoshny/ngx-hateoas-client" alt="Total downloads by npm" />
+</a>&nbsp;
+
+<a href="https://mit-license.org/">
+  <img src="https://img.shields.io/npm/l/@lagoshny/ngx-hateoas-client" alt="License info" />
+</a>&nbsp;
+
+<br />
+<br />
 
 **Compatible with Angular 10.**
 
@@ -11,6 +33,8 @@ This client compatible with Java server-side applications based on [Spring HATEO
 >This client is a continuation of the [@lagoshny/ngx-hal-client](https://github.com/lagoshny/ngx-hal-client).
 You can find out about the motivation to create a new client [here](https://github.com/lagoshny/ngx-hateoas-client/blob/master/migration-guide.md#Motivation).
 To migrate from `@lagoshny/ngx-hal-client` to this client you can use the [migration guide](https://github.com/lagoshny/ngx-hateoas-client/blob/master/migration-guide.md#Motivation).
+
+You can found examples of usage this client with [task-manager-front]() application that uses server-side [task-manager-back]() application.
 
 ## Contents
 1. [Changelog](#Changelog)

@@ -91,7 +91,7 @@ Some new features:
 
 Congratulations! It is all that you need to do to migrate to `@lagoshny/ngx-hateoas-client`.
 
->You can found an example of the migration process by this [commit]() from one of my applications.
+>You can found an example of the migration process by this [commit](https://github.com/lagoshny/task-manager-front/pull/34/commits/7e74f347ccbd7a99e285f0127f5367c59cfa7ab6) from one of my applications.
 
 **If you have some questions or found a bug you can create new issue [here](https://github.com/lagoshny/ngx-hateoas-client/issues).**
 

@@ -1,4 +1,26 @@
 # NgxHateoasClient
+<a href="https://www.npmjs.com/package/@lagoshny/ngx-hateoas-client">
+  <img src="https://img.shields.io/npm/v/@lagoshny/ngx-hateoas-client" alt="Last released npm version" />
+</a>&nbsp;
+
+<a href="https://github.com/lagoshny/ngx-hateoas-client/actions?query=workflow%3ABuild">
+  <img src="https://img.shields.io/github/workflow/status/lagoshny/ngx-hateoas-client/Build/master" alt="Pipeline info" />
+</a>&nbsp;
+
+<a href="https://github.com/lagoshny/ngx-hateoas-client/issues">
+  <img src="https://img.shields.io/github/issues/lagoshny/ngx-hateoas-client" alt="Total open issues" />
+</a>&nbsp;
+
+<a href="https://www.npmjs.com/package/@lagoshny/ngx-hateoas-client">
+  <img src="https://img.shields.io/npm/dt/@lagoshny/ngx-hateoas-client" alt="Total downloads by npm" />
+</a>&nbsp;
+
+<a href="https://mit-license.org/">
+  <img src="https://img.shields.io/npm/l/@lagoshny/ngx-hateoas-client" alt="License info" />
+</a>&nbsp;
+
+<br />
+<br />
 
 **Compatible with Angular 10.**
 
@@ -2512,19 +2534,19 @@ The library accepts configuration object:
 ```
 #### Http params
 
-`rootUrl` (required) - defines root server URL that will be used to perform resource requests.
-`proxyUrl` (optional) -  defines proxy URL that uses to change rootUrl to proxyUrl when getting a relation link.
+- `rootUrl` (required) - defines root server URL that will be used to perform resource requests.
+- `proxyUrl` (optional) -  defines proxy URL that uses to change rootUrl to proxyUrl when getting a relation link.
 
 #### Logging params
 
-`verboseLogs` - to debug lib works enable logging to the console. With enabled logging, all prepared resource stages will be printed.
+- `verboseLogs` - to debug lib works enable logging to the console. With enabled logging, all prepared resource stages will be printed.
 
 > See more about logging [here](#logging).
 
 #### Cache params
 
-`enabled` - `true` to use cache for `GET` requests, `false` otherwise, default value is `true`.
-`lifeTime` - default cache lifetime is 300 000 seconds (=5 minutes) pass new value to change default one.
+- `enabled` - `true` to use cache for `GET` requests, `false` otherwise, default value is `true`.
+- `lifeTime` - default cache lifetime is 300 000 seconds (=5 minutes) pass new value to change default one.
 
 > See more about caching [here](#cache-support).
 

@@ -71,9 +71,7 @@ Some new features:
   npm i @lagoshny/ngx-hateoas-client --save
   ``` 
 
-- After that change `@lagoshny/ngx-hal-client` configuration to `@lagoshny/ngx-hateoas-client` using the same configuration params.
-  
-  See more about `@lagoshny/ngx-hateoas-client` configuration [here](https://github.com/lagoshny/ngx-hateoas-client#Configuration).
+- After that delete old `@lagoshny/ngx-hal-client` configuration and add a new `@lagoshny/ngx-hateoas-client` [configuration](https://github.com/lagoshny/ngx-hateoas-client#Configuration) using the same configuration params.
 
 - Now need change class imports from `@lagoshny/ngx-hal-client` to `@lagoshny/ngx-hateoas-client`. 
 
@@ -93,7 +91,7 @@ Some new features:
 
 Congratulations! It is all that you need to do to migrate to `@lagoshny/ngx-hateoas-client`.
 
->You can found an example of the migration process by this [commit]() from one of my applications.
+>You can found an example of the migration process by this [commit](https://github.com/lagoshny/task-manager-front/pull/34/commits/7e74f347ccbd7a99e285f0127f5367c59cfa7ab6) from one of my applications.
 
 **If you have some questions or found a bug you can create new issue [here](https://github.com/lagoshny/ngx-hateoas-client/issues).**
 
@@ -104,8 +102,8 @@ This section describes the main library changes compare with `@lagoshny/ngx-hal-
 The next changes were in the lib configuration:
 
 The old configuration `ExternalConfigService` class was delete. 
-Added new `HateoasConfigurationService` class has the method `configure` to pass app configuration. 
-How configure library with `HateoasConfigurationService` see [here](https://github.com/lagoshny/ngx-hateoas-client#Configuration). 
+Added new `NgxHateoasClientConfigurationService` class has the method `configure` to pass app configuration. 
+How configure library with `NgxHateoasClientConfigurationService` see [here](https://github.com/lagoshny/ngx-hateoas-client#Configuration). 
 
 ## RestService
 Class `RestService` renamed to `HateoasResourceOperation`.
@@ -149,7 +147,7 @@ Now:
 getCollection(options?: GetOption): Observable<ResourceCollection<T>>;
 ```
 
-- Changed `options` type from `HalOptions` to [GetOption](https://github.com/lagoshny/ngx-hateoas-client#GetOption).
+- Changed `options` type from `HalOptions` to [GetOption](https://github.com/lagoshny/ngx-hateoas-client#GetOption), see [here](#haloptions-changes) how to change `HalOptions` to `GetOption`.
 - Deleted `subType` param, subtypes support, see [here](https://github.com/lagoshny/ngx-hateoas-client#Subtypes-support). 
 
 > See more about `GetCollection` method [here](https://github.com/lagoshny/ngx-hateoas-client#GetCollection). 
@@ -166,7 +164,7 @@ Now:
 getPage(options?: PagedGetOption): Observable<PagedResourceCollection<T>>;
 ```
 
-- Changed `options` type from `HalOptions` to [PagedGetOption](https://github.com/lagoshny/ngx-hateoas-client#PagedGetOption).
+- Changed `options` type from `HalOptions` to [PagedGetOption](https://github.com/lagoshny/ngx-hateoas-client#PagedGetOption), see [here](#haloptions-changes) how to change `HalOptions` to `PagedGetOption`.
 - Deleted `subType` param, subtypes support, see [here](https://github.com/lagoshny/ngx-hateoas-client#Subtypes-support).
 - Changed return value from `ResourcePage` to [PagedCollectionResource](https://github.com/lagoshny/ngx-hateoas-client#PagedResourceCollection) see [classes changes](#classes).
 
@@ -184,7 +182,7 @@ Now:
 searchCollection(query: string, options?: GetOption): Observable<ResourceCollection<T>>;
 ```
 
-- Changed `options` type from `HalOptions` to [GetOption](https://github.com/lagoshny/ngx-hateoas-client#GetOption).
+- Changed `options` type from `HalOptions` to [GetOption](https://github.com/lagoshny/ngx-hateoas-client#GetOption), see [here](#haloptions-changes) how to change `HalOptions` to `GetOption`.
 - Deleted `subType` param, subtypes support, see [here](https://github.com/lagoshny/ngx-hateoas-client#Subtypes-support).
 - Changed return type  from `Array<Resource>` to [ResourceCollection](https://github.com/lagoshny/ngx-hateoas-client#ResourceCollection).
 
@@ -202,7 +200,7 @@ Now:
 searchPage(query: string, options?: PagedGetOption): Observable<PagedResourceCollection<T>>;
 ```
 
-- Changed `options` type from `HalOptions` to [GetOption](https://github.com/lagoshny/ngx-hateoas-client#GetOption).
+- Changed `options` type from `HalOptions` to [PagedGetOption](https://github.com/lagoshny/ngx-hateoas-client#PagedGetOption), see [here](#haloptions-changes) how to change `HalOptions` to `PagedGetOption`.
 - Deleted `subType` param, subtypes support, see [here](https://github.com/lagoshny/ngx-hateoas-client#Subtypes-support).
 - Changed return type  from `ResourcePage` to [PagedCollectionResource](https://github.com/lagoshny/ngx-hateoas-client#PagedResourceCollection).
 
@@ -220,7 +218,7 @@ Now:
 searchResource(query: string, options?: GetOption): Observable<T>;
 ```
 
-- Changed `options` type from `HalOptions` to [GetOption](https://github.com/lagoshny/ngx-hateoas-client#GetOption).
+- Changed `options` type from `HalOptions` to [GetOption](https://github.com/lagoshny/ngx-hateoas-client#GetOption), see [here](#haloptions-changes) how to change `HalOptions` to `GetOption`.
 
 > See more about `SearchResource` method [here](https://github.com/lagoshny/ngx-hateoas-client#SearchResource). 
  
@@ -239,7 +237,7 @@ customQuery<R>(method: HttpMethod, query: string, requestBody?: RequestBody<any>
 - Added generic param `<R>` that define return type instead of old `Array<Resource>`.
 - Added `method` param that defined the HTTP query method.
 - Added [requestBody](https://github.com/lagoshny/ngx-hateoas-client#RequestBody) param allows pass request body (used with PATCH, PUT, POST methods).
-- Changed `options` type from `HalOptions` to [PagedGetOption](https://github.com/lagoshny/ngx-hateoas-client#PagedGetOption).
+- Changed `options` type from `HalOptions` to [PagedGetOption](https://github.com/lagoshny/ngx-hateoas-client#PagedGetOption), see [here](#haloptions-changes) how to change `HalOptions` to `PagedGetOption`.
 - Deleted `subType` param, subtypes support, see [here](https://github.com/lagoshny/ngx-hateoas-client#Subtypes-support).
 
 > See more about `CustomQuery` method [here](https://github.com/lagoshny/ngx-hateoas-client#CustomQuery). 
@@ -359,7 +357,7 @@ getRelatedCollection<T extends ResourceCollection<BaseResource>>(relationName: s
 
 - Renamed `relation` param to `relationName`.
 - Deleted `type`, `embedded` (is not supported anymore), `builder` (more about subtypes [here](https://github.com/lagoshny/ngx-hateoas-client#Subtypes-support)), `expireMs`, `isCacheActive`  (more about cache support [here](https://github.com/lagoshny/ngx-hateoas-client##cache-support)).
-- Changed `options` type from `HalOptions` to [GetOption](https://github.com/lagoshny/ngx-hateoas-client#GetOption).
+- Changed `options` type from `HalOptions` to [GetOption](https://github.com/lagoshny/ngx-hateoas-client#GetOption), see [here](#haloptions-changes) how to change `HalOptions` to `GetOption`.
 - Changed return type from `Array<Resource>` to [ResourceCollection<Resource>](https://github.com/lagoshny/ngx-hateoas-client#ResourceCollection).
 
 > See more about `GetRelatedCollection` method [here](https://github.com/lagoshny/ngx-hateoas-client#GetRelatedCollection). 
@@ -465,7 +463,7 @@ sortElements(sortParam: Sort, options?: { useCache: true }): Observable<PagedRes
 ## Other classes
 
 ### CacheHelper changes
-`CacheHelper` class does not exist anymore, use `HateoasConfigurationService` to configure [cache settings](https://github.com/lagoshny/ngx-hateoas-client#cache-params).
+`CacheHelper` class does not exist anymore, use `NgxHateoasClientConfigurationService` to configure [cache settings](https://github.com/lagoshny/ngx-hateoas-client#cache-params).
 
 ### HalParam changes
 `HalParam` class replaced to [GetOption](https://github.com/lagoshny/ngx-hateoas-client#GetOption) or [PagedGetOption](https://github.com/lagoshny/ngx-hateoas-client#PagedGetOption) classes.
@@ -630,93 +628,3 @@ See more about support subtypes [here](https://github.com/lagoshny/ngx-hateoas-c
 ### ExpireMs and IsCacheActive changes
 `expireMs`, `isCacheActive` params are not exist anymore.
 How to manage the cache see [here](https://github.com/lagoshny/ngx-hateoas-client#cache-support).
-...
-
-### Migration from @lagoshny/ngx-hal-client
-
-There are two options to migrate:
-
-- The first option is use migration script (LINK) and some part migrate manually.
-Pluses:
-- Fast migration without change Services and Components code you need only change lib configuration.  
-- You can migrate use this option and after by step use mannual migration guide migrate all depreceated parts to new one.   
-
-Coins:
-- You will use old comparable library api and will not support some new library features.
-- You will have depreceated warning messages.
-- Some features in `@lagoshny/ngx-hal-client` was implemented with errors (all errors will be safed for comparable version).
-  For example `addRelation` change last relation but dhould add new one.
-
- 
-The second option is use the guide do it manually. 
-
-Pluses:
-- You will use new API that reduce code to invoke methods.
-- You will got all new lib changes
-- You will got fixed `@lagoshny/ngx-hal-client` errors.
-
-Coins:
-- To migrate use this option you will need some time than you first option
-
-#### First migration option
-
-The first step is to run migration script (LINK). To do that you need put migration script in `src` project folder and run it through bash terminal.
-It will be rename/delete some imports and classes.
-
-The second step is delete the old `@lagoshny/ngx-hal-client` library configuration.
-To do this delete class that implemented `ExternalConfigurationHandlerInterface` interface and provider for configuration service from module where you used `@lagoshny/ngx-hal-client` library 
-`{provide: 'ExternalConfigurationService', useClass: ExternalConfigurationService}`
-
-
-After that change `NgxHalClientModule.forRoot()` to `NgxHateoasClientModule.forRoot()` imported from `@lagoshny/ngx-hateoas-client`.
-And last step you need pass configuration to `@lagoshny/ngx-hateoas-client` library using `HateoasConfigurationService`:
-
-In your application module (for example root `AppModule`) you need define constructor and inject there `HateoasConfigurationService`.
-
-```  
-constructor(hateoasConf: HateoasConfigurationService) {
-  hateoasConf.configure({
-    http: {
-      rootUrl: 'http://localhost:8080/api/v1',
-      proxyUrl: '..' // if it was used
-    },
-    comparable: {
-      ngxHalClient: true
-    }
-  });
-}
-```
-
-You need pass the rootUrl, proxyUrl (optional if it was used before), and comparable option with `ngxHalClient: true` (it will be enable comparable mode library to clone all `ngxHalClient` behaviour).
- 
-
-The first migration part is completed and you can continue work with your application, but you will see warning messages that you used depreceated methods, because you used old API 
-that was changed in new library where some methods has changed signature and was renamed.
-You can see that was changed in Manually migration guide (LINK).
-
-The next step is change old API to the new API you can do it by step more information see in Manually migration guide (LINK)
-
-#### Migration script
-
-You can find migration script in folder `scripts/migration.sh` to run it you need to open bash terminal
-and put command `./migration.sh` and wait until script finished a work.
-
-##### What did migration script do?
-Migration script did the next steps:
-
-- Change all import from `@lagoshny/ngx-hal-client` to `@lagoshny/ngx-hateoas-client`.
-- Remove `Injector` param from all classes extended `RestService` class.
-- Rename `RestService` to `OldRestService`
-- Rename `Resource` to `OldResource`
-- Rename `EmbeddedResource` to `OldEmbeddedResource`
-- Rename `BaseResource` to `OldBaseResource`
-- Rename `Sort` to `OldSort`
-- Rename `SortOrder` to `OldSortOrder`
-- Rename `ResourcePage` to `OldResourcePage`
-- Rename `SubTypeBuilder` to `OldSubTypeBuilder`
-- Remove `CacheHelper` imports.
-- Remove all `CacheHelper` invokes.
-
-
-#### Manually migration option
-

@@ -1,8 +1,30 @@
 # NgxHateoasClient
+<a href="https://www.npmjs.com/package/@lagoshny/ngx-hateoas-client">
+  <img src="https://img.shields.io/npm/v/@lagoshny/ngx-hateoas-client" alt="Last released npm version" />
+</a>&nbsp;
+
+<a href="https://github.com/lagoshny/ngx-hateoas-client/actions?query=workflow%3ABuild">
+  <img src="https://img.shields.io/github/workflow/status/lagoshny/ngx-hateoas-client/Build/master" alt="Pipeline info" />
+</a>&nbsp;
+
+<a href="https://github.com/lagoshny/ngx-hateoas-client/issues">
+  <img src="https://img.shields.io/github/issues/lagoshny/ngx-hateoas-client" alt="Total open issues" />
+</a>&nbsp;
+
+<a href="https://www.npmjs.com/package/@lagoshny/ngx-hateoas-client">
+  <img src="https://img.shields.io/npm/dt/@lagoshny/ngx-hateoas-client" alt="Total downloads by npm" />
+</a>&nbsp;
+
+<a href="https://mit-license.org/">
+  <img src="https://img.shields.io/npm/l/@lagoshny/ngx-hateoas-client" alt="License info" />
+</a>&nbsp;
+
+<br />
+<br />
 
 **Compatible with Angular 10.**
 
-This client can be used to develop `Angular 4.3+` applications working with RESTful server API. 
+This client can be used to develop `Angular 6.0+` applications working with RESTful server API. 
 By `RESTful API` means when the server application implements all the layers of the [Richardson Maturity Model](https://martinfowler.com/articles/richardsonMaturityModel.html) 
 and the server provides [HAL/JSON](http://stateless.co/hal_specification.html) response type.
 
@@ -83,7 +105,7 @@ npm i @lagoshny/ngx-hateoas-client --save
 
 ### Configuration
 
-Before start, configure `NgxHateoasClientModule` and pass configuration through `HateoasConfigurationService`. 
+Before start, configure `NgxHateoasClientModule` and pass configuration through `NgxHateoasClientConfigurationService`. 
 
 1) `NgxHalClientModule` configuration:
 
@@ -109,13 +131,13 @@ export class AppModule {
 2) In constructor app root module inject `HalConfigurationService` and pass a configuration:
 
 ```ts
-import { ..., HateoasConfigurationService } from '@lagoshny/ngx-hateoas-client';
+import { ..., NgxHateoasClientConfigurationService } from '@lagoshny/ngx-hateoas-client';
 
 ...
 
 export class AppModule {
 
-  constructor(hateoasConfig: HateoasConfigurationService) {
+  constructor(hateoasConfig: NgxHateoasClientConfigurationService) {
     hateoasConfig.configure({
       http: {
         rootUrl: 'http://localhost:8080/api/v1'
@@ -236,7 +258,7 @@ If the server-side model has Embeddable entity type then use [EmbeddedResource](
 Both [Resource](#resource) and [EmbeddedResource](#embeddedresource) have some the same methods therefore they have common parent [BaseResource](#baseresource) class implements these methods. 
 
 To work with resource collections uses [ResourceCollection](#resourcecollection) type its holds an array of the resources.
-When you have a paged resource collection result use an extension of [ResourceCollection](#resourcecollection) is [PagedResourceCollection](#pagedresourcecollection) that allows you to navigate by pages and perform custom page requests.
+When you have a paged collection of resources result use an extension of [ResourceCollection](#resourcecollection) is [PagedResourceCollection](#pagedresourcecollection) that allows you to navigate by pages and perform custom page requests.
  
 In some cases, the server-side can have an entity inheritance model how to work with entity subtypes, you can found [here](#subtypes-support).
 
@@ -427,7 +449,7 @@ cart.getRelation<Shop>('shop', {
   sort: {
     name: 'ASC'
   },
-  // useCache: true | false, when the cache is enabled then by default true, false otherwise
+  // useCache: true | false, by default true
 })
   .subscribe((shop: Shop) => {
     // some logic        
@@ -473,7 +495,7 @@ cart.getRelatedCollection<ResourceCollection<Product>>('products', {
   sort: {
     name: 'ASC'
   },
-  // useCache: true | false, when the cache is enabled then by default true, false otherwise
+  // useCache: true | false, by default true
 })
   .subscribe((collection: ResourceCollection<Product>) => {
     const products: Array<Product> = collection.resources;
@@ -498,7 +520,7 @@ getRelatedPage<T extends PagedResourceCollection<BaseResource>>(relationName: st
 - `relationName` - resource relation name used to get request URL.
 - `options` - [PagedGetOption](#pagedgetoption) additional options applied to the request, if not passed `pageParams` then used [default page params](#default-page-values).
 - `return value` - [PagedResourceCollection](#pagedresourcecollection) paged collection of resources with type `T`.
-- `throws error` - when required params are not valid or link not found by relation name or returned value is not [PagedResourceCollection]().
+- `throws error` - when required params are not valid or link not found by relation name or returned value is not [PagedResourceCollection](#pagedresourcecollection).
 
 ##### Examples of usage ([given the presets](#resource-presets)):
 
@@ -533,7 +555,7 @@ cart.getRelatedPage<PagedResourceCollection<Product>>('productsPage', {
   sort: {
     name: 'ASC'
   },
-  useCache
+  // useCache: true | false, by default true
 })
   .subscribe((page: PagedResourceCollection<Product>) => {
     const products: Array<Product> = page.resources;
@@ -890,9 +912,9 @@ Resource collection holds resources in the public property with the name `resour
 
 ## PagedResourceCollection
 This resource type represents paged collection of resources.
-You can get this type as result [GetRelatedPage](), [GetResourcePage]() or perform [CustomQuery]()/[CustomSearchQuery]() with passed return type as PagedResourceCollection.
+You can get this type as result [GetRelatedPage](#getrelatedpage), [GetPage](#getpage) or perform [CustomQuery](#customquery)/[CustomSearchQuery](#customsearchquery) with passed return type as PagedResourceCollection.
 
-PagedResourceCollection extends [ResourceCollection]() type and adds methods to work with a page.  
+PagedResourceCollection extends [ResourceCollection](#resourcecollection) type and adds methods to work with a page.  
 
 ### Default page values
 When you do not pass `page` or `size` params in methods with [PagedGetOption](#pagedgetoption) then used default values: `page = 0`, `size = 20`.
@@ -1255,7 +1277,7 @@ customPage(params: SortedPageParam, options?: {useCache: true;}): Observable<Pag
 - `return value` - [PagedResourceCollection](#pagedresourcecollection) with resource types `T`.
 - `throws error` - when the page size, greater than total count resources or page number greater than total pages.
 
-> When pass only part of the `params` then used [default page params]() for not passed ones.
+> When pass only part of the `params` then used [default page params](#default-page-values) for not passed ones.
 
 ##### Examples of usage:
 
@@ -1489,7 +1511,7 @@ this.productService.getResource(1, {
   sort: {
     cost: 'ASC'
   },
-  // useCache: true | false, when the cache is enabled then by default true, false otherwise
+  // useCache: true | false, by default true
 }).subscribe((product: Product) => {
     // some logic
 })
@@ -1502,7 +1524,7 @@ this.productHateoasService.getResource('products', 1, {
   sort: {
     cost: 'ASC'
   },
-  // useCache: true | false, when the cache is enabled then by default true, false otherwise
+  // useCache: true | false, by default true
 }).subscribe((product: Product) => {
     // some logic
 })
@@ -1551,7 +1573,7 @@ this.productService.getCollection({
   sort: {
     cost: 'ASC'
   },
-  // useCache: true | false, when the cache is enabled then by default true, false otherwise
+  // useCache: true | false, by default true
 }).subscribe((collection: ResourceCollection<Product>) => {
     const products: Array<Product> = collection.resources;
     // some logic
@@ -1565,7 +1587,7 @@ this.productHateoasService.getCollection('products', {
   sort: {
     cost: 'ASC'
   },
-  // useCache: true | false, when the cache is enabled then by default true, false otherwise
+  // useCache: true | false, by default true
 }).subscribe((collection: ResourceCollection<Product>) => {
     const products: Array<Product> = collection.resources;
     // some logic
@@ -1586,7 +1608,7 @@ getPage(options?: PagedGetOption): Observable<PagedResourceCollection<T>>;
 ```
 
 - `options` - [PagedGetOption](#pagedgetoption) additional options applied to the request, if not passed `pageParams` then used [default page params](#default-page-values).
-- `return value` - [PagedResourceCollection]() paged collection of resources with type `T`.
+- `return value` - [PagedResourceCollection](#pagedresourcecollection) paged collection of resources with type `T`.
 - `throws error` when returned value is not [PagedResourceCollection](#pagedresourcecollection) 
 
 ##### Example of usage ([given the presets](#resource-service-presets)):
@@ -1634,7 +1656,7 @@ this.productService.getPage({
   sort: {
     cost: 'ASC'
   },
-  // useCache: true | false, when the cache is enabled then by default true, false otherwise
+  // useCache: true | false, by default true
 }).subscribe((page: PagedResourceCollection<Product>) => {
     const products: Array<Product> = page.resources;
     /* can use page methods
@@ -1658,7 +1680,7 @@ this.productHateoasService.getPage('products', {
   sort: {
     cost: 'ASC'
   },
-  // useCache: true | false, when the cache is enabled then by default true, false otherwise
+  // useCache: true | false, by default true
 }).subscribe((page: PagedResourceCollection<Product>) => {
     const products: Array<Product> = page.resources;
     /* can use page methods
@@ -2256,7 +2278,7 @@ this.productService.searchResource('byName', {
   sort: {
     name: 'ASC'
   },
-  // useCache: true | false, when the cache is enabled then by default true, false otherwise
+  // useCache: true | false, by default true
 })
   .subscribe((product: Product) => {
     // some logic
@@ -2270,7 +2292,7 @@ this.productHateoasService.searchResource('products', 'byName', {
   sort: {
     name: 'ASC'
   },
-  // useCache: true | false, when the cache is enabled then by default true, false otherwise
+  // useCache: true | false, by default true
 })
   .subscribe((product: Product) => {
     // some logic
@@ -2325,7 +2347,7 @@ this.productService.searchCollection('byName', {
   sort: {
     name: 'ASC'
   },
-  // useCache: true | false, when the cache is enabled then by default true, false otherwise
+  // useCache: true | false, by default true
 }).subscribe((collection: ResourceCollection<Product>) => {
     const products: Array<Product> = collection.resources;
     // some logic
@@ -2339,7 +2361,7 @@ this.productHateoasService.searchCollection('products', 'byName', {
   sort: {
     name: 'ASC'
   },
-  // useCache: true | false, when the cache is enabled then by default true, false otherwise
+  // useCache: true | false, by default true
 }).subscribe((collection: ResourceCollection<Product>) => {
     const products: Array<Product> = collection.resources;
     // some logic
@@ -2400,7 +2422,7 @@ this.productService.searchPage('byName', {
   sort: {
     name: 'ASC'
   },
-  // useCache: true | false, when the cache is enabled then by default true, false otherwise
+  // useCache: true | false, by default true
 }).subscribe((pagedCollection: PagedResourceCollection<Product>) => {
     const products: Array<Product> = pagedCollection.resources;
     // some logic
@@ -2418,7 +2440,7 @@ this.productHateoasService.searchPage('products', 'byName', {
   sort: {
     cost: 'ASC'
   },
-  // useCache: true | false, when the cache is enabled then by default true, false otherwise
+  // useCache: true | false, by default true
 }).subscribe((pagedCollection: PagedResourceCollection<Product>) => {
     const products: Array<Product> = pagedCollection.resources;
     // some logic
@@ -2512,25 +2534,25 @@ The library accepts configuration object:
 ```
 #### Http params
 
-`rootUrl` (required) - defines root server URL that will be used to perform resource requests.
-`proxyUrl` (optional) -  defines proxy URL that uses to change rootUrl to proxyUrl when getting a relation link.
+- `rootUrl` (required) - defines root server URL that will be used to perform resource requests.
+- `proxyUrl` (optional) -  defines proxy URL that uses to change rootUrl to proxyUrl when getting a relation link.
 
 #### Logging params
 
-`verboseLogs` - to debug lib works enable logging to the console. With enabled logging, all prepared resource stages will be printed.
+- `verboseLogs` - to debug lib works enable logging to the console. With enabled logging, all prepared resource stages will be printed.
 
 > See more about logging [here](#logging).
 
 #### Cache params
 
-`enabled` - `true` to use cache for `GET` requests, `false` by default.
-`lifeTime` - by default cache lifetime is 300 000 seconds (=5 minutes) pass new value to change default one.
+- `enabled` - `true` to use cache for `GET` requests, `false` otherwise, default value is `true`.
+- `lifeTime` - default cache lifetime is 300 000 seconds (=5 minutes) pass new value to change default one.
 
 > See more about caching [here](#cache-support).
 
 ### Cache support
 The library supports caching `GET` request response values.
-By default, the cache `disabled`. 
+By default, the cache `enabled`. 
 
 To enable cache pass `cache.enabled = true` to library configuration. Also, you can manage the cache expired time with `cache.lifeTime` param.
 

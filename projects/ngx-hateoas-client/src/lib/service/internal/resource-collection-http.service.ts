@@ -17,7 +17,7 @@ import { ValidationUtils } from '../../util/validation.utils';
 import { CacheKey } from './cache/model/cache-key';
 import { ResourceCacheService } from './cache/resource-cache.service';
 
-export function getResourceCollectionHttpService(): ResourceCollectionHttpService<ResourceCollection<BaseResource>> {
+export function getResourceCollectionHttpService(): ResourceCollectionHttpService {
   return DependencyInjector.get(ResourceCollectionHttpService);
 }
 
@@ -25,7 +25,7 @@ export function getResourceCollectionHttpService(): ResourceCollectionHttpServic
  * Service to perform HTTP requests to get {@link ResourceCollection} type.
  */
 @Injectable()
-export class ResourceCollectionHttpService<T extends ResourceCollection<BaseResource>> extends HttpExecutor {
+export class ResourceCollectionHttpService extends HttpExecutor {
 
   constructor(httpClient: HttpClient,
               cacheService: ResourceCacheService) {
@@ -39,15 +39,13 @@ export class ResourceCollectionHttpService<T extends ResourceCollection<BaseReso
    * @param options request options
    * @throws error when required params are not valid or returned resource type is not collection of the resources
    */
-  public get(url: string,
-             options?: GetOption): Observable<T> {
+  public get<T extends ResourceCollection<BaseResource>>(url: string,
+                                                         options?: GetOption): Observable<T> {
     const httpOptions = {params: UrlUtils.convertToHttpParams(options)};
     return super.getHttp(url, httpOptions)
       .pipe(
         map((data: any) => {
-          if (LibConfig.config.comparable.ngxHalClient) {
-            return ResourceUtils.instantiateResourceCollection(data) as T;
-          } else if (!isResourceCollection(data)) {
+          if (!isResourceCollection(data)) {
             if (LibConfig.config.cache.enabled) {
               this.cacheService.evictResource(CacheKey.of(url, httpOptions));
             }
@@ -68,7 +66,7 @@ export class ResourceCollectionHttpService<T extends ResourceCollection<BaseReso
    * @param options (optional) options that applied to the request
    * @throws error when required params are not valid
    */
-  public getResourceCollection(resourceName: string, options?: GetOption): Observable<T> {
+  public getResourceCollection<T extends ResourceCollection<BaseResource>>(resourceName: string, options?: GetOption): Observable<T> {
     ValidationUtils.validateInputParams({resourceName});
 
     const url = UrlUtils.generateResourceUrl(UrlUtils.getApiUrl(), resourceName);
@@ -89,7 +87,7 @@ export class ResourceCollectionHttpService<T extends ResourceCollection<BaseReso
    * @param options (optional) options that applied to the request
    * @throws error when required params are not valid
    */
-  public search(resourceName: string, searchQuery: string, options?: GetOption): Observable<T> {
+  public search<T extends ResourceCollection<BaseResource>>(resourceName: string, searchQuery: string, options?: GetOption): Observable<T> {
     ValidationUtils.validateInputParams({resourceName, searchQuery});
 
     const url = UrlUtils.generateResourceUrl(UrlUtils.getApiUrl(), resourceName).concat('/search/' + searchQuery);

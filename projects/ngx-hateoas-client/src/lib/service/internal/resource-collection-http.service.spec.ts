@@ -1,8 +1,12 @@
 import { ResourceCollectionHttpService } from './resource-collection-http.service';
 import { ResourceCollection } from '../../model/resource/resource-collection';
-import { BaseResource } from '../../model/resource/base-resource';
 import { of } from 'rxjs';
-import { rawEmbeddedResource, rawPagedResourceCollection, rawResource, rawResourceCollection } from '../../model/resource/resources.test';
+import {
+  rawEmbeddedResource,
+  rawPagedResourceCollection,
+  rawResource,
+  rawResourceCollection
+} from '../../model/resource/resources.test';
 import { ResourceUtils } from '../../util/resource.utils';
 import { HttpParams } from '@angular/common/http';
 import { Resource } from '../../model/resource/resource';
@@ -11,7 +15,7 @@ import { UrlUtils } from '../../util/url.utils';
 
 /* tslint:disable:no-string-literal */
 describe('ResourceCollectionHttpService', () => {
-  let resourceCollectionHttpService: ResourceCollectionHttpService<ResourceCollection<BaseResource>>;
+  let resourceCollectionHttpService: ResourceCollectionHttpService;
   let httpClientSpy: any;
   let cacheServiceSpy: any;
 
@@ -26,7 +30,7 @@ describe('ResourceCollectionHttpService', () => {
     };
 
     resourceCollectionHttpService =
-      new ResourceCollectionHttpService<ResourceCollection<BaseResource>>(httpClientSpy, cacheServiceSpy);
+      new ResourceCollectionHttpService(httpClientSpy, cacheServiceSpy);
 
     ResourceUtils.useResourceType(Resource);
     ResourceUtils.useResourceCollectionType(ResourceCollection);

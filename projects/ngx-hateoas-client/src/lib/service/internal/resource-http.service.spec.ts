@@ -1,16 +1,20 @@
 /* tslint:disable:no-string-literal */
-import { BaseResource } from '../../model/resource/base-resource';
 import { ResourceUtils } from '../../util/resource.utils';
 import { ResourceHttpService } from './resource-http.service';
 import { Resource } from '../../model/resource/resource';
 import { of } from 'rxjs';
-import { rawPagedResourceCollection, rawResource, rawResourceCollection, SimpleResource } from '../../model/resource/resources.test';
+import {
+  rawPagedResourceCollection,
+  rawResource,
+  rawResourceCollection,
+  SimpleResource
+} from '../../model/resource/resources.test';
 import { HttpParams } from '@angular/common/http';
 import { LibConfig } from '../../config/lib-config';
 import { UrlUtils } from '../../util/url.utils';
 
 describe('ResourceHttpService', () => {
-  let resourceHttpService: ResourceHttpService<BaseResource>;
+  let resourceHttpService: ResourceHttpService;
   let httpClientSpy: any;
   let cacheServiceSpy: any;
 
@@ -30,7 +34,7 @@ describe('ResourceHttpService', () => {
     };
 
     resourceHttpService =
-      new ResourceHttpService<BaseResource>(httpClientSpy, cacheServiceSpy);
+      new ResourceHttpService(httpClientSpy, cacheServiceSpy);
 
     ResourceUtils.useResourceType(Resource);
   });

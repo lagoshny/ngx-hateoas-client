@@ -4,8 +4,12 @@
   "lib": {
     "entryFile": "src/public-api.ts",
     "umdModuleIds": {
-      "lodash": "lodash",
-      "uri-templates": "uri-templates"
+      "lodash-es": "lodash-es",
+      "uri-templates-es": "uri-templates-es"
     }
-  }
+  },
+  "whitelistedNonPeerDependencies": [
+    "uri-templates-es",
+    "lodash-es"
+  ]
 }

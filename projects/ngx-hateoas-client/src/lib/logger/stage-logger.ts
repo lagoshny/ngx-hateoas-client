@@ -1,7 +1,7 @@
-import * as _ from 'lodash';
 import { ConsoleLogger } from './console-logger';
 import { Stage } from './stage.enum';
 import { LibConfig } from '../config/lib-config';
+import { capitalize, isEmpty, isNil, isObject, isString } from 'lodash-es';
 
 /**
  * Simplify logger calls.
@@ -17,14 +17,14 @@ export class StageLogger {
     const paramToLog = this.prepareParams(params);
 
     let resourceName;
-    if (_.isString(resource)) {
+    if (isString(resource)) {
       resourceName = resource;
-    } else if (!_.isNil(resource)) {
+    } else if (!isNil(resource)) {
       resourceName = 'resourceName' in resource ? resource['resourceName'] : 'EmbeddedResource';
     } else {
       resourceName = 'NOT_DEFINED_RESOURCE_NAME';
     }
-    ConsoleLogger.resourcePrettyInfo(`${ _.capitalize(resourceName) } ${ method }`,
+    ConsoleLogger.resourcePrettyInfo(`${ capitalize(resourceName) } ${ method }`,
       `STAGE ${ Stage.BEGIN }`, paramToLog);
   }
 
@@ -35,13 +35,13 @@ export class StageLogger {
     const paramToLog = this.prepareParams(params);
 
     let resourceName;
-    if (_.isString(resource)) {
+    if (isString(resource)) {
       resourceName = resource;
     } else {
       resourceName = 'resourceName' in resource ? resource['resourceName'] : 'EmbeddedResource';
     }
 
-    ConsoleLogger.resourcePrettyInfo(`${ _.capitalize(resourceName) } ${ method }`,
+    ConsoleLogger.resourcePrettyInfo(`${ capitalize(resourceName) } ${ method }`,
       `STAGE ${ Stage.END }`, paramToLog);
   }
 
@@ -65,14 +65,14 @@ export class StageLogger {
 
   private static prepareParams(params: object) {
     const paramToLog = {};
-    if (_.isEmpty(params)) {
+    if (isEmpty(params)) {
       return paramToLog;
     }
     for (const [key, value] of Object.entries(params)) {
       if (!params.hasOwnProperty(key)) {
         continue;
       }
-      if (_.isObject(value)) {
+      if (isObject(value)) {
         paramToLog[key] = JSON.stringify(value, null, 2);
       } else {
         paramToLog[key] = value;

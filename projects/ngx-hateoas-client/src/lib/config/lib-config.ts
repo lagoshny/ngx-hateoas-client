@@ -13,11 +13,8 @@ export class LibConfig {
       verboseLogs: false
     },
     cache: {
-      enabled: false,
+      enabled: true,
       lifeTime: 5 * 60 * 1000
-    },
-    comparable: {
-      ngxHalClient: false
     }
   };
 

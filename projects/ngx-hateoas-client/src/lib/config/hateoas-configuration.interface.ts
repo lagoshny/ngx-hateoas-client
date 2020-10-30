@@ -46,14 +46,4 @@ export interface HateoasConfiguration {
     lifeTime?: number;
   };
 
-  /**
-   * Comparable lib settings.
-   */
-  comparable?: {
-    /**
-     * Enable comparable mode with ngx-hal-client library.
-     */
-    ngxHalClient?: boolean;
-  };
-
 }

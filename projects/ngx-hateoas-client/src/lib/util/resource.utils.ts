@@ -3,12 +3,12 @@ import { isEmbeddedResource, isResource } from '../model/resource-type';
 import { ResourceCollection } from '../model/resource/resource-collection';
 import { PagedResourceCollection } from '../model/resource/paged-resource-collection';
 import { Include, Link, PageData, RequestBody } from '../model/declarations';
-import * as _ from 'lodash';
 import { Resource } from '../model/resource/resource';
 import { EmbeddedResource } from '../model/resource/embedded-resource';
 import { UrlUtils } from './url.utils';
 import { Stage } from '../logger/stage.enum';
 import { StageLogger } from '../logger/stage-logger';
+import { isArray, isEmpty, isNil, isObject, upperFirst } from 'lodash-es';
 
 /* tslint:disable:no-string-literal */
 export class ResourceUtils {
@@ -41,12 +41,12 @@ export class ResourceUtils {
 
   public static instantiateResource<T extends BaseResource>(payload: object): T {
     // @ts-ignore
-    if (_.isEmpty(payload)
-      || (!_.isObject(payload['_links']) || _.isEmpty(payload['_links']))) {
+    if (isEmpty(payload)
+      || (!isObject(payload['_links']) || isEmpty(payload['_links']))) {
       return null;
     }
     for (const key of Object.keys(payload)) {
-      if (_.isArray(payload[key])) {
+      if (isArray(payload[key])) {
         for (let i = 0; i < payload[key].length; i++) {
           if (isEmbeddedResource(payload[key][i])) {
             payload[key][i] = ResourceUtils.createResource(new this.embeddedResourceType(), payload[key][i]);
@@ -71,9 +71,9 @@ export class ResourceUtils {
 
 
   public static instantiateResourceCollection<T extends ResourceCollection<BaseResource>>(payload: object): T {
-    if (_.isEmpty(payload)
-      || (!_.isObject(payload['_links']) || _.isEmpty(payload['_links']))
-      || (!_.isObject(payload['_embedded']) || _.isEmpty(payload['_embedded']))) {
+    if (isEmpty(payload)
+      || (!isObject(payload['_links']) || isEmpty(payload['_links']))
+      || (!isObject(payload['_embedded']) || isEmpty(payload['_embedded']))) {
       return null;
     }
     const result = new this.resourceCollectionType() as T;
@@ -110,13 +110,13 @@ export class ResourceUtils {
    * @param requestBody that contains the body directly and optional body values option {@link ValuesOption}
    */
   public static resolveValues(requestBody: RequestBody<any>): any {
-    if (_.isEmpty(requestBody) || _.isNil(requestBody.body)
-      || (_.isObject(requestBody.body) && _.isEmpty(requestBody.body))) {
+    if (isEmpty(requestBody) || isNil(requestBody.body)
+      || (isObject(requestBody.body) && isEmpty(requestBody.body))) {
       StageLogger.stageLog(Stage.RESOLVE_VALUES, {result: 'body is empty return null'});
       return null;
     }
     const body = requestBody.body;
-    if (!_.isObject(body) || _.isArray(body)) {
+    if (!isObject(body) || isArray(body)) {
       StageLogger.stageLog(Stage.RESOLVE_VALUES, {result: 'body is not object or array return as is'});
       return body;
     }
@@ -130,10 +130,10 @@ export class ResourceUtils {
         result[key] = null;
         continue;
       }
-      if (_.isNil(body[key])) {
+      if (isNil(body[key])) {
         continue;
       }
-      if (_.isArray(body[key])) {
+      if (isArray(body[key])) {
         const array: any[] = body[key];
         result[key] = [];
         array.forEach((element) => {
@@ -178,14 +178,14 @@ export class ResourceUtils {
   private static findResourceName(resource: BaseResource): string {
     // @ts-ignore
     const resourceLinks = resource._links as Link;
-    if (_.isEmpty(resourceLinks) || _.isEmpty(resourceLinks.self) || _.isNil(resourceLinks.self.href)) {
+    if (isEmpty(resourceLinks) || isEmpty(resourceLinks.self) || isNil(resourceLinks.self.href)) {
       return undefined;
     }
     const selfLinkHref = resourceLinks.self.href;
 
     for (const linkKey of Object.keys(resourceLinks)) {
       if (linkKey !== 'self' && UrlUtils.removeTemplateParams(resourceLinks[linkKey].href) === selfLinkHref) {
-        return _.upperFirst(linkKey);
+        return upperFirst(linkKey);
       }
     }
   }

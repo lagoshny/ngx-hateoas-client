@@ -17,7 +17,7 @@ import { ValidationUtils } from '../util/validation.utils';
  * configuration using {@link #configure()} method.
  */
 @Injectable()
-export class HateoasConfigurationService {
+export class NgxHateoasClientConfigurationService {
 
   constructor(private injector: Injector) {
     DependencyInjector.injector = injector;

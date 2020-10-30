@@ -1,4 +1,4 @@
-import * as _ from 'lodash';
+import { isObject } from 'lodash-es';
 
 export function isEmbeddedResource(object: any) {
   // Embedded resource doesn't have self link in _links object
@@ -10,11 +10,11 @@ export function isResource(object: any): boolean {
 }
 
 export function isResourceCollection(object: any): boolean {
-  return _.isObject(object) && ('_embedded' in object) && !('page' in object);
+  return isObject(object) && ('_embedded' in object) && !('page' in object);
 }
 
 export function isPagedResourceCollection(object: any): boolean {
-  return _.isObject(object) && ('_embedded' in object) && ('page' in object);
+  return isObject(object) && ('_embedded' in object) && ('page' in object);
 }
 
 /**
@@ -23,5 +23,5 @@ export function isPagedResourceCollection(object: any): boolean {
  * @param object which need to check links property
  */
 export function isResourceObject(object: any) {
-  return _.isObject(object) && ('_links' in object);
+  return isObject(object) && ('_links' in object);
 }

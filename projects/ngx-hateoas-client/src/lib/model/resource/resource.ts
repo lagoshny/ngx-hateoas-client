@@ -2,7 +2,6 @@ import { BaseResource } from './base-resource';
 import { getResourceHttpService } from '../../service/internal/resource-http.service';
 import { HttpHeaders, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import * as _ from 'lodash';
 import { ResourceUtils } from '../../util/resource.utils';
 import { UrlUtils } from '../../util/url.utils';
 import { LinkData } from '../declarations';
@@ -10,6 +9,7 @@ import { tap } from 'rxjs/operators';
 import { Stage } from '../../logger/stage.enum';
 import { StageLogger } from '../../logger/stage-logger';
 import { ValidationUtils } from '../../util/validation.utils';
+import { eq, isNil, isObject, last, split, toLower } from 'lodash-es';
 
 /**
  * Resource class.
@@ -42,11 +42,11 @@ export class Resource extends BaseResource {
    */
   public isResourceOf<T extends Resource>(typeOrName: (new() => T) | string): boolean {
     ValidationUtils.validateInputParams({typeOrName});
-    if (_.isObject(typeOrName)) {
+    if (isObject(typeOrName)) {
       const that = new typeOrName() as T;
-      return _.eq(_.toLower(this.resourceName), _.toLower(that.constructor.name));
+      return eq(toLower(this.resourceName), toLower(that.constructor.name));
     } else {
-      return _.eq(_.toLower(this.resourceName), _.toLower(typeOrName));
+      return eq(toLower(this.resourceName), toLower(typeOrName));
     }
   }
 
@@ -165,9 +165,9 @@ export class Resource extends BaseResource {
 
     const relationLink = this.getRelationLink(relationName);
     const resource = ResourceUtils.initResource(entity) as Resource;
-    const resourceId = _.last(_.split(resource.getSelfLinkHref(), '/'));
+    const resourceId = last(split(resource.getSelfLinkHref(), '/'));
 
-    if (_.isNil(resourceId) || resourceId === '') {
+    if (isNil(resourceId) || resourceId === '') {
       StageLogger.stageErrorLog(Stage.PREPARE_URL, {
         step: 'ResolveResourceId',
         error: 'Passed resource self link should has id',

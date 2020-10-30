@@ -26,7 +26,7 @@ class ResourceWithRelation extends SimpleResource {
 }
 
 describe('HateoasResourceService', () => {
-  let hateoasResourceService: HateoasResourceService<Resource>;
+  let hateoasResourceService: HateoasResourceService;
   let commonHttpServiceSpy: any;
   let resourceHttpServiceSpy: any;
   let resourceCollectionHttpServiceSpy: any;
@@ -53,7 +53,7 @@ describe('HateoasResourceService', () => {
     };
 
     hateoasResourceService =
-      new HateoasResourceService<Resource>(commonHttpServiceSpy, resourceHttpServiceSpy,
+      new HateoasResourceService(commonHttpServiceSpy, resourceHttpServiceSpy,
         resourceCollectionHttpServiceSpy, pagedResourceCollectionHttpServiceSpy);
 
     ResourceUtils.useResourceType(Resource);

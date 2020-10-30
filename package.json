@@ -70,7 +70,8 @@
     "ngx hateoas client",
     "hateoas client",
     "Angular hateoas client",
-    "Spring HATEOAS"
+    "Spring HATEOAS",
+    "Angulat hal"
   ],
   "homepage": "https://github.com/lagoshny/ngx-hateoas-client",
   "issues": {

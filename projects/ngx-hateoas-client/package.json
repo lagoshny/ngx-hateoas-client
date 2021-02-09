@@ -10,7 +10,7 @@
     "@angular/core": ">=6.x.x <= 10.x.x"
   },
   "dependencies": {
-    "tslib": "^2.0.3",
+    "tslib": "^2.1.0",
     "uri-templates-es": "^1.0.0",
     "lodash-es": "4.17.15"
   },
@@ -20,13 +20,12 @@
     "HAL",
     "hypermedia",
     "REST",
-    "Angular 4",
-    "Angular 5",
     "Angular 6",
     "Angular 7",
     "Angular 8",
     "Angular 9",
     "Angular 10",
+    "Angular 11",
     "ngx hal client",
     "ngx hateoas client",
     "hateoas client",

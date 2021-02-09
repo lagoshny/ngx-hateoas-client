@@ -22,7 +22,7 @@
 <br />
 <br />
 
-**Compatible with Angular 10.**
+**Compatible with Angular 11.**
 
 This client can be used to develop `Angular 6.0+` applications working with RESTful server API. 
 By `RESTful API` means when the server application implements all the layers of the [Richardson Maturity Model](https://martinfowler.com/articles/richardsonMaturityModel.html) 

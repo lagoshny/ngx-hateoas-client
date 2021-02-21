@@ -107,29 +107,29 @@ describe('Resource ADD_RELATION', () => {
   });
 
   it('should throw error when passed relationName is empty', () => {
-    expect(() => resource.addRelation('', [new TestProductResource()]))
+    expect(() => resource.addCollectionRelation('', [new TestProductResource()]))
       .toThrowError(`Passed param(s) 'relationName = ' is not valid`);
   });
 
   it('should throw error when passed entities is empty', () => {
-    expect(() => resource.addRelation('any', []))
+    expect(() => resource.addCollectionRelation('any', []))
       .toThrowError(`Passed param(s) 'entities = []' is not valid`);
   });
 
   it('should throw error when passed relationName,entities are undefined', () => {
-    expect(() => resource.addRelation(undefined, undefined))
+    expect(() => resource.addCollectionRelation(undefined, undefined))
       .toThrowError(`Passed param(s) 'relationName = undefined', 'entities = undefined' are not valid`);
   });
 
   it('should throw error when passed relationName,entities are null', () => {
-    expect(() => resource.addRelation(null, null))
+    expect(() => resource.addCollectionRelation(null, null))
       .toThrowError(`Passed param(s) 'relationName = null', 'entities = null' are not valid`);
   });
 
   it('should clear template params in TEMPLATED relation link', () => {
     resourceHttpServiceSpy.post.and.returnValue(of(new HttpResponse()));
 
-    resource.addRelation('product', [new TestProductResource()])
+    resource.addCollectionRelation('product', [new TestProductResource()])
       .subscribe(() => {
         const resultResourceUrl = resourceHttpServiceSpy.post.calls.argsFor(0)[0];
         expect(resultResourceUrl).toBe('http://localhost:8080/api/v1/order/1/products');
@@ -139,7 +139,7 @@ describe('Resource ADD_RELATION', () => {
   it('should pass relation self link as body', () => {
     resourceHttpServiceSpy.post.and.returnValue(of(new HttpResponse()));
 
-    resource.addRelation('product', [new TestProductResource()])
+    resource.addCollectionRelation('product', [new TestProductResource()])
       .subscribe(() => {
         const body = resourceHttpServiceSpy.post.calls.argsFor(0)[1];
         expect(body).toBe('http://localhost:8080/api/v1/product/1');
@@ -149,7 +149,7 @@ describe('Resource ADD_RELATION', () => {
   it('should pass content-type: text/uri-list', () => {
     resourceHttpServiceSpy.post.and.returnValue(of(new HttpResponse()));
 
-    resource.addRelation('product', [new TestProductResource()])
+    resource.addCollectionRelation('product', [new TestProductResource()])
       .subscribe(() => {
         const headers = resourceHttpServiceSpy.post.calls.argsFor(0)[2].headers as HttpHeaders;
         expect(headers.has('Content-Type')).toBeTrue();
@@ -160,7 +160,7 @@ describe('Resource ADD_RELATION', () => {
   it('should pass observe "response" value', () => {
     resourceHttpServiceSpy.post.and.returnValue(of(new HttpResponse()));
 
-    resource.addRelation('product', [new TestProductResource()])
+    resource.addCollectionRelation('product', [new TestProductResource()])
       .subscribe(() => {
         const observe = resourceHttpServiceSpy.post.calls.argsFor(0)[2].observe;
         expect(observe).toBeDefined();
@@ -204,24 +204,24 @@ describe('Resource BIND_RELATION', () => {
   });
 
   it('should throw error when passed relationName is empty', () => {
-    expect(() => resource.bindRelation('', new TestProductResource()))
+    expect(() => resource.bindRelation('', [new TestProductResource()]))
       .toThrowError(`Passed param(s) 'relationName = ' is not valid`);
   });
 
   it('should throw error when passed relationName,entity are undefined', () => {
     expect(() => resource.bindRelation(undefined, undefined))
-      .toThrowError(`Passed param(s) 'relationName = undefined', 'entity = undefined' are not valid`);
+      .toThrowError(`Passed param(s) 'relationName = undefined', 'entities = undefined' are not valid`);
   });
 
   it('should throw error when passed relationName,entity are null', () => {
     expect(() => resource.bindRelation(null, null))
-      .toThrowError(`Passed param(s) 'relationName = null', 'entity = null' are not valid`);
+      .toThrowError(`Passed param(s) 'relationName = null', 'entities = null' are not valid`);
   });
 
   it('should clear template params in TEMPLATED relation link', () => {
     resourceHttpServiceSpy.put.and.returnValue(of(new HttpResponse()));
 
-    resource.bindRelation('product', new TestProductResource())
+    resource.bindRelation('product', [new TestProductResource()])
       .subscribe(() => {
         const resultResourceUrl = resourceHttpServiceSpy.put.calls.argsFor(0)[0];
         expect(resultResourceUrl).toBe('http://localhost:8080/api/v1/order/1/products');
@@ -231,7 +231,7 @@ describe('Resource BIND_RELATION', () => {
   it('should pass relation self link as body', () => {
     resourceHttpServiceSpy.put.and.returnValue(of(new HttpResponse()));
 
-    resource.bindRelation('product', new TestProductResource())
+    resource.bindRelation('product', [new TestProductResource()])
       .subscribe(() => {
         const body = resourceHttpServiceSpy.put.calls.argsFor(0)[1];
         expect(body).toBe('http://localhost:8080/api/v1/product/1');
@@ -241,7 +241,7 @@ describe('Resource BIND_RELATION', () => {
   it('should pass content-type: text/uri-list', () => {
     resourceHttpServiceSpy.put.and.returnValue(of(new HttpResponse()));
 
-    resource.bindRelation('product', new TestProductResource())
+    resource.bindRelation('product', [new TestProductResource()])
       .subscribe(() => {
         const headers = resourceHttpServiceSpy.put.calls.argsFor(0)[2].headers as HttpHeaders;
         expect(headers.has('Content-Type')).toBeTrue();
@@ -252,11 +252,71 @@ describe('Resource BIND_RELATION', () => {
   it('should pass observe "response" value', () => {
     resourceHttpServiceSpy.put.and.returnValue(of(new HttpResponse()));
 
-    resource.bindRelation('product', new TestProductResource())
+    resource.bindRelation('product', [new TestProductResource()])
       .subscribe(() => {
         const observe = resourceHttpServiceSpy.put.calls.argsFor(0)[2].observe;
         expect(observe).toBeDefined();
         expect(observe).toBe('response');
+      });
+  });
+
+});
+
+describe('Resource UNBIND_RELATION', () => {
+  let resource: Resource;
+  let resourceHttpServiceSpy: any;
+
+  beforeEach(async(() => {
+    resourceHttpServiceSpy = {
+      delete: jasmine.createSpy('delete')
+    };
+
+    TestBed.configureTestingModule({
+      providers: [
+        {
+          provide: LibConfig, useValue: {
+            enableCache: false,
+            baseApiUrl: 'http://localhost:8080/api/v1',
+          }
+        },
+        {provide: ResourceHttpService, useValue: resourceHttpServiceSpy}
+      ]
+    }).compileComponents();
+  }));
+
+  beforeEach(() => {
+    DependencyInjector.injector = TestBed;
+    ResourceUtils.useResourceType(Resource);
+    resource = new TestOrderResource();
+  });
+
+  afterEach(() => {
+    DependencyInjector.injector = null;
+    ResourceUtils.useResourceType(null);
+  });
+
+  it('should throw error when passed relationName is empty', () => {
+    expect(() => resource.unbindRelation(''))
+      .toThrowError(`Passed param(s) 'relationName = ' is not valid`);
+  });
+
+  it('should throw error when passed relationName is undefined', () => {
+    expect(() => resource.unbindRelation(undefined))
+      .toThrowError(`Passed param(s) 'relationName = undefined' is not valid`);
+  });
+
+  it('should throw error when passed relationName is null', () => {
+    expect(() => resource.unbindRelation(null))
+      .toThrowError(`Passed param(s) 'relationName = null' is not valid`);
+  });
+
+  it('should clear template params in TEMPLATED relation link', () => {
+    resourceHttpServiceSpy.delete.and.returnValue(of(new HttpResponse()));
+
+    resource.unbindRelation('product')
+      .subscribe(() => {
+        const resultResourceUrl = resourceHttpServiceSpy.delete.calls.argsFor(0)[0];
+        expect(resultResourceUrl).toBe('http://localhost:8080/api/v1/order/1/products');
       });
   });
 

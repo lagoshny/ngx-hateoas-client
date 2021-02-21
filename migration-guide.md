@@ -368,7 +368,7 @@ Removed `getProjectionArray` method, use [getRelatedCollection](https://github.c
 > See more about `GetRelatedCollection` method [here](https://github.com/lagoshny/ngx-hateoas-client#GetRelatedCollection). 
 
 ### AddRelation changes
-`addRelation` changed method signature:
+`addRelation` changed method name and signature:
 
 Was: 
 ```
@@ -376,19 +376,19 @@ addRelation<T extends BaseResource>(relation: string, resource: T): Observable<a
 ```
 Now: 
 ```
-addRelation<T extends Resource>(relationName: string, entities: Array<T>): Observable<HttpResponse<any>>;
+addCollectionRelation<T extends Resource>(relationName: string, entities: Array<T>): Observable<HttpResponse<any>>;
 ```
 
 - Renamed `relation` param to `relationName`.
 - Renamed `resource` param to `entities` and changed param type to an array.
 
-> See more about `AddRelation` method [here](https://github.com/lagoshny/ngx-hateoas-client#AddRelation). 
+> See more about `addCollectionRelation` method [here](https://github.com/lagoshny/ngx-hateoas-client#AddCollectionRelation). 
 
 ### SubstituteRelation changes
 Renamed `substituteRelation` to `bindRelation` and some method changes:
 
 - Renamed `relation` param to `relationName`.
-- Renamed `resource` param to `entitiy`.
+- Renamed `resource` param to `entities` and changed param type to an array.
 
 > See more about `BindRelation` method [here](https://github.com/lagoshny/ngx-hateoas-client#BindRelation). 
 

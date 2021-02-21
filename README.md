@@ -34,7 +34,7 @@ This client compatible with Java server-side applications based on [Spring HATEO
 You can find out about the motivation to create a new client [here](https://github.com/lagoshny/ngx-hateoas-client/blob/master/migration-guide.md#Motivation).
 To migrate from `@lagoshny/ngx-hal-client` to this client you can use the [migration guide](https://github.com/lagoshny/ngx-hateoas-client/blob/master/migration-guide.md#Motivation).
 
-You can found examples of usage this client with [task-manager-front]() application that uses server-side [task-manager-back]() application.
+You can found examples of usage this client with [task-manager-front](https://github.com/lagoshny/task-manager-front) application that uses server-side [task-manager-back](https://github.com/lagoshny/task-manager-back) application.
 
 ## Contents
 1. [Changelog](#Changelog)
@@ -55,9 +55,9 @@ You can found examples of usage this client with [task-manager-front]() applicat
       - [PutRelation](#PutRelation)
    - [Resource](#Resource)
       - [IsResourceOf](#IsResourceOf)
-      - [AddRelation](#AddRelation)
-      - [UpdateRelation](#UpdateRelation)
+      - [AddCollectionRelation](#AddCollectionRelation)
       - [BindRelation](#BindRelation)
+      - [UnbindRelation](#UnbindRelation)
       - [ClearCollectionRelation](#ClearCollectionRelation)
       - [DeleteRelation](#DeleteRelation)
    - [EmbeddedResource](#EmbeddedResource)
@@ -198,7 +198,7 @@ To perform resource requests you can use built-in [HateoasResourceService](#buil
 The library has built-in `HateoasResourceService`.
 It is a simple service with methods to get/create/update/delete resources.
 
-To use it injecting `HateoasResourceService` to a component or a service class and set the resource type to a generic param.
+To use it inject `HateoasResourceService` to a component or a service class after that you can perform resource requests by passing the resource name.
 
 ```ts
 @Component({
@@ -206,7 +206,7 @@ To use it injecting `HateoasResourceService` to a component or a service class a
 })
 export class SomeComponent {
 
-  constructor(private hateoasProductService: HateoasResourceService<Product>) {
+  constructor(private resourceService: HateoasResourceService) {
   }
 
   onSomeAction() {
@@ -214,7 +214,7 @@ export class SomeComponent {
     product.cost = 100;
     product.name = 'Fruit';
 
-    this.hateoasProductService.createResource('product', product)
+    this.resourceService.createResource('product', product)
             .subscribe((createdResource: Product) => {
                 // TODO something
             });
@@ -754,13 +754,18 @@ cart.isResourceOf(Cart); // return FALSE because Cart class constructor name is 
 
 ```
 
-### AddRelation
-Adding passed entities (they should exist on the server) to the resource collection behind the relation name.
+### AddCollectionRelation
+Adding passed entities to the resource collection behind the relation name.
+
+Used `POST` method with `'Content-Type': 'text/uri-list'`.
+
+>This method **DOES NOT REPLACED** existing resources in the collection instead it adds new ones. 
+To replace collection resource with passed entities use [bindRelation](#bindrelation) method.
 
 Method signature:
 
 ```
-addRelation<T extends Resource>(relationName: string, entities: Array<T>): Observable<HttpResponse<any>>;
+addCollectionRelation<T extends Resource>(relationName: string, entities: Array<T>): Observable<HttpResponse<any>>;
 ```
 
 - `relationName` - resource relation name used to get request URL mapped to resource collection.
@@ -771,84 +776,116 @@ addRelation<T extends Resource>(relationName: string, entities: Array<T>): Obser
 ##### Examples of usage ([given the presets](#resource-presets)):
 
 ```ts
-/* 
- Performing POST request by the URL: http://localhost:8080/api/v1/carts/1/products
- Content-type: 'text/uri-list'
- Body: [http://localhost:8080/api/v1/products/1, http://localhost:8080/api/v1/products/2]
-*/
 // Suppose product1 already exists with id = 1
 const product1 = ...;
 // Suppose product2 already exists with id = 2
 const product2 = ...;
 
-cart.addRelation('products', [product1, product2])
+cart.addCollectionRelation('products', [product1, product2])
+  /* 
+    Performing POST request by the URL: http://localhost:8080/api/v1/carts/1/products
+    Content-type: 'text/uri-list'
+    Body: [http://localhost:8080/api/v1/products/1, http://localhost:8080/api/v1/products/2]
+  */
   .subscribe((result: HttpResponse<any>) => {
      // some logic            
   });
-```
-
-### UpdateRelation
-Updating an entity value by relation link URL.
-
-Method signature:
-
-```
-updateRelation<T extends Resource>(relationName: string, entity: T): Observable<HttpResponse<any>>;
-```
-
-- `relationName` - resource relation name used to get request URL.
-- `entity` - new entity value.
-- `return value` - Angular `HttpResponse` result.
-
-##### Examples of usage ([given the presets](#resource-presets)):
-
-```ts
-/* 
- Performing PATCH request by the URL: http://localhost:8080/api/v1/carts/1/shop
- Content-type: 'text/uri-list'
- Body: http://localhost:8080/api/v1/shops/2
-*/
-// Suppose newShop already exists with id = 2
-const newShop = ...;
-cart.updateRelation('shop', newShop)
-  .subscribe((result: HttpResponse<any>) => {
-     // some logic            
-  });
-
 ```
 
 ### BindRelation
-Binding the passed entity to this resource by relation link URL.
+Bounding the passed entity or collection of entities to this resource by the relation name.
+
+Used `PUT` method with `'Content-Type': 'text/uri-list'`.
+
+
+>This method also **REPLACED** existing resources in the collection by passed entities.
+To add entities to collection resource use [addCollectionRelation](#addCollectionRelation) method.
 
 Method signature:
 
 ```
-bindRelation<T extends Resource>(relationName: string, entity: T): Observable<HttpResponse<any>>;
+bindRelation<T extends Resource>(relationName: string, entity: Array<T>): Observable<HttpResponse<any>>;
 ```
 
 - `relationName` - resource relation name used to get request URL.
-- `entity` - entity to bind.
+- `entities` - an array of entities that should be bound to resource.
+- `return value` - Angular `HttpResponse` result.
+
+##### Examples of usage ([given the presets](#resource-presets)):
+
+With single resource relation:
+```ts
+// Suppose shopToBind already exists with id = 1
+const shopToBind = ...;
+cart.bindRelation('shop', [shopToBind])
+  /* 
+    Performing PUT request by the URL: http://localhost:8080/api/v1/carts/1/shop
+    Content-type: 'text/uri-list'
+    Body: http://localhost:8080/api/v1/shops/1
+  */
+  .subscribe((result: HttpResponse<any>) => {
+     // some logic            
+  });
+
+```
+
+With collection resource relation:
+```ts
+// Suppose product1 already exists with id = 1
+const product1 = ...;
+// Suppose product2 already exists with id = 2
+const product2 = ...;
+
+cart.bindRelation('products', [product1, product2])
+  /* 
+    Performing PUT request by the URL: http://localhost:8080/api/v1/carts/1/products
+    Content-type: 'text/uri-list'
+    Body: [http://localhost:8080/api/v1/products/1, http://localhost:8080/api/v1/products/2]
+  */
+  .subscribe((result: HttpResponse<any>) => {
+     // some logic            
+  });
+```
+
+### UnbindRelation
+Unbinding single resource relation behind resource name.
+
+Used `DELETE` method to relation resource link URL.
+
+>This method does not work with collection resource relations.
+> To clear collection resource relation use [ClearCollectionRelation](#clearCollectionRelation) method.
+> To delete one resource from resource collection use [deleteRelation](#deleterelation) method.
+
+Method signature:
+
+```
+unbindRelation<T extends Resource>(relationName: string): Observable<HttpResponse<any>>;
+```
+
+- `relationName` - resource relation name to unbind.
 - `return value` - Angular `HttpResponse` result.
 
 ##### Examples of usage ([given the presets](#resource-presets)):
 
 ```ts
-/* 
- Performing PUT request by the URL: http://localhost:8080/api/v1/carts/1/shop
- Content-type: 'text/uri-list'
- Body: http://localhost:8080/api/v1/shops/1
-*/
-// Suppose shopToBind already exists with id = 1
-const shopToBind = ...;
-cart.bindRelation('shop', shopToBind)
+// Suppose cart already bound shop resource by relation name 'shop'
+cart.unbindRelation('shop')
+  /* 
+    Performing DELETE request by the URL: http://localhost:8080/api/v1/carts/1/shop
+  */
   .subscribe((result: HttpResponse<any>) => {
      // some logic            
   });
-
 ```
 
 ### ClearCollectionRelation
 Unbinding all resources from resource collection behind resource name.
+
+Used `PUT` method with `'Content-Type': 'text/uri-list'` and `EMPTY` body to clear relations.
+
+>This method does not work with SINGLE resource relations.
+> To delete single resource relations use [unboundRelation](#unboundRelation) or [deleteRelation](#deleterelation) methods.
+> To delete one resource from collection use [deleteRelation](#deleterelation) method.
 
 Method signature:
 
@@ -875,7 +912,12 @@ cart.clearCollectionRelation('products')
 ```
 
 ### DeleteRelation
-Unbinding resource relation entity by relation link URL.
+Deleting resource relation.
+
+For collection, means that only passed entity will be unbound from the collection.
+For single resource, deleting relation the same as [undoundRelation](#unbindrelation) method.
+
+>To delete all resource relations from collection use [clearCollectionRelation](#clearcollectionrelation) method.
 
 Method signature:
 
@@ -1444,7 +1486,7 @@ Examples of usage resource service methods rely on this presets.
   ```ts
   @Component({ ... })
   export class AppComponent {
-      constructor(private productHateoasService: HateoasResourceService<Product>) {
+      constructor(private productHateoasService: HateoasResourceService) {
       }
   }
   ```  

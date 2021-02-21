@@ -58,7 +58,7 @@ You can found examples of usage this client with [task-manager-front](https://gi
     - [AddCollectionRelation](#AddCollectionRelation)
     - [BindRelation](#BindRelation)
     - [UnbindRelation](#UnbindRelation)
-    - [ClearCollectionRelation](#ClearCollectionRelation)
+    - [UnbindCollectionRelation](#UnbindCollectionRelation)
     - [DeleteRelation](#DeleteRelation)
   - [EmbeddedResource](#EmbeddedResource)
   - [ResourceCollection](#ResourceCollection)
@@ -804,7 +804,7 @@ To add entities to collection resource use [addCollectionRelation](#addCollectio
 Method signature:
 
 ```
-bindRelation<T extends Resource>(relationName: string, entity: Array<T>): Observable<HttpResponse<any>>;
+bindRelation<T extends Resource>(relationName: string, entities: T | Array<T>): Observable<HttpResponse<any>>;
 ```
 
 - `relationName` - resource relation name used to get request URL.
@@ -817,7 +817,7 @@ With single resource relation:
 ```ts
 // Suppose shopToBind already exists with id = 1
 const shopToBind = ...;
-cart.bindRelation('shop', [shopToBind])
+cart.bindRelation('shop', shopToBind)
   /* 
     Performing PUT request by the URL: http://localhost:8080/api/v1/carts/1/shop
     Content-type: 'text/uri-list'
@@ -853,7 +853,7 @@ Unbinding single resource relation behind resource name.
 Used `DELETE` method to relation resource link URL.
 
 >This method does not work with collection resource relations.
-> To clear collection resource relation use [ClearCollectionRelation](#clearCollectionRelation) method.
+> To unbind collection resource relation use [UnbindCollectionRelation](#unbindCollectionRelation) method.
 > To delete one resource from resource collection use [deleteRelation](#deleterelation) method.
 
 Method signature:
@@ -878,8 +878,10 @@ cart.unbindRelation('shop')
   });
 ```
 
-### ClearCollectionRelation
+### UnbindCollectionRelation
 Unbinding all resources from resource collection behind resource name.
+
+Used `PUT` method with `'Content-Type': 'text/uri-list'` and `EMPTY` body to clear relations.
 
 >This method does not work with SINGLE resource relations.
 > To delete single resource relations use [unboundRelation](#unboundRelation) or [deleteRelation](#deleterelation) methods.
@@ -888,7 +890,7 @@ Unbinding all resources from resource collection behind resource name.
 Method signature:
 
 ```
-clearCollectionRelation<T extends Resource>(relationName: string): Observable<HttpResponse<any>>;
+unbindCollectionRelation<T extends Resource>(relationName: string): Observable<HttpResponse<any>>;
 ```
 
 - `relationName` - resource relation name used to get request URL.
@@ -902,7 +904,7 @@ clearCollectionRelation<T extends Resource>(relationName: string): Observable<Ht
  Content-type: 'text/uri-list'
  Body: ''
 */
-cart.clearCollectionRelation('products')
+cart.unbindCollectionRelation('products')
   .subscribe((result: HttpResponse<any>) => {
      // some logic            
   });

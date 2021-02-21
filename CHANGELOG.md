@@ -1,3 +1,11 @@
+## 1.1.1 (2021-02-21)
+#### Refactoring
+
+- `bindRelation` now accepts entity and an array of entities
+- `clearCollectionRelation` renamed to `unbindCollectionRelation`
+  
+README.md was updated.
+
 ## 1.1.0 (2021-02-21)
 #### Updated Resource methods 
 

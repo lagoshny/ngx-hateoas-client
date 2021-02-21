@@ -204,7 +204,7 @@ describe('Resource BIND_RELATION', () => {
   });
 
   it('should throw error when passed relationName is empty', () => {
-    expect(() => resource.bindRelation('', [new TestProductResource()]))
+    expect(() => resource.bindRelation('', new TestProductResource()))
       .toThrowError(`Passed param(s) 'relationName = ' is not valid`);
   });
 
@@ -221,7 +221,7 @@ describe('Resource BIND_RELATION', () => {
   it('should clear template params in TEMPLATED relation link', () => {
     resourceHttpServiceSpy.put.and.returnValue(of(new HttpResponse()));
 
-    resource.bindRelation('product', [new TestProductResource()])
+    resource.bindRelation('product', new TestProductResource())
       .subscribe(() => {
         const resultResourceUrl = resourceHttpServiceSpy.put.calls.argsFor(0)[0];
         expect(resultResourceUrl).toBe('http://localhost:8080/api/v1/order/1/products');
@@ -231,7 +231,7 @@ describe('Resource BIND_RELATION', () => {
   it('should pass relation self link as body', () => {
     resourceHttpServiceSpy.put.and.returnValue(of(new HttpResponse()));
 
-    resource.bindRelation('product', [new TestProductResource()])
+    resource.bindRelation('product', new TestProductResource())
       .subscribe(() => {
         const body = resourceHttpServiceSpy.put.calls.argsFor(0)[1];
         expect(body).toBe('http://localhost:8080/api/v1/product/1');
@@ -241,7 +241,7 @@ describe('Resource BIND_RELATION', () => {
   it('should pass content-type: text/uri-list', () => {
     resourceHttpServiceSpy.put.and.returnValue(of(new HttpResponse()));
 
-    resource.bindRelation('product', [new TestProductResource()])
+    resource.bindRelation('product', new TestProductResource())
       .subscribe(() => {
         const headers = resourceHttpServiceSpy.put.calls.argsFor(0)[2].headers as HttpHeaders;
         expect(headers.has('Content-Type')).toBeTrue();
@@ -252,7 +252,7 @@ describe('Resource BIND_RELATION', () => {
   it('should pass observe "response" value', () => {
     resourceHttpServiceSpy.put.and.returnValue(of(new HttpResponse()));
 
-    resource.bindRelation('product', [new TestProductResource()])
+    resource.bindRelation('product', new TestProductResource())
       .subscribe(() => {
         const observe = resourceHttpServiceSpy.put.calls.argsFor(0)[2].observe;
         expect(observe).toBeDefined();
@@ -322,7 +322,7 @@ describe('Resource UNBIND_RELATION', () => {
 
 });
 
-describe('Resource CLEAR_COLLECTION_RELATION', () => {
+describe('Resource UNBIND_COLLECTION_RELATION', () => {
   let resource: Resource;
   let resourceHttpServiceSpy: any;
 
@@ -356,24 +356,24 @@ describe('Resource CLEAR_COLLECTION_RELATION', () => {
   });
 
   it('should throw error when passed relationName is empty', () => {
-    expect(() => resource.clearCollectionRelation(''))
+    expect(() => resource.unbindCollectionRelation(''))
       .toThrowError(`Passed param(s) 'relationName = ' is not valid`);
   });
 
   it('should throw error when passed relationName is undefined', () => {
-    expect(() => resource.clearCollectionRelation(undefined))
+    expect(() => resource.unbindCollectionRelation(undefined))
       .toThrowError(`Passed param(s) 'relationName = undefined' is not valid`);
   });
 
   it('should throw error when passed relationName is null', () => {
-    expect(() => resource.clearCollectionRelation(null))
+    expect(() => resource.unbindCollectionRelation(null))
       .toThrowError(`Passed param(s) 'relationName = null' is not valid`);
   });
 
   it('should clear template params in TEMPLATED relation link', () => {
     resourceHttpServiceSpy.put.and.returnValue(of(new HttpResponse()));
 
-    resource.clearCollectionRelation('product')
+    resource.unbindCollectionRelation('product')
       .subscribe(() => {
         const resultResourceUrl = resourceHttpServiceSpy.put.calls.argsFor(0)[0];
         expect(resultResourceUrl).toBe('http://localhost:8080/api/v1/order/1/products');
@@ -383,7 +383,7 @@ describe('Resource CLEAR_COLLECTION_RELATION', () => {
   it('should pass empty string as body', () => {
     resourceHttpServiceSpy.put.and.returnValue(of(new HttpResponse()));
 
-    resource.clearCollectionRelation('product')
+    resource.unbindCollectionRelation('product')
       .subscribe(() => {
         const body = resourceHttpServiceSpy.put.calls.argsFor(0)[1];
         expect(body).toBe('');
@@ -393,7 +393,7 @@ describe('Resource CLEAR_COLLECTION_RELATION', () => {
   it('should pass content-type: text/uri-list', () => {
     resourceHttpServiceSpy.put.and.returnValue(of(new HttpResponse()));
 
-    resource.clearCollectionRelation('product')
+    resource.unbindCollectionRelation('product')
       .subscribe(() => {
         const headers = resourceHttpServiceSpy.put.calls.argsFor(0)[2].headers as HttpHeaders;
         expect(headers.has('Content-Type')).toBeTrue();
@@ -404,7 +404,7 @@ describe('Resource CLEAR_COLLECTION_RELATION', () => {
   it('should pass observe "response" value', () => {
     resourceHttpServiceSpy.put.and.returnValue(of(new HttpResponse()));
 
-    resource.clearCollectionRelation('product')
+    resource.unbindCollectionRelation('product')
       .subscribe(() => {
         const observe = resourceHttpServiceSpy.put.calls.argsFor(0)[2].observe;
         expect(observe).toBeDefined();

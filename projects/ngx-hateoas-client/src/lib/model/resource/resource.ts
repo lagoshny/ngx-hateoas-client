@@ -9,7 +9,7 @@ import { tap } from 'rxjs/operators';
 import { Stage } from '../../logger/stage.enum';
 import { StageLogger } from '../../logger/stage-logger';
 import { ValidationUtils } from '../../util/validation.utils';
-import { eq, isNil, isObject, last, split, toLower } from 'lodash-es';
+import { isArray, eq, isNil, isObject, last, split, toLower } from 'lodash-es';
 
 /**
  * Resource class.
@@ -95,16 +95,21 @@ export class Resource extends BaseResource {
    * @param entities one or more entities that should be bind to this resource
    * @throws error when required params are not valid or link not found by relation name
    */
-  public bindRelation<T extends Resource>(relationName: string, entities: Array<T>): Observable<HttpResponse<any>> {
+  public bindRelation<T extends Resource>(relationName: string, entities: T | Array<T>): Observable<HttpResponse<any>> {
     StageLogger.resourceBeginLog(this, 'BIND_RELATION', {relationName, resourceLinks: this._links, entities});
     ValidationUtils.validateInputParams({relationName, entities});
 
     const relationLink = this.getRelationLink(relationName);
-    const body = entities
-      .map(entity => {
-        return ResourceUtils.initResource(entity).getSelfLinkHref();
-      })
-      .join('\n');
+    let body;
+    if (isArray(entities)) {
+      body = entities
+        .map(entity => {
+          return ResourceUtils.initResource(entity).getSelfLinkHref();
+        })
+        .join('\n');
+    } else {
+      body = ResourceUtils.initResource(entities).getSelfLinkHref();
+    }
 
     return getResourceHttpService().put(UrlUtils.generateLinkUrl(relationLink), body, {
       observe: 'response',
@@ -121,7 +126,7 @@ export class Resource extends BaseResource {
    * Used DELETE method to relation resource link URL.
    *
    * This method DOES NOT WORK WITH COLLECTION RESOURCE relations.
-   * To clear collection resource relation use {@link clearCollectionRelation} method.
+   * To clear collection resource relation use {@link unbindCollectionRelation} method.
    * To delete one resource from resource collection use {@link deleteRelation} method.
    *
    * @param relationName resource relation name to unbind
@@ -151,8 +156,8 @@ export class Resource extends BaseResource {
    * @param relationName used to get relation link to unbind
    * @throws error when required params are not valid or link not found by relation name
    */
-  public clearCollectionRelation<T extends Resource>(relationName: string): Observable<HttpResponse<any>> {
-    StageLogger.resourceBeginLog(this, 'CLEAR_COLLECTION_RELATION', {relationName, resourceLinks: this._links});
+  public unbindCollectionRelation<T extends Resource>(relationName: string): Observable<HttpResponse<any>> {
+    StageLogger.resourceBeginLog(this, 'UNBIND_COLLECTION_RELATION', {relationName, resourceLinks: this._links});
     ValidationUtils.validateInputParams({relationName});
 
     const relationLink = this.getRelationLink(relationName);
@@ -162,7 +167,7 @@ export class Resource extends BaseResource {
       headers: new HttpHeaders({'Content-Type': 'text/uri-list'})
     }).pipe(
       tap(() => {
-        StageLogger.resourceEndLog(this, 'CLEAR_COLLECTION_RELATION', {result: `relation ${ relationName } was cleared successfully`});
+        StageLogger.resourceEndLog(this, 'UNBIND_COLLECTION_RELATION', {result: `relation ${ relationName } was unbound successfully`});
       })
     );
   }
@@ -172,7 +177,7 @@ export class Resource extends BaseResource {
    * For collection, means that only passed entity will be unbound from the collection.
    * For single resource, deleting relation the same as @{link unbindRelation} method.
    *
-   * To delete all resource relations from collection use {@link clearCollectionRelation} method.
+   * To delete all resource relations from collection use {@link unbindCollectionRelation} method.
    *
    * @param relationName used to get relation link to unbind
    * @param entity that should be unbind from this relation

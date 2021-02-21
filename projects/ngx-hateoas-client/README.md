@@ -24,8 +24,8 @@
 
 **Compatible with Angular 11.**
 
-This client can be used to develop `Angular 6.0+` applications working with RESTful server API. 
-By `RESTful API` means when the server application implements all the layers of the [Richardson Maturity Model](https://martinfowler.com/articles/richardsonMaturityModel.html) 
+This client can be used to develop `Angular 6.0+` applications working with RESTful server API.
+By `RESTful API` means when the server application implements all the layers of the [Richardson Maturity Model](https://martinfowler.com/articles/richardsonMaturityModel.html)
 and the server provides [HAL/JSON](http://stateless.co/hal_specification.html) response type.
 
 This client compatible with Java server-side applications based on [Spring HATEOAS](https://spring.io/projects/spring-hateoas) or [Spring Data REST](https://docs.spring.io/spring-data/rest/docs/current/reference/html/#reference).
@@ -34,61 +34,63 @@ This client compatible with Java server-side applications based on [Spring HATEO
 You can find out about the motivation to create a new client [here](https://github.com/lagoshny/ngx-hateoas-client/blob/master/migration-guide.md#Motivation).
 To migrate from `@lagoshny/ngx-hal-client` to this client you can use the [migration guide](https://github.com/lagoshny/ngx-hateoas-client/blob/master/migration-guide.md#Motivation).
 
+You can found examples of usage this client with [task-manager-front](https://github.com/lagoshny/task-manager-front) application that uses server-side [task-manager-back](https://github.com/lagoshny/task-manager-back) application.
+
 ## Contents
 1. [Changelog](#Changelog)
 2. [Getting started](#Getting-started)
-   - [Installation](#Installation)
-   - [Configuration](#Configuration)
-   - [Usage](#Usage)
-      - [Define resource classes](#Define-resource-classes)
-      - [Built-in HateoasResourceService](#built-in-hateoasresourceservice)
-      - [Create custom Resource service](#Create-custom-Resource-service)
-3. [Resource types](#Resource-types)        
-   - [BaseResource](#BaseResource)
-      - [GetRelation](#GetRelation)
-      - [GetRelatedCollection](#GetRelatedCollection)
-      - [GetRelatedPage](#GetRelatedPage)
-      - [PostRelation](#PostRelation)
-      - [PatchRelation](#PatchRelation)
-      - [PutRelation](#PutRelation)
-   - [Resource](#Resource)
-      - [IsResourceOf](#IsResourceOf)
-      - [AddRelation](#AddRelation)
-      - [UpdateRelation](#UpdateRelation)
-      - [BindRelation](#BindRelation)
-      - [ClearCollectionRelation](#ClearCollectionRelation)
-      - [DeleteRelation](#DeleteRelation)
-   - [EmbeddedResource](#EmbeddedResource)
-   - [ResourceCollection](#ResourceCollection)
-   - [PagedResourceCollection](#PagedResourceCollection)
-   - [Subtypes support](#Subtypes-support)      
+  - [Installation](#Installation)
+  - [Configuration](#Configuration)
+  - [Usage](#Usage)
+    - [Define resource classes](#Define-resource-classes)
+    - [Built-in HateoasResourceService](#built-in-hateoasresourceservice)
+    - [Create custom Resource service](#Create-custom-Resource-service)
+3. [Resource types](#Resource-types)
+  - [BaseResource](#BaseResource)
+    - [GetRelation](#GetRelation)
+    - [GetRelatedCollection](#GetRelatedCollection)
+    - [GetRelatedPage](#GetRelatedPage)
+    - [PostRelation](#PostRelation)
+    - [PatchRelation](#PatchRelation)
+    - [PutRelation](#PutRelation)
+  - [Resource](#Resource)
+    - [IsResourceOf](#IsResourceOf)
+    - [AddCollectionRelation](#AddCollectionRelation)
+    - [BindRelation](#BindRelation)
+    - [UnbindRelation](#UnbindRelation)
+    - [ClearCollectionRelation](#ClearCollectionRelation)
+    - [DeleteRelation](#DeleteRelation)
+  - [EmbeddedResource](#EmbeddedResource)
+  - [ResourceCollection](#ResourceCollection)
+  - [PagedResourceCollection](#PagedResourceCollection)
+  - [Subtypes support](#Subtypes-support)
 4. [Resource service](#Resource-service)
-   - [GetResource](#GetResource)
-   - [GetCollection](#GetCollection)
-   - [GetPage](#GetPage)
-   - [CreateResource](#CreateResource)
-   - [UpdateResource](#UpdateResource)
-   - [UpdateResourceById](#UpdateResourceById)
-   - [PatchResource](#PatchResource)
-   - [PatchResourceById](#PatchResourceById)
-   - [DeleteResource](#DeleteResource)
-   - [DeleteResourceById](#DeleteResourceById)
-   - [SearchResource](#SearchResource)
-   - [SearchCollection](#SearchCollection)
-   - [SearchPage](#SearchPage)
-   - [CustomQuery](#CustomQuery)
-   - [CustomSearchQuery](#CustomSearchQuery)
-5. [Settings](#settings)        
-    - [Configuration params](#Configuration-params)        
-    - [Cache support](#cache-support)        
-    - [Logging](#Logging)
-6. [Public classes](#Public-classes)     
-   - [GetOption](#GetOption)        
-   - [PagedGetOption](#PagedGetOption)        
-   - [RequestOption](#RequestOption)        
-   - [RequestBody](#RequestBody)        
-   - [Sort](#Sort)        
-   - [SortedPageParam](#SortedPageParam)        
+  - [GetResource](#GetResource)
+  - [GetCollection](#GetCollection)
+  - [GetPage](#GetPage)
+  - [CreateResource](#CreateResource)
+  - [UpdateResource](#UpdateResource)
+  - [UpdateResourceById](#UpdateResourceById)
+  - [PatchResource](#PatchResource)
+  - [PatchResourceById](#PatchResourceById)
+  - [DeleteResource](#DeleteResource)
+  - [DeleteResourceById](#DeleteResourceById)
+  - [SearchResource](#SearchResource)
+  - [SearchCollection](#SearchCollection)
+  - [SearchPage](#SearchPage)
+  - [CustomQuery](#CustomQuery)
+  - [CustomSearchQuery](#CustomSearchQuery)
+5. [Settings](#settings)
+  - [Configuration params](#Configuration-params)
+  - [Cache support](#cache-support)
+  - [Logging](#Logging)
+6. [Public classes](#Public-classes)
+  - [GetOption](#GetOption)
+  - [PagedGetOption](#PagedGetOption)
+  - [RequestOption](#RequestOption)
+  - [RequestBody](#RequestBody)
+  - [Sort](#Sort)
+  - [SortedPageParam](#SortedPageParam)
 
 ## Changelog
 [Learn about the latest improvements](https://github.com/lagoshny/ngx-hateoas-client/blob/master/CHANGELOG.md).
@@ -105,7 +107,7 @@ npm i @lagoshny/ngx-hateoas-client --save
 
 ### Configuration
 
-Before start, configure `NgxHateoasClientModule` and pass configuration through `NgxHateoasClientConfigurationService`. 
+Before start, configure `NgxHateoasClientModule` and pass configuration through `NgxHateoasClientConfigurationService`.
 
 1) `NgxHalClientModule` configuration:
 
@@ -185,7 +187,7 @@ export class Product extend Resource {
 
 Thereafter, the `Product` class will have `Resource` methods to work with the product's relations through resource links.
 
->Also, you can extend model classes with the `EmbeddedResource` class when the model class used as an [embeddable](https://docs.oracle.com/javaee/6/api/javax/persistence/Embeddable.html) entity. 
+>Also, you can extend model classes with the `EmbeddedResource` class when the model class used as an [embeddable](https://docs.oracle.com/javaee/6/api/javax/persistence/Embeddable.html) entity.
 You can read more about `EmbeddedResource` [here](#embeddedresource).
 
 
@@ -196,7 +198,7 @@ To perform resource requests you can use built-in [HateoasResourceService](#buil
 The library has built-in `HateoasResourceService`.
 It is a simple service with methods to get/create/update/delete resources.
 
-To use it injecting `HateoasResourceService` to a component or a service class and set the resource type to a generic param.
+To use it inject `HateoasResourceService` to a component or a service class after that you can perform resource requests by passing the resource name.
 
 ```ts
 @Component({
@@ -204,7 +206,7 @@ To use it injecting `HateoasResourceService` to a component or a service class a
 })
 export class SomeComponent {
 
-  constructor(private hateoasProductService: HateoasResourceService<Product>) {
+  constructor(private resourceService: HateoasResourceService) {
   }
 
   onSomeAction() {
@@ -212,7 +214,7 @@ export class SomeComponent {
     product.cost = 100;
     product.name = 'Fruit';
 
-    this.hateoasProductService.createResource('product', product)
+    this.resourceService.createResource('product', product)
             .subscribe((createdResource: Product) => {
                 // TODO something
             });
@@ -253,13 +255,13 @@ export class ProductService extends HateoasResourceOperation<Product> {
 ## Resource types
 
 There are several types of resources, the main resource type is [Resource](#resource) represents the server-side entity model class.
-If the server-side model has Embeddable entity type then use [EmbeddedResource](#embeddedresource) type instead [Resource](#resource) type. 
+If the server-side model has Embeddable entity type then use [EmbeddedResource](#embeddedresource) type instead [Resource](#resource) type.
 
-Both [Resource](#resource) and [EmbeddedResource](#embeddedresource) have some the same methods therefore they have common parent [BaseResource](#baseresource) class implements these methods. 
+Both [Resource](#resource) and [EmbeddedResource](#embeddedresource) have some the same methods therefore they have common parent [BaseResource](#baseresource) class implements these methods.
 
 To work with resource collections uses [ResourceCollection](#resourcecollection) type its holds an array of the resources.
 When you have a paged collection of resources result use an extension of [ResourceCollection](#resourcecollection) is [PagedResourceCollection](#pagedresourcecollection) that allows you to navigate by pages and perform custom page requests.
- 
+
 In some cases, the server-side can have an entity inheritance model how to work with entity subtypes, you can found [here](#subtypes-support).
 
 ### Resource presets
@@ -323,7 +325,7 @@ Examples of usage resource relation methods rely on presets.
   
  
   ```
-  
+
 - Suppose we have existed resources:
   ```json
   Cart:
@@ -509,7 +511,7 @@ Getting related resource collection with pagination by relation name.
 
 This method takes [PagedGetOption](#pagedgetoption) parameter with it you can pass `projection` param (see below).
 
->If do not pass `pageParams` with `PagedGetOption` then will be used [default page options](#default-page-values). 
+>If do not pass `pageParams` with `PagedGetOption` then will be used [default page options](#default-page-values).
 
 Method signature:
 
@@ -581,7 +583,7 @@ postRelation(relationName: string, requestBody: RequestBody<any>, options?: Requ
 - `relationName` - resource relation name used to get request URL.
 - `requestBody` - [RequestBody](#requestbody) contains request body and additional body options.
 - `options` - [RequestOption](#requestoption) additional options applied to the request.
-- `return value` - by default `raw response data` or Angular `HttpResponse` when `options` param has a `observe: 'response'` value. 
+- `return value` - by default `raw response data` or Angular `HttpResponse` when `options` param has a `observe: 'response'` value.
 
 ##### Examples of usage ([given the presets](#resource-presets)):
 
@@ -629,7 +631,7 @@ patchRelation(relationName: string, requestBody: RequestBody<any>, options?: Req
 - `relationName` - resource relation name used to get request URL.
 - `requestBody` - [RequestBody](#requestbody) contains request body and additional body options.
 - `options` - [RequestOption](#requestoption) additional options applied to the request.
-- `return value` - by default `raw response data` or Angular `HttpResponse` when `options` param has a `observe: 'response'` value. 
+- `return value` - by default `raw response data` or Angular `HttpResponse` when `options` param has a `observe: 'response'` value.
 
 ##### Examples of usage ([given the presets](#resource-presets)):
 
@@ -678,7 +680,7 @@ putRelation(relationName: string, requestBody: RequestBody<any>, options?: Reque
 - `relationName` - resource relation name used to get request URL.
 - `requestBody` - [RequestBody](#requestbody) contains request body and additional body options.
 - `options` - [RequestOption](#requestoption) additional options applied to the request.
-- `return value` - by default `raw response data` or Angular `HttpResponse` when `options` param has a `observe: 'response'` value. 
+- `return value` - by default `raw response data` or Angular `HttpResponse` when `options` param has a `observe: 'response'` value.
 
 ##### Examples of usage ([given the presets](#resource-presets)):
 
@@ -737,9 +739,9 @@ Method signature:
 isResourceOf<T extends Resource>(typeOrName: (new () => T) | string): boolean;
 ```
 - `typeOrName` - resource type, or string that represent resource name.
-                 If you pass resource type for example `someResource.isResourceOf(CartPayment)` then class name will be used to compare with the resource name (ignoring letter case).
-                 If you pass resource name as a string then it will be used to compare with resource name with (ignoring letter case).
-- `return value` - `true` when resource name equals passed value, `false` otherwise. 
+  If you pass resource type for example `someResource.isResourceOf(CartPayment)` then class name will be used to compare with the resource name (ignoring letter case).
+  If you pass resource name as a string then it will be used to compare with resource name with (ignoring letter case).
+- `return value` - `true` when resource name equals passed value, `false` otherwise.
 
 ##### Examples of usage ([given the presets](#resource-presets)):
 
@@ -752,13 +754,18 @@ cart.isResourceOf(Cart); // return FALSE because Cart class constructor name is 
 
 ```
 
-### AddRelation
-Adding passed entities (they should exist on the server) to the resource collection behind the relation name.
+### AddCollectionRelation
+Adding passed entities to the resource collection behind the relation name.
+
+Used `POST` method with `'Content-Type': 'text/uri-list'`.
+
+>This method **DOES NOT REPLACED** existing resources in the collection instead it adds new ones.
+To replace collection resource with passed entities use [bindRelation](#bindrelation) method.
 
 Method signature:
 
 ```
-addRelation<T extends Resource>(relationName: string, entities: Array<T>): Observable<HttpResponse<any>>;
+addCollectionRelation<T extends Resource>(relationName: string, entities: Array<T>): Observable<HttpResponse<any>>;
 ```
 
 - `relationName` - resource relation name used to get request URL mapped to resource collection.
@@ -769,84 +776,114 @@ addRelation<T extends Resource>(relationName: string, entities: Array<T>): Obser
 ##### Examples of usage ([given the presets](#resource-presets)):
 
 ```ts
-/* 
- Performing POST request by the URL: http://localhost:8080/api/v1/carts/1/products
- Content-type: 'text/uri-list'
- Body: [http://localhost:8080/api/v1/products/1, http://localhost:8080/api/v1/products/2]
-*/
 // Suppose product1 already exists with id = 1
 const product1 = ...;
 // Suppose product2 already exists with id = 2
 const product2 = ...;
 
-cart.addRelation('products', [product1, product2])
+cart.addCollectionRelation('products', [product1, product2])
+  /* 
+    Performing POST request by the URL: http://localhost:8080/api/v1/carts/1/products
+    Content-type: 'text/uri-list'
+    Body: [http://localhost:8080/api/v1/products/1, http://localhost:8080/api/v1/products/2]
+  */
   .subscribe((result: HttpResponse<any>) => {
      // some logic            
   });
-```
-
-### UpdateRelation
-Updating an entity value by relation link URL.
-
-Method signature:
-
-```
-updateRelation<T extends Resource>(relationName: string, entity: T): Observable<HttpResponse<any>>;
-```
-
-- `relationName` - resource relation name used to get request URL.
-- `entity` - new entity value.
-- `return value` - Angular `HttpResponse` result.
-
-##### Examples of usage ([given the presets](#resource-presets)):
-
-```ts
-/* 
- Performing PATCH request by the URL: http://localhost:8080/api/v1/carts/1/shop
- Content-type: 'text/uri-list'
- Body: http://localhost:8080/api/v1/shops/2
-*/
-// Suppose newShop already exists with id = 2
-const newShop = ...;
-cart.updateRelation('shop', newShop)
-  .subscribe((result: HttpResponse<any>) => {
-     // some logic            
-  });
-
 ```
 
 ### BindRelation
-Binding the passed entity to this resource by relation link URL.
+Bounding the passed entity or collection of entities to this resource by the relation name.
+
+Used `PUT` method with `'Content-Type': 'text/uri-list'`.
+
+
+>This method also **REPLACED** existing resources in the collection by passed entities.
+To add entities to collection resource use [addCollectionRelation](#addCollectionRelation) method.
 
 Method signature:
 
 ```
-bindRelation<T extends Resource>(relationName: string, entity: T): Observable<HttpResponse<any>>;
+bindRelation<T extends Resource>(relationName: string, entity: Array<T>): Observable<HttpResponse<any>>;
 ```
 
 - `relationName` - resource relation name used to get request URL.
-- `entity` - entity to bind.
+- `entities` - an array of entities that should be bound to resource.
+- `return value` - Angular `HttpResponse` result.
+
+##### Examples of usage ([given the presets](#resource-presets)):
+
+With single resource relation:
+```ts
+// Suppose shopToBind already exists with id = 1
+const shopToBind = ...;
+cart.bindRelation('shop', [shopToBind])
+  /* 
+    Performing PUT request by the URL: http://localhost:8080/api/v1/carts/1/shop
+    Content-type: 'text/uri-list'
+    Body: http://localhost:8080/api/v1/shops/1
+  */
+  .subscribe((result: HttpResponse<any>) => {
+     // some logic            
+  });
+
+```
+
+With collection resource relation:
+```ts
+// Suppose product1 already exists with id = 1
+const product1 = ...;
+// Suppose product2 already exists with id = 2
+const product2 = ...;
+
+cart.bindRelation('products', [product1, product2])
+  /* 
+    Performing PUT request by the URL: http://localhost:8080/api/v1/carts/1/products
+    Content-type: 'text/uri-list'
+    Body: [http://localhost:8080/api/v1/products/1, http://localhost:8080/api/v1/products/2]
+  */
+  .subscribe((result: HttpResponse<any>) => {
+     // some logic            
+  });
+```
+
+### UnbindRelation
+Unbinding single resource relation behind resource name.
+
+Used `DELETE` method to relation resource link URL.
+
+>This method does not work with collection resource relations.
+> To clear collection resource relation use [ClearCollectionRelation](#clearCollectionRelation) method.
+> To delete one resource from resource collection use [deleteRelation](#deleterelation) method.
+
+Method signature:
+
+```
+unbindRelation<T extends Resource>(relationName: string): Observable<HttpResponse<any>>;
+```
+
+- `relationName` - resource relation name to unbind.
 - `return value` - Angular `HttpResponse` result.
 
 ##### Examples of usage ([given the presets](#resource-presets)):
 
 ```ts
-/* 
- Performing PUT request by the URL: http://localhost:8080/api/v1/carts/1/shop
- Content-type: 'text/uri-list'
- Body: http://localhost:8080/api/v1/shops/1
-*/
-// Suppose shopToBind already exists with id = 1
-const shopToBind = ...;
-cart.bindRelation('shop', shopToBind)
+// Suppose cart already bound shop resource by relation name 'shop'
+cart.unbindRelation('shop')
+  /* 
+    Performing DELETE request by the URL: http://localhost:8080/api/v1/carts/1/shop
+  */
   .subscribe((result: HttpResponse<any>) => {
      // some logic            
   });
-
 ```
 
 ### ClearCollectionRelation
 Unbinding all resources from resource collection behind resource name.
+
+>This method does not work with SINGLE resource relations.
+> To delete single resource relations use [unboundRelation](#unboundRelation) or [deleteRelation](#deleterelation) methods.
+> To delete one resource from collection use [deleteRelation](#deleterelation) method.
 
 Method signature:
 
@@ -873,7 +910,12 @@ cart.clearCollectionRelation('products')
 ```
 
 ### DeleteRelation
-Unbinding resource relation entity by relation link URL.
+Deleting resource relation.
+
+For collection, means that only passed entity will be unbound from the collection.
+For single resource, deleting relation the same as [undoundRelation](#unbindrelation) method.
+
+>To delete all resource relations from collection use [clearCollectionRelation](#clearcollectionrelation) method.
 
 Method signature:
 
@@ -914,7 +956,7 @@ Resource collection holds resources in the public property with the name `resour
 This resource type represents paged collection of resources.
 You can get this type as result [GetRelatedPage](#getrelatedpage), [GetPage](#getpage) or perform [CustomQuery](#customquery)/[CustomSearchQuery](#customsearchquery) with passed return type as PagedResourceCollection.
 
-PagedResourceCollection extends [ResourceCollection](#resourcecollection) type and adds methods to work with a page.  
+PagedResourceCollection extends [ResourceCollection](#resourcecollection) type and adds methods to work with a page.
 
 ### Default page values
 When you do not pass `page` or `size` params in methods with [PagedGetOption](#pagedgetoption) then used default values: `page = 0`, `size = 20`.
@@ -1189,7 +1231,7 @@ size(size: number, options?: {useCache: true;}): Observable<PagedResourceCollect
 
 - `size` - count of resources to page.
 - `options` - additional options to manipulate the cache when getting a result (by default will be used the cache if it enabled in the [configuration](#cache-params)).
-- `return value` - [PagedResourceCollection](#pagedresourcecollection) with resource types `T`. 
+- `return value` - [PagedResourceCollection](#pagedresourcecollection) with resource types `T`.
 - `throws error` - when `size` greater than total count resources.
 
 ##### Examples of usage:
@@ -1233,7 +1275,7 @@ sortElements(sortParam: Sort, options?: {useCache: true;}): Observable<PagedReso
 
 - `sortParam` - [Sort](#sort) params.
 - `options` - additional options to manipulate the cache when getting a result (by default will be used the cache if it enabled in the [configuration](#cache-params)).
-- `return value` - [PagedResourceCollection](#pagedresourcecollection) with resource types `T`. 
+- `return value` - [PagedResourceCollection](#pagedresourcecollection) with resource types `T`.
 
 ##### Examples of usage:
 
@@ -1357,7 +1399,7 @@ Suppose exists the next resource's hierarchy:
 ```
 
 With `hal-json` representation:
-  
+
 ```json
   Cart:
   {
@@ -1411,7 +1453,7 @@ cart.getRelation('client')
   });
 ```
 
-## Resource service 
+## Resource service
 
 As described before to work with resources you can use built-in [HateoasResourceService](#built-in-hateoasresourceservice)  or create [custom resource service](#resource-service).
 
@@ -1437,16 +1479,16 @@ Examples of usage resource service methods rely on this presets.
   
   }
   ```
-  
+
 - Resource service as built-in [HateoasResourceService](#built-in-hateoasresourceservice) is
   ```ts
   @Component({ ... })
   export class AppComponent {
-      constructor(private productHateoasService: HateoasResourceService<Product>) {
+      constructor(private productHateoasService: HateoasResourceService) {
       }
   }
   ```  
-  
+
 - Resource service as [custom resource service](#create-custom-resource-service) is
   ```ts
   import { HalResourceOperation } from '@lagoshny/ngx-hal-client';
@@ -1599,7 +1641,7 @@ Getting paged collection of resources [PagedResourceCollection](#pagedresourceco
 
 This method takes [PagedGetOption](#pagedgetoption) parameter with it you can pass `projection` param (see below).
 
->If do not pass `pageParams` with `PagedGetOption` then will be used [default page options](#default-page-values). 
+>If do not pass `pageParams` with `PagedGetOption` then will be used [default page options](#default-page-values).
 
 Method signature:
 
@@ -1609,7 +1651,7 @@ getPage(options?: PagedGetOption): Observable<PagedResourceCollection<T>>;
 
 - `options` - [PagedGetOption](#pagedgetoption) additional options applied to the request, if not passed `pageParams` then used [default page params](#default-page-values).
 - `return value` - [PagedResourceCollection](#pagedresourcecollection) paged collection of resources with type `T`.
-- `throws error` when returned value is not [PagedResourceCollection](#pagedresourcecollection) 
+- `throws error` when returned value is not [PagedResourceCollection](#pagedresourcecollection)
 
 ##### Example of usage ([given the presets](#resource-service-presets)):
 
@@ -1703,7 +1745,7 @@ createResource(requestBody: RequestBody<T>): Observable<T | any>;
 ```
 
 - `requestBody` - [RequestBody](#requestbody) contains request body (in this case resource object) and additional body options.
-- `return value` - [Resource](#resource) with type `T` or `raw response data` when returned value is not resource object. 
+- `return value` - [Resource](#resource) with type `T` or `raw response data` when returned value is not resource object.
 
 ##### Example of usage ([given the presets](#resource-service-presets)):
 
@@ -1787,9 +1829,9 @@ Method signature:
 updateResource(entity: T, requestBody?: RequestBody<any>): Observable<T | any>;
 ```
 
-- `entity` - resource to update. 
+- `entity` - resource to update.
 - `requestBody` - [RequestBody](#requestbody) contains request body (in this case new values for resource) and additional body options.
-- `return value` - [Resource](#resource) with type `T` or `raw response data` when returned value is not resource object. 
+- `return value` - [Resource](#resource) with type `T` or `raw response data` when returned value is not resource object.
 
 >When passed only `entity` param then values of `entity` will be used to update values of resource.
 
@@ -1864,7 +1906,7 @@ updateResourceById(id: number | string, requestBody: RequestBody<any>): Observab
 
 - `id` - resource id to update.
 - `requestBody` - [RequestBody](#requestbody) contains request body (in this case new values for resource) and additional body options.
-- `return value` - [Resource](#resource) with type `T` or `raw response data` when returned value is not resource object. 
+- `return value` - [Resource](#resource) with type `T` or `raw response data` when returned value is not resource object.
 
 ##### Example of usage ([given the presets](#resource-service-presets)):
 
@@ -1961,9 +2003,9 @@ Method signature:
 patchResource(entity: T, requestBody?: RequestBody<any>): Observable<T | any>;
 ```
 
-- `entity` - resource to patch. 
+- `entity` - resource to patch.
 - `requestBody` - [RequestBody](#requestbody) contains request body (in this case new values for resource) and additional body options.
-- `return value` - [Resource](#resource) with type `T` or `raw response data` when returned value is not resource object. 
+- `return value` - [Resource](#resource) with type `T` or `raw response data` when returned value is not resource object.
 
 >When passed only `entity` param then values of `entity` will be used to patch values of resource.
 
@@ -2039,7 +2081,7 @@ patchResourceById(id: number | string, requestBody: RequestBody<any>): Observabl
 
 - `id` - resource id to patch.
 - `requestBody` - [RequestBody](#requestbody) contains request body (in this case new values for resource) and additional body options.
-- `return value` - [Resource](#resource) with type `T` or `raw response data` when returned value is not resource object. 
+- `return value` - [Resource](#resource) with type `T` or `raw response data` when returned value is not resource object.
 
 ##### Example of usage ([given the presets](#resource-service-presets)):
 
@@ -2133,9 +2175,9 @@ Method signature:
 deleteResource(entity: T, options?: RequestOption): Observable<HttpResponse<any> | any>;
 ```
 
-- `entity` - resource to delete. 
+- `entity` - resource to delete.
 - `options` - [RequestOption](#requestoption) additional options applied to the request.
-- `return value` - by default `raw response data` or Angular `HttpResponse` when `options` param has a `observe: 'response'` value. 
+- `return value` - by default `raw response data` or Angular `HttpResponse` when `options` param has a `observe: 'response'` value.
 
 ##### Example of usage ([given the presets](#resource-service-presets)):
 
@@ -2184,7 +2226,7 @@ deleteResourceById(id: number | string, options?: RequestOption): Observable<Htt
 
 - `id` - resource id to delete.
 - `options` - [RequestOption](#requestoption) additional options applied to the request.
-- `return value` - by default `raw response data` or Angular `HttpResponse` when `options` param has a `observe: 'response'` value. 
+- `return value` - by default `raw response data` or Angular `HttpResponse` when `options` param has a `observe: 'response'` value.
 
 ##### Example of usage ([given the presets](#resource-service-presets)):
 
@@ -2374,7 +2416,7 @@ Searching for collection of resources with pagination[PagedResourceCollection](#
 
 This method takes [PagedGetOption](#pagedgetoption) parameter with it you can pass `projection` param (see below).
 
->If do not pass `pageParams` with `PagedGetOption` then will be used [default page options](#default-page-values). 
+>If do not pass `pageParams` with `PagedGetOption` then will be used [default page options](#default-page-values).
 
 Method signature:
 
@@ -2451,7 +2493,7 @@ this.productHateoasService.searchPage('products', 'byName', {
 #### CustomQuery
 Performing custom HTTP request for resource.
 
->For example, use this method to perform a count query (see example below). 
+>For example, use this method to perform a count query (see example below).
 
 Method signature:
 
@@ -2463,7 +2505,7 @@ customQuery<R>(method: HttpMethod, query: string, requestBody?: RequestBody<any>
 - `query` - additional part of the URL, added after root resource URL.
 - `requestBody` - [RequestBody](#requestbody) uses when `method` is `POST`, `PATCH`, `PUT` to pass request body and additional body options.
 - `options` - [PagedGetOption](#pagedgetoption) additional options applied to the request.
-- `return value` - `any` object that equals to passed generic type `<R>` 
+- `return value` - `any` object that equals to passed generic type `<R>`
 
 ##### Example of usage ([given the presets](#resource-service-presets)):
 
@@ -2483,7 +2525,7 @@ this.productHateoasService.customQuery<number>('products', HttpMethod.GET, '/sea
 #### CustomSearchQuery
 Performing custom search HTTP request for resource.
 
->For example, use this method to perform a count query (see example below). 
+>For example, use this method to perform a count query (see example below).
 
 Method signature:
 
@@ -2495,7 +2537,7 @@ customSearchQuery<R>(method: HttpMethod, searchQuery: string, requestBody?: Requ
 - `searchQuery` - additional part of the URL that follow after `/search/` resource URL.
 - `requestBody` - [RequestBody](#requestbody) uses when `method` is `POST`, `PATCH`, `PUT` to pass request body and additional body options.
 - `options` - [PagedGetOption](#pagedgetoption) additional options applied to the request.
-- `return value` - `any` object that equals to passed generic type `<R>` 
+- `return value` - `any` object that equals to passed generic type `<R>`
 
 
 ##### Example of usage ([given the presets](#resource-service-presets)):
@@ -2552,11 +2594,11 @@ The library accepts configuration object:
 
 ### Cache support
 The library supports caching `GET` request response values.
-By default, the cache `enabled`. 
+By default, the cache `enabled`.
 
 To enable cache pass `cache.enabled = true` to library configuration. Also, you can manage the cache expired time with `cache.lifeTime` param.
 
-> More about the cache configuration see [here](#cache-params). 
+> More about the cache configuration see [here](#cache-params).
 
 Also, methods with options types `GetOption` or `PagedGetOption` has additional param `useCache` that allows to manage the cache.
 By default `useCache` has `true` value, but when the cache disabled then it param ignored.
@@ -2570,10 +2612,10 @@ When perform the same `GET` request twice (to get resource or resource collectio
 When perform `POST`, `PATCH`, `PUT`, `DELETE` requests for some resource than all saved cache values for this resource will be evicted.
 
 > You can know when resource result got from the server or got from the cache enable the library [verboseLogs](#logging-params) param.
-> See more about logging [here](#logging).                                                                                                                      
+> See more about logging [here](#logging).
 
 ### Logging
-To debug library use library logging. 
+To debug library use library logging.
 To enable logging set `logs.verboseLogs` to `true` value see more [here](#logging-params).
 
 There are several logging stages:
@@ -2588,7 +2630,7 @@ There are several logging stages:
 - `CACHE_GET` - logs a received value from the cache
 - `CACHE_EVICT` - logs an evicted value from the cache
 - `HTTP_REQUEST` - logs HTTP request params
-- `HTTP_RESPONSE` - logs raw HTTP response data 
+- `HTTP_RESPONSE` - logs raw HTTP response data
 - `END` - last stage, when method invoke was successful
 
 With logging, you can find out was a value fetched from the cache or the server, how resource relationships resolved etc.

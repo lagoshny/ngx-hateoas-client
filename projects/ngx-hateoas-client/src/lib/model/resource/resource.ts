@@ -143,6 +143,7 @@ export class Resource extends BaseResource {
 
   /**
    * Unbind all resources from collection by the relation name.
+   * Used PUT method with 'Content-Type': 'text/uri-list' and EMPTY body to clear relations.
    *
    * To delete one resource from collection use {@link deleteRelation} method.
    * To delete single resource relations use {@link unbindRelation} or {@link deleteRelation} methods.

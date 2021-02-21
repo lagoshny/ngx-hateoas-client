@@ -204,7 +204,7 @@ describe('Resource BIND_RELATION', () => {
   });
 
   it('should throw error when passed relationName is empty', () => {
-    expect(() => resource.bindRelation('', [new TestProductResource()]))
+    expect(() => resource.bindRelation('', new TestProductResource()))
       .toThrowError(`Passed param(s) 'relationName = ' is not valid`);
   });
 
@@ -221,7 +221,7 @@ describe('Resource BIND_RELATION', () => {
   it('should clear template params in TEMPLATED relation link', () => {
     resourceHttpServiceSpy.put.and.returnValue(of(new HttpResponse()));
 
-    resource.bindRelation('product', [new TestProductResource()])
+    resource.bindRelation('product', new TestProductResource())
       .subscribe(() => {
         const resultResourceUrl = resourceHttpServiceSpy.put.calls.argsFor(0)[0];
         expect(resultResourceUrl).toBe('http://localhost:8080/api/v1/order/1/products');
@@ -231,7 +231,7 @@ describe('Resource BIND_RELATION', () => {
   it('should pass relation self link as body', () => {
     resourceHttpServiceSpy.put.and.returnValue(of(new HttpResponse()));
 
-    resource.bindRelation('product', [new TestProductResource()])
+    resource.bindRelation('product', new TestProductResource())
       .subscribe(() => {
         const body = resourceHttpServiceSpy.put.calls.argsFor(0)[1];
         expect(body).toBe('http://localhost:8080/api/v1/product/1');
@@ -241,7 +241,7 @@ describe('Resource BIND_RELATION', () => {
   it('should pass content-type: text/uri-list', () => {
     resourceHttpServiceSpy.put.and.returnValue(of(new HttpResponse()));
 
-    resource.bindRelation('product', [new TestProductResource()])
+    resource.bindRelation('product', new TestProductResource())
       .subscribe(() => {
         const headers = resourceHttpServiceSpy.put.calls.argsFor(0)[2].headers as HttpHeaders;
         expect(headers.has('Content-Type')).toBeTrue();
@@ -252,7 +252,7 @@ describe('Resource BIND_RELATION', () => {
   it('should pass observe "response" value', () => {
     resourceHttpServiceSpy.put.and.returnValue(of(new HttpResponse()));
 
-    resource.bindRelation('product', [new TestProductResource()])
+    resource.bindRelation('product', new TestProductResource())
       .subscribe(() => {
         const observe = resourceHttpServiceSpy.put.calls.argsFor(0)[2].observe;
         expect(observe).toBeDefined();

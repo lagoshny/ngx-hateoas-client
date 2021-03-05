@@ -19,12 +19,12 @@ export class ValidationUtils {
     }
 
     const notValidParams = [];
-    // tslint:disable-next-line:no-string-literal
-    if (isFunction(params) && !params['__resourceName__']) {
-      throw new Error(`Passed resource type ${ params } should has resource name passed with @HateoasResource decorator`);
-    }
-
     for (const [key, value] of Object.entries(params)) {
+      // tslint:disable-next-line:no-string-literal
+      if (isFunction(value) && isFunction(value.constructor) && !value['__resourceName__']) {
+        throw new Error(`Resource '${ value.name }' has not 'resourceName' value. Set it with @HateoasResource decorator on '${ value.name }' class.`);
+      }
+
       if (isNil(value)
         || (isString(value) && !value)
         || (isPlainObject(value) && isEmpty(value))

@@ -7,6 +7,7 @@ import { PagedResourceCollectionHttpService } from './service/internal/paged-res
 import { ResourceCollectionHttpService } from './service/internal/resource-collection-http.service';
 import { CommonResourceHttpService } from './service/internal/common-resource-http.service';
 import { ResourceCacheService } from './service/internal/cache/resource-cache.service';
+import { HateoasResource, HateoasEmbeddedResource } from './model/decorators';
 
 export { NgxHateoasClientConfigurationService } from './config/ngx-hateoas-client-configuration.service';
 export { Resource } from './model/resource/resource';
@@ -16,6 +17,7 @@ export { PagedResourceCollection } from './model/resource/paged-resource-collect
 export { Sort, SortOrder, Include, HttpMethod } from './model/declarations';
 export { HateoasResourceOperation } from './service/external/hateoas-resource-operation';
 export { HateoasResourceService } from './service/external/hateoas-resource.service';
+export { HateoasResource, HateoasEmbeddedResource } from './model/decorators';
 
 @NgModule({
   imports: [

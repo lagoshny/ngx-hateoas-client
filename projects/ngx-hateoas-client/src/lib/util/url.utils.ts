@@ -99,6 +99,18 @@ export class UrlUtils {
   }
 
   /**
+   * Retrieve a resource name from resource url.
+   *
+   * @param url resource url
+   */
+  public static getResourceNameFromUrl(url: string): string {
+    ValidationUtils.validateInputParams({url});
+
+    const dividedBySlashUrl = url.replace(`${ UrlUtils.getApiUrl() }/`, '').split('/');
+    return dividedBySlashUrl[0];
+  }
+
+  /**
    * Clear url from template params.
    *
    * @param url to be cleaned

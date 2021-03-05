@@ -1,12 +1,13 @@
 /* tslint:disable:no-string-literal */
 import { HateoasResourceService } from './hateoas-resource.service';
-import { HttpMethod, Include, Resource } from '../../ngx-hateoas-client.module';
+import { HateoasResource, HttpMethod, Include, Resource } from '../../ngx-hateoas-client.module';
 import { of } from 'rxjs';
 import { SimpleResource } from '../../model/resource/resources.test';
 import { ResourceUtils } from '../../util/resource.utils';
 import { HttpParams } from '@angular/common/http';
 import anything = jasmine.anything;
 
+@HateoasResource('resourceRelation')
 class ResourceRelation extends Resource {
   // tslint:disable-next-line:variable-name
   _links = {
@@ -20,6 +21,7 @@ class ResourceRelation extends Resource {
 
 }
 
+@HateoasResource('resourceWithRelation')
 class ResourceWithRelation extends SimpleResource {
   public relation: ResourceRelation;
   public name: 'Test';
@@ -63,64 +65,44 @@ describe('HateoasResourceService', () => {
     ResourceUtils.useResourceType(null);
   });
 
-  it('GET_RESOURCE should throw error when passed resourceName is empty', () => {
-    expect(() => hateoasResourceService.getResource('', 2))
-      .toThrowError(`Passed param(s) 'resourceName = ' is not valid`);
-  });
-
   it('GET_RESOURCE should throw error when passed resourceName,id are undefined', () => {
     expect(() => hateoasResourceService.getResource(undefined, undefined))
-      .toThrowError(`Passed param(s) 'resourceName = undefined', 'id = undefined' are not valid`);
+      .toThrowError(`Passed param(s) 'resourceType = undefined', 'id = undefined' are not valid`);
   });
 
   it('GET_RESOURCE should throw error when passed resourceName,id are null', () => {
     expect(() => hateoasResourceService.getResource(null, null))
-      .toThrowError(`Passed param(s) 'resourceName = null', 'id = null' are not valid`);
-  });
-
-  it('GET_COLLECTION should throw error when passed resourceName is empty', () => {
-    expect(() => hateoasResourceService.getCollection(''))
-      .toThrowError(`Passed param(s) 'resourceName = ' is not valid`);
+      .toThrowError(`Passed param(s) 'resourceType = null', 'id = null' are not valid`);
   });
 
   it('GET_COLLECTION should throw error when passed resourceName is undefined', () => {
     expect(() => hateoasResourceService.getCollection(undefined))
-      .toThrowError(`Passed param(s) 'resourceName = undefined' is not valid`);
+      .toThrowError(`Passed param(s) 'resourceType = undefined' is not valid`);
   });
 
   it('GET_COLLECTION should throw error when passed resourceName is null', () => {
     expect(() => hateoasResourceService.getCollection(null))
-      .toThrowError(`Passed param(s) 'resourceName = null' is not valid`);
-  });
-
-  it('GET_PAGE should throw error when passed resourceName is empty', () => {
-    expect(() => hateoasResourceService.getPage(''))
-      .toThrowError(`Passed param(s) 'resourceName = ' is not valid`);
+      .toThrowError(`Passed param(s) 'resourceType = null' is not valid`);
   });
 
   it('GET_PAGE should throw error when passed resourceName is undefined', () => {
     expect(() => hateoasResourceService.getPage(undefined))
-      .toThrowError(`Passed param(s) 'resourceName = undefined' is not valid`);
+      .toThrowError(`Passed param(s) 'resourceType = undefined' is not valid`);
   });
 
   it('GET_PAGE should throw error when passed resourceName is null', () => {
     expect(() => hateoasResourceService.getPage(null))
-      .toThrowError(`Passed param(s) 'resourceName = null' is not valid`);
-  });
-
-  it('CREATE_RESOURCE should throw error when passed resourceName is empty', () => {
-    expect(() => hateoasResourceService.createResource('', {body: new SimpleResource()}))
-      .toThrowError(`Passed param(s) 'resourceName = ' is not valid`);
+      .toThrowError(`Passed param(s) 'resourceType = null' is not valid`);
   });
 
   it('CREATE_RESOURCE should throw error when passed resourceName,requestBody are undefined', () => {
     expect(() => hateoasResourceService.createResource(undefined, undefined))
-      .toThrowError(`Passed param(s) 'resourceName = undefined', 'requestBody = undefined' are not valid`);
+      .toThrowError(`Passed param(s) 'resourceType = undefined', 'requestBody = undefined' are not valid`);
   });
 
   it('CREATE_RESOURCE should throw error when passed resourceName,requestBody are null', () => {
     expect(() => hateoasResourceService.createResource(null, null))
-      .toThrowError(`Passed param(s) 'resourceName = null', 'requestBody = null' are not valid`);
+      .toThrowError(`Passed param(s) 'resourceType = null', 'requestBody = null' are not valid`);
   });
 
   it('CREATE_RESOURCE should resolve resource values', () => {
@@ -128,7 +110,7 @@ describe('HateoasResourceService', () => {
     const resourceWithRelation = new ResourceWithRelation();
     resourceWithRelation.relation = new ResourceRelation();
 
-    hateoasResourceService.createResource('test', {body: resourceWithRelation})
+    hateoasResourceService.createResource(ResourceWithRelation, {body: resourceWithRelation})
       .subscribe(() => {
         const body = resourceHttpServiceSpy.postResource.calls.argsFor(0)[1];
         expect(body).toBeDefined();
@@ -175,7 +157,10 @@ describe('HateoasResourceService', () => {
     const resourceWithRelation = new ResourceWithRelation();
     resourceWithRelation.name = null;
 
-    hateoasResourceService.updateResource(resourceWithRelation, {body: resourceWithRelation, valuesOption: {include: Include.NULL_VALUES}})
+    hateoasResourceService.updateResource(resourceWithRelation, {
+      body: resourceWithRelation,
+      valuesOption: {include: Include.NULL_VALUES}
+    })
       .subscribe(() => {
         const body = resourceHttpServiceSpy.put.calls.argsFor(0)[1];
         expect(body).toBeDefined();
@@ -194,24 +179,19 @@ describe('HateoasResourceService', () => {
       });
   });
 
-  it('UPDATE_RESOURCE_BY_ID should throw error when passed resourceName is empty', () => {
-    expect(() => hateoasResourceService.updateResourceById('', 1, {body: {param: 'test'}}))
-      .toThrowError(`Passed param(s) 'resourceName = ' is not valid`);
-  });
-
   it('UPDATE_RESOURCE_BY_ID should throw error when passed id is empty', () => {
-    expect(() => hateoasResourceService.updateResourceById('any', '', {body: {param: 'test'}}))
+    expect(() => hateoasResourceService.updateResourceById(SimpleResource, '', {body: {param: 'test'}}))
       .toThrowError(`Passed param(s) 'id = ' is not valid`);
   });
 
   it('UPDATE_RESOURCE_BY_ID should throw error when passed resourceName,id,requestBody are undefined', () => {
     expect(() => hateoasResourceService.updateResourceById(undefined, undefined, undefined))
-      .toThrowError(`Passed param(s) 'resourceName = undefined', 'id = undefined', 'requestBody = undefined' are not valid`);
+      .toThrowError(`Passed param(s) 'resourceType = undefined', 'id = undefined', 'requestBody = undefined' are not valid`);
   });
 
   it('UPDATE_RESOURCE_BY_ID should throw error when passed resourceName,id,requestBody are null', () => {
     expect(() => hateoasResourceService.updateResourceById(null, null, null))
-      .toThrowError(`Passed param(s) 'resourceName = null', 'id = null', 'requestBody = null' are not valid`);
+      .toThrowError(`Passed param(s) 'resourceType = null', 'id = null', 'requestBody = null' are not valid`);
   });
 
   it('UPDATE_RESOURCE_BY_ID should resolve resource values', () => {
@@ -219,7 +199,7 @@ describe('HateoasResourceService', () => {
     const resourceWithRelation = new ResourceWithRelation();
     resourceWithRelation.relation = new ResourceRelation();
 
-    hateoasResourceService.updateResourceById('test', 1, {body: resourceWithRelation})
+    hateoasResourceService.updateResourceById(ResourceWithRelation, 1, {body: resourceWithRelation})
       .subscribe(() => {
         const body = resourceHttpServiceSpy.putResource.calls.argsFor(0)[2];
         expect(body).toBeDefined();
@@ -232,7 +212,10 @@ describe('HateoasResourceService', () => {
     const resourceWithRelation = new ResourceWithRelation();
     resourceWithRelation.name = null;
 
-    hateoasResourceService.updateResourceById('test', 1, {body: resourceWithRelation, valuesOption: {include: Include.NULL_VALUES}})
+    hateoasResourceService.updateResourceById(ResourceWithRelation, 1, {
+      body: resourceWithRelation,
+      valuesOption: {include: Include.NULL_VALUES}
+    })
       .subscribe(() => {
         const body = resourceHttpServiceSpy.putResource.calls.argsFor(0)[2];
         expect(body).toBeDefined();
@@ -279,7 +262,10 @@ describe('HateoasResourceService', () => {
     const resourceWithRelation = new ResourceWithRelation();
     resourceWithRelation.name = null;
 
-    hateoasResourceService.patchResource(resourceWithRelation, {body: resourceWithRelation, valuesOption: {include: Include.NULL_VALUES}})
+    hateoasResourceService.patchResource(resourceWithRelation, {
+      body: resourceWithRelation,
+      valuesOption: {include: Include.NULL_VALUES}
+    })
       .subscribe(() => {
         const body = resourceHttpServiceSpy.patch.calls.argsFor(0)[1];
         expect(body).toBeDefined();
@@ -298,24 +284,20 @@ describe('HateoasResourceService', () => {
       });
   });
 
-  it('PATCH_RESOURCE_BY_ID should throw error when passed resourceName is empty', () => {
-    expect(() => hateoasResourceService.patchResourceById('', 1, {body: {param: 'test'}}))
-      .toThrowError(`Passed param(s) 'resourceName = ' is not valid`);
-  });
 
   it('PATCH_RESOURCE_BY_ID should throw error when passed id is empty', () => {
-    expect(() => hateoasResourceService.patchResourceById('any', '', {body: {param: 'test'}}))
+    expect(() => hateoasResourceService.patchResourceById(SimpleResource, '', {body: {param: 'test'}}))
       .toThrowError(`Passed param(s) 'id = ' is not valid`);
   });
 
   it('PATCH_RESOURCE_BY_ID should throw error when passed resourceName,id,requestBody are undefined', () => {
     expect(() => hateoasResourceService.patchResourceById(undefined, undefined, undefined))
-      .toThrowError(`Passed param(s) 'resourceName = undefined', 'id = undefined', 'requestBody = undefined' are not valid`);
+      .toThrowError(`Passed param(s) 'resourceType = undefined', 'id = undefined', 'requestBody = undefined' are not valid`);
   });
 
   it('PATCH_RESOURCE_BY_ID should throw error when passed resourceName,id,requestBody are null', () => {
     expect(() => hateoasResourceService.patchResourceById(null, null, null))
-      .toThrowError(`Passed param(s) 'resourceName = null', 'id = null', 'requestBody = null' are not valid`);
+      .toThrowError(`Passed param(s) 'resourceType = null', 'id = null', 'requestBody = null' are not valid`);
   });
 
   it('PATCH_RESOURCE_BY_ID should resolve resource values', () => {
@@ -323,7 +305,7 @@ describe('HateoasResourceService', () => {
     const resourceWithRelation = new ResourceWithRelation();
     resourceWithRelation.relation = new ResourceRelation();
 
-    hateoasResourceService.patchResourceById('test', 1, {body: resourceWithRelation})
+    hateoasResourceService.patchResourceById(ResourceWithRelation, 1, {body: resourceWithRelation})
       .subscribe(() => {
         const body = resourceHttpServiceSpy.patchResource.calls.argsFor(0)[2];
         expect(body).toBeDefined();
@@ -336,7 +318,10 @@ describe('HateoasResourceService', () => {
     const resourceWithRelation = new ResourceWithRelation();
     resourceWithRelation.name = null;
 
-    hateoasResourceService.patchResourceById('test', 1, {body: resourceWithRelation, valuesOption: {include: Include.NULL_VALUES}})
+    hateoasResourceService.patchResourceById(ResourceWithRelation, 1, {
+      body: resourceWithRelation,
+      valuesOption: {include: Include.NULL_VALUES}
+    })
       .subscribe(() => {
         const body = resourceHttpServiceSpy.patchResource.calls.argsFor(0)[2];
         expect(body).toBeDefined();
@@ -390,30 +375,25 @@ describe('HateoasResourceService', () => {
       });
   });
 
-  it('DELETE_RESOURCE_BY_ID should throw error when passed resourceName is empty', () => {
-    expect(() => hateoasResourceService.deleteResourceById('', 1))
-      .toThrowError(`Passed param(s) 'resourceName = ' is not valid`);
-  });
-
   it('DELETE_RESOURCE_BY_ID should throw error when passed id is empty', () => {
-    expect(() => hateoasResourceService.deleteResourceById('any', ''))
+    expect(() => hateoasResourceService.deleteResourceById(SimpleResource, ''))
       .toThrowError(`Passed param(s) 'id = ' is not valid`);
   });
 
   it('DELETE_RESOURCE_BY_ID should throw error when passed resourceName,id,requestBody are undefined', () => {
     expect(() => hateoasResourceService.deleteResourceById(undefined, undefined))
-      .toThrowError(`Passed param(s) 'resourceName = undefined', 'id = undefined' are not valid`);
+      .toThrowError(`Passed param(s) 'resourceType = undefined', 'id = undefined' are not valid`);
   });
 
   it('DELETE_RESOURCE_BY_ID should throw error when passed resourceName,id are null', () => {
     expect(() => hateoasResourceService.deleteResourceById(null, null))
-      .toThrowError(`Passed param(s) 'resourceName = null', 'id = null' are not valid`);
+      .toThrowError(`Passed param(s) 'resourceType = null', 'id = null' are not valid`);
   });
 
   it('DELETE_RESOURCE_BY_ID should pass option params as http request params', () => {
     resourceHttpServiceSpy.deleteResource.and.returnValue(of(anything()));
 
-    hateoasResourceService.deleteResourceById('resource', 1, {params: {test: 'param'}})
+    hateoasResourceService.deleteResourceById(SimpleResource, 1, {params: {test: 'param'}})
       .subscribe(() => {
         const params = resourceHttpServiceSpy.deleteResource.calls.argsFor(0)[2].params as HttpParams;
         expect(params).toBeDefined();
@@ -425,7 +405,7 @@ describe('HateoasResourceService', () => {
   it('DELETE_RESOURCE_BY_ID should pass observe value if it specified', () => {
     resourceHttpServiceSpy.deleteResource.and.returnValue(of(anything()));
 
-    hateoasResourceService.deleteResourceById('resource', 1, {observe: 'response'})
+    hateoasResourceService.deleteResourceById(SimpleResource, 1, {observe: 'response'})
       .subscribe(() => {
         const observe = resourceHttpServiceSpy.deleteResource.calls.argsFor(0)[2].observe;
         expect(observe).toBeDefined();
@@ -433,84 +413,65 @@ describe('HateoasResourceService', () => {
       });
   });
 
-  it('SEARCH_COLLECTION should throw error when passed resourceName is empty', () => {
-    expect(() => hateoasResourceService.searchCollection('', 'any'))
-      .toThrowError(`Passed param(s) 'resourceName = ' is not valid`);
-  });
-
   it('SEARCH_COLLECTION should throw error when passed searchQuery is empty', () => {
-    expect(() => hateoasResourceService.searchCollection('any', ''))
+    expect(() => hateoasResourceService.searchCollection(SimpleResource, ''))
       .toThrowError(`Passed param(s) 'searchQuery = ' is not valid`);
   });
 
   it('SEARCH_COLLECTION should throw error when passed resourceName,searchQuery are undefined', () => {
     expect(() => hateoasResourceService.searchCollection(undefined, undefined))
-      .toThrowError(`Passed param(s) 'resourceName = undefined', 'searchQuery = undefined' are not valid`);
+      .toThrowError(`Passed param(s) 'resourceType = undefined', 'searchQuery = undefined' are not valid`);
   });
 
   it('SEARCH_COLLECTION should throw error when passed resourceName,searchQuery are null', () => {
     expect(() => hateoasResourceService.searchCollection(null, null))
-      .toThrowError(`Passed param(s) 'resourceName = null', 'searchQuery = null' are not valid`);
-  });
-
-  it('SEARCH_PAGE should throw error when passed resourceName is empty', () => {
-    expect(() => hateoasResourceService.searchPage('', 'any'))
-      .toThrowError(`Passed param(s) 'resourceName = ' is not valid`);
+      .toThrowError(`Passed param(s) 'resourceType = null', 'searchQuery = null' are not valid`);
   });
 
   it('SEARCH_PAGE should throw error when passed searchQuery is empty', () => {
-    expect(() => hateoasResourceService.searchPage('any', ''))
+    expect(() => hateoasResourceService.searchPage(SimpleResource, ''))
       .toThrowError(`Passed param(s) 'searchQuery = ' is not valid`);
   });
 
   it('SEARCH_PAGE should throw error when passed resourceName,searchQuery are undefined', () => {
     expect(() => hateoasResourceService.searchPage(undefined, undefined))
-      .toThrowError(`Passed param(s) 'resourceName = undefined', 'searchQuery = undefined' are not valid`);
+      .toThrowError(`Passed param(s) 'resourceType = undefined', 'searchQuery = undefined' are not valid`);
   });
 
   it('SEARCH_PAGE should throw error when passed resourceName,searchQuery are null', () => {
     expect(() => hateoasResourceService.searchPage(null, null))
-      .toThrowError(`Passed param(s) 'resourceName = null', 'searchQuery = null' are not valid`);
-  });
-
-  it('SEARCH_RESOURCE should throw error when passed resourceName is empty', () => {
-    expect(() => hateoasResourceService.searchResource('', 'any'))
-      .toThrowError(`Passed param(s) 'resourceName = ' is not valid`);
+      .toThrowError(`Passed param(s) 'resourceType = null', 'searchQuery = null' are not valid`);
   });
 
   it('SEARCH_RESOURCE should throw error when passed searchQuery is empty', () => {
-    expect(() => hateoasResourceService.searchResource('any', ''))
+    expect(() => hateoasResourceService.searchResource(SimpleResource, ''))
       .toThrowError(`Passed param(s) 'searchQuery = ' is not valid`);
   });
 
   it('SEARCH_RESOURCE should throw error when passed resourceName,searchQuery are undefined', () => {
     expect(() => hateoasResourceService.searchResource(undefined, undefined))
-      .toThrowError(`Passed param(s) 'resourceName = undefined', 'searchQuery = undefined' are not valid`);
+      .toThrowError(`Passed param(s) 'resourceType = undefined', 'searchQuery = undefined' are not valid`);
   });
 
   it('SEARCH_RESOURCE should throw error when passed resourceName,searchQuery are null', () => {
     expect(() => hateoasResourceService.searchResource(null, null))
-      .toThrowError(`Passed param(s) 'resourceName = null', 'searchQuery = null' are not valid`);
+      .toThrowError(`Passed param(s) 'resourceType = null', 'searchQuery = null' are not valid`);
   });
 
-  it('CUSTOM_QUERY should throw error when passed resourceName is empty', () => {
-    expect(() => hateoasResourceService.customQuery('', HttpMethod.POST, 'query', {body: new SimpleResource()}))
-      .toThrowError(`Passed param(s) 'resourceName = ' is not valid`);
-  });
 
   it('CUSTOM_QUERY should throw error when passed query is empty', () => {
-    expect(() => hateoasResourceService.customQuery('any', HttpMethod.POST, '', {body: new SimpleResource()}))
+    expect(() => hateoasResourceService.customQuery(SimpleResource, HttpMethod.POST, '', {body: new SimpleResource()}))
       .toThrowError(`Passed param(s) 'query = ' is not valid`);
   });
 
   it('CUSTOM_QUERY should throw error when passed resourceName,method,query are undefined', () => {
     expect(() => hateoasResourceService.customQuery(undefined, undefined, undefined))
-      .toThrowError(`Passed param(s) 'resourceName = undefined', 'method = undefined', 'query = undefined' are not valid`);
+      .toThrowError(`Passed param(s) 'resourceType = undefined', 'method = undefined', 'query = undefined' are not valid`);
   });
 
   it('CUSTOM_QUERY should throw error when passed resourceName,method,query are null', () => {
     expect(() => hateoasResourceService.customQuery(null, null, null))
-      .toThrowError(`Passed param(s) 'resourceName = null', 'method = null', 'query = null' are not valid`);
+      .toThrowError(`Passed param(s) 'resourceType = null', 'method = null', 'query = null' are not valid`);
   });
 
   it('CUSTOM_QUERY should resolve resource values', () => {
@@ -518,7 +479,7 @@ describe('HateoasResourceService', () => {
     const resourceWithRelation = new ResourceWithRelation();
     resourceWithRelation.relation = new ResourceRelation();
 
-    hateoasResourceService.customQuery('test', HttpMethod.POST, 'query', {body: resourceWithRelation})
+    hateoasResourceService.customQuery(ResourceWithRelation, HttpMethod.POST, 'query', {body: resourceWithRelation})
       .subscribe(() => {
         const body = commonHttpServiceSpy.customQuery.calls.argsFor(0)[3];
         expect(body).toBeDefined();
@@ -531,7 +492,7 @@ describe('HateoasResourceService', () => {
     const resourceWithRelation = new ResourceWithRelation();
     resourceWithRelation.name = null;
 
-    hateoasResourceService.customQuery('test', HttpMethod.POST, 'query',
+    hateoasResourceService.customQuery(ResourceWithRelation, HttpMethod.POST, 'query',
       {body: resourceWithRelation, valuesOption: {include: Include.NULL_VALUES}})
       .subscribe(() => {
         const body = commonHttpServiceSpy.customQuery.calls.argsFor(0)[3];
@@ -540,25 +501,19 @@ describe('HateoasResourceService', () => {
       });
   });
 
-  //
-  it('CUSTOM_SEARCH_QUERY should throw error when passed resourceName is empty', () => {
-    expect(() => hateoasResourceService.customSearchQuery('', HttpMethod.POST, 'searchQuery', {body: new SimpleResource()}))
-      .toThrowError(`Passed param(s) 'resourceName = ' is not valid`);
-  });
-
   it('CUSTOM_SEARCH_QUERY should throw error when passed query is empty', () => {
-    expect(() => hateoasResourceService.customSearchQuery('any', HttpMethod.POST, '', {body: new SimpleResource()}))
+    expect(() => hateoasResourceService.customSearchQuery(SimpleResource, HttpMethod.POST, '', {body: new SimpleResource()}))
       .toThrowError(`Passed param(s) 'searchQuery = ' is not valid`);
   });
 
   it('CUSTOM_SEARCH_QUERY should throw error when passed resourceName,method,query are undefined', () => {
     expect(() => hateoasResourceService.customSearchQuery(undefined, undefined, undefined))
-      .toThrowError(`Passed param(s) 'resourceName = undefined', 'method = undefined', 'searchQuery = undefined' are not valid`);
+      .toThrowError(`Passed param(s) 'resourceType = undefined', 'method = undefined', 'searchQuery = undefined' are not valid`);
   });
 
   it('CUSTOM_SEARCH_QUERY should throw error when passed resourceName,method,query are null', () => {
     expect(() => hateoasResourceService.customSearchQuery(null, null, null))
-      .toThrowError(`Passed param(s) 'resourceName = null', 'method = null', 'searchQuery = null' are not valid`);
+      .toThrowError(`Passed param(s) 'resourceType = null', 'method = null', 'searchQuery = null' are not valid`);
   });
 
   it('CUSTOM_SEARCH_QUERY should resolve resource values', () => {
@@ -566,7 +521,7 @@ describe('HateoasResourceService', () => {
     const resourceWithRelation = new ResourceWithRelation();
     resourceWithRelation.relation = new ResourceRelation();
 
-    hateoasResourceService.customSearchQuery('test', HttpMethod.POST, 'searchQuery', {body: resourceWithRelation})
+    hateoasResourceService.customSearchQuery(ResourceWithRelation, HttpMethod.POST, 'searchQuery', {body: resourceWithRelation})
       .subscribe(() => {
         const body = commonHttpServiceSpy.customQuery.calls.argsFor(0)[3];
         expect(body).toBeDefined();
@@ -579,7 +534,7 @@ describe('HateoasResourceService', () => {
     const resourceWithRelation = new ResourceWithRelation();
     resourceWithRelation.name = null;
 
-    hateoasResourceService.customSearchQuery('test', HttpMethod.POST, 'searchQuery',
+    hateoasResourceService.customSearchQuery(ResourceWithRelation, HttpMethod.POST, 'searchQuery',
       {body: resourceWithRelation, valuesOption: {include: Include.NULL_VALUES}})
       .subscribe(() => {
         const body = commonHttpServiceSpy.customQuery.calls.argsFor(0)[3];
@@ -591,7 +546,7 @@ describe('HateoasResourceService', () => {
   it('CUSTOM_SEARCH_QUERY should put \'search\' path to result url', () => {
     commonHttpServiceSpy.customQuery.and.returnValue(of(anything()));
 
-    hateoasResourceService.customSearchQuery('test', HttpMethod.GET, 'searchQuery')
+    hateoasResourceService.customSearchQuery(SimpleResource, HttpMethod.GET, 'searchQuery')
       .subscribe(() => {
         const url = commonHttpServiceSpy.customQuery.calls.argsFor(0)[2];
         expect(url).toBeDefined();
@@ -602,7 +557,7 @@ describe('HateoasResourceService', () => {
   it('CUSTOM_SEARCH_QUERY should put \'search\' path without additional slash to result url', () => {
     commonHttpServiceSpy.customQuery.and.returnValue(of(anything()));
 
-    hateoasResourceService.customSearchQuery('test', HttpMethod.GET, '/searchQuery')
+    hateoasResourceService.customSearchQuery(SimpleResource, HttpMethod.GET, '/searchQuery')
       .subscribe(() => {
         const url = commonHttpServiceSpy.customQuery.calls.argsFor(0)[2];
         expect(url).toBeDefined();

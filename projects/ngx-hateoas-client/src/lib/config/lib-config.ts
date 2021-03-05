@@ -15,7 +15,11 @@ export class LibConfig {
     cache: {
       enabled: true,
       lifeTime: 5 * 60 * 1000
-    }
+    },
+    useTypes: {
+      resources: []
+    },
+    isProduction: false
   };
 
   public static config: HateoasConfiguration = LibConfig.DEFAULT_CONFIG;

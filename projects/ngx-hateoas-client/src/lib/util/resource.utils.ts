@@ -8,10 +8,14 @@ import { EmbeddedResource } from '../model/resource/embedded-resource';
 import { UrlUtils } from './url.utils';
 import { Stage } from '../logger/stage.enum';
 import { StageLogger } from '../logger/stage-logger';
-import { isArray, isEmpty, isNil, isObject, upperFirst } from 'lodash-es';
+import { isArray, isEmpty, isNil, isObject } from 'lodash-es';
+import { ConsoleLogger } from '../logger/console-logger';
 
 /* tslint:disable:no-string-literal */
 export class ResourceUtils {
+
+  public static RESOURCE_NAME_TYPE_MAP: Map<string, any> = new Map<string, any>();
+  public static EMBEDDED_RESOURCE_TYPE_MAP: Map<string, any> = new Map<string, any>();
 
   private static resourceType: new() => BaseResource;
 
@@ -49,26 +53,49 @@ export class ResourceUtils {
       if (isArray(payload[key])) {
         for (let i = 0; i < payload[key].length; i++) {
           if (isEmbeddedResource(payload[key][i])) {
-            payload[key][i] = ResourceUtils.createResource(new this.embeddedResourceType(), payload[key][i]);
+            payload[key][i] = this.createEmbeddedResource(key, payload[key][i]);
           } else if (isResource(payload[key][i])) {
-            payload[key][i] = ResourceUtils.createResource(new this.resourceType(), payload[key][i]);
-            payload[key][i]['resourceName'] = this.findResourceName(payload[key][i]);
+            payload[key][i] = this.createResource(payload[key][i]);
           }
         }
       } else if (isEmbeddedResource(payload[key])) {
-        payload[key] = ResourceUtils.createResource(new this.embeddedResourceType(), payload[key]);
+        payload[key] = this.createEmbeddedResource(key, payload[key]);
       } else if (isResource(payload[key])) {
-        payload[key] = ResourceUtils.createResource(new this.resourceType(), payload[key]);
-        payload[key]['resourceName'] = this.findResourceName(payload[key]);
+        payload[key] = this.createResource(payload[key]);
       }
     }
 
-    const resource = Object.assign(new this.resourceType() as T, payload);
-    resource['resourceName'] = this.findResourceName(resource);
-
-    return resource;
+    return this.createResource(payload);
   }
 
+  private static createResource<T extends BaseResource>(payload: any): T {
+    const resourceName = this.findResourceName(payload as T);
+    const resourceClass = ResourceUtils.RESOURCE_NAME_TYPE_MAP.get(resourceName);
+    if (resourceClass) {
+      return Object.assign(new (resourceClass)() as T, payload);
+    } else {
+      ConsoleLogger.prettyWarn('Not found resource type when create resource: \'' + resourceName + '\' so used default Resource type, for this can be some reasons: \n\r' +
+        '1) You did not pass resource property name as \'' + resourceName + '\' with @HateoasResource decorator. \n\r' +
+        '2) You did not declare resource type in configuration "configuration.useTypes.resources". \n\r' +
+        '\n\r Please check both points to to fix this issue.');
+
+      return Object.assign(new this.resourceType(), payload);
+    }
+  }
+
+  private static createEmbeddedResource<T extends BaseResource>(key: string, payload: any): T {
+    const resourceClass = ResourceUtils.EMBEDDED_RESOURCE_TYPE_MAP.get(key);
+    if (resourceClass) {
+      return Object.assign(new (resourceClass)() as T, payload);
+    } else {
+      ConsoleLogger.prettyWarn('Not found embedded resource type when create resource: \'' + key + '\' so used default EmbeddedResource type, for this can be some reasons:. \n\r' +
+        '1) You did not pass embedded resource property name as \'' + key + '\' with @HateoasEmbeddedResource decorator. \n\r' +
+        '2) You did not declare embedded resource type in configuration "configuration.useTypes.embeddedResources". \n\r' +
+        '\n\r Please check both points to to fix this issue.');
+
+      return Object.assign(new this.embeddedResourceType(), payload);
+    }
+  }
 
   public static instantiateResourceCollection<T extends ResourceCollection<BaseResource>>(payload: object): T {
     if (isEmpty(payload)
@@ -145,6 +172,8 @@ export class ResourceUtils {
         });
       } else if (isResource(body[key])) {
         result[key] = body[key]._links?.self?.href;
+      } else if (isObject(body[key])) {
+        result[key] = this.resolveValues({body: body[key], valuesOption: requestBody?.valuesOption});
       } else {
         result[key] = body[key];
       }
@@ -184,14 +213,10 @@ export class ResourceUtils {
     const selfLinkHref = resourceLinks.self.href;
 
     for (const linkKey of Object.keys(resourceLinks)) {
-      if (linkKey !== 'self' && UrlUtils.removeTemplateParams(resourceLinks[linkKey].href) === selfLinkHref) {
-        return upperFirst(linkKey);
+      if (linkKey === 'self' && UrlUtils.removeTemplateParams(resourceLinks[linkKey].href) === selfLinkHref) {
+        return UrlUtils.getResourceNameFromUrl(resourceLinks[linkKey].href);
       }
     }
-  }
-
-  private static createResource<T extends BaseResource>(entity: T, payload: any): T {
-    return Object.assign(entity, payload);
   }
 
 }

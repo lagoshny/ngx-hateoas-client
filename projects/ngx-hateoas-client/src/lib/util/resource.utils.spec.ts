@@ -79,36 +79,6 @@ describe('ResourceUtils', () => {
     expect(result['resourceCollection'][1] instanceof Resource).toBeTrue();
   });
 
-  it('INSTANTIATE_RESOURCE should fill resourceName for "Resource" type', () => {
-    const result = ResourceUtils.instantiateResource({
-      ...rawResource,
-      resourceCollection: [
-        rawResource,
-        rawResource
-      ]
-    });
-
-    expect(result['resourceCollection']).toBeDefined();
-    expect(result['resourceCollection'].length).toBe(2);
-    expect(result['resourceCollection'][0]['resourceName']).toBe('Resource');
-    expect(result['resourceCollection'][1]['resourceName']).toBe('Resource');
-  });
-
-  it('INSTANTIATE_RESOURCE should NOT fill resourceName for "EmbeddedResource" type', () => {
-    const result = ResourceUtils.instantiateResource({
-      ...rawResource,
-      embeddedCollection: [
-        rawEmbeddedResource,
-        rawEmbeddedResource
-      ]
-    });
-
-    expect(result['embeddedCollection']).toBeDefined();
-    expect(result['embeddedCollection'].length).toBe(2);
-    expect(result['embeddedCollection'][0]['resourceName']).toBeUndefined();
-    expect(result['embeddedCollection'][1]['resourceName']).toBeUndefined();
-  });
-
   it('INSTANTIATE_COLLECTION_RESOURCE should return "null" when passed payload is empty object', () => {
     expect(ResourceUtils.instantiateResourceCollection({})).toBeNull();
   });
@@ -327,6 +297,24 @@ describe('ResourceUtils', () => {
       obj: {
         simple: 'test'
       }
+    });
+  });
+
+  it('RESOLVE_VALUES should generate resource link for object that has Resource properties', () => {
+    expect(ResourceUtils.resolveValues({
+      body: {
+        name: 'test',
+        obj: {
+          simple: 'test'
+        },
+        resource: rawResource
+      }
+    })).toEqual({
+      name: 'test',
+      obj: {
+        simple: 'test'
+      },
+      resource: 'http://localhost:8080/api/v1/resource/1'
     });
   });
 

@@ -1,6 +1,7 @@
 import { ResourceCollection } from './resource-collection';
 import { EmbeddedResource } from './embedded-resource';
 import { Resource } from './resource';
+import { HateoasEmbeddedResource, HateoasResource } from '../decorators';
 
 export const rawEmbeddedResource = {
   name: 'Test',
@@ -29,6 +30,7 @@ export const rawResource = {
   }
 };
 
+@HateoasResource('test')
 export class SimpleResource extends Resource {
 
   // tslint:disable-next-line:variable-name
@@ -43,6 +45,7 @@ export class SimpleResource extends Resource {
 
 }
 
+@HateoasEmbeddedResource(['anotherResource'])
 export class SimpleEmbeddedResource extends EmbeddedResource {
 
   // tslint:disable-next-line:variable-name

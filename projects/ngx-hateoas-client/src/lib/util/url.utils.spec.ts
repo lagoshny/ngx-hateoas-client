@@ -294,4 +294,31 @@ describe('UrlUtils', () => {
     LibConfig.config.http.proxyUrl = '';
   });
 
+  it('GET_RESOURCE_NAME_FROM_URL should throw error when url is empty', () => {
+    expect(() => UrlUtils.getResourceNameFromUrl(''))
+      .toThrowError(`Passed param(s) 'url = ' is not valid`);
+  });
+
+  it('GET_RESOURCE_NAME_FROM_URL should throw error when url is null', () => {
+    expect(() => UrlUtils.getResourceNameFromUrl(null))
+      .toThrowError(`Passed param(s) 'url = null' is not valid`);
+  });
+
+  it('GET_RESOURCE_NAME_FROM_URL should throw error when url is undefined', () => {
+    expect(() => UrlUtils.getResourceNameFromUrl(undefined))
+      .toThrowError(`Passed param(s) 'url = undefined' is not valid`);
+  });
+
+  it('GET_RESOURCE_NAME_FROM_URL should return resource name without root proxy', () => {
+    const resourceNameFromUrl = UrlUtils.getResourceNameFromUrl('http://localhost:8080/api/v1/resources/1');
+    expect(resourceNameFromUrl).toEqual('resources');
+  });
+
+  it('GET_RESOURCE_NAME_FROM_URL should return resource name with root proxy', () => {
+    LibConfig.config.http.proxyUrl = 'http://proxy-localhost:8080/api/v1';
+    const resourceNameFromUrl = UrlUtils.getResourceNameFromUrl('http://proxy-localhost:8080/api/v1/resources/1');
+    LibConfig.config.http.proxyUrl = '';
+    expect(resourceNameFromUrl).toEqual('resources');
+  });
+
 });

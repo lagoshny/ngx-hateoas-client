@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { LibConfig } from '../../config/lib-config';
 import { Observable, throwError as observableThrowError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
-import { isResourceCollection } from '../../model/resource-type';
+import { getResourceType, isResourceCollection } from '../../model/resource-type';
 import { ResourceUtils } from '../../util/resource.utils';
 import { ResourceCollection } from '../../model/resource/resource-collection';
 import { BaseResource } from '../../model/resource/base-resource';
@@ -49,7 +49,7 @@ export class ResourceCollectionHttpService extends HttpExecutor {
             if (LibConfig.config.cache.enabled) {
               this.cacheService.evictResource(CacheKey.of(url, httpOptions));
             }
-            const errMsg = 'You try to get wrong resource type, expected resource collection type.';
+            const errMsg = `You try to get the wrong resource type: expected ResourceCollection type, actual ${ getResourceType(data) } type.`;
             StageLogger.stageErrorLog(Stage.INIT_RESOURCE, {error: errMsg});
             throw new Error(errMsg);
           }

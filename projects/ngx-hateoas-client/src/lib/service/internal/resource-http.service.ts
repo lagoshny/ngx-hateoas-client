@@ -6,7 +6,7 @@ import { ResourceUtils } from '../../util/resource.utils';
 import { BaseResource } from '../../model/resource/base-resource';
 import { DependencyInjector } from '../../util/dependency-injector';
 import { UrlUtils } from '../../util/url.utils';
-import { isResource } from '../../model/resource-type';
+import { getResourceType, isResource } from '../../model/resource-type';
 import { GetOption } from '../../model/declarations';
 import { HttpExecutor } from '../http-executor';
 import { LibConfig } from '../../config/lib-config';
@@ -52,7 +52,7 @@ export class ResourceHttpService extends HttpExecutor {
             if (LibConfig.config.cache.enabled) {
               this.cacheService.evictResource(CacheKey.of(url, httpOptions));
             }
-            const errMsg = 'You try to get wrong resource type, expected single resource.';
+            const errMsg = `You try to get wrong resource type: expected Resource type, actual ${ getResourceType(data) } type.`;
             StageLogger.stageErrorLog(Stage.INIT_RESOURCE, {
               error: errMsg
             });

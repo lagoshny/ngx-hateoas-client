@@ -47,6 +47,7 @@ export class ResourceUtils {
     // @ts-ignore
     if (isEmpty(payload)
       || (!isObject(payload['_links']) || isEmpty(payload['_links']))) {
+      ConsoleLogger.warn('Incorrect resource object! Returned \'null\' value, because it has not \'_links\' array. Check that server send right resource object.', {incorrectResource: payload});
       return null;
     }
     for (const key of Object.keys(payload)) {

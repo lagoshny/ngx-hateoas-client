@@ -36,6 +36,6 @@ export function getResourceType(object: any): string {
   } else if (isPagedResourceCollection(object)) {
     return 'PagedResourceCollection';
   } else {
-    return 'UnknownResourceType';
+    return 'Unknown';
   }
 }

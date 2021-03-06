@@ -47,7 +47,7 @@ describe('ResourceCollectionHttpService', () => {
 
     resourceCollectionHttpService.get('someUrl').subscribe(() => {
     }, error => {
-      expect(error.message).toBe('You try to get wrong resource type, expected resource collection type.');
+      expect(error.message).toBe('You try to get the wrong resource type: expected ResourceCollection type, actual EmbeddedResource type.');
     });
   });
 
@@ -56,7 +56,7 @@ describe('ResourceCollectionHttpService', () => {
 
     resourceCollectionHttpService.get('someUrl').subscribe(() => {
     }, error => {
-      expect(error.message).toBe('You try to get wrong resource type, expected resource collection type.');
+      expect(error.message).toBe('You try to get the wrong resource type: expected ResourceCollection type, actual Resource type.');
     });
   });
 
@@ -65,7 +65,7 @@ describe('ResourceCollectionHttpService', () => {
 
     resourceCollectionHttpService.get('someUrl').subscribe(() => {
     }, error => {
-      expect(error.message).toBe('You try to get wrong resource type, expected resource collection type.');
+      expect(error.message).toBe('You try to get the wrong resource type: expected ResourceCollection type, actual PagedResourceCollection type.');
     });
   });
 
@@ -74,7 +74,7 @@ describe('ResourceCollectionHttpService', () => {
 
     resourceCollectionHttpService.get('someUrl').subscribe(() => {
     }, error => {
-      expect(error.message).toBe('You try to get wrong resource type, expected resource collection type.');
+      expect(error.message).toBe('You try to get the wrong resource type: expected ResourceCollection type, actual Unknown type.');
     });
   });
 

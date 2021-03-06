@@ -20,7 +20,7 @@ export abstract class AbstractResource {
    */
   public getRelationLink(relationName: string): LinkData {
     if (isEmpty(this._links)) {
-      throw new Error(`Resource '${ this.constructor.name }' relation links are empty, can not to get relation with the name '${ relationName }'`);
+      throw new Error(`Resource '${ this.constructor.name }' relation links are empty, can not to get relation with the name '${ relationName }'.`);
     }
 
     const relationLink = this._links[relationName];

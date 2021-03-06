@@ -321,4 +321,49 @@ describe('UrlUtils', () => {
     expect(resourceNameFromUrl).toEqual('resources');
   });
 
+  it('FILL_DEFAULT_PAGE_DATA_IF_NO_PRESENT fill all default values when passed options are \'null\'', () => {
+    const pagedOptions = UrlUtils.fillDefaultPageDataIfNoPresent(null);
+
+    expect(pagedOptions).toBeDefined();
+    expect(pagedOptions.pageParams).toBeDefined();
+    expect(pagedOptions.pageParams.page).toBe(UrlUtils.DEFAULT_PAGE.page);
+    expect(pagedOptions.pageParams.size).toBe(UrlUtils.DEFAULT_PAGE.size);
+  });
+
+  it('FILL_DEFAULT_PAGE_DATA_IF_NO_PRESENT fill all default values when passed options are \'undefined\'', () => {
+    const pagedOptions = UrlUtils.fillDefaultPageDataIfNoPresent(undefined);
+
+    expect(pagedOptions).toBeDefined();
+    expect(pagedOptions.pageParams).toBeDefined();
+    expect(pagedOptions.pageParams.page).toBe(UrlUtils.DEFAULT_PAGE.page);
+    expect(pagedOptions.pageParams.size).toBe(UrlUtils.DEFAULT_PAGE.size);
+  });
+
+  it('FILL_DEFAULT_PAGE_DATA_IF_NO_PRESENT fill all default values when passed options are \'empty object\'', () => {
+    const pagedOptions = UrlUtils.fillDefaultPageDataIfNoPresent({});
+
+    expect(pagedOptions).toBeDefined();
+    expect(pagedOptions.pageParams).toBeDefined();
+    expect(pagedOptions.pageParams.page).toBe(UrlUtils.DEFAULT_PAGE.page);
+    expect(pagedOptions.pageParams.size).toBe(UrlUtils.DEFAULT_PAGE.size);
+  });
+
+  it('FILL_DEFAULT_PAGE_DATA_IF_NO_PRESENT fill page default value when passed options have not it', () => {
+    const pagedOptions = UrlUtils.fillDefaultPageDataIfNoPresent({pageParams: {size: 40}});
+
+    expect(pagedOptions).toBeDefined();
+    expect(pagedOptions.pageParams).toBeDefined();
+    expect(pagedOptions.pageParams.page).toBe(UrlUtils.DEFAULT_PAGE.page);
+    expect(pagedOptions.pageParams.size).toBe(40);
+  });
+
+  it('FILL_DEFAULT_PAGE_DATA_IF_NO_PRESENT fill size default value when passed options have not it', () => {
+    const pagedOptions = UrlUtils.fillDefaultPageDataIfNoPresent({pageParams: {page: 4}});
+
+    expect(pagedOptions).toBeDefined();
+    expect(pagedOptions.pageParams).toBeDefined();
+    expect(pagedOptions.pageParams.page).toBe(4);
+    expect(pagedOptions.pageParams.size).toBe(UrlUtils.DEFAULT_PAGE.size);
+  });
+
 });

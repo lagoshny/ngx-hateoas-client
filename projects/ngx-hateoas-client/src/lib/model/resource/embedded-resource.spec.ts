@@ -8,7 +8,7 @@ describe('EmbeddedResource', () => {
     expect(() => {
       const embeddedResource = new SimpleEmbeddedResource();
       embeddedResource.getRelationLink('self');
-    }).toThrowError(`Resource relation with name 'self' not found`);
+    }).toThrowError(`Resource 'SimpleEmbeddedResource' has not relation link with the name 'self'.`);
   });
 
 });

@@ -366,4 +366,26 @@ describe('UrlUtils', () => {
     expect(pagedOptions.pageParams.size).toBe(UrlUtils.DEFAULT_PAGE.size);
   });
 
+  it('CLEAR_URL_PARAMS should throw error when url is empty', () => {
+    expect(() => UrlUtils.clearUrlParams(''))
+      .toThrowError(`Passed param(s) 'url = ' is not valid`);
+  });
+
+  it('CLEAR_URL_PARAMS should throw error when url is null', () => {
+    expect(() => UrlUtils.clearUrlParams(null))
+      .toThrowError(`Passed param(s) 'url = null' is not valid`);
+  });
+
+  it('CLEAR_URL_PARAMS should throw error when url is undefined', () => {
+    expect(() => UrlUtils.clearUrlParams(undefined))
+      .toThrowError(`Passed param(s) 'url = undefined' is not valid`);
+  });
+
+  it('CLEAR_URL_PARAMS clear all url param', () => {
+    const clearedUrl = UrlUtils.clearUrlParams('http://localhost:8080/api/v1/products?page=0&size=3');
+
+    expect(clearedUrl).toBeDefined();
+    expect(clearedUrl).toEqual('http://localhost:8080/api/v1/products');
+  });
+
 });

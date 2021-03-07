@@ -128,6 +128,19 @@ export class UrlUtils {
   }
 
   /**
+   * Clear all url params.
+   *
+   * @param url to clear params
+   * @throws error when required params are not valid
+   */
+  public static clearUrlParams(url: string): string {
+    ValidationUtils.validateInputParams({url});
+    const srcUrl = new URL(url);
+
+    return srcUrl.origin + srcUrl.pathname;
+  }
+
+  /**
    * Fill url template params.
    *
    * @param url to be filled

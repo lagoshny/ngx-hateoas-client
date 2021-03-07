@@ -181,8 +181,8 @@ type NonResourcePropertyType<T> = {
 }[keyof T];
 
 /**
- * Type that allowed represent resource as resource projection excluding {@link Resource},
+ * Type that allowed represent resource relations as resource projection excluding {@link Resource},
  * {@link EmbeddedResource} props and methods from current type.
  */
-export type ResourceProjection<T extends BaseResource> =
+export type ProjectionRelType<T extends BaseResource> =
   Pick<T, Exclude<keyof T, keyof Resource | keyof EmbeddedResource> & NonResourcePropertyType<T>>;

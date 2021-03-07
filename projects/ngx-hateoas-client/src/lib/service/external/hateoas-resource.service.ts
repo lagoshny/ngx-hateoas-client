@@ -42,7 +42,7 @@ export class HateoasResourceService {
   public getResource<T extends Resource>(resourceType: new () => T, id: number | string, options?: GetOption): Observable<T> {
     ValidationUtils.validateInputParams({resourceType, id});
     const resourceName = resourceType['__resourceName__'];
-    ResourceUtils.fillProjectionNameFromResourceType(resourceType, options);
+    options = ResourceUtils.fillProjectionNameFromResourceType(resourceType, options);
     StageLogger.resourceBeginLog(resourceName, 'ResourceService GET_RESOURCE', {id, options});
 
     return this.resourceHttpService.getResource<T>(resourceName, id, options)
@@ -62,7 +62,7 @@ export class HateoasResourceService {
   public getCollection<T extends Resource>(resourceType: new () => T, options?: GetOption): Observable<ResourceCollection<T>> {
     ValidationUtils.validateInputParams({resourceType});
     const resourceName = resourceType['__resourceName__'];
-    ResourceUtils.fillProjectionNameFromResourceType(resourceType, options);
+    options = ResourceUtils.fillProjectionNameFromResourceType(resourceType, options);
     StageLogger.resourceBeginLog(resourceName, 'ResourceService GET_COLLECTION', {options});
 
     return this.resourceCollectionHttpService.getResourceCollection<ResourceCollection<T>>(resourceName, options)
@@ -82,7 +82,7 @@ export class HateoasResourceService {
   public getPage<T extends Resource>(resourceType: new () => T, options?: PagedGetOption): Observable<PagedResourceCollection<T>> {
     ValidationUtils.validateInputParams({resourceType});
     const resourceName = resourceType['__resourceName__'];
-    ResourceUtils.fillProjectionNameFromResourceType(resourceType, options);
+    options = ResourceUtils.fillProjectionNameFromResourceType(resourceType, options);
     StageLogger.resourceBeginLog(resourceName, 'ResourceService GET_PAGE', {options});
 
     return this.pagedResourceCollectionHttpService.getResourcePage<PagedResourceCollection<T>>(resourceName, options)
@@ -266,7 +266,7 @@ export class HateoasResourceService {
                                               options?: GetOption): Observable<ResourceCollection<T>> {
     ValidationUtils.validateInputParams({resourceType, searchQuery});
     const resourceName = resourceType['__resourceName__'];
-    ResourceUtils.fillProjectionNameFromResourceType(resourceType, options);
+    options = ResourceUtils.fillProjectionNameFromResourceType(resourceType, options);
     StageLogger.resourceBeginLog(resourceName, 'ResourceService SEARCH_COLLECTION', {query: searchQuery, options});
 
     return this.resourceCollectionHttpService.search<ResourceCollection<T>>(resourceName, searchQuery, options)
@@ -284,7 +284,7 @@ export class HateoasResourceService {
                                         options?: PagedGetOption): Observable<PagedResourceCollection<T>> {
     ValidationUtils.validateInputParams({resourceType, searchQuery});
     const resourceName = resourceType['__resourceName__'];
-    ResourceUtils.fillProjectionNameFromResourceType(resourceType, options);
+    options = ResourceUtils.fillProjectionNameFromResourceType(resourceType, options);
     StageLogger.resourceBeginLog(resourceName, 'ResourceService SEARCH_PAGE', {query: searchQuery, options});
 
     return this.pagedResourceCollectionHttpService.search<PagedResourceCollection<T>>(resourceName, searchQuery, options)
@@ -300,7 +300,7 @@ export class HateoasResourceService {
   public searchResource<T extends Resource>(resourceType: new () => T, searchQuery: string, options?: GetOption): Observable<T> {
     ValidationUtils.validateInputParams({resourceType, searchQuery});
     const resourceName = resourceType['__resourceName__'];
-    ResourceUtils.fillProjectionNameFromResourceType(resourceType, options);
+    options = ResourceUtils.fillProjectionNameFromResourceType(resourceType, options);
     StageLogger.resourceBeginLog(resourceName, 'ResourceService SEARCH_SINGLE', {query: searchQuery, options});
 
     return this.resourceHttpService.search<T>(resourceName, searchQuery, options)
@@ -320,7 +320,7 @@ export class HateoasResourceService {
                         options?: PagedGetOption): Observable<R> {
     ValidationUtils.validateInputParams({resourceType, method, query});
     const resourceName = resourceType['__resourceName__'];
-    ResourceUtils.fillProjectionNameFromResourceType(resourceType, options);
+    options = ResourceUtils.fillProjectionNameFromResourceType(resourceType, options);
     StageLogger.resourceBeginLog(resourceName, 'ResourceService CUSTOM_QUERY', {
       method: HttpMethod,
       query,
@@ -350,7 +350,7 @@ export class HateoasResourceService {
                               options?: PagedGetOption): Observable<R> {
     ValidationUtils.validateInputParams({resourceType, method, searchQuery});
     const resourceName = resourceType['__resourceName__'];
-    ResourceUtils.fillProjectionNameFromResourceType(resourceType, options);
+    options = ResourceUtils.fillProjectionNameFromResourceType(resourceType, options);
     StageLogger.resourceBeginLog(resourceName, 'ResourceService CUSTOM_SEARCH_QUERY', {
       method: HttpMethod,
       searchQuery,

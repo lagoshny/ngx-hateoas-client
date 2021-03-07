@@ -8,7 +8,7 @@ import { EmbeddedResource } from '../model/resource/embedded-resource';
 import { UrlUtils } from './url.utils';
 import { Stage } from '../logger/stage.enum';
 import { StageLogger } from '../logger/stage-logger';
-import { isArray, isEmpty, isNil, isObject } from 'lodash-es';
+import { isArray, isEmpty, isNil, isObject, isPlainObject } from 'lodash-es';
 import { ConsoleLogger } from '../logger/console-logger';
 
 /* tslint:disable:no-string-literal */
@@ -57,6 +57,9 @@ export class ResourceUtils {
 
   private static resolvePayloadProperties<T extends BaseResource>(payload: object): object {
     for (const key of Object.keys(payload)) {
+      if (key === 'hibernateLazyInitializer') {
+        continue;
+      }
       if (key === '_links') {
         payload[key] = payload[key];
         continue;
@@ -107,7 +110,7 @@ export class ResourceUtils {
       return Object.assign(new (relationClass)() as T, payload);
     } else {
       ConsoleLogger.prettyWarn('Not found resource relation type when create relation: \'' + relationName + '\' so used default Resource type, for this can be some reasons: \n\r' +
-        'You did not pass relation type property with @HateoasProjectionRelation decorator on relation property \'' + relationName + '\'. \n\r' +
+        'You did not pass relation type property with @ProjectionRel decorator on relation property \'' + relationName + '\'. \n\r' +
         '\n\rPlease check it to to fix this issue.');
 
       return Object.assign(new this.resourceType(), payload);
@@ -203,7 +206,7 @@ export class ResourceUtils {
         });
       } else if (isResource(body[key])) {
         result[key] = body[key]._links?.self?.href;
-      } else if (isObject(body[key])) {
+      } else if (isPlainObject(body[key])) {
         result[key] = this.resolveValues({body: body[key], valuesOption: requestBody?.valuesOption});
       } else {
         result[key] = body[key];
@@ -250,7 +253,10 @@ export class ResourceUtils {
     if (projectionName) {
       options = {
         ...options,
-        params: {projection: projectionName}
+        params: {
+          ...options.params,
+          projection: projectionName
+        }
       };
     }
 

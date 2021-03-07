@@ -43,6 +43,13 @@ export class HateoasResourceService {
     ValidationUtils.validateInputParams({resourceType, id});
     const resourceName = resourceType['__resourceName__'];
     StageLogger.resourceBeginLog(resourceName, 'ResourceService GET_RESOURCE', {id, options});
+    const projectionName = resourceType['__projectionName__'];
+    if (projectionName) {
+      options = {
+        ...options,
+        params: {projection: projectionName}
+      };
+    }
 
     return this.resourceHttpService.getResource<T>(resourceName, id, options)
       .pipe(tap(() => {

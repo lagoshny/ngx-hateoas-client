@@ -15,6 +15,7 @@ import { ConsoleLogger } from '../logger/console-logger';
 export class ResourceUtils {
 
   public static RESOURCE_NAME_TYPE_MAP: Map<string, any> = new Map<string, any>();
+  public static RESOURCE_PROJECTION_REL_NAME_TYPE_MAP: Map<string, any> = new Map<string, any>();
   public static EMBEDDED_RESOURCE_TYPE_MAP: Map<string, any> = new Map<string, any>();
 
   private static resourceType: new() => BaseResource;
@@ -50,23 +51,39 @@ export class ResourceUtils {
       ConsoleLogger.warn('Incorrect resource object! Returned \'null\' value, because it has not \'_links\' array. Check that server send right resource object.', {incorrectResource: payload});
       return null;
     }
+
+    return this.createResource(this.resolvePayloadProperties(payload));
+  }
+
+  private static resolvePayloadProperties<T extends BaseResource>(payload: object): object {
     for (const key of Object.keys(payload)) {
-      if (isArray(payload[key])) {
-        for (let i = 0; i < payload[key].length; i++) {
-          if (isEmbeddedResource(payload[key][i])) {
-            payload[key][i] = this.createEmbeddedResource(key, payload[key][i]);
-          } else if (isResource(payload[key][i])) {
-            payload[key][i] = this.createResource(payload[key][i]);
-          }
-        }
-      } else if (isEmbeddedResource(payload[key])) {
-        payload[key] = this.createEmbeddedResource(key, payload[key]);
-      } else if (isResource(payload[key])) {
-        payload[key] = this.createResource(payload[key]);
+      if (key === '_links') {
+        payload[key] = payload[key];
+        continue;
       }
+      payload[key] = this.resolvePayloadType(key, payload[key]);
     }
 
-    return this.createResource(payload);
+    return payload;
+  }
+
+  private static resolvePayloadType<T extends BaseResource>(key: string, payload: object): object {
+    if (isArray(payload)) {
+      for (let i = 0; i < payload.length; i++) {
+        payload[i] = this.resolvePayloadType(key, payload[i]);
+      }
+    } else if (isEmbeddedResource(payload)) {
+      // Need to check embedded resource props because some inner props can be objects that can be also resources
+      payload = this.resolvePayloadProperties(this.createEmbeddedResource(key, payload));
+    } else if (isResource(payload)) {
+      // Need to check resource props because some inner props can be objects that can be also resources
+      payload = this.resolvePayloadProperties(this.createResource(payload));
+    } else if (isObject(payload)) {
+      // Need to check resource relation props because some inner props can be objects that can be also resources
+      payload = this.resolvePayloadProperties(this.createResourceRelation(key, payload));
+    }
+
+    return payload;
   }
 
   private static createResource<T extends BaseResource>(payload: any): T {
@@ -79,6 +96,19 @@ export class ResourceUtils {
         '1) You did not pass resource property name as \'' + resourceName + '\' with @HateoasResource decorator. \n\r' +
         '2) You did not declare resource type in configuration "configuration.useTypes.resources". \n\r' +
         '\n\r Please check both points to to fix this issue.');
+
+      return Object.assign(new this.resourceType(), payload);
+    }
+  }
+
+  private static createResourceRelation<T extends Resource>(relationName: string, payload: any): T {
+    const relationClass = ResourceUtils.RESOURCE_PROJECTION_REL_NAME_TYPE_MAP.get(relationName);
+    if (relationClass) {
+      return Object.assign(new (relationClass)() as T, payload);
+    } else {
+      ConsoleLogger.prettyWarn('Not found resource relation type when create relation: \'' + relationName + '\' so used default Resource type, for this can be some reasons: \n\r' +
+        'You did not pass relation type property with @HateoasProjectionRelation decorator on relation property \'' + relationName + '\'. \n\r' +
+        '\n\rPlease check it to to fix this issue.');
 
       return Object.assign(new this.resourceType(), payload);
     }
@@ -211,13 +241,8 @@ export class ResourceUtils {
     if (isEmpty(resourceLinks) || isEmpty(resourceLinks.self) || isNil(resourceLinks.self.href)) {
       return undefined;
     }
-    const selfLinkHref = resourceLinks.self.href;
 
-    for (const linkKey of Object.keys(resourceLinks)) {
-      if (linkKey === 'self' && UrlUtils.removeTemplateParams(resourceLinks[linkKey].href) === selfLinkHref) {
-        return UrlUtils.getResourceNameFromUrl(resourceLinks[linkKey].href);
-      }
-    }
+    return UrlUtils.getResourceNameFromUrl(UrlUtils.removeTemplateParams(resourceLinks.self.href));
   }
 
 }

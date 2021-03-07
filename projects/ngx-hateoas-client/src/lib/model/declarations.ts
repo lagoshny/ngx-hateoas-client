@@ -1,4 +1,6 @@
 import { Resource } from './resource/resource';
+import { BaseResource } from './resource/base-resource';
+import { EmbeddedResource } from './resource/embedded-resource';
 
 /**
  * Resource link object.
@@ -173,3 +175,14 @@ export interface RequestBody<T> {
 export enum HttpMethod {
   GET = 'GET', POST = 'POST', PUT = 'PUT', PATCH = 'PATCH'
 }
+
+type NonResourcePropertyType<T> = {
+  [K in keyof T]: T[K] extends BaseResource ? never : K;
+}[keyof T];
+
+/**
+ * Type that allowed represent resource as resource projection excluding {@link Resource},
+ * {@link EmbeddedResource} props and methods from current type.
+ */
+export type ResourceProjection<T extends BaseResource> =
+  Pick<T, Exclude<keyof T, keyof Resource | keyof EmbeddedResource> & NonResourcePropertyType<T>>;

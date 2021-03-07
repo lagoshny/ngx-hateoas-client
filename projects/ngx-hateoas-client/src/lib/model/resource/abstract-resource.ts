@@ -18,7 +18,7 @@ export abstract class AbstractResource {
    * @param relationName used to get the specific resource relation link
    * @throws error if no link is found by passed relation name
    */
-  public getRelationLink(relationName: string): LinkData {
+  protected getRelationLink(relationName: string): LinkData {
     if (isEmpty(this._links)) {
       throw new Error(`Resource '${ this.constructor.name }' relation links are empty, can not to get relation with the name '${ relationName }'.`);
     }

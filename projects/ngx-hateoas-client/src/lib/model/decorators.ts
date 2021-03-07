@@ -3,7 +3,6 @@ import { ResourceUtils } from '../util/resource.utils';
 import { isArray, isEmpty, isNull, isUndefined } from 'lodash-es';
 import { Resource } from './resource/resource';
 import { EmbeddedResource } from './resource/embedded-resource';
-import { ResourceProjection } from './declarations';
 import { BaseResource } from './resource/base-resource';
 
 /**
@@ -51,6 +50,12 @@ export function HateoasEmbeddedResource(resourcePropertiesNames: Array<string>) 
   };
 }
 
+/**
+ * Decorator used to create a projection representation of {@link Resource} heirs.
+ *
+ * @param resourceType type of resource that using for projection.
+ * @param projectionName name of projection, will be used as projection request param.
+ */
 export function HateoasProjectionResource(resourceType: new() => Resource, projectionName: string) {
   return <T extends new(...args: any[]) => any>(constructor: T) => {
     if (isNull(resourceType) || isUndefined(resourceType)) {
@@ -70,6 +75,12 @@ export function HateoasProjectionResource(resourceType: new() => Resource, proje
   };
 }
 
+/**
+ * Decorator used to mark projection class properties that are resources.
+ * This decorator used with class marked as {@link HateoasProjectionResource}.
+ *
+ * @param relationType resource relation type that will be used to create resource with this type when parsed server response.
+ */
 export function HateoasProjectionRelation(relationType: new() => BaseResource) {
   return (target: object, propertyKey: string) => {
     if (isNull(relationType) || isUndefined(relationType)) {

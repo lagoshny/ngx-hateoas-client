@@ -2,7 +2,7 @@ import { BaseResource } from '../model/resource/base-resource';
 import { isEmbeddedResource, isResource } from '../model/resource-type';
 import { ResourceCollection } from '../model/resource/resource-collection';
 import { PagedResourceCollection } from '../model/resource/paged-resource-collection';
-import { Include, Link, PageData, RequestBody } from '../model/declarations';
+import { GetOption, Include, Link, PageData, RequestBody } from '../model/declarations';
 import { Resource } from '../model/resource/resource';
 import { EmbeddedResource } from '../model/resource/embedded-resource';
 import { UrlUtils } from './url.utils';
@@ -243,6 +243,18 @@ export class ResourceUtils {
     }
 
     return UrlUtils.getResourceNameFromUrl(UrlUtils.removeTemplateParams(resourceLinks.self.href));
+  }
+
+  public static fillProjectionNameFromResourceType<T extends Resource>(resourceType: new () => T, options?: GetOption) {
+    const projectionName = resourceType['__projectionName__'];
+    if (projectionName) {
+      options = {
+        ...options,
+        params: {projection: projectionName}
+      };
+    }
+
+    return options;
   }
 
 }

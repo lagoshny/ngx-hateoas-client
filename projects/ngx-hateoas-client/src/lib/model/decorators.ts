@@ -76,16 +76,6 @@ export function HateoasProjectionRelation(relationType: new() => BaseResource) {
       throw new Error(`Init resource projection '${ target.constructor.name }' relation type error. @HateoasProjectionRelation decorator param relationType can not be null/undefined, please pass a valid relationType.`);
     }
 
-    // const copiedClass = Object.create(relationType.prototype).constructor;
-    // Object.setPrototypeOf(copiedClass, null);
-    // const projectionName = target.constructor['__projectionName__'];
-    // console.log(projectionName);
-    // ResourceUtils.RESOURCE_PROJECTION_REL_NAME_TYPE_MAP.set(propertyKey, copiedClass);
-
-    // const copiedClass = class extends relationType {
-    // };
-    // Object.setPrototypeOf(Object.getPrototypeOf(copiedClass), null);
-
     ResourceUtils.RESOURCE_PROJECTION_REL_NAME_TYPE_MAP.set(propertyKey, relationType);
   };
 }

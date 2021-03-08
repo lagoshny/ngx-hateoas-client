@@ -58,6 +58,7 @@ export class ResourceUtils {
   private static resolvePayloadProperties<T extends BaseResource>(payload: object): object {
     for (const key of Object.keys(payload)) {
       if (key === 'hibernateLazyInitializer') {
+        delete payload[key];
         continue;
       }
       if (key === '_links') {
@@ -82,8 +83,8 @@ export class ResourceUtils {
       // Need to check resource props because some inner props can be objects that can be also resources
       payload = this.resolvePayloadProperties(this.createResource(payload));
     } else if (isObject(payload)) {
-      // Need to check resource relation props because some inner props can be objects that can be also resources
-      payload = this.resolvePayloadProperties(this.createResourceRelation(key, payload));
+      // Need to check resource projection relation props because some inner props can be objects that can be also resources
+      payload = this.resolvePayloadProperties(this.createResourceProjectionRel(key, payload));
     }
 
     return payload;
@@ -104,7 +105,7 @@ export class ResourceUtils {
     }
   }
 
-  private static createResourceRelation<T extends Resource>(relationName: string, payload: any): T {
+  private static createResourceProjectionRel<T extends Resource>(relationName: string, payload: any): T {
     const relationClass = ResourceUtils.RESOURCE_PROJECTION_REL_NAME_TYPE_MAP.get(relationName);
     if (relationClass) {
       return Object.assign(new (relationClass)() as T, payload);
@@ -208,7 +209,8 @@ export class ResourceUtils {
         result[key] = body[key]._links?.self?.href;
       } else if (isPlainObject(body[key])) {
         result[key] = this.resolveValues({body: body[key], valuesOption: requestBody?.valuesOption});
-      } else {
+      }
+      else {
         result[key] = body[key];
       }
     }
@@ -248,7 +250,16 @@ export class ResourceUtils {
     return UrlUtils.getResourceNameFromUrl(UrlUtils.removeTemplateParams(resourceLinks.self.href));
   }
 
+  /**
+   * Try to get projectionName from resource type and set it to options. If resourceType has not projectionName then return options as is.
+   *
+   * @param resourceType from get projectionName
+   * @param options to set projectionName
+   */
   public static fillProjectionNameFromResourceType<T extends Resource>(resourceType: new () => T, options?: GetOption) {
+    if (!resourceType) {
+      return;
+    }
     const projectionName = resourceType['__projectionName__'];
     if (projectionName) {
       options = {

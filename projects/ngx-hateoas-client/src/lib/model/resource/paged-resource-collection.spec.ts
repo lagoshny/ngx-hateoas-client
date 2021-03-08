@@ -7,6 +7,7 @@ import { PagedResourceCollectionHttpService } from '../../service/internal/paged
 import { DependencyInjector } from '../../util/dependency-injector';
 import { of } from 'rxjs';
 import { ResourceCollection } from './resource-collection';
+import { PagedGetOption } from '../declarations';
 
 describe('PagedResourceCollection', () => {
 
@@ -114,16 +115,20 @@ describe('PagedResourceCollection', () => {
     const pagedResourceCollection = new PagedResourceCollection(new SimpleResourceCollection(), pageDataWithLinks);
     pagedResourceCollection.customPage({pageParams: {page: 2, size: 8}, sort: {first: 'ASC', second: 'DESC'}})
       .subscribe(() => {
-        const httpParams = pagedResourceCollectionHttpServiceSpy.get.calls.argsFor(0)[1].params;
-        expect(httpParams.has('page')).toBeTrue();
-        expect(httpParams.get('page')).toBe('2');
+        const options: PagedGetOption = pagedResourceCollectionHttpServiceSpy.get.calls.argsFor(0)[1];
+        expect(options).toBeDefined();
+        expect(options.pageParams).toBeDefined();
+        expect(options.pageParams.page).toBeDefined();
+        expect(options.pageParams.page).toEqual(2);
 
-        expect(httpParams.has('sort')).toBeTrue();
-        expect(httpParams.getAll('sort')[0]).toBe('first,ASC');
-        expect(httpParams.getAll('sort')[1]).toBe('second,DESC');
+        expect(options.pageParams.size).toBeDefined();
+        expect(options.pageParams.size).toEqual(8);
 
-        expect(httpParams.has('size')).toBeTrue();
-        expect(httpParams.get('size')).toBe('8');
+        expect(options.sort).toBeDefined();
+        expect(options.sort.first).toBeDefined();
+        expect(options.sort.first).toEqual('ASC');
+        expect(options.sort.second).toBeDefined();
+        expect(options.sort.second).toEqual('DESC');
       });
   });
 

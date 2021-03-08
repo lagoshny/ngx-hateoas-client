@@ -52,7 +52,7 @@ export interface HateoasConfiguration {
   /**
    * Declared resource/embedded resource types that will be used to create resources from server response that contains resources.
    */
-  useTypes: {
+  useTypes?: {
     resources: Array<new (...args: any[]) => Resource>;
     embeddedResources?: Array<new (...args: any[]) => EmbeddedResource>;
   };

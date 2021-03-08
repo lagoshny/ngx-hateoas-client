@@ -26,6 +26,11 @@ export function isResourceObject(object: any) {
   return isObject(object) && ('_links' in object);
 }
 
+/**
+ * Defining resource type bypassed object.
+ *
+ * @param object that presumably is one of resource type
+ */
 export function getResourceType(object: any): string {
   if (isEmbeddedResource(object)) {
     return 'EmbeddedResource';

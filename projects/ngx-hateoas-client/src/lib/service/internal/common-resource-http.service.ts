@@ -75,12 +75,13 @@ export class CommonResourceHttpService extends HttpExecutor {
 
     return result.pipe(
       map(data => {
+        const isProjection = httpParams.has('projection');
         if (isPagedResourceCollection(data)) {
-          return ResourceUtils.instantiatePagedResourceCollection(data);
+          return ResourceUtils.instantiatePagedResourceCollection(data, isProjection);
         } else if (isResourceCollection(data)) {
-          return ResourceUtils.instantiateResourceCollection(data);
+          return ResourceUtils.instantiateResourceCollection(data, isProjection);
         } else if (isResource(data)) {
-          return ResourceUtils.instantiateResource(data);
+          return ResourceUtils.instantiateResource(data, isProjection);
         } else {
           return data;
         }

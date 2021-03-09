@@ -59,7 +59,7 @@ export class ResourceHttpService extends HttpExecutor {
             throw new Error(errMsg);
           }
 
-          return ResourceUtils.instantiateResource(data) as T;
+          return ResourceUtils.instantiateResource(data, httpOptions.params.has('projection')) as T;
         }),
         catchError(error => observableThrowError(error)));
   }

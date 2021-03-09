@@ -57,7 +57,7 @@ export class PagedResourceCollectionHttpService extends HttpExecutor {
             throw new Error(errMsg);
           }
 
-          return ResourceUtils.instantiatePagedResourceCollection(data) as T;
+          return ResourceUtils.instantiatePagedResourceCollection(data, httpOptions.params.has('projection')) as T;
         }),
         catchError(error => observableThrowError(error)));
   }

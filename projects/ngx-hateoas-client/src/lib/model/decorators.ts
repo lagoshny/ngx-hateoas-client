@@ -28,24 +28,24 @@ export function HateoasResource(resourceName: string) {
 }
 
 /**
- * Decorator used to classes that extend {@link EmbeddedResource} class to register 'resourcePropertiesNames' and 'resourceType'
+ * Decorator used to classes that extend {@link EmbeddedResource} class to register 'relationNames' and 'resourceType'
  * information about this resource.
  *
- * @param resourcePropertiesNames names of the properties that using to hold this embedded resource in resource objects.
+ * @param relationNames names of the properties that using to hold this embedded resource in resource objects.
  */
-export function HateoasEmbeddedResource(resourcePropertiesNames: Array<string>) {
+export function HateoasEmbeddedResource(relationNames: Array<string>) {
   return <T extends new(...args: any[]) => any>(constructor: T) => {
-    if (isNull(resourcePropertiesNames)
-      || isUndefined(resourcePropertiesNames)
-      || (isArray(resourcePropertiesNames) && isEmpty(resourcePropertiesNames))) {
-      throw new Error(`Init resource '${ constructor.name }' error. @HateoasEmbeddedResource decorator param resourcePropertiesNames can not be null/undefined/empty, please pass a valid resourcePropertiesNames.`);
+    if (isNull(relationNames)
+      || isUndefined(relationNames)
+      || (isArray(relationNames) && isEmpty(relationNames))) {
+      throw new Error(`Init resource '${ constructor.name }' error. @HateoasEmbeddedResource decorator param relationNames can not be null/undefined/empty, please pass a valid relationNames.`);
     }
 
     if (!isInstanceOfParent(constructor, EmbeddedResource)) {
       throw new Error(`Init resource '${ constructor.name }' error. @HateoasEmbeddedResource decorator applied only to 'EmbeddedResource' type, you used it with ${ Object.getPrototypeOf(constructor) } type.`);
     }
-    resourcePropertiesNames.forEach(resourceName => {
-      ResourceUtils.EMBEDDED_RESOURCE_TYPE_MAP.set(resourceName, constructor);
+    relationNames.forEach(relationName => {
+      ResourceUtils.EMBEDDED_RESOURCE_TYPE_MAP.set(relationName, constructor);
     });
   };
 }
@@ -70,6 +70,7 @@ export function HateoasProjection(resourceType: new() => Resource, projectionNam
     }
     constructor['__resourceName__'] = resourceType['__resourceName__'];
     constructor['__projectionName__'] = projectionName;
+    ResourceUtils.RESOURCE_NAME_PROJECTION_TYPE_MAP.set(resourceType['__resourceName__'], constructor);
 
     return constructor;
   };

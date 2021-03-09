@@ -32,6 +32,7 @@ Why you may need does it see in the [motivation](#motivation) section.
       - [DeleteRelation](#DeleteRelation-changes)
       - [PostRelation](#PostRelation-changes)
       - [PatchRelation](#PatchRelation-changes)
+   - [EmbeddedResource](#embeddedresource-changes)
    - [ResourcePage](#ResourcePage-changes)
       - [SortElements](#SortElements-changes)     
    - [Other classes](#Other-classes)
@@ -54,8 +55,9 @@ Some new features:
 - A simplified configuration: now you inject configuration service and pass configuration as JS object 
   instead of create a standalone configuration class with configuration interface implementation. See more in [configuration](https://github.com/lagoshny/ngx-hateoas-client#Configuration).
 - Added ability to debug library with [logging feature](https://github.com/lagoshny/ngx-hateoas-client#Logging).
-- Changed [support for subtypes](https://github.com/lagoshny/ngx-hateoas-client#Subtypes-support) now is not need pass subtypes object to method param because each [Resource](https://github.com/lagoshny/ngx-hateoas-client#resource) class has a `resourceName` property and [isResourceOf](https://github.com/lagoshny/ngx-hateoas-client#isresourceof) method to check resource type.
+- Changed [support for subtypes](https://github.com/lagoshny/ngx-hateoas-client#Subtypes-support) now is not need to pass subtypes object to method param because each [Resource](https://github.com/lagoshny/ngx-hateoas-client#resource) class has own resource type.
 - Added [HateoasResourceService](https://github.com/lagoshny/ngx-hateoas-client#built-in-hateoasresourceservice) is standalone generic resource service, only need to set generic param to resource type and use it without create a resource service class. 
+- Added support for [resource projection](https://github.com/lagoshny/ngx-hateoas-client#built-in-hateoasresourceservice#resource-projection-support)
 - Added more than 400 tests.
 - Added [documentation](https://github.com/lagoshny/ngx-hateoas-client#contents) describing all library features.
 - And much more.
@@ -75,13 +77,15 @@ Some new features:
 
 - Now need change class imports from `@lagoshny/ngx-hal-client` to `@lagoshny/ngx-hateoas-client`. 
 
-  Use `replaceAll` command with a code editor.
+  To do it you can use `replaceAll` command with a code editor.
 
 - Do all `RestService` changes described [below](#RestService).
 
   >Find info about methods param changes in this [section](#Other-classes).  
   
 - Do all `Resource` changes described [below](#Resource).
+  
+- Do all `EmbeddedResource` changes described [below](#Resource).
 
   >Find info about methods param changes in this [section](#Other-classes).
 
@@ -111,7 +115,7 @@ Class `RestService` renamed to `HateoasResourceOperation`.
 ### Common changes
 The next common changes was in `RestService` (now is `HateoasResourceOperation` class):
 
-- Deleted constructor params: `injector` and `type`, now only `resourceName` param.
+- Deleted constructor params: `injector` and `resourceName`, now only `type` param.
 - Deleted page methods:  `totalElement`, `totalPages`, `hasFirst`, `hasNext`, `hasPrev`, `hasLast`, `next`, `prev`, `first`, `last`, `page`. See [PagedResourceCollection](https://github.com/lagoshny/ngx-hateoas-client#PagedResourceCollection) to use these methods. 
 - Deleted `getByRelation` and `getByRelationArray` use [getRelation](https://github.com/lagoshny/ngx-hateoas-client#GetRelation) and [getRelatedCollection](https://github.com/lagoshny/ngx-hateoas-client#GetRelatedCollection) from [Resource](https://github.com/lagoshny/ngx-hateoas-client#Resource) class instead.
 - Deleted `customQueryPost` use [customQuery](https://github.com/lagoshny/ngx-hateoas-client#CustomQuery) instead.
@@ -320,6 +324,23 @@ Deleted `handleError` method, if you need, define the same method in your projec
 ## Resource
 This section contains `Resource` class changes.
 
+Now each `Resource` class should have a `@HateasoResource` decorator that accepts `resourceName` param. You cas see more about this [here](https://github.com/lagoshny/ngx-hateoas-client#hateoasresource)
+
+Was: 
+```ts
+export class Product extends Resource {
+  ...
+}
+
+```
+Now:
+```ts
+@HateoasResource('products')
+export class Product extends Resource {
+  ...
+}
+```
+
 ### GetRelation changes
 `getRelation` method signature changes:
 
@@ -400,6 +421,13 @@ Renamed `substituteRelation` to `bindRelation` and some method changes:
 
 > See more about `DeleteRelation` method [here](https://github.com/lagoshny/ngx-hateoas-client#DeleteRelation). 
 
+### ClearCollectionRelation changes
+Renamed `clearCollectionRelation` to `unbindCollectionRelation` and some method changes:
+
+- Renamed `relation` param to `relationName`.
+
+> See more about `unbindCollectionRelation` method [here](https://github.com/lagoshny/ngx-hateoas-client##unbindcollectionrelation).
+
 ### PostRelation changes
 `postRelation` changed method signature:
 
@@ -437,6 +465,37 @@ patchRelation(relationName: string, requestBody: RequestBody<any>, options?: Req
 
 > See more about `PatchRelation` method [here](https://github.com/lagoshny/ngx-hateoas-client#PatchRelation). 
 
+
+## EmbeddedResource changes
+
+Now each `EmbeddedResource` class should have a `@HateasoEmbeddedResource` decorator that accepts `relationNames` param. You cas see more about this [here](https://github.com/lagoshny/ngx-hateoas-client#hateoasembeddedresource)
+
+Was:
+```ts
+export class Client extends Resource {
+  ...
+  public clientAddress: Address;
+  ...
+}
+
+export class Address extends EmbeddedResource {
+  ...
+}
+```
+Now:
+```ts
+@HateoasResource('clients')
+export class Client extends Resource {
+...
+  public clientAddress: Address;
+...
+}
+
+@HateoasEmbeddedResource(['clientAddress'])
+export class Address extends EmbeddedResource {
+  ...
+}
+```
 
 ## ResourcePage changes
 

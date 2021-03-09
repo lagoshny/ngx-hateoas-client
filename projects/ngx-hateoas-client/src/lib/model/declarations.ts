@@ -47,7 +47,6 @@ export interface PagedGetOption extends GetOption {
 export interface GetOption {
   params?: {
     [paramName: string]: Resource | string | number | boolean;
-    projection?: string;
   };
   /**
    * Sorting options.

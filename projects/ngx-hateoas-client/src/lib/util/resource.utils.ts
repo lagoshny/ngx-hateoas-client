@@ -73,7 +73,9 @@ export class ResourceUtils {
   }
 
   private static resolvePayloadType<T extends BaseResource>(key: string, payload: object, isProjection?: boolean): object {
-    if (isArray(payload)) {
+    if (isNil(payload)) {
+      return payload;
+    } else if (isArray(payload)) {
       for (let i = 0; i < payload.length; i++) {
         payload[i] = this.resolvePayloadType(key, payload[i], isProjection);
       }

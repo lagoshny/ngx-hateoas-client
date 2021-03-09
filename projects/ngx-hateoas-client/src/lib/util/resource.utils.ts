@@ -80,7 +80,7 @@ export class ResourceUtils {
     } else if (isProjection && isPlainObject(payload)) {
       // Need to check resource projection relation props because some inner props can be objects that can be also resources
       payload = this.resolvePayloadProperties(this.createResourceProjectionRel(key, payload), isProjection);
-    } else if (isEmbeddedResource(payload)) {
+    } else if (isEmbeddedResource(payload) || ResourceUtils.EMBEDDED_RESOURCE_TYPE_MAP.get(key)) {
       // Need to check embedded resource props because some inner props can be objects that can be also resources
       payload = this.resolvePayloadProperties(this.createEmbeddedResource(key, payload), isProjection);
     } else if (isResource(payload)) {

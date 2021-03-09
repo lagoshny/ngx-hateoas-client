@@ -19,6 +19,12 @@ export class LibConfig {
     useTypes: {
       resources: []
     },
+    pagination: {
+      defaultPage: {
+        size: 20,
+        page: 0
+      }
+    },
     isProduction: false
   };
 

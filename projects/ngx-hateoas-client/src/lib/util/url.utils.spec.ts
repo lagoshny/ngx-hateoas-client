@@ -326,8 +326,8 @@ describe('UrlUtils', () => {
 
     expect(pagedOptions).toBeDefined();
     expect(pagedOptions.pageParams).toBeDefined();
-    expect(pagedOptions.pageParams.page).toBe(UrlUtils.DEFAULT_PAGE.page);
-    expect(pagedOptions.pageParams.size).toBe(UrlUtils.DEFAULT_PAGE.size);
+    expect(pagedOptions.pageParams.page).toBe(LibConfig.config.pagination.defaultPage.page);
+    expect(pagedOptions.pageParams.size).toBe(LibConfig.config.pagination.defaultPage.size);
   });
 
   it('FILL_DEFAULT_PAGE_DATA_IF_NO_PRESENT fill all default values when passed options are \'undefined\'', () => {
@@ -335,8 +335,8 @@ describe('UrlUtils', () => {
 
     expect(pagedOptions).toBeDefined();
     expect(pagedOptions.pageParams).toBeDefined();
-    expect(pagedOptions.pageParams.page).toBe(UrlUtils.DEFAULT_PAGE.page);
-    expect(pagedOptions.pageParams.size).toBe(UrlUtils.DEFAULT_PAGE.size);
+    expect(pagedOptions.pageParams.page).toBe(LibConfig.config.pagination.defaultPage.page);
+    expect(pagedOptions.pageParams.size).toBe(LibConfig.config.pagination.defaultPage.size);
   });
 
   it('FILL_DEFAULT_PAGE_DATA_IF_NO_PRESENT fill all default values when passed options are \'empty object\'', () => {
@@ -344,8 +344,8 @@ describe('UrlUtils', () => {
 
     expect(pagedOptions).toBeDefined();
     expect(pagedOptions.pageParams).toBeDefined();
-    expect(pagedOptions.pageParams.page).toBe(UrlUtils.DEFAULT_PAGE.page);
-    expect(pagedOptions.pageParams.size).toBe(UrlUtils.DEFAULT_PAGE.size);
+    expect(pagedOptions.pageParams.page).toBe(LibConfig.config.pagination.defaultPage.page);
+    expect(pagedOptions.pageParams.size).toBe(LibConfig.config.pagination.defaultPage.size);
   });
 
   it('FILL_DEFAULT_PAGE_DATA_IF_NO_PRESENT fill page default value when passed options have not it', () => {
@@ -353,7 +353,7 @@ describe('UrlUtils', () => {
 
     expect(pagedOptions).toBeDefined();
     expect(pagedOptions.pageParams).toBeDefined();
-    expect(pagedOptions.pageParams.page).toBe(UrlUtils.DEFAULT_PAGE.page);
+    expect(pagedOptions.pageParams.page).toBe(LibConfig.config.pagination.defaultPage.page);
     expect(pagedOptions.pageParams.size).toBe(40);
   });
 
@@ -363,7 +363,7 @@ describe('UrlUtils', () => {
     expect(pagedOptions).toBeDefined();
     expect(pagedOptions.pageParams).toBeDefined();
     expect(pagedOptions.pageParams.page).toBe(4);
-    expect(pagedOptions.pageParams.size).toBe(UrlUtils.DEFAULT_PAGE.size);
+    expect(pagedOptions.pageParams.size).toBe(LibConfig.config.pagination.defaultPage.size);
   });
 
   it('CLEAR_URL_PARAMS should throw error when url is empty', () => {

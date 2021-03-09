@@ -62,4 +62,15 @@ export interface HateoasConfiguration {
    */
   isProduction?: boolean;
 
+
+  /**
+   * Let to change default page params that is size = 20, page = 0.
+   */
+  pagination?: {
+    defaultPage: {
+      size: number;
+      page?: number;
+    }
+  };
+
 }

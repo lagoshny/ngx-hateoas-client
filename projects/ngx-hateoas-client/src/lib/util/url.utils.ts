@@ -1,18 +1,13 @@
 import { HttpParams } from '@angular/common/http';
 import { isResource } from '../model/resource-type';
 import { Resource } from '../model/resource/resource';
-import { GetOption, LinkData, PagedGetOption, PageParam, Sort } from '../model/declarations';
+import { GetOption, LinkData, PagedGetOption, Sort } from '../model/declarations';
 import { ValidationUtils } from './validation.utils';
 import { LibConfig } from '../config/lib-config';
 import { isEmpty, isNil, isObject, toString } from 'lodash-es';
 import { UriTemplate } from 'uri-templates-es';
 
 export class UrlUtils {
-
-  public static readonly DEFAULT_PAGE: PageParam = {
-    page: 0,
-    size: 20,
-  };
 
   /**
    * Convert passed params to the {@link HttpParams}.
@@ -174,11 +169,11 @@ export class UrlUtils {
   public static fillDefaultPageDataIfNoPresent(options: PagedGetOption) {
     const pagedOptions = !isEmpty(options) ? options : {};
     if (isEmpty(pagedOptions.pageParams)) {
-      pagedOptions.pageParams = UrlUtils.DEFAULT_PAGE;
+      pagedOptions.pageParams = LibConfig.config.pagination.defaultPage;
     } else if (!pagedOptions.pageParams.size) {
-      pagedOptions.pageParams.size = UrlUtils.DEFAULT_PAGE.size;
+      pagedOptions.pageParams.size = LibConfig.config.pagination.defaultPage.size;
     } else if (!pagedOptions.pageParams.page) {
-      pagedOptions.pageParams.page = UrlUtils.DEFAULT_PAGE.page;
+      pagedOptions.pageParams.page = LibConfig.config.pagination.defaultPage.page;
     }
 
     return pagedOptions;

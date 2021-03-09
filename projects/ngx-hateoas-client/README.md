@@ -422,7 +422,7 @@ export class ShopProjection extends Resource {
 
 Using `@ProjectionRel` decorator allows knowing`hateoas-client` which relation resource type needs to use when creating a resource from the serv-side answer.
 
-> Here used `ProjectionRelType` type as a wrapper for `Cart` resource class, to hide `Resource'/`EmbeddedResource` methods in projection relation.
+> Here used `ProjectionRelType` type as a wrapper for `Cart` resource class, to hide `Resource`/`EmbeddedResource` methods in projection relation.
 > See more [here](#projectionreltype) about this type.
 
 ### Resource presets

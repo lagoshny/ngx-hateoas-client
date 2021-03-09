@@ -24,8 +24,8 @@
 
 **Compatible with Angular 11.**
 
-This client can be used to develop `Angular 6.0+` applications working with RESTful server API. 
-By `RESTful API` means when the server application implements all the layers of the [Richardson Maturity Model](https://martinfowler.com/articles/richardsonMaturityModel.html) 
+This client can be used to develop `Angular 6.0+` applications working with RESTful server API.
+By `RESTful API` means when the server application implements all the layers of the [Richardson Maturity Model](https://martinfowler.com/articles/richardsonMaturityModel.html)
 and the server provides [HAL/JSON](http://stateless.co/hal_specification.html) response type.
 
 This client compatible with Java server-side applications based on [Spring HATEOAS](https://spring.io/projects/spring-hateoas) or [Spring Data REST](https://docs.spring.io/spring-data/rest/docs/current/reference/html/#reference).
@@ -39,65 +39,65 @@ You can found examples of usage this client with [task-manager-front](https://gi
 ## Contents
 1. [Changelog](#Changelog)
 2. [Getting started](#Getting-started)
-   - [Installation](#Installation)
-   - [Configuration](#Configuration)
-   - [Usage](#Usage)
-      - [Define resource classes](#Define-resource-classes)
-      - [Built-in HateoasResourceService](#built-in-hateoasresourceservice)
-      - [Create custom Resource service](#Create-custom-Resource-service)
-3. [Resource types](#Resource-types)        
-   - [Decorators](#decorators)
-      - [@HateoasResource](#hateoasresource)
-      - [@HateoasEmbeddedResource](#hateoasembeddedresource)
-      - [@HateoasProjection](#hateoasprojection)
-         - [@ProjectionRel](#projectionrel)
-   - [BaseResource](#BaseResource)
-      - [GetRelation](#GetRelation)
-      - [GetRelatedCollection](#GetRelatedCollection)
-      - [GetRelatedPage](#GetRelatedPage)
-      - [PostRelation](#PostRelation)
-      - [PatchRelation](#PatchRelation)
-      - [PutRelation](#PutRelation)
-   - [Resource](#Resource)
-      - [AddCollectionRelation](#AddCollectionRelation)
-      - [BindRelation](#BindRelation)
-      - [UnbindRelation](#UnbindRelation)
-      - [UnbindCollectionRelation](#UnbindCollectionRelation)
-      - [DeleteRelation](#DeleteRelation)
-   - [EmbeddedResource](#EmbeddedResource)
-   - [ResourceCollection](#ResourceCollection)
-   - [PagedResourceCollection](#PagedResourceCollection)
-   - [Subtypes support](#Subtypes-support)     
-   - [Resource projection support](#resource-projection-support)
-     - [ProjectionRelType](#projectionreltype)
+- [Installation](#Installation)
+- [Configuration](#Configuration)
+- [Usage](#Usage)
+  - [Define resource classes](#Define-resource-classes)
+  - [Built-in HateoasResourceService](#built-in-hateoasresourceservice)
+  - [Create custom Resource service](#Create-custom-Resource-service)
+3. [Resource types](#Resource-types)
+- [Decorators](#decorators)
+  - [@HateoasResource](#hateoasresource)
+  - [@HateoasEmbeddedResource](#hateoasembeddedresource)
+  - [@HateoasProjection](#hateoasprojection)
+    - [@ProjectionRel](#projectionrel)
+- [BaseResource](#BaseResource)
+  - [GetRelation](#GetRelation)
+  - [GetRelatedCollection](#GetRelatedCollection)
+  - [GetRelatedPage](#GetRelatedPage)
+  - [PostRelation](#PostRelation)
+  - [PatchRelation](#PatchRelation)
+  - [PutRelation](#PutRelation)
+- [Resource](#Resource)
+  - [AddCollectionRelation](#AddCollectionRelation)
+  - [BindRelation](#BindRelation)
+  - [UnbindRelation](#UnbindRelation)
+  - [UnbindCollectionRelation](#UnbindCollectionRelation)
+  - [DeleteRelation](#DeleteRelation)
+- [EmbeddedResource](#EmbeddedResource)
+- [ResourceCollection](#ResourceCollection)
+- [PagedResourceCollection](#PagedResourceCollection)
+- [Subtypes support](#Subtypes-support)
+- [Resource projection support](#resource-projection-support)
+  - [ProjectionRelType](#projectionreltype)
 4. [Resource service](#Resource-service)
-   - [GetResource](#GetResource)
-   - [GetCollection](#GetCollection)
-   - [GetPage](#GetPage)
-   - [CreateResource](#CreateResource)
-   - [UpdateResource](#UpdateResource)
-   - [UpdateResourceById](#UpdateResourceById)
-   - [PatchResource](#PatchResource)
-   - [PatchResourceById](#PatchResourceById)
-   - [DeleteResource](#DeleteResource)
-   - [DeleteResourceById](#DeleteResourceById)
-   - [SearchResource](#SearchResource)
-   - [SearchCollection](#SearchCollection)
-   - [SearchPage](#SearchPage)
-   - [CustomQuery](#CustomQuery)
-   - [CustomSearchQuery](#CustomSearchQuery)
-5. [Settings](#settings)        
-    - [Configuration params](#Configuration-params)        
-    - [UseTypes](#usetypes-params)        
-    - [Cache support](#cache-support)        
-    - [Logging](#Logging)
-6. [Public classes](#Public-classes)     
-   - [GetOption](#GetOption)        
-   - [PagedGetOption](#PagedGetOption)        
-   - [RequestOption](#RequestOption)        
-   - [RequestBody](#RequestBody)        
-   - [Sort](#Sort)        
-   - [SortedPageParam](#SortedPageParam)        
+- [GetResource](#GetResource)
+- [GetCollection](#GetCollection)
+- [GetPage](#GetPage)
+- [CreateResource](#CreateResource)
+- [UpdateResource](#UpdateResource)
+- [UpdateResourceById](#UpdateResourceById)
+- [PatchResource](#PatchResource)
+- [PatchResourceById](#PatchResourceById)
+- [DeleteResource](#DeleteResource)
+- [DeleteResourceById](#DeleteResourceById)
+- [SearchResource](#SearchResource)
+- [SearchCollection](#SearchCollection)
+- [SearchPage](#SearchPage)
+- [CustomQuery](#CustomQuery)
+- [CustomSearchQuery](#CustomSearchQuery)
+5. [Settings](#settings)
+- [Configuration params](#Configuration-params)
+- [UseTypes](#usetypes-params)
+- [Cache support](#cache-support)
+- [Logging](#Logging)
+6. [Public classes](#Public-classes)
+- [GetOption](#GetOption)
+- [PagedGetOption](#PagedGetOption)
+- [RequestOption](#RequestOption)
+- [RequestBody](#RequestBody)
+- [Sort](#Sort)
+- [SortedPageParam](#SortedPageParam)
 
 ## Changelog
 [Learn about the latest improvements](https://github.com/lagoshny/ngx-hateoas-client/blob/master/CHANGELOG.md).
@@ -114,7 +114,7 @@ npm i @lagoshny/ngx-hateoas-client --save
 
 ### Configuration
 
-Before start, need to configure `NgxHateoasClientModule` and pass configuration through `NgxHateoasClientConfigurationService`. 
+Before start, need to configure `NgxHateoasClientModule` and pass configuration through `NgxHateoasClientConfigurationService`.
 
 1) `NgxHateoasClientModule` configuration:
 
@@ -165,7 +165,7 @@ See more about other a configuration params [here](#configuration-params).
 
 ### Define resource classes
 
-To represent model class as a resource model extend model class by `Resource` class. 
+To represent model class as a resource model extend model class by `Resource` class.
 Besides you need to decorate the class with [@HateoasResource](#hateoasresource) decorator that will register your resource class with passed `resourceName` in `hateoas-client`.
 Suppose you have some `Product` model class:
 
@@ -202,7 +202,7 @@ Thereafter, the `Product` class will have `Resource` methods to work with the pr
 
 >You can create a resource projection class that will map to a server-side projection model. How to do it read in [this section](#resource-projection-support).
 
->Also, you can extend model classes with the `EmbeddedResource` class and decorate with [@HateasEmbeddedResource](#hateoasembeddedresource) decorator when the model class used as an [embeddable](https://docs.oracle.com/javaee/6/api/javax/persistence/Embeddable.html) entity. 
+>Also, you can extend model classes with the `EmbeddedResource` class and decorate with [@HateasEmbeddedResource](#hateoasembeddedresource) decorator when the model class used as an [embeddable](https://docs.oracle.com/javaee/6/api/javax/persistence/Embeddable.html) entity.
 You can read more about `EmbeddedResource` [here](#embeddedresource).
 
 It is recommended also to declare the `Product` resource class (others `Resources` and `EmbeddedResources` too) in the `hateoas-client` configuration:
@@ -297,7 +297,7 @@ export class ProductService extends HateoasResourceOperation<Product> {
 ## Resource types
 
 There are several types of resources: the main resource type is [Resource](#resource) represents the server-side entity model class.
-If the server-side model has Embeddable entity type then use [EmbeddedResource](#embeddedresource) type instead [Resource](#resource) type. 
+If the server-side model has Embeddable entity type then use [EmbeddedResource](#embeddedresource) type instead [Resource](#resource) type.
 
 Both [Resource](#resource) and [EmbeddedResource](#embeddedresource) have some the same methods therefore they have common parent [BaseResource](#baseresource) class implements these methods.
 
@@ -307,7 +307,7 @@ Also, you can create `Resource` class to represent resource projection, see more
 
 To work with resource collections uses [ResourceCollection](#resourcecollection) type its holds an array of the resources.
 When you have a paged collection of resources result use an extension of [ResourceCollection](#resourcecollection) is [PagedResourceCollection](#pagedresourcecollection) that allows you to navigate by pages and perform custom page requests.
- 
+
 In some cases, the server-side can have an entity inheritance model how to work with entity subtypes, you can found [here](#subtypes-support).
 
 ## Decorators
@@ -386,7 +386,7 @@ export class ShopProjection extends Resource {
 
 ```
 
-Using `@HateoasProjection` you can create separate resource projection classes with desired resource properties and relations. 
+Using `@HateoasProjection` you can create separate resource projection classes with desired resource properties and relations.
 For resource projection relations to another resource, you need to wrap these relations with [ProjectionRelType](#projectionreltype) type and mark these relations with [@ProjectionRel](#projectionrel) decorator with a relation resource type.
 
 - [ProjectionRelType](#projectionreltype) will hide `Resource`/`EmbeddedResource` methods for projection relation that will lead clear projection relation interface.
@@ -422,7 +422,7 @@ export class ShopProjection extends Resource {
 
 Using `@ProjectionRel` decorator allows knowing`hateoas-client` which relation resource type needs to use when creating a resource from the serv-side answer.
 
-> Here used `ProjectionRelType` type as a wrapper for `Cart` resource class, to hide `Resource'/`EmbeddedResource` methods in projection relation.
+> Here used `ProjectionRelType` type as a wrapper for `Cart` resource class, to hide `Resource`/`EmbeddedResource` methods in projection relation.
 > See more [here](#projectionreltype) about this type.
 
 ### Resource presets
@@ -490,8 +490,8 @@ Examples of usage resource relation methods rely on presets.
   
  
   ```
-  
-- HateoasClientConfiguration: 
+
+- HateoasClientConfiguration:
   ```ts
     hateoasConfig.configure({
         http: {
@@ -687,7 +687,7 @@ Getting related resource collection with pagination by relation name.
 
 This method takes [PagedGetOption](#pagedgetoption) parameter with it you can pass `projection` param (see below).
 
->If do not pass `pageParams` with `PagedGetOption` then will be used [default page options](#default-page-values). 
+>If do not pass `pageParams` with `PagedGetOption` then will be used [default page options](#default-page-values).
 >Also, you can set up own default page params through [configuration](#pagination-params).
 
 Method signature:
@@ -760,7 +760,7 @@ postRelation(relationName: string, requestBody: RequestBody<any>, options?: Requ
 - `relationName` - resource relation name used to get request URL.
 - `requestBody` - [RequestBody](#requestbody) contains request body and additional body options.
 - `options` - [RequestOption](#requestoption) additional options applied to the request.
-- `return value` - by default `raw response data` or Angular `HttpResponse` when `options` param has a `observe: 'response'` value. 
+- `return value` - by default `raw response data` or Angular `HttpResponse` when `options` param has a `observe: 'response'` value.
 
 ##### Examples of usage ([given the presets](#resource-presets)):
 
@@ -808,7 +808,7 @@ patchRelation(relationName: string, requestBody: RequestBody<any>, options?: Req
 - `relationName` - resource relation name used to get request URL.
 - `requestBody` - [RequestBody](#requestbody) contains request body and additional body options.
 - `options` - [RequestOption](#requestoption) additional options applied to the request.
-- `return value` - by default `raw response data` or Angular `HttpResponse` when `options` param has a `observe: 'response'` value. 
+- `return value` - by default `raw response data` or Angular `HttpResponse` when `options` param has a `observe: 'response'` value.
 
 ##### Examples of usage ([given the presets](#resource-presets)):
 
@@ -857,7 +857,7 @@ putRelation(relationName: string, requestBody: RequestBody<any>, options?: Reque
 - `relationName` - resource relation name used to get request URL.
 - `requestBody` - [RequestBody](#requestbody) contains request body and additional body options.
 - `options` - [RequestOption](#requestoption) additional options applied to the request.
-- `return value` - by default `raw response data` or Angular `HttpResponse` when `options` param has a `observe: 'response'` value. 
+- `return value` - by default `raw response data` or Angular `HttpResponse` when `options` param has a `observe: 'response'` value.
 
 ##### Examples of usage ([given the presets](#resource-presets)):
 
@@ -909,7 +909,7 @@ Adding passed entities to the resource collection behind the relation name.
 
 Used `POST` method with `'Content-Type': 'text/uri-list'`.
 
->This method **DOES NOT REPLACED** existing resources in the collection instead it adds new ones. 
+>This method **DOES NOT REPLACED** existing resources in the collection instead it adds new ones.
 To replace collection resource with passed entities use [bindRelation](#bindrelation) method.
 
 Method signature:
@@ -1110,7 +1110,7 @@ Resource collection holds resources in the public property with the name `resour
 This resource type represents paged collection of resources.
 You can get this type as result [GetRelatedPage](#getrelatedpage), [GetPage](#getpage) or perform [CustomQuery](#customquery)/[CustomSearchQuery](#customsearchquery) with passed return type as PagedResourceCollection.
 
-PagedResourceCollection extends [ResourceCollection](#resourcecollection) type and adds methods to work with a page.  
+PagedResourceCollection extends [ResourceCollection](#resourcecollection) type and adds methods to work with a page.
 
 ### Default page values
 When you do not pass `page` or `size` params in methods with [PagedGetOption](#pagedgetoption) then used [default page values](#default-page-values).
@@ -1387,7 +1387,7 @@ size(size: number, options?: {useCache: true;}): Observable<PagedResourceCollect
 
 - `size` - count of resources to page.
 - `options` - additional options to manipulate the cache when getting a result (by default will be used the cache if it enabled in the [configuration](#cache-params)).
-- `return value` - [PagedResourceCollection](#pagedresourcecollection) with resource types `T`. 
+- `return value` - [PagedResourceCollection](#pagedresourcecollection) with resource types `T`.
 - `throws error` - when `size` greater than total count resources.
 
 ##### Examples of usage:
@@ -1431,7 +1431,7 @@ sortElements(sortParam: Sort, options?: {useCache: true;}): Observable<PagedReso
 
 - `sortParam` - [Sort](#sort) params.
 - `options` - additional options to manipulate the cache when getting a result (by default will be used the cache if it enabled in the [configuration](#cache-params)).
-- `return value` - [PagedResourceCollection](#pagedresourcecollection) with resource types `T`. 
+- `return value` - [PagedResourceCollection](#pagedresourcecollection) with resource types `T`.
 
 ##### Examples of usage:
 
@@ -1559,7 +1559,7 @@ Suppose exists the next resource's hierarchy:
 ```
 
 With `hal-json` representation:
-  
+
 ```json
   Cart:
   {
@@ -1739,7 +1739,7 @@ export class CartProjection extends Resource {
 
 Here `CartProjection.shop` will show only `Shop` type properties and methods. Methods from `Resource` will be hidden.
 
-## Resource service 
+## Resource service
 
 As described before to work with resources you can use built-in [HateoasResourceService](#built-in-hateoasresourceservice) or create [custom resource service](#resource-service).
 
@@ -1789,7 +1789,7 @@ Examples of usage resource service methods rely on this presets.
       public type: ProjectionRelType<ProductType>;
   }
   ```
-  
+
 - HateoasClientConfiguration:
   ```ts
     hateoasConfig.configure({
@@ -1801,7 +1801,7 @@ Examples of usage resource service methods rely on this presets.
         }
     })
   ```
-  
+
 - Resource service as built-in [HateoasResourceService](#built-in-hateoasresourceservice) is
   ```ts
   @Component({ ... })
@@ -1810,7 +1810,7 @@ Examples of usage resource service methods rely on this presets.
       }
   }
   ```  
-  
+
 - Resource service as [custom resource service](#create-custom-resource-service) is
   ```ts
   import { HateoasResourceOperation, HateoasResourceService, PagedResourceCollection, ResourceCollection} from '@lagoshny/ngx-hateoas-client';
@@ -2026,7 +2026,7 @@ getPage(options?: PagedGetOption): Observable<PagedResourceCollection<T>>;
 
 - `options` - [PagedGetOption](#pagedgetoption) additional options applied to the request, if not passed `pageParams` then used [default page params](#default-page-values).
 - `return value` - [PagedResourceCollection](#pagedresourcecollection) paged collection of resources with type `T`.
-- `throws error` when returned value is not [PagedResourceCollection](#pagedresourcecollection) 
+- `throws error` when returned value is not [PagedResourceCollection](#pagedresourcecollection)
 
 ##### Example of usage ([given the presets](#resource-service-presets)):
 
@@ -2164,7 +2164,7 @@ createResource(requestBody: RequestBody<T>): Observable<T | any>;
 ```
 
 - `requestBody` - [RequestBody](#requestbody) contains request body (in this case resource object) and additional body options.
-- `return value` - [Resource](#resource) with type `T` or `raw response data` when returned value is not resource object. 
+- `return value` - [Resource](#resource) with type `T` or `raw response data` when returned value is not resource object.
 
 ##### Example of usage ([given the presets](#resource-service-presets)):
 
@@ -2248,9 +2248,9 @@ Method signature:
 updateResource(entity: T, requestBody?: RequestBody<any>): Observable<T | any>;
 ```
 
-- `entity` - resource to update. 
+- `entity` - resource to update.
 - `requestBody` - [RequestBody](#requestbody) contains request body (in this case new values for resource) and additional body options.
-- `return value` - [Resource](#resource) with type `T` or `raw response data` when returned value is not resource object. 
+- `return value` - [Resource](#resource) with type `T` or `raw response data` when returned value is not resource object.
 
 >When passed only `entity` param then values of `entity` will be used to update values of resource.
 
@@ -2325,7 +2325,7 @@ updateResourceById(id: number | string, requestBody: RequestBody<any>): Observab
 
 - `id` - resource id to update.
 - `requestBody` - [RequestBody](#requestbody) contains request body (in this case new values for resource) and additional body options.
-- `return value` - [Resource](#resource) with type `T` or `raw response data` when returned value is not resource object. 
+- `return value` - [Resource](#resource) with type `T` or `raw response data` when returned value is not resource object.
 
 ##### Example of usage ([given the presets](#resource-service-presets)):
 
@@ -2422,9 +2422,9 @@ Method signature:
 patchResource(entity: T, requestBody?: RequestBody<any>): Observable<T | any>;
 ```
 
-- `entity` - resource to patch. 
+- `entity` - resource to patch.
 - `requestBody` - [RequestBody](#requestbody) contains request body (in this case new values for resource) and additional body options.
-- `return value` - [Resource](#resource) with type `T` or `raw response data` when returned value is not resource object. 
+- `return value` - [Resource](#resource) with type `T` or `raw response data` when returned value is not resource object.
 
 >When passed only `entity` param then values of `entity` will be used to patch values of resource.
 
@@ -2500,7 +2500,7 @@ patchResourceById(id: number | string, requestBody: RequestBody<any>): Observabl
 
 - `id` - resource id to patch.
 - `requestBody` - [RequestBody](#requestbody) contains request body (in this case new values for resource) and additional body options.
-- `return value` - [Resource](#resource) with type `T` or `raw response data` when returned value is not resource object. 
+- `return value` - [Resource](#resource) with type `T` or `raw response data` when returned value is not resource object.
 
 ##### Example of usage ([given the presets](#resource-service-presets)):
 
@@ -2594,9 +2594,9 @@ Method signature:
 deleteResource(entity: T, options?: RequestOption): Observable<HttpResponse<any> | any>;
 ```
 
-- `entity` - resource to delete. 
+- `entity` - resource to delete.
 - `options` - [RequestOption](#requestoption) additional options applied to the request.
-- `return value` - by default `raw response data` or Angular `HttpResponse` when `options` param has a `observe: 'response'` value. 
+- `return value` - by default `raw response data` or Angular `HttpResponse` when `options` param has a `observe: 'response'` value.
 
 ##### Example of usage ([given the presets](#resource-service-presets)):
 
@@ -2645,7 +2645,7 @@ deleteResourceById(id: number | string, options?: RequestOption): Observable<Htt
 
 - `id` - resource id to delete.
 - `options` - [RequestOption](#requestoption) additional options applied to the request.
-- `return value` - by default `raw response data` or Angular `HttpResponse` when `options` param has a `observe: 'response'` value. 
+- `return value` - by default `raw response data` or Angular `HttpResponse` when `options` param has a `observe: 'response'` value.
 
 ##### Example of usage ([given the presets](#resource-service-presets)):
 
@@ -3011,8 +3011,8 @@ this.resourceHateoasService.searchPage(ProductProjection)
 #### CustomQuery
 Performing custom HTTP request for resource.
 
->For example, use this method to perform a count query (see example below). 
- 
+>For example, use this method to perform a count query (see example below).
+
 Method signature:
 
 ```
@@ -3023,7 +3023,7 @@ customQuery<R>(method: HttpMethod, query: string, requestBody?: RequestBody<any>
 - `query` - additional part of the URL, added after root resource URL.
 - `requestBody` - [RequestBody](#requestbody) uses when `method` is `POST`, `PATCH`, `PUT` to pass request body and additional body options.
 - `options` - [PagedGetOption](#pagedgetoption) additional options applied to the request.
-- `return value` - `any` object that equals to passed generic type `<R>` 
+- `return value` - `any` object that equals to passed generic type `<R>`
 
 ##### Example of usage ([given the presets](#resource-service-presets)):
 
@@ -3043,7 +3043,7 @@ this.resourceHateoasService.customQuery<number>(Product, HttpMethod.GET, '/searc
 #### CustomSearchQuery
 Performing custom search HTTP request for resource.
 
->For example, use this method to perform a count query (see example below). 
+>For example, use this method to perform a count query (see example below).
 
 Method signature:
 
@@ -3055,7 +3055,7 @@ customSearchQuery<R>(method: HttpMethod, searchQuery: string, requestBody?: Requ
 - `searchQuery` - additional part of the URL that follow after `/search/` resource URL.
 - `requestBody` - [RequestBody](#requestbody) uses when `method` is `POST`, `PATCH`, `PUT` to pass request body and additional body options.
 - `options` - [PagedGetOption](#pagedgetoption) additional options applied to the request.
-- `return value` - `any` object that equals to passed generic type `<R>` 
+- `return value` - `any` object that equals to passed generic type `<R>`
 
 
 ##### Example of usage ([given the presets](#resource-service-presets)):
@@ -3119,7 +3119,7 @@ The library accepts configuration object:
 This configuration section uses to declare resource/embedded resource types that will be used to create resources with concrete resource classes when parsed server's answer.
 
 For example, you use subtypes and you need to know which subtype is received from the server (see more about suptypes in this [section](#subtypes-support)).
-If you do not declare this subtype type in `useTypes.resources` section you get the common `Resource` class type without your subtype class methods. 
+If you do not declare this subtype type in `useTypes.resources` section you get the common `Resource` class type without your subtype class methods.
 
 Because [@HateoasResource](#hateoasresource)/[@HateoasEmbeddedResource](#hateoasembeddedresource) decorators are used to registering heirs of `Resource`/`EmbeddedResource` classes in `hateoas-client`, then if you did not use your `Resource` class in your code
 (i.e. there was no import of this resource in your code, it will be means that the decorator did not run), then you will receive a generic `Resource` type instead of a concrete resource type when parsed the server's answer.
@@ -3146,11 +3146,11 @@ Let to change [default page params](#default-page-values) that use when a page r
 
 ### Cache support
 The library supports caching `GET` request response values.
-By default, the cache `enabled`. 
+By default, the cache `enabled`.
 
 To enable cache pass `cache.enabled = true` to library configuration. Also, you can manage the cache expired time with `cache.lifeTime` param.
 
-> More about the cache configuration see [here](#cache-params). 
+> More about the cache configuration see [here](#cache-params).
 
 Also, methods with options types `GetOption` or `PagedGetOption` has additional param `useCache` that allows to manage the cache.
 By default `useCache` has `true` value, but when the cache disabled then it param ignored.
@@ -3164,10 +3164,10 @@ When perform the same `GET` request twice (to get resource or resource collectio
 When perform `POST`, `PATCH`, `PUT`, `DELETE` requests for some resource than all saved cache values for this resource will be evicted.
 
 > You can know when resource result got from the server or got from the cache enable the library [verboseLogs](#logging-params) param.
-> See more about logging [here](#logging).                                                                                                                      
+> See more about logging [here](#logging).
 
 ### Logging
-To debug library use library logging. 
+To debug library use library logging.
 To enable logging set `logs.verboseLogs` to `true` value see more [here](#logging-params).
 
 There are several logging stages:
@@ -3182,7 +3182,7 @@ There are several logging stages:
 - `CACHE_GET` - logs a received value from the cache
 - `CACHE_EVICT` - logs an evicted value from the cache
 - `HTTP_REQUEST` - logs HTTP request params
-- `HTTP_RESPONSE` - logs raw HTTP response data 
+- `HTTP_RESPONSE` - logs raw HTTP response data
 - `END` - last stage, when method invoke was successful
 
 With logging, you can find out was a value fetched from the cache or the server, how resource relationships resolved etc.

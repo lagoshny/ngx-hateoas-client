@@ -1,3 +1,7 @@
+## 2.0.3-beta (2021-05-19)
+#### Changes
+Updated peer dependencies
+
 ## 2.0.0-beta (2021-03-09)
 #### Changes
 

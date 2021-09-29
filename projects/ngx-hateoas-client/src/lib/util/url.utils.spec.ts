@@ -294,4 +294,98 @@ describe('UrlUtils', () => {
     LibConfig.config.http.proxyUrl = '';
   });
 
+  it('GET_RESOURCE_NAME_FROM_URL should throw error when url is empty', () => {
+    expect(() => UrlUtils.getResourceNameFromUrl(''))
+      .toThrowError(`Passed param(s) 'url = ' is not valid`);
+  });
+
+  it('GET_RESOURCE_NAME_FROM_URL should throw error when url is null', () => {
+    expect(() => UrlUtils.getResourceNameFromUrl(null))
+      .toThrowError(`Passed param(s) 'url = null' is not valid`);
+  });
+
+  it('GET_RESOURCE_NAME_FROM_URL should throw error when url is undefined', () => {
+    expect(() => UrlUtils.getResourceNameFromUrl(undefined))
+      .toThrowError(`Passed param(s) 'url = undefined' is not valid`);
+  });
+
+  it('GET_RESOURCE_NAME_FROM_URL should return resource name without root proxy', () => {
+    const resourceNameFromUrl = UrlUtils.getResourceNameFromUrl('http://localhost:8080/api/v1/resources/1');
+    expect(resourceNameFromUrl).toEqual('resources');
+  });
+
+  it('GET_RESOURCE_NAME_FROM_URL should return resource name with root proxy', () => {
+    LibConfig.config.http.proxyUrl = 'http://proxy-localhost:8080/api/v1';
+    const resourceNameFromUrl = UrlUtils.getResourceNameFromUrl('http://proxy-localhost:8080/api/v1/resources/1');
+    LibConfig.config.http.proxyUrl = '';
+    expect(resourceNameFromUrl).toEqual('resources');
+  });
+
+  it('FILL_DEFAULT_PAGE_DATA_IF_NO_PRESENT fill all default values when passed options are \'null\'', () => {
+    const pagedOptions = UrlUtils.fillDefaultPageDataIfNoPresent(null);
+
+    expect(pagedOptions).toBeDefined();
+    expect(pagedOptions.pageParams).toBeDefined();
+    expect(pagedOptions.pageParams.page).toBe(LibConfig.config.pagination.defaultPage.page);
+    expect(pagedOptions.pageParams.size).toBe(LibConfig.config.pagination.defaultPage.size);
+  });
+
+  it('FILL_DEFAULT_PAGE_DATA_IF_NO_PRESENT fill all default values when passed options are \'undefined\'', () => {
+    const pagedOptions = UrlUtils.fillDefaultPageDataIfNoPresent(undefined);
+
+    expect(pagedOptions).toBeDefined();
+    expect(pagedOptions.pageParams).toBeDefined();
+    expect(pagedOptions.pageParams.page).toBe(LibConfig.config.pagination.defaultPage.page);
+    expect(pagedOptions.pageParams.size).toBe(LibConfig.config.pagination.defaultPage.size);
+  });
+
+  it('FILL_DEFAULT_PAGE_DATA_IF_NO_PRESENT fill all default values when passed options are \'empty object\'', () => {
+    const pagedOptions = UrlUtils.fillDefaultPageDataIfNoPresent({});
+
+    expect(pagedOptions).toBeDefined();
+    expect(pagedOptions.pageParams).toBeDefined();
+    expect(pagedOptions.pageParams.page).toBe(LibConfig.config.pagination.defaultPage.page);
+    expect(pagedOptions.pageParams.size).toBe(LibConfig.config.pagination.defaultPage.size);
+  });
+
+  it('FILL_DEFAULT_PAGE_DATA_IF_NO_PRESENT fill page default value when passed options have not it', () => {
+    const pagedOptions = UrlUtils.fillDefaultPageDataIfNoPresent({pageParams: {size: 40}});
+
+    expect(pagedOptions).toBeDefined();
+    expect(pagedOptions.pageParams).toBeDefined();
+    expect(pagedOptions.pageParams.page).toBe(LibConfig.config.pagination.defaultPage.page);
+    expect(pagedOptions.pageParams.size).toBe(40);
+  });
+
+  it('FILL_DEFAULT_PAGE_DATA_IF_NO_PRESENT fill size default value when passed options have not it', () => {
+    const pagedOptions = UrlUtils.fillDefaultPageDataIfNoPresent({pageParams: {page: 4}});
+
+    expect(pagedOptions).toBeDefined();
+    expect(pagedOptions.pageParams).toBeDefined();
+    expect(pagedOptions.pageParams.page).toBe(4);
+    expect(pagedOptions.pageParams.size).toBe(LibConfig.config.pagination.defaultPage.size);
+  });
+
+  it('CLEAR_URL_PARAMS should throw error when url is empty', () => {
+    expect(() => UrlUtils.clearUrlParams(''))
+      .toThrowError(`Passed param(s) 'url = ' is not valid`);
+  });
+
+  it('CLEAR_URL_PARAMS should throw error when url is null', () => {
+    expect(() => UrlUtils.clearUrlParams(null))
+      .toThrowError(`Passed param(s) 'url = null' is not valid`);
+  });
+
+  it('CLEAR_URL_PARAMS should throw error when url is undefined', () => {
+    expect(() => UrlUtils.clearUrlParams(undefined))
+      .toThrowError(`Passed param(s) 'url = undefined' is not valid`);
+  });
+
+  it('CLEAR_URL_PARAMS clear all url param', () => {
+    const clearedUrl = UrlUtils.clearUrlParams('http://localhost:8080/api/v1/products?page=0&size=3');
+
+    expect(clearedUrl).toBeDefined();
+    expect(clearedUrl).toEqual('http://localhost:8080/api/v1/products');
+  });
+
 });

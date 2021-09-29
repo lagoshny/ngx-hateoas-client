@@ -3,7 +3,13 @@ import { ResourceUtils } from './resource.utils';
 import { EmbeddedResource } from '../model/resource/embedded-resource';
 import { ResourceCollection } from '../model/resource/resource-collection';
 import { PagedResourceCollection } from '../model/resource/paged-resource-collection';
-import { rawEmbeddedResource, rawPagedResourceCollection, rawResource, rawResourceCollection } from '../model/resource/resources.test';
+import {
+  RawEmbeddedResource,
+  rawEmbeddedResource,
+  rawPagedResourceCollection, RawResource,
+  rawResource,
+  rawResourceCollection, SimpleResource, SimpleResourceProjection
+} from '../model/resource/resources.test';
 import { Include } from '../model/declarations';
 
 /* tslint:disable:no-string-literal */
@@ -79,34 +85,44 @@ describe('ResourceUtils', () => {
     expect(result['resourceCollection'][1] instanceof Resource).toBeTrue();
   });
 
-  it('INSTANTIATE_RESOURCE should fill resourceName for "Resource" type', () => {
+  it('INSTANTIATE_RESOURCE should skip \'hibernateLazyInitializer\' resource property', () => {
     const result = ResourceUtils.instantiateResource({
       ...rawResource,
-      resourceCollection: [
-        rawResource,
-        rawResource
-      ]
+      hibernateLazyInitializer: {}
     });
 
-    expect(result['resourceCollection']).toBeDefined();
-    expect(result['resourceCollection'].length).toBe(2);
-    expect(result['resourceCollection'][0]['resourceName']).toBe('Resource');
-    expect(result['resourceCollection'][1]['resourceName']).toBe('Resource');
+    expect(result instanceof Resource).toBeTrue();
+    expect(result['hibernateLazyInitializer']).toBeUndefined();
   });
 
-  it('INSTANTIATE_RESOURCE should NOT fill resourceName for "EmbeddedResource" type', () => {
+  it('INSTANTIATE_RESOURCE should create Resource with concrete resource type not with common ', () => {
     const result = ResourceUtils.instantiateResource({
       ...rawResource,
-      embeddedCollection: [
-        rawEmbeddedResource,
-        rawEmbeddedResource
-      ]
     });
 
-    expect(result['embeddedCollection']).toBeDefined();
-    expect(result['embeddedCollection'].length).toBe(2);
-    expect(result['embeddedCollection'][0]['resourceName']).toBeUndefined();
-    expect(result['embeddedCollection'][1]['resourceName']).toBeUndefined();
+    expect(result instanceof RawResource).toBeTrue();
+  });
+
+  it('INSTANTIATE_RESOURCE should create EmbeddedResource with concrete embedded resource type not with common ', () => {
+    const result = ResourceUtils.instantiateResource({
+      ...rawResource,
+      embedResTest: rawEmbeddedResource
+    });
+
+    expect(result instanceof Resource).toBeTrue();
+    expect(result['embedResTest'] instanceof RawEmbeddedResource).toBeTrue();
+  });
+
+  it('INSTANTIATE_RESOURCE projection should create projection relation property as resource object', () => {
+    const resourceProjection = new SimpleResourceProjection();
+    resourceProjection.rawResource = new RawResource();
+    const result = ResourceUtils.instantiateResource({
+      ...resourceProjection
+    });
+
+    expect(result instanceof Resource).toBeTrue();
+    expect(result['rawResource']).toBeDefined();
+    expect(result['rawResource'] instanceof RawResource).toBeTrue();
   });
 
   it('INSTANTIATE_COLLECTION_RESOURCE should return "null" when passed payload is empty object', () => {
@@ -130,7 +146,10 @@ describe('ResourceUtils', () => {
   });
 
   it('INSTANTIATE_COLLECTION_RESOURCE should return "null" when passed payload._links is not object', () => {
-    expect(ResourceUtils.instantiateResourceCollection({_links: 'not_object', _embedded: {someVal: 'test'}})).toBeNull();
+    expect(ResourceUtils.instantiateResourceCollection({
+      _links: 'not_object',
+      _embedded: {someVal: 'test'}
+    })).toBeNull();
   });
 
   it('INSTANTIATE_COLLECTION_RESOURCE should return "null" when passed payload._embedded is null', () => {
@@ -142,7 +161,10 @@ describe('ResourceUtils', () => {
   });
 
   it('INSTANTIATE_COLLECTION_RESOURCE should return "null" when passed payload._embedded is not object', () => {
-    expect(ResourceUtils.instantiateResourceCollection({_embedded: 'not_object', _links: {someVal: 'test'}})).toBeNull();
+    expect(ResourceUtils.instantiateResourceCollection({
+      _embedded: 'not_object',
+      _links: {someVal: 'test'}
+    })).toBeNull();
   });
 
   it('INSTANTIATE_COLLECTION_RESOURCE should create resource collections with all resources from _embedded object', () => {
@@ -183,11 +205,17 @@ describe('ResourceUtils', () => {
   });
 
   it('INSTANTIATE_PAGED_COLLECTION_RESOURCE should return "null" when passed payload._links is undefined', () => {
-    expect(ResourceUtils.instantiatePagedResourceCollection({_links: undefined, _embedded: {someVal: 'test'}})).toBeNull();
+    expect(ResourceUtils.instantiatePagedResourceCollection({
+      _links: undefined,
+      _embedded: {someVal: 'test'}
+    })).toBeNull();
   });
 
   it('INSTANTIATE_PAGED_COLLECTION_RESOURCE should return "null" when passed payload._links is not object', () => {
-    expect(ResourceUtils.instantiatePagedResourceCollection({_links: 'not_object', _embedded: {someVal: 'test'}})).toBeNull();
+    expect(ResourceUtils.instantiatePagedResourceCollection({
+      _links: 'not_object',
+      _embedded: {someVal: 'test'}
+    })).toBeNull();
   });
 
   it('INSTANTIATE_PAGED_COLLECTION_RESOURCE should return "null" when passed payload._embedded is null', () => {
@@ -195,11 +223,17 @@ describe('ResourceUtils', () => {
   });
 
   it('INSTANTIATE_PAGED_COLLECTION_RESOURCE should return "null" when passed payload._embedded is undefined', () => {
-    expect(ResourceUtils.instantiatePagedResourceCollection({_embedded: undefined, _links: {someVal: 'test'}})).toBeNull();
+    expect(ResourceUtils.instantiatePagedResourceCollection({
+      _embedded: undefined,
+      _links: {someVal: 'test'}
+    })).toBeNull();
   });
 
   it('INSTANTIATE_PAGED_COLLECTION_RESOURCE should return "null" when passed payload._embedded is not object', () => {
-    expect(ResourceUtils.instantiatePagedResourceCollection({_embedded: 'not_object', _links: {someVal: 'test'}})).toBeNull();
+    expect(ResourceUtils.instantiatePagedResourceCollection({
+      _embedded: 'not_object',
+      _links: {someVal: 'test'}
+    })).toBeNull();
   });
 
   it('INSTANTIATE_PAGED_COLLECTION_RESOURCE should create paged resource collections with default page options', () => {
@@ -327,6 +361,24 @@ describe('ResourceUtils', () => {
       obj: {
         simple: 'test'
       }
+    });
+  });
+
+  it('RESOLVE_VALUES should generate resource link for object that has Resource properties', () => {
+    expect(ResourceUtils.resolveValues({
+      body: {
+        name: 'test',
+        obj: {
+          simple: 'test'
+        },
+        resource: rawResource
+      }
+    })).toEqual({
+      name: 'test',
+      obj: {
+        simple: 'test'
+      },
+      resource: 'http://localhost:8080/api/v1/resource/1'
     });
   });
 
@@ -564,6 +616,43 @@ describe('ResourceUtils', () => {
     });
   });
 
+  it('RESOLVE_VALUES INNER RESOURCE OBJECT should convert to resource self link', () => {
+    expect(ResourceUtils.resolveValues({
+      body: {
+        name: 'test',
+        someObject: {
+          innerObject: {
+            innerResource: rawResource
+          }
+        }
+      }
+    })).toEqual({
+      name: 'test',
+      someObject: {
+        innerObject: {
+          innerResource: rawResource._links.self.href
+        }
+      }
+    });
+  });
+
+  it('RESOLVE_VALUES DATE OBJECT should pass as Data object', () => {
+    const dateToTest = new Date();
+    expect(ResourceUtils.resolveValues({
+      body: {
+        name: 'test',
+        someObject: {
+          dateObj: dateToTest
+        }
+      }
+    })).toEqual({
+      name: 'test',
+      someObject: {
+        dateObj: dateToTest
+      }
+    });
+  });
+
   it('INIT_RESOURCE should return resource class object', () => {
     const resourceClass = ResourceUtils.initResource(rawResource);
 
@@ -583,6 +672,74 @@ describe('ResourceUtils', () => {
 
     expect(obj).toBeDefined();
     expect(obj).toEqual({test: 'name'});
+  });
+
+  it('FILL_PROJECTION_NAME_FROM_RESOURCE_TYPE should return options as \'undefined\' when resource type and options are \'null\' ', () => {
+    const options = ResourceUtils.fillProjectionNameFromResourceType(null, null);
+
+    expect(options).toBeUndefined();
+  });
+
+  it('FILL_PROJECTION_NAME_FROM_RESOURCE_TYPE should return options as \'undefined\' ' +
+    'when resource type and options are \'undefined\' ', () => {
+    const options = ResourceUtils.fillProjectionNameFromResourceType(undefined, undefined);
+
+    expect(options).toBeUndefined();
+  });
+
+  it('FILL_PROJECTION_NAME_FROM_RESOURCE_TYPE should return options as IS when resource type has not __projectionName__ ', () => {
+    const options = ResourceUtils.fillProjectionNameFromResourceType(SimpleResource, {params: {test: 'ololo'}});
+
+    expect(options).toBeDefined();
+    expect(options.params).toBeDefined();
+    expect(options.params.test).toBeDefined();
+    expect(options.params.test).toEqual('ololo');
+  });
+
+  it('FILL_PROJECTION_NAME_FROM_RESOURCE_TYPE should return options with projection param ' +
+    'when resource type has __projectionName__ ', () => {
+    const options = ResourceUtils.fillProjectionNameFromResourceType(SimpleResourceProjection, {params: {test: 'ololo'}});
+
+    expect(options).toBeDefined();
+    expect(options.params).toBeDefined();
+    expect(options.params.test).toBeDefined();
+    expect(options.params.test).toEqual('ololo');
+    expect(options.params.projection).toBeDefined();
+    expect(options.params.projection).toEqual('simpleProjection');
+  });
+
+  it('FILL_PROJECTION_NAME_FROM_RESOURCE_TYPE should replace options param projection with projection param ' +
+    'from resource type __projectionName__ ', () => {
+    const options = ResourceUtils.fillProjectionNameFromResourceType(SimpleResourceProjection, {
+      params: {
+        test: 'ololo',
+        projection: 'testProjection'
+      }
+    });
+
+    expect(options).toBeDefined();
+    expect(options.params).toBeDefined();
+    expect(options.params.test).toBeDefined();
+    expect(options.params.test).toEqual('ololo');
+    expect(options.params.projection).toBeDefined();
+    expect(options.params.projection).toEqual('simpleProjection');
+  });
+
+  it('FILL_PROJECTION_NAME_FROM_RESOURCE_TYPE should NOT replace options param projection ' +
+    'when resource type has not __projectionName__', () => {
+    const options = ResourceUtils.fillProjectionNameFromResourceType(SimpleResource, {
+      params: {
+        test: 'ololo',
+        projection: 'testProjection'
+      }
+    });
+
+    expect(options).toBeDefined();
+    expect(options.params).toBeDefined();
+    expect(options.params.test).toBeDefined();
+    expect(options.params.test).toEqual('ololo');
+    expect(options.params.projection).toBeDefined();
+    expect(options.params.projection).toEqual('testProjection');
   });
 
 });

@@ -57,20 +57,6 @@ describe('Resource', () => {
     expect(orderResource.getSelfLinkHref()).toBe('http://localhost:8080/api/v1/order/1');
   });
 
-  it('should return "true" when resourceName eq to passed resource class name', () => {
-    const orderResource = new TestOrderResource();
-    orderResource['resourceName'] = 'TestOrderResource';
-
-    expect(orderResource.isResourceOf(TestOrderResource)).toBeTrue();
-  });
-
-  it('should return "true" when resourceName eq to passed name', () => {
-    const orderResource = new TestOrderResource();
-    orderResource['resourceName'] = 'OrderResource';
-
-    expect(orderResource.isResourceOf('OrderResource')).toBeTrue();
-  });
-
 });
 
 describe('Resource ADD_RELATION', () => {

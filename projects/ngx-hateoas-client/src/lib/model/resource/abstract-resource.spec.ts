@@ -30,51 +30,51 @@ describe('AbstractResource', () => {
     expect(() => {
       abstractResource['_links'] = {};
       abstractResource.getRelationLink('any');
-    }).toThrowError(`Resource links is empty, can't to get relation 'any'`);
+    }).toThrowError(`Resource 'TestAbstractResource' relation links are empty, can not to get relation with the name 'any'.`);
   });
 
   it('should throw error when _links object is null', () => {
     expect(() => {
       abstractResource['_links'] = null;
       abstractResource.getRelationLink('any');
-    }).toThrowError(`Resource links is empty, can't to get relation 'any'`);
+    }).toThrowError(`Resource 'TestAbstractResource' relation links are empty, can not to get relation with the name 'any'.`);
   });
 
   it('should throw error when _links object is undefined', () => {
     expect(() => {
       abstractResource['_links'] = undefined;
       abstractResource.getRelationLink('any');
-    }).toThrowError(`Resource links is empty, can't to get relation 'any'`);
+    }).toThrowError(`Resource 'TestAbstractResource' relation links are empty, can not to get relation with the name 'any'.`);
   });
 
   it('should throw error when try to add relation that does not exist', () => {
     expect(() => abstractResource.getRelationLink('unknown'))
-      .toThrowError(`Resource relation with name 'unknown' not found`);
+      .toThrowError(`Resource 'TestAbstractResource' has not relation link with the name 'unknown'.`);
   });
 
   it('should throw error when pass relationName as null', () => {
     expect(() => abstractResource.getRelationLink(null))
-      .toThrowError(`Resource relation with name 'null' not found`);
+      .toThrowError(`Resource 'TestAbstractResource' has not relation link with the name 'null'.`);
   });
 
   it('should throw error when pass relationName as undefined', () => {
     expect(() => abstractResource.getRelationLink(undefined))
-      .toThrowError(`Resource relation with name 'undefined' not found`);
+      .toThrowError(`Resource 'TestAbstractResource' has not relation link with the name 'undefined'.`);
   });
 
   it('should throw error when passed relation link href is empty', () => {
     expect(() => abstractResource.getRelationLink('badEmptyRelation'))
-      .toThrowError(`Resource relation with name 'badEmptyRelation' not found`);
+      .toThrowError(`Resource 'TestAbstractResource' has not relation link with the name 'badEmptyRelation'.`);
   });
 
   it('should throw error when passed relation link href is null', () => {
     expect(() => abstractResource.getRelationLink('badNullRelation'))
-      .toThrowError(`Resource relation with name 'badNullRelation' not found`);
+      .toThrowError(`Resource 'TestAbstractResource' has not relation link with the name 'badNullRelation'.`);
   });
 
   it('should throw error when passed relation link href is undefined', () => {
     expect(() => abstractResource.getRelationLink('badUndefinedRelation'))
-      .toThrowError(`Resource relation with name 'badUndefinedRelation' not found`);
+      .toThrowError(`Resource 'TestAbstractResource' has not relation link with the name 'badUndefinedRelation'.`);
   });
 
   it('should return relation link by relationName', () => {

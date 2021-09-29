@@ -46,6 +46,11 @@ You can found examples of usage this client with [task-manager-front](https://gi
     - [Built-in HateoasResourceService](#built-in-hateoasresourceservice)
     - [Create custom Resource service](#Create-custom-Resource-service)
 3. [Resource types](#Resource-types)
+  - [Decorators](#decorators)
+    - [@HateoasResource](#hateoasresource)
+    - [@HateoasEmbeddedResource](#hateoasembeddedresource)
+    - [@HateoasProjection](#hateoasprojection)
+      - [@ProjectionRel](#projectionrel)
   - [BaseResource](#BaseResource)
     - [GetRelation](#GetRelation)
     - [GetRelatedCollection](#GetRelatedCollection)
@@ -54,7 +59,6 @@ You can found examples of usage this client with [task-manager-front](https://gi
     - [PatchRelation](#PatchRelation)
     - [PutRelation](#PutRelation)
   - [Resource](#Resource)
-    - [IsResourceOf](#IsResourceOf)
     - [AddCollectionRelation](#AddCollectionRelation)
     - [BindRelation](#BindRelation)
     - [UnbindRelation](#UnbindRelation)
@@ -64,6 +68,8 @@ You can found examples of usage this client with [task-manager-front](https://gi
   - [ResourceCollection](#ResourceCollection)
   - [PagedResourceCollection](#PagedResourceCollection)
   - [Subtypes support](#Subtypes-support)
+  - [Resource projection support](#resource-projection-support)
+    - [ProjectionRelType](#projectionreltype)
 4. [Resource service](#Resource-service)
   - [GetResource](#GetResource)
   - [GetCollection](#GetCollection)
@@ -82,6 +88,7 @@ You can found examples of usage this client with [task-manager-front](https://gi
   - [CustomSearchQuery](#CustomSearchQuery)
 5. [Settings](#settings)
   - [Configuration params](#Configuration-params)
+  - [UseTypes](#usetypes-params)
   - [Cache support](#cache-support)
   - [Logging](#Logging)
 6. [Public classes](#Public-classes)
@@ -107,9 +114,9 @@ npm i @lagoshny/ngx-hateoas-client --save
 
 ### Configuration
 
-Before start, configure `NgxHateoasClientModule` and pass configuration through `NgxHateoasClientConfigurationService`.
+Before start, need to configure `NgxHateoasClientModule` and pass configuration through `NgxHateoasClientConfigurationService`.
 
-1) `NgxHalClientModule` configuration:
+1) `NgxHateoasClientModule` configuration:
 
 ```ts
 import { NgxHateoasClientModule } from '@lagoshny/ngx-hateoas-client';
@@ -130,7 +137,7 @@ export class AppModule {
 }
 ```
 
-2) In constructor app root module inject `HalConfigurationService` and pass a configuration:
+2) In constructor app root module inject `NgxHateoasClientConfigurationService` and pass a configuration:
 
 ```ts
 import { ..., NgxHateoasClientConfigurationService } from '@lagoshny/ngx-hateoas-client';
@@ -159,6 +166,7 @@ See more about other a configuration params [here](#configuration-params).
 ### Define resource classes
 
 To represent model class as a resource model extend model class by `Resource` class.
+Besides you need to decorate the class with [@HateoasResource](#hateoasresource) decorator that will register your resource class with passed `resourceName` in `hateoas-client`.
 Suppose you have some `Product` model class:
 
 ```ts
@@ -171,11 +179,16 @@ export class Product {
 }
 ``` 
 
-When extending it with `Resource` class it will look like:
+After making it as a `Resource` it will look like this:
 
 ```ts
-import { Resource } from '@lagoshny/ngx-hateoas-client';
+import { Resource, HateoasResource } from '@lagoshny/ngx-hateoas-client';
 
+/* 
+  Resource name 'products' should be map to server-side resource name that used to build resource self URL.
+  For example in this case it can be: http://localhost:8080/api/v1/products
+ */
+@HateoasResource('products')
 export class Product extend Resource {
 
     public name: string;
@@ -187,20 +200,43 @@ export class Product extend Resource {
 
 Thereafter, the `Product` class will have `Resource` methods to work with the product's relations through resource links.
 
->Also, you can extend model classes with the `EmbeddedResource` class when the model class used as an [embeddable](https://docs.oracle.com/javaee/6/api/javax/persistence/Embeddable.html) entity.
+>You can create a resource projection class that will map to a server-side projection model. How to do it read in [this section](#resource-projection-support).
+
+>Also, you can extend model classes with the `EmbeddedResource` class and decorate with [@HateasEmbeddedResource](#hateoasembeddedresource) decorator when the model class used as an [embeddable](https://docs.oracle.com/javaee/6/api/javax/persistence/Embeddable.html) entity.
 You can read more about `EmbeddedResource` [here](#embeddedresource).
 
+It is recommended also to declare the `Product` resource class (others `Resources` and `EmbeddedResources` too) in the `hateoas-client` configuration:
 
-To perform resource requests you can use built-in [HateoasResourceService](#built-in-hateoasresourceservice) or a create [custom resource service](#create-custom-resource-service).
+```ts
+...
+  hateoasConfig.configure({
+    ...
+    useTypes: {
+        resources: [Product]
+    }
+  }
+...
+```
+>See more about `useTypes` in the configuration section [here](#usetypes-params).
+
+Now you have created a resource class and ready to perform requests for this resource.
+For this you can use universal on resource built-in [HateoasResourceService](#built-in-hateoasresourceservice) or a create [custom resource service](#create-custom-resource-service) for concrete resource class.
 
 ### Built-in HateoasResourceService
 
-The library has built-in `HateoasResourceService`.
-It is a simple service with methods to get/create/update/delete resources.
+The library has built-in universal on resource `HateoasResourceService`.
+It is a simple service with methods to `get`/`create`/`update`/`delete`/`search` resources.
 
-To use it inject `HateoasResourceService` to a component or a service class after that you can perform resource requests by passing the resource name.
+To use it inject `HateoasResourceService` to a component or a service class after that you can perform resource requests by passing the resource type.
 
 ```ts
+import { Resource, HateoasResource, HateoasResourceService } from '@lagoshny/ngx-hateoas-client';
+
+@HateoasResource('products')
+export class Product extends Resource {
+ ...
+}
+
 @Component({
   ...
 })
@@ -214,7 +250,7 @@ export class SomeComponent {
     product.cost = 100;
     product.name = 'Fruit';
 
-    this.resourceService.createResource('product', product)
+    this.resourceService.createResource(Product, product)
             .subscribe((createdResource: Product) => {
                 // TODO something
             });
@@ -223,58 +259,182 @@ export class SomeComponent {
 }
 ```
 
-Each `HateoasResourceService` method has the first param is the resource name that should be equals to the resource name in backend API.
-The resource name uses to build a URL for resource requests.
+Each `HateoasResourceService` method has the first param is the resource type that extends [Resource](#resource) class and decorated with [@HateoasResource](#hateoasresource).
+The resource type uses to build a URL for resource requests and create resources with a concrete class when parsing the server's answer.
 
-More about available `HateoasResourceService` methods see [here](#resource-service).
+More about `HateoasResourceService` methods see [here](#resource-service).
 
->`HateoasResourceService` is the best choice for simple resources that has not extra logic for requests.
-When you have some logic that should be preparing resource before a request, or you do not want always pass the resource name as first method param
-you can create a custom resource service extends `HateoasResourceOperation` to see more about this [here](#create-custom-resource-service).
+>`HateoasResourceService` is a universal service that can work with several `Resources` at a time, you need only pass a desired resource type as the first param.
+>If you have not extra logic to work with your resources then you can inject once `HateoasResourceService` and use it to work with your resources.
+
+When you have some logic that should be preparing resource before a request you need to create a custom resource service extends `HateoasResourceOperation` to see more about this [here](#create-custom-resource-service).
 
 ### Create custom Resource service
 
-To create custom resource service create a new service and extends it with `HateoasResourceOperation` and pass `resourceName` to parent constructor.
+To create a custom resource service create a new service and extends it with `HateoasResourceOperation` and pass `resourceType` to the parent constructor.
 
 ```ts
-import { HateoasResourceOperation } from '@lagoshny/ngx-hateoas-client';
+import { Resource, HateoasResource, HateoasResourceOperation } from '@lagoshny/ngx-hateoas-client';
+
+@HateoasResource('products')
+export class Product extends Resource {
+...
+}
 
 @Injectable({providedIn: 'root'})
 export class ProductService extends HateoasResourceOperation<Product> {
 
   constructor() {
-    super('products');
+    super(Product);
   }
 
 }
 
 ```
 
-`HateoasResourceOperation` has the same [methods](#resource-service) as `HateoasResourceService` without `resourceName` as the first param.
+`HateoasResourceOperation` has the same [methods](#resource-service) as `HateoasResourceService` without `resourceType` as the first param (because you pass `resourceType` with service constructor).
 
 ## Resource types
 
-There are several types of resources, the main resource type is [Resource](#resource) represents the server-side entity model class.
+There are several types of resources: the main resource type is [Resource](#resource) represents the server-side entity model class.
 If the server-side model has Embeddable entity type then use [EmbeddedResource](#embeddedresource) type instead [Resource](#resource) type.
 
 Both [Resource](#resource) and [EmbeddedResource](#embeddedresource) have some the same methods therefore they have common parent [BaseResource](#baseresource) class implements these methods.
+
+Also, you can create `Resource` class to represent resource projection, see more about resource projection [here](#resource-projection-support).
+
+>Each `Resource`/`EmbeddedResource` has decorators [@HateoasResource](#hateoasresource)/[@HateoasEmbeddedResource](#hateoasembeddedresource) respectively. They're used to register info about your resources in `hateoas-client`. For example, `resourceName` that used to build resource requests.
 
 To work with resource collections uses [ResourceCollection](#resourcecollection) type its holds an array of the resources.
 When you have a paged collection of resources result use an extension of [ResourceCollection](#resourcecollection) is [PagedResourceCollection](#pagedresourcecollection) that allows you to navigate by pages and perform custom page requests.
 
 In some cases, the server-side can have an entity inheritance model how to work with entity subtypes, you can found [here](#subtypes-support).
 
+## Decorators
+
+### @HateoasResource
+`@HateoasResource` decorator use to register your `Resource` classes in `hateoas-client` with passed `resourceName` as decorator's param.
+
+- `resourceName` should be equals to the server-side resource name that uses to represent self resource link.
+
+For example, you need to work with `Shop`resource:
+
+```ts
+import { Resource, HateoasResource } from '@lagoshny/ngx-hateoas-client';
+
+@HateoasResource('shops')
+export class Shop extends Resource {
+ ...
+}
+
+```
+
+It means that server-side use `shops` as resource name for `Shop` entity and it is resource self-link seem like: `http://localhost:8080/api/v1/shops` (with the assumption that server's root URL is `http://localhost:8080/api/v1`)
+
+>It is required to mark your `Resource` classes with this decorator otherwise you will get an error when performing resource request
+
+### @HateoasEmbeddedResource
+`@HateoasEmbeddedResource` decorator use to register your `EmbeddedResource` classes in `hateoas-client` with passed `relationNames` as decorator's param.
+
+- `relationNames` is an array of the names where each is the name of relation with which `EmbeddedResource` using in `Resource` class.
+
+For example, you have `Client` resource that using `Address` embedded resource:
+
+```ts
+import { EmbeddedResource, Resource, HateoasEmbeddedResource, HateoasResource } from '@lagoshny/ngx-hateoas-client';
+
+@HateoasEmbeddedResource(['clientAddress'])
+export class Address extends EmbeddedResource {
+ ...
+}
+
+@HateoasResource('clients')
+export class Client extends Resource {
+ ...
+ public clientAddress: Address;
+ ...
+}
+
+```
+
+In this case, `@HateoasEmbeddedResource.relationNames` has one element (`clientAddress`) that equals to property `Address` name in `Client` resource.
+
+If embedded resource `Address` will use in several resources then `@HateoasEmbeddedResource.relationNames` should have all different property `Address` names that used in these resources.
+
+>It is required to mark your `EmbeddedResource` classes with this decorator if wou want get concrete embedded resource class (in this example `Address` class). Otherwise you will get a warning about creating an embedded resource when parsing server's answer with the default `EmbeddedResource` class when performing resource request that using an embedded resource.
+
+### @HateoasProjection
+`@HateoasProjection` decorator use to register your projection resource classes in `hateoas-client` with passed `resourceType` and `projectionName` as decorator's params.
+
+- `resourceType` equals to resource type that use this resource projection.
+- `projectionName` should be equals to the server-side resource projection name.
+
+For example, you have `Shop` resource projection with the name `shopProjection`:
+
+```ts
+import { Resource, HateoasResource, HateoasProjection } from '@lagoshny/ngx-hateoas-client';
+
+@HateoasResource('shops')
+export class Shop extends Resource {
+...
+}
+
+@HateoasProjection(Shop, 'shopProjection')
+export class ShopProjection extends Resource {
+ ...
+}
+
+```
+
+Using `@HateoasProjection` you can create separate resource projection classes with desired resource properties and relations.
+For resource projection relations to another resource, you need to wrap these relations with [ProjectionRelType](#projectionreltype) type and mark these relations with [@ProjectionRel](#projectionrel) decorator with a relation resource type.
+
+- [ProjectionRelType](#projectionreltype) will hide `Resource`/`EmbeddedResource` methods for projection relation that will lead clear projection relation interface.
+- [@ProjectionRel](#projectionrel) decorator will be used to create relation with concrete resource type when parsing server-side answer.
+
+See more about resource projection support [here](#resource-projection-support).
+
+#### @ProjectionRel
+`@ProjectionRel` decorator use to register projection relation resource type in `hateoas-client` with passed `relationType` as decorator's param.
+
+- `relationType` equals to resource type that used as a relation property in resource projection.
+
+For example, you have `Shop` resource projection with the name `shopProjection` and this projection has relation to `Cart` resource:
+
+```ts
+import { Resource, HateoasResource, HateoasProjection, ProjectionRel, ProjectionRelType } from '@lagoshny/ngx-hateoas-client';
+import { ProjectionRelType } from './declarations';
+
+@HateoasResource('carts')
+export class Cart extends Resource {
+  ...
+}
+
+@HateoasProjection(Shop, 'shopProjection')
+export class ShopProjection extends Resource {
+  ...
+  @ProjectionRel(Cart)
+  public cart: ProjectionRelType<Cart>;
+  ...
+}
+
+```
+
+Using `@ProjectionRel` decorator allows knowing`hateoas-client` which relation resource type needs to use when creating a resource from the serv-side answer.
+
+> Here used `ProjectionRelType` type as a wrapper for `Cart` resource class, to hide `Resource`/`EmbeddedResource` methods in projection relation.
+> See more [here](#projectionreltype) about this type.
+
 ### Resource presets
 
 Examples of usage resource relation methods rely on presets.
 
 
-- Server root url = http://localhost:8080/api/v1
-
 - Resource classes are
-  ```ts
-  import { Resource } from '@lagoshny/ngx-hal-client';
+   ```ts
+  import { Resource, HateoasResource } from '@lagoshny/ngx-hateoas-client';
   
+  @HateoasResource('carts')
   export class Cart extends Resource {
   
       public shop: Shop;
@@ -287,6 +447,7 @@ Examples of usage resource relation methods rely on presets.
   
   }
   
+  @HateoasResource('shops')
   export class Shop extends Resource {
   
       public name: string;
@@ -295,6 +456,7 @@ Examples of usage resource relation methods rely on presets.
   
   }
    
+  @HateoasResource('products')
   export class Product extends Resource {
   
       public name: string;
@@ -305,18 +467,21 @@ Examples of usage resource relation methods rely on presets.
   
   }
   
+  @HateoasResource('clients')
   export class Client extends Resource {
   
     public address: string;
   
   }
   
+  @HateoasResource('physicalClients')
   export class PhysicalClient extends Client {
   
     public fio: string;
   
   }
   
+  @HateoasResource('juridicalClients')
   export class JuridicalClient extends Client {
   
     public inn: string;
@@ -326,6 +491,17 @@ Examples of usage resource relation methods rely on presets.
  
   ```
 
+- HateoasClientConfiguration:
+  ```ts
+    hateoasConfig.configure({
+        http: {
+            rootUrl: 'http://localhost:8080/api/v1'    
+        },
+        useTypes: {
+            resources: [Cart, Shop, Product, Client, PhysicalClient, JuridicalClient]
+        }
+    })
+  ```
 - Suppose we have existed resources:
   ```json
   Cart:
@@ -512,6 +688,7 @@ Getting related resource collection with pagination by relation name.
 This method takes [PagedGetOption](#pagedgetoption) parameter with it you can pass `projection` param (see below).
 
 >If do not pass `pageParams` with `PagedGetOption` then will be used [default page options](#default-page-values).
+>Also, you can set up own default page params through [configuration](#pagination-params).
 
 Method signature:
 
@@ -725,34 +902,7 @@ The difference between the `Resource` type and [EmbeddedResource](#embeddedresou
 
 `Resource` class extend [BaseResource](#baseresource) with additional resource relations methods that used only with `Resource` type.
 
-### IsResourceOf
-Uses when resource has sub-types, and you want to know what subtype current resource has.
-Read more about sub-types [here](#subtypes-support).
-
->Each [Resource](#resource) has a private property is `resourceName` that calculated by the URL which resource was get.
-Suppose to get `Cart` resource used the next URL: `http://localhost:8080/api/v1/carts/1`.
-Then `Cart.resourceName` will be equals to `carts` because this part of the URL represents the resource name.
-
-Method signature:
-
-```
-isResourceOf<T extends Resource>(typeOrName: (new () => T) | string): boolean;
-```
-- `typeOrName` - resource type, or string that represent resource name.
-  If you pass resource type for example `someResource.isResourceOf(CartPayment)` then class name will be used to compare with the resource name (ignoring letter case).
-  If you pass resource name as a string then it will be used to compare with resource name with (ignoring letter case).
-- `return value` - `true` when resource name equals passed value, `false` otherwise.
-
-##### Examples of usage ([given the presets](#resource-presets)):
-
-```ts
-// Suppose was perform GET request to get the Cart resource by the URL: http://localhost:8080/api/v1/carts/1
-
-cart.isResourceOf('carts'); // return TRUE
-cart.isResourceOf('cart'); // return FALSE
-cart.isResourceOf(Cart); // return FALSE because Cart class constructor name is 'cart'
-
-```
+>Each `Resource` class should be declared with [@HateoasResource](#hateoasresource) decorator.
 
 ### AddCollectionRelation
 Adding passed entities to the resource collection behind the relation name.
@@ -884,7 +1034,7 @@ Unbinding all resources from resource collection behind resource name.
 Used `PUT` method with `'Content-Type': 'text/uri-list'` and `EMPTY` body to clear relations.
 
 >This method does not work with SINGLE resource relations.
-> To delete single resource relations use [unboundRelation](#unboundRelation) or [deleteRelation](#deleterelation) methods.
+> To delete single resource relations use [unbindRelation](#unbindrelation) or [deleteRelation](#deleterelation) methods.
 > To delete one resource from collection use [deleteRelation](#deleterelation) method.
 
 Method signature:
@@ -914,10 +1064,10 @@ cart.unbindCollectionRelation('products')
 ### DeleteRelation
 Deleting resource relation.
 
-For collection, means that only passed entity will be unbound from the collection.
-For single resource, deleting relation the same as [undoundRelation](#unbindrelation) method.
+For collection, means that only passed entity will be unbind from the collection.
+For single resource, deleting relation the same as [unbindRelation](#unbindrelation) method.
 
->To delete all resource relations from collection use [clearCollectionRelation](#clearcollectionrelation) method.
+>To delete all resource relations from collection use [unbindCollectionRelation](#unbindcollectionrelation) method.
 
 Method signature:
 
@@ -948,6 +1098,8 @@ It means that this entity has not an id property and can't exist standalone.
 
 Because embedded resources have not an id then it can use only [BaseResource](#baseresource) methods.
 
+>Each `EmbeddedResource` class should be declared with [@HateoasEmbeddedResource](#hateoasembeddedresource) decorator.
+
 ## ResourceCollection
 This resource type represents collection of resources.
 You can get this type as result [GetRelatedCollection](#getrelatedcollection), [GetResourceCollection](#getresourcecollection) or perform [CustomQuery](#customquery)/[CustomSearchQuery](#customsearchquery) with passed return type as `ResourceCollection`.
@@ -961,7 +1113,9 @@ You can get this type as result [GetRelatedPage](#getrelatedpage), [GetPage](#ge
 PagedResourceCollection extends [ResourceCollection](#resourcecollection) type and adds methods to work with a page.
 
 ### Default page values
-When you do not pass `page` or `size` params in methods with [PagedGetOption](#pagedgetoption) then used default values: `page = 0`, `size = 20`.
+When you do not pass `page` or `size` params in methods with [PagedGetOption](#pagedgetoption) then used [default page values](#default-page-values).
+
+>Also, you can set up own default page params through [configuration](#pagination-params).
 
 ### HasFirst
 
@@ -1221,7 +1375,7 @@ pagedProductCollection.page(3, {useCache: false})
 ```
 
 ### Size
-Performing a request to get the page with passed page size and current or [default page number](#default-page-values) (if before page number not passed).
+Performing a request to get the page with passed page size and page number reset to `0` value.
 
 >To pass page number, page size, sort params together use [customPage](#custompage) method.
 
@@ -1240,10 +1394,10 @@ size(size: number, options?: {useCache: true;}): Observable<PagedResourceCollect
 
 Suppose products have 5 pages with 20 resources per page, and the previous request was to get products with a page number = 1, size = 20.
 
-To increase the current page size to 50, will perform a request to the current page number with page size = 50.
+To increase the current page size to 50, will perform a request to the page number = 0 and page size = 50.
 
 ```ts
-// Performing GET request by the URL: http://localhost:8080/api/v1/products?page=1&size=50
+// Performing GET request by the URL: http://localhost:8080/api/v1/products?page=0&size=50
 const pagedProductCollection = ...;
 pagedProductCollection.size(50)
   .subscribe((customPageResult: PagedResourceCollection<Product>) => {
@@ -1255,7 +1409,7 @@ pagedProductCollection.size(50)
 With options:
 
 ```ts
-// Performing GET request by the URL: http://localhost:8080/api/v1/products?page=1&size=50
+// Performing GET request by the URL: http://localhost:8080/api/v1/products?page=0&size=50
 const pagedProductCollection = ...;
 pagedProductCollection.size(50, {useCache: false})
   .subscribe((customPageResult: PagedResourceCollection<Product>) => {
@@ -1372,26 +1526,30 @@ The library allows work with entities hierarchy.
 Suppose exists the next resource's hierarchy:
 
 ```ts
- import { Resource } from '@lagoshny/ngx-hal-client';
+ import { Resource, HateoasResource } from '@lagoshny/ngx-hateoas-client';
   
+  @HateoasResource('carts')
   export class Cart extends Resource {
   
       public client: Client;
   
   }
-  
+
+  @HateoasResource('clients') 
   export class Client extends Resource {
   
     public address: string;
   
   }
-  
+
+  @HateoasResource('physicalClients')
   export class PhysicalClient extends Client {
   
     public fio: string;
   
   }
   
+  @HateoasResource('juridicalClients') 
   export class JuridicalClient extends Client {
   
     public inn: string;
@@ -1433,10 +1591,23 @@ With `hal-json` representation:
     }
   }
 ```  
+
+Of course, resource types are set in the configuration [useTypes](#configuration) section:
+
+```ts
+...
+  hateoasConfig.configure({
+    useTypes: {
+        resources: [Cart, Client, PhysicalClient, JuridicalClient]
+    }
+  }
+...
+```
+
 From the example, above can note that the `Cart` resource has the `client` property with type `Client`.
 In its turn, `client` can have one of the types `PhysicalClient` or `JuridicalClient`.
 
-You can use [Resource.isResourceOf](#isresourceof) method to know what `client` resource type you got.
+You can use `instanceof` statement to know what `client` resource type you got.
 
 ##### Examples of usage:
 
@@ -1445,32 +1616,145 @@ You can use [Resource.isResourceOf](#isresourceof) method to know what `client` 
 const cart = ...
 cart.getRelation('client')
   .subscribe((client: Client) => {
-    if (client.isResourceOf('physicalClients')) {
+    if (client instanceof PhysicalClient) {
       const physicalClient = client as PhysicalClient;
     // some logic        
-    } else if (client.isResourceOf('juridicalClients')) {
+    } else if (client instanceof JuridicalClient) {
       const juridicalClient = client as JuridicalClient;
     // some logic        
     }
   });
 ```
 
+## Resource projection support
+Spring Data Rest allows creating resource projections. Projection can show resource relations with a resource object as inner objects (not only as links in resource relation links array).
+`Hateoas-client` has support for these resource projections.
+
+See more about Spring Data Rest projections [here](https://docs.spring.io/spring-data/rest/docs/current/reference/html/#projections-excerpts).
+
+To create resource projection you need to create a projection class extend it with [Resource](#resource) and mark it with [@HateaosProjection](#hateoasprojection) decorator passing projection `resourceType` and `projectionName` params.
+
+- `resourceType` should be equals to resource type that use this projection.
+- `projectionName` should be equals to the server-side resource projection name.
+
+If your projection has property relations to resource classes then you should decorate these properties with [@ProjectionRel](#projectionrel) decorator passing `resourceType` param.
+Besides need to wrap property resource type with  [ProjectionRelType](#projectionreltype) type to hide `Resource`/`EmbeddedResource` methods (see example below).
+
+>As mentioned earlier that projection relations that resources are plain JSON objects. This means that these objects have not resources relations links array and other signs of the resource.
+But in your code when you will use existing resources classes as a relation type in projection class you will have all `Resource`/`EmbeddedResource` methods that can be applied only to resource type.
+To prevent this behavior you need all projection resource relation types to wrap with [ProjectionRelType](#projectionreltype) type.
+
+Resource projection example:
+
+Suppose, you have a projection with the name `cartProjection` for `Cart` resource:
+
+```ts
+import { Resource, HateoasResource, HateoasProjection, ProjectionRel, ProjectionRelType } from '@lagoshny/ngx-hateoas-client';
+
+@HateoasResource('carts')
+export class Cart extends Resource {
+  ...
+  public shop: Shop;
+  ...
+}
+
+@HateoasResource('shops')
+export class Shop extends Resource {
+  ...
+  public shopName: string;
+  
+  public printShopName() {
+      console.log(this.shopName)
+  }
+  ...
+}
+
+@HateoasProjection(Cart, 'cartProjection')
+export class CartProjection extends Resource {
+  ...
+  @ProjectionRel(Shop)
+  public shop: ProjectionRelType<Shop>;
+  ...
+}
+```
+
+Usages:
+
+```ts
+import { HateoasResourceService } from '@lagoshny/ngx-hateoas-client';
+
+...
+
+export class CartComponent {
+  constructor(private reosurceService: HateoasResourceService) {
+  }
+  
+  public getCartProjection(): CartProjection {
+      this.reosurceService.getResource(CartProjection, 1)
+        .subscribe((cartProjection: CartProjection) => {
+            // Will print `true` because cartProjection.shop is Shop type as was declared with @ProjectionRel decorator
+            console.log(cartProjection.shop instanceof Shop);
+            // Will print the shop name to the console
+            cartProjection.shop.printShopName();
+            // Will not compile because ProjectionRelType<Shop> has not Resource/EmbeddedResource methods
+            cartProjection.shop.getRelation(...);
+        })
+  }
+}
+...
+
+```
+
+In this case, `CartProjection.shop` is a simple object with the type `Shop` that has only `Shop` class properties and methods without `Resource`/`EmbeddedResource` methods.
+
+>Resource projection classes can be used with `HateoasResourceService` methods, you need to pass resource projection type as the first methods param instead of a simple resource type.
+
+### ProjectionRelType
+This is a special type that allows wrapping your resource relations properties in [resource projection](#resource-projection-support) to hide all `Reosurce`/`EmbeddedResource` methods.
+
+Usages:
+
+```ts
+import { Resource, HateoasResource, HateoasProjection, ProjectionRel, ProjectionRelType } from '@lagoshny/ngx-hateoas-client';
+
+@HateoasResource('carts')
+export class Cart extends Resource {
+  ...
+  public shop: Shop;
+  ...
+}
+
+@HateoasResource('shops')
+export class Shop extends Resource {
+}
+
+@HateoasProjection(Cart, 'cartProjection')
+export class CartProjection extends Resource {
+  ...
+  @ProjectionRel(Shop)
+  public shop: ProjectionRelType<Shop>;
+  ...
+}
+```
+
+Here `CartProjection.shop` will show only `Shop` type properties and methods. Methods from `Resource` will be hidden.
+
 ## Resource service
 
-As described before to work with resources you can use built-in [HateoasResourceService](#built-in-hateoasresourceservice)  or create [custom resource service](#resource-service).
+As described before to work with resources you can use built-in [HateoasResourceService](#built-in-hateoasresourceservice) or create [custom resource service](#resource-service).
 
->Difference in methods signature between built-in HateoasResourceService and custom resource service is built-in service always has a resource name as the first method param but can use without creating custom resource service
+>Difference in methods signature between built-in HateoasResourceService and custom resource service is built-in service always has a resource type as the first method param.
 
 ### Resource service presets
 
 Examples of usage resource service methods rely on this presets.
 
 
-- Server root url = http://localhost:8080/api/v1
 - Resource class is
   ```ts
-  import { Resource } from '@lagoshny/ngx-hal-client';
+  import { Resource, HateoasResource } from '@lagoshny/ngx-hateoas-client';
   
+  @HateoasResource('products')
   export class Product extends Resource {
   
       public name: string;
@@ -1479,28 +1763,88 @@ Examples of usage resource service methods rely on this presets.
   
       public description: string;
   
+      public type: ProductType;
+  
   }
+  
+  @HateoasResource('productTypes')
+  export class ProductType extends Resource {
+      public name: string;
+  }
+  ```
+
+- Resource projection class is
+  ```ts
+  import { Resource, HateoasProjection, ProjectionRel, ProjectionRelType } from '@lagoshny/ngx-hateoas-client';
+
+  @HateoasProjection(Product, 'productProjection')
+  export class ProuctProjection extends Resource {
+      public name: string;
+  
+      public cost: number;
+  
+      public description: string;
+  
+      @ProjectionRel(ProductType)
+      public type: ProjectionRelType<ProductType>;
+  }
+  ```
+
+- HateoasClientConfiguration:
+  ```ts
+    hateoasConfig.configure({
+        http: {
+            rootUrl: 'http://localhost:8080/api/v1'    
+        },
+        useTypes: {
+            resources: [Product, ProductType, ProuctProjection]
+        }
+    })
   ```
 
 - Resource service as built-in [HateoasResourceService](#built-in-hateoasresourceservice) is
   ```ts
   @Component({ ... })
   export class AppComponent {
-      constructor(private productHateoasService: HateoasResourceService) {
+      constructor(private resourceHateoasService: HateoasResourceService) {
       }
   }
   ```  
 
 - Resource service as [custom resource service](#create-custom-resource-service) is
   ```ts
-  import { HalResourceOperation } from '@lagoshny/ngx-hal-client';
-  import { Product } from '../model/product.model';
+  import { HateoasResourceOperation, HateoasResourceService, PagedResourceCollection, ResourceCollection} from '@lagoshny/ngx-hateoas-client';
   
   @Injectable({providedIn: 'root'})
-  export class ProductService extends HalResourceOperation<Product> {
-    constructor() {
-      super('products');
+  export class ProductService extends HateoasResourceOperation<Product> {
+    constructor(private resourceHateoasService: HateoasResourceService) {
+      super(Product);
     }
+    
+    public getProductProjection(id: number): Observable<ProductProjection> {
+      return this.resourceHateoasService.getResource(ProductProjection, id);
+    }
+      
+    public getProductProjections(): Observable<ResourceCollection<ProductProjection>> {
+      return this.resourceHateoasService.getCollection(ProductProjection);
+    }    
+  
+    public getPagedProductProjections(): Observable<PagedResourceCollection<ProductProjection>> {
+      return this.resourceHateoasService.getPage(ProductProjection);
+    }    
+     
+    public searchProductProjection(searchQuery: string): Observable<ProductProjection> {
+      return this.resourceHateoasService.searchResource(ProductProjection, searchQuery);
+    }
+      
+    public searchProductProjections(searchQuery: string): Observable<ResourceCollection<ProductProjection>> {
+      return this.resourceHateoasService.searchCollection(ProductProjection, searchQuery);
+    }    
+  
+    public searchPagedProductProjections(searchQuery: string): Observable<PagedResourceCollection<ProductProjection>> {
+      return this.resourceHateoasService.searchPage(ProductProjection, searchQuery);
+    }
+
   }
   
   @Component({ ... })
@@ -1510,12 +1854,13 @@ Examples of usage resource service methods rely on this presets.
   }
   ```
 
-**No matter which service used both have the same resource methods.**
+**No matter which service used (custom or built-in) both have the same resource methods.**
 
 ### GetResource
 Getting one resource [Resource](#resource).
+This method takes [GetOption](#getoption) parameter type.
 
-This method takes [GetOption](#getoption) parameter with it you can pass `projection` param.
+>To get resource projection instead of a resource type pass resource projection type in first method param when used `resourceHateoasService`. See more about projection support [here](#resource-projection-support).
 
 Method signature:
 
@@ -1537,7 +1882,7 @@ this.productService.getResource(1)
         // some logic
     })
 
-this.productHateoasService.getResource('products', 1)
+this.resourceHateoasService.getResource(Product, 1)
     .subscribe((product: Product) => {
         // some logic
     })
@@ -1546,11 +1891,10 @@ this.productHateoasService.getResource('products', 1)
 With options:
 
 ```ts
-// Performing GET request by the URL: http://localhost:8080/api/v1/products/1?testParam=test&projection=productProjection&sort=cost,ASC
+// Performing GET request by the URL: http://localhost:8080/api/v1/products/1?testParam=test&sort=cost,ASC
 this.productService.getResource(1, {
   params: {
-    testParam: 'test',
-    projection: 'productProjection',
+    testParam: 'test'
   },
   sort: {
     cost: 'ASC'
@@ -1560,10 +1904,9 @@ this.productService.getResource(1, {
     // some logic
 })
 
-this.productHateoasService.getResource('products', 1, {
+this.resourceHateoasService.getResource(Product, 1, {
   params: {
-    testParam: 'test',
-    projection: 'productProjection',
+    testParam: 'test'
   },
   sort: {
     cost: 'ASC'
@@ -1574,9 +1917,25 @@ this.productHateoasService.getResource('products', 1, {
 })
 ```
 
+Get projection example:
+```ts
+// Performing GET request by the URL: http://localhost:8080/api/v1/products/1?projection=productProjection
+this.productService.getProductProjection(1)
+  .subscribe((productProjection: ProductProjection) => {
+    // some logic
+  })
+
+this.resourceHateoasService.getResource(ProductProjection, 1)
+  .subscribe((productProjection: ProductProjection) => {
+    // some logic
+})
+```
+
 ### GetCollection
 Getting collection of resources [ResourceCollection](#resourcecollection).
-This method takes [GetOption](#getoption) parameter with it you can pass `projection` param.
+This method takes [GetOption](#getoption) parameter type.
+
+>To get resource projection instead of a resource type pass resource projection type in first method param when used `resourceHateoasService`. See more about projection support [here](#resource-projection-support).
 
 Method signature:
 
@@ -1598,7 +1957,7 @@ this.productService.getCollection()
         // some logic
     })
 
-this.productHateoasService.getCollection('products')
+this.resourceHateoasService.getCollection(Product)
     .subscribe((collection: ResourceCollection<Product>) => {
         const products: Array<Product> = collection.resources;
         // some logic
@@ -1608,11 +1967,10 @@ this.productHateoasService.getCollection('products')
 With options:
 
 ```ts
-// Performing GET request by the URL: http://localhost:8080/api/v1/products?testParam=test&projection=productProjection&sort=cost,ASC
+// Performing GET request by the URL: http://localhost:8080/api/v1/products?testParam=test&sort=cost,ASC
 this.productService.getCollection({
   params: {
-    testParam: 'test',
-    projection: 'productProjection',
+    testParam: 'test'
   },
   sort: {
     cost: 'ASC'
@@ -1623,10 +1981,9 @@ this.productService.getCollection({
     // some logic
 })
 
-this.productHateoasService.getCollection('products', {
+this.resourceHateoasService.getCollection(Producr, {
   params: {
-    testParam: 'test',
-    projection: 'productProjection',
+    testParam: 'test'
   },
   sort: {
     cost: 'ASC'
@@ -1638,12 +1995,28 @@ this.productHateoasService.getCollection('products', {
 })
 ```
 
+Get projection example:
+```ts
+// Performing GET request by the URL: http://localhost:8080/api/v1/products?projection=productProjection
+this.productService.getProductProjections()
+  .subscribe((productProjections: ResourceCollection<ProductProjection>) => {
+    // some logic
+  })
+
+this.resourceHateoasService.getCollection(ProductProjection)
+  .subscribe((productProjections: ResourceCollection<ProductProjection>) => {
+    // some logic
+})
+```
+
 ### GetPage
 Getting paged collection of resources [PagedResourceCollection](#pagedresourcecollection).
+This method takes [PagedGetOption](#pagedgetoption) parameter type.
 
-This method takes [PagedGetOption](#pagedgetoption) parameter with it you can pass `projection` param (see below).
+>To get resource projection instead of a resource type pass resource projection type in first method param when used `resourceHateoasService`. See more about projection support [here](#resource-projection-support).
 
 >If do not pass `pageParams` with `PagedGetOption` then will be used [default page options](#default-page-values).
+>Also, you can set up own default page params through [configuration](#pagination-params).
 
 Method signature:
 
@@ -1667,11 +2040,14 @@ this.productService.getPage()
            page.last();
            page.next();
            page.prev();
-           page.customPage();
+           page.size(...);
+           page.page(...);
+           page.sortElements(...);
+           page.customPage(...);
         */    
     });
 
-this.productHateoasService.getPage('products')
+this.resourceHateoasService.getPage(Product)
     .subscribe((page: PagedResourceCollection<Product>) => {
         const products: Array<Product> = page.resources;
         /* can use page methods
@@ -1679,7 +2055,10 @@ this.productHateoasService.getPage('products')
            page.last();
            page.next();
            page.prev();
-           page.customPage();
+           page.size(...);
+           page.page(...);
+           page.sortElements(...);
+           page.customPage(...);
         */   
     });
 ```
@@ -1687,15 +2066,14 @@ this.productHateoasService.getPage('products')
 With options:
 
 ```ts
-// Performing GET request by the URL: http://localhost:8080/api/v1/products?testParam=test&projection=productProjection&page=1&size=40&sort=cost,ASC
+// Performing GET request by the URL: http://localhost:8080/api/v1/products?testParam=test&page=1&size=40&sort=cost,ASC
 this.productService.getPage({
   pageParams: {
     page: 1,
     size: 40
   },
   params: {
-    testParam: 'test',
-    projection: 'productProjection',
+    testParam: 'test'
   },
   sort: {
     cost: 'ASC'
@@ -1708,18 +2086,20 @@ this.productService.getPage({
        page.last();
        page.next();
        page.prev();
-       page.customPage();
+       page.size(...);
+       page.page(...);
+       page.sortElements(...);
+       page.customPage(...);
     */  
 });
 
-this.productHateoasService.getPage('products', {
+this.resourceHateoasService.getPage(Product, {
   pageParams: {
     page: 1,
     size: 40
   },
   params: {
-    testParam: 'test',
-    projection: 'productProjection',
+    testParam: 'test'
   },
   sort: {
     cost: 'ASC'
@@ -1732,9 +2112,46 @@ this.productHateoasService.getPage('products', {
        page.last();
        page.next();
        page.prev();
-       page.customPage();
+       page.size(...);
+       page.page(...);
+       page.sortElements(...);
+       page.customPage(...);
     */  
 });
+```
+
+Get projection example:
+```ts
+// Performing GET request by the URL: http://localhost:8080/api/v1/products?projection=productProjection
+this.productService.getPagedProductProjections()
+  .subscribe((page: PagedResourceCollection<ProductProjection>) => {
+    const products: Array<ProductProjection> = page.resources;
+    /* can use page methods
+       page.first();
+       page.last();
+       page.next();
+       page.prev();
+       page.size(...);
+       page.page(...);
+       page.sortElements(...);
+       page.customPage(...);
+    */
+  })
+
+this.resourceHateoasService.getPage(ProductProjection)
+  .subscribe((page: PagedResourceCollection<ProductProjection>) => {
+    const products: Array<ProductProjection> = page.resources;
+    /* can use page methods
+       page.first();
+       page.last();
+       page.next();
+       page.prev();
+       page.size(...);
+       page.page(...);
+       page.sortElements(...);
+       page.customPage(...);
+    */
+  })
 ```
 
 ### CreateResource
@@ -1771,7 +2188,7 @@ this.productService.createResource({
     // some logic 
 });
 
-this.productHateoasService.createResource('products', {
+this.resourceHateoasService.createResource(Product, {
   body: newProduct
 }).subscribe((createdProduct: Product) => {
     // some logic 
@@ -1804,7 +2221,7 @@ this.productService.createResource({
     // some logic 
 });
 
-this.productHateoasService.createResource('products', {
+this.resourceHateoasService.createResource(Product, {
   body: newProduct,
   valuesOption: {
     include: Include.NULL_VALUES
@@ -1859,7 +2276,7 @@ this.productService.updateResource(exitsProduct)
   .subscribe((updatedProduct: Product) => {
     // some logic 
 });
-// For productHateoasService this snippet is identical
+// For resourceHateoasService this snippet is identical
 ```
 
 With options:
@@ -1889,7 +2306,7 @@ this.productService.updateResource(exitsProduct, {
 }).subscribe((updatedProduct: Product) => {
     // some logic 
 });
-// For productHateoasService this snippet is identical
+// For resourceHateoasService this snippet is identical
 ```
 
 ### UpdateResourceById
@@ -1937,7 +2354,7 @@ this.productService.updateResourceById(1, {
     // some logic 
 });
 
-this.productHateoasService.updateResourceById('products', 1, {
+this.resourceHateoasService.updateResourceById(Product, 1, {
   body: {
     ...exitsProduct
   }
@@ -1975,7 +2392,7 @@ this.productService.updateResourceById(1, {
     // some logic 
 });
 
-this.productHateoasService.updateResourceById('products', 1, {
+this.resourceHateoasService.updateResourceById(Product, 1, {
   body: {
     name: null,
     cost: 500
@@ -2033,7 +2450,7 @@ this.productService.patchResource(exitsProduct)
   .subscribe((patchedProduct: Product) => {
     // some logic 
 });
-// For productHateoasService this snippet is identical
+// For resourceHateoasService this snippet is identical
 ```
 
 With options:
@@ -2063,7 +2480,7 @@ this.productService.patchResource(exitsProduct, {
 }).subscribe((patchedProduct: Product) => {
     // some logic 
 });
-// For productHateoasService this snippet is identical
+// For resourceHateoasService this snippet is identical
 
 ```
 
@@ -2112,7 +2529,7 @@ this.productService.patchResourceById(1, {
     // some logic 
 });
 
-this.productHateoasService.patchResourceById('products', 1, {
+this.resourceHateoasService.patchResourceById(Product, 1, {
   body: {
     ...exitsProduct
   }
@@ -2150,7 +2567,7 @@ this.productService.patchResourceById(1, {
     // some logic 
 });
 
-this.productHateoasService.patchResourceById('products', 1, {
+this.resourceHateoasService.patchResourceById(Product, 1, {
   body: {
     name: null,
     cost: 500
@@ -2192,7 +2609,7 @@ this.productService.deleteResource(exitsProduct)
   .subscribe((result: any) => {
     // some logic     
   });
-// For productHateoasService this snippet is identical
+// For resourceHateoasService this snippet is identical
 ```
 
 With options:
@@ -2212,7 +2629,7 @@ this.productService.deleteResource(exitsProduct, {
   .subscribe((result: HttpResponse<any>) => {
     // some logic     
   });
-// For productHateoasService this snippet is identical
+// For resourceHateoasService this snippet is identical
 ```
 
 ### DeleteResourceById
@@ -2242,7 +2659,7 @@ this.productService.deleteResourceById(1)
     // some logic     
   });
 
-this.productHateoasService.deleteResourceById('products', 1)
+this.resourceHateoasService.deleteResourceById(Product, 1)
   .subscribe((result: any) => {
     // some logic     
   });
@@ -2266,7 +2683,7 @@ this.productService.deleteResourceById(1, {
     // some logic     
   });
 
-this.productHateoasService.deleteResourceById('products', 1, {
+this.resourceHateoasService.deleteResourceById(Product, 1, {
   observe: 'response',
   params: {
     testParam: 'test'
@@ -2280,7 +2697,9 @@ this.productHateoasService.deleteResourceById('products', 1, {
 ### SearchResource
 Searching for one resource [Resource](#resource).
 
-This method takes [GetOption](#getoption) parameter with it you can pass `projection` param.
+This method takes [GetOption](#getoption) parameter type.
+
+>To search resource projection instead of a resource type pass resource projection type in first method param when used `resourceHateoasService`. See more about projection support [here](#resource-projection-support).
 
 Method signature:
 
@@ -2304,7 +2723,7 @@ this.productService.searchResource('searchQuery')
         // some logic
     });
 
-this.productHateoasService.searchResource('products', 'searchQuery')
+this.resourceHateoasService.searchResource(Product, 'searchQuery')
     .subscribe((product: Product) => {
         // some logic
     });
@@ -2313,10 +2732,9 @@ this.productHateoasService.searchResource('products', 'searchQuery')
 With options:
 
 ```ts
-// Performing GET request by the URL: http://localhost:8080/api/v1/products/search/byName?name=Fruit&projection=productProjection&sort=name,ASC
+// Performing GET request by the URL: http://localhost:8080/api/v1/products/search/byName?name=Fruit&sort=name,ASC
 this.productService.searchResource('byName', {
   params: {
-    projection: 'productProjection',
     name: 'Fruit'
   },
   sort: {
@@ -2328,9 +2746,8 @@ this.productService.searchResource('byName', {
     // some logic
   });
 
-this.productHateoasService.searchResource('products', 'byName', {
+this.resourceHateoasService.searchResource(Product, 'byName', {
   params: {
-    projection: 'productProjection',
     name: 'Fruit'
   },
   sort: {
@@ -2344,10 +2761,26 @@ this.productHateoasService.searchResource('products', 'byName', {
 
 ```
 
+Get projection example:
+```ts
+// Performing GET request by the URL: http://localhost:8080/api/v1/products/search/searchQuery?projection=productProjection
+this.productService.searchProductProjection()
+  .subscribe((productProjections: ProductProjection) => {
+    // some logic
+  })
+
+this.resourceHateoasService.searchResource(ProductProjection, 'searchQuery')
+  .subscribe((productProjections: ProductProjection) => {
+    // some logic
+})
+```
+
 #### SearchCollection
 Searching for collection of resources [ResourceCollection](#resourcecollection).
 
-This method takes [GetOption](#getoption) parameter with it you can pass `projection` param.
+This method takes [GetOption](#getoption) parameter type.
+
+>To search resource projection instead of a resource type pass resource projection type in first method param when used `resourceHateoasService`. See more about projection support [here](#resource-projection-support).
 
 Method signature:
 
@@ -2372,7 +2805,7 @@ this.productService.searchCollection('searchQuery')
         // some logic
     });
 
-this.productHateoasService.searchCollection('products', 'searchQuery')
+this.resourceHateoasService.searchCollection(Product, 'searchQuery')
     .subscribe((collection: ResourceCollection<Product>) => {
         const products: Array<Product> = collection.resources;
         // some logic
@@ -2382,11 +2815,10 @@ this.productHateoasService.searchCollection('products', 'searchQuery')
 With options:
 
 ```ts
-// Performing GET request by the URL: http://localhost:8080/api/v1/products/search/byName?name=Fruit&projection=productProjection&sort=name,ASC
+// Performing GET request by the URL: http://localhost:8080/api/v1/products/search/byName?name=Fruit&sort=name,ASC
 this.productService.searchCollection('byName', {
   params: {
-    name: 'Fruit',
-    projection: 'productProjection',
+    name: 'Fruit'
   },
   sort: {
     name: 'ASC'
@@ -2397,10 +2829,9 @@ this.productService.searchCollection('byName', {
     // some logic
 });
 
-this.productHateoasService.searchCollection('products', 'byName', {
+this.resourceHateoasService.searchCollection(Product, 'byName', {
   params: {
-    name: 'Fruit',
-    projection: 'productProjection',
+    name: 'Fruit'
   },
   sort: {
     name: 'ASC'
@@ -2413,12 +2844,28 @@ this.productHateoasService.searchCollection('products', 'byName', {
 
 ```
 
+Get projection example:
+```ts
+// Performing GET request by the URL: http://localhost:8080/api/v1/products/search/searchQuery?projection=productProjection
+this.productService.searchProductProjections()
+  .subscribe((productProjections: ResourceCollection<ProductProjection>) => {
+    // some logic
+  })
+
+this.resourceHateoasService.searchCollection(Product, 'searchQuery')
+  .subscribe((productProjections: ResourceCollection<ProductProjection>) => {
+    // some logic
+})
+```
+
 #### SearchPage
 Searching for collection of resources with pagination[PagedResourceCollection](#pagedresourcecollection).
+This method takes [PagedGetOption](#pagedgetoption) parameter type.
 
-This method takes [PagedGetOption](#pagedgetoption) parameter with it you can pass `projection` param (see below).
+>To search resource projection instead of a resource type pass resource projection type in first method param when used `resourceHateoasService`. See more about projection support [here](#resource-projection-support).
 
 >If do not pass `pageParams` with `PagedGetOption` then will be used [default page options](#default-page-values).
+>Also, you can set up own default page params through [configuration](#pagination-params).
 
 Method signature:
 
@@ -2440,28 +2887,45 @@ searchPage(searchQuery: string, options?: PagedGetOption): Observable<PagedResou
 this.productService.searchPage('searchQuery')
     .subscribe((pagedCollection: PagedResourceCollection<Product>) => {
         const products: Array<Product> = pagedCollection.resources;
-        // some logic
+        /* can use page methods
+           page.first();
+           page.last();
+           page.next();
+           page.prev();
+           page.size(...);
+           page.page(...);
+           page.sortElements(...);
+           page.customPage(...);
+        */    
     });
 
-this.productHateoasService.searchPage('products', 'searchQuery')
+this.resourceHateoasService.searchPage(Product, 'searchQuery')
     .subscribe((pagedCollection: PagedResourceCollection<Product>) => {
         const products: Array<Product> = pagedCollection.resources;
-        // some logic
+        /* can use page methods
+           page.first();
+           page.last();
+           page.next();
+           page.prev();
+           page.size(...);
+           page.page(...);
+           page.sortElements(...);
+           page.customPage(...);
+        */
     });
 ```
 
 With options:
 
 ```ts
-// Performing GET request by the URL: http://localhost:8080/api/v1/products/search/byName?name=Fruit&projection=productProjection&page=1&size=30&sort=name,ASC
+// Performing GET request by the URL: http://localhost:8080/api/v1/products/search/byName?name=Fruit&page=1&size=30&sort=name,ASC
 this.productService.searchPage('byName', {
   pageParams: {
     page: 1,
     size: 30
   },
   params: {
-    name: 'Fruit',
-    projection: 'productProjection',
+    name: 'Fruit'
   },
   sort: {
     name: 'ASC'
@@ -2469,17 +2933,25 @@ this.productService.searchPage('byName', {
   // useCache: true | false, by default true
 }).subscribe((pagedCollection: PagedResourceCollection<Product>) => {
     const products: Array<Product> = pagedCollection.resources;
-    // some logic
+    /* can use page methods
+       page.first();
+       page.last();
+       page.next();
+       page.prev();
+       page.size(...);
+       page.page(...);
+       page.sortElements(...);
+       page.customPage(...);
+    */
 });
 
-this.productHateoasService.searchPage('products', 'byName', {
+this.resourceHateoasService.searchPage(Product, 'byName', {
   pageParams: {
     page: 1,
     size: 40
   },
   params: {
-    testParam: 'test',
-    projection: 'productProjection',
+    testParam: 'test'
   },
   sort: {
     cost: 'ASC'
@@ -2487,10 +2959,54 @@ this.productHateoasService.searchPage('products', 'byName', {
   // useCache: true | false, by default true
 }).subscribe((pagedCollection: PagedResourceCollection<Product>) => {
     const products: Array<Product> = pagedCollection.resources;
-    // some logic
+    /* can use page methods
+       page.first();
+       page.last();
+       page.next();
+       page.prev();
+       page.size(...);
+       page.page(...);
+       page.sortElements(...);
+       page.customPage(...);
+    */
 });
 
 ```
+
+Get projection example:
+```ts
+// Performing GET request by the URL: http://localhost:8080/api/v1/products/search/searchQuery?page=0&size=20&projection=productProjection
+this.productService.searchPagedProductProjections()
+  .subscribe((page: PagedResourceCollection<ProductProjection>) => {
+    const products: Array<ProductProjection> = page.resources;
+    /* can use page methods
+       page.first();
+       page.last();
+       page.next();
+       page.prev();
+       page.size(...);
+       page.page(...);
+       page.sortElements(...);
+       page.customPage(...);
+    */
+  })
+
+this.resourceHateoasService.searchPage(ProductProjection)
+  .subscribe((page: PagedResourceCollection<ProductProjection>) => {
+    const products: Array<ProductProjection> = page.resources;
+    /* can use page methods
+       page.first();
+       page.last();
+       page.next();
+       page.prev();
+       page.size(...);
+       page.page(...);
+       page.sortElements(...);
+       page.customPage(...);
+    */
+  })
+```
+
 
 #### CustomQuery
 Performing custom HTTP request for resource.
@@ -2518,7 +3034,7 @@ this.productService.customQuery<number>(HttpMethod.GET, '/search/countAllBy')
     // some logic        
   });
 
-this.productHateoasService.customQuery<number>('products', HttpMethod.GET, '/search/countAllBy')
+this.resourceHateoasService.customQuery<number>(Product, HttpMethod.GET, '/search/countAllBy')
   .subscribe((count: number) => {
     // some logic        
   });
@@ -2551,7 +3067,7 @@ this.productService.customSearchQuery<number>(HttpMethod.GET, '/countAllBy')
     // some logic        
   });
 
-this.productHateoasService.customSearchQuery<number>('products', HttpMethod.GET, '/countAllBy')
+this.resourceHateoasService.customSearchQuery<number>(Product, HttpMethod.GET, '/countAllBy')
   .subscribe((count: number) => {
     // some logic        
   });
@@ -2575,6 +3091,11 @@ The library accepts configuration object:
     enabled: boolean;
     lifeTime?: number;
   };
+  useTypes?: {
+    resources: Array<new (...args: any[]) => Resource>;
+    embeddedResources?: Array<new (...args: any[]) => EmbeddedResource>;
+  };
+  isProduction?: boolean;
 ```
 #### Http params
 
@@ -2593,6 +3114,35 @@ The library accepts configuration object:
 - `lifeTime` - default cache lifetime is 300 000 seconds (=5 minutes) pass new value to change default one.
 
 > See more about caching [here](#cache-support).
+
+#### UseTypes params
+This configuration section uses to declare resource/embedded resource types that will be used to create resources with concrete resource classes when parsed server's answer.
+
+For example, you use subtypes and you need to know which subtype is received from the server (see more about suptypes in this [section](#subtypes-support)).
+If you do not declare this subtype type in `useTypes.resources` section you get the common `Resource` class type without your subtype class methods.
+
+Because [@HateoasResource](#hateoasresource)/[@HateoasEmbeddedResource](#hateoasembeddedresource) decorators are used to registering heirs of `Resource`/`EmbeddedResource` classes in `hateoas-client`, then if you did not use your `Resource` class in your code
+(i.e. there was no import of this resource in your code, it will be means that the decorator did not run), then you will receive a generic `Resource` type instead of a concrete resource type when parsed the server's answer.
+When will it happen you will get `warnings` in the browser console.
+
+To prevent it you need to declare this resource type in `useTypes.resources` section. This will run [@HaeoasResource](#hateoasresource) resource decorator and register your `Resource` type in `hateoas-client`.
+The same logic applied to [EmbeddedResource](#embeddedresource)'s. Use `useTypes.embeddedResources` to register your `EmbeddedResource`'s type in `hateoas-client`.
+
+>It is recommend if all types of your resources (i.e. your classes that extended [Resource](#resource)/[EmbeddedResource](#embeddedresource) classes) will be declared in sections `useTypes.resources` and `useTypes.embeddedResources` respectively.
+
+- `resources` - an array of the [Resource](#resource) types used to create concrete resource types when parsed server's answer instead of common `Resource` type.
+- `embeddedResources` - an array of the [EmbeddedResource](#embeddedresource) types used to create concrete embedded resource types when parsed server's answer instead of common `EmbeddedResource` type.
+
+#### isProduction param
+Some `hateoas-client` features can change their behaviours depends on this param. For example, [Logging](#logging) disable all `warning` messages when `isProduction` is true.
+
+- `isProduction` - need set to `true` when running in production environment, `false` by default.
+
+#### Pagination params
+Let to change [default page params](#default-page-values) that use when a page request not pass page params.
+
+- `size` - change default page size, current value you can see [here](#default-page-values).
+- `page` - change default page number, current value you can see [here](#default-page-values).
 
 ### Cache support
 The library supports caching `GET` request response values.
@@ -2637,6 +3187,13 @@ There are several logging stages:
 
 With logging, you can find out was a value fetched from the cache or the server, how resource relationships resolved etc.
 
+#### Warnings
+Logs can appear in the browser's console with a warning level. These messages can help you to understand what is problem and how you need to fix it.
+
+It, not good practice to show these messages in production therefore warning level logs to disable when `hateoas-client` used in `production` mode.
+
+>See more [configuration section](#isproduction-param) how to set production mode.
+
 ## Public classes
 This section describes public classes available to use in client apps.
 
@@ -2649,7 +3206,6 @@ Uses as option type in methods that retrieve resource or resource collection fro
 export interface GetOption {
   params?: {
     [paramName: string]: Resource | string | number | boolean;
-    projection?: string;
   };
   sort?: Sort;
   useCache?: boolean;

@@ -1,4 +1,6 @@
 import { Resource } from './resource/resource';
+import { BaseResource } from './resource/base-resource';
+import { EmbeddedResource } from './resource/embedded-resource';
 
 /**
  * Resource link object.
@@ -45,7 +47,6 @@ export interface PagedGetOption extends GetOption {
 export interface GetOption {
   params?: {
     [paramName: string]: Resource | string | number | boolean;
-    projection?: string;
   };
   /**
    * Sorting options.
@@ -173,3 +174,14 @@ export interface RequestBody<T> {
 export enum HttpMethod {
   GET = 'GET', POST = 'POST', PUT = 'PUT', PATCH = 'PATCH'
 }
+
+type NonResourcePropertyType<T> = {
+  [K in keyof T]: T[K] extends BaseResource ? never : K;
+}[keyof T];
+
+/**
+ * Type that allowed represent resource relations as resource projection excluding {@link Resource},
+ * {@link EmbeddedResource} props and methods from current type.
+ */
+export type ProjectionRelType<T extends BaseResource> =
+  Pick<T, Exclude<keyof T, keyof Resource | keyof EmbeddedResource> & NonResourcePropertyType<T>>;

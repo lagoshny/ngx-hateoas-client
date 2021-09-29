@@ -1,6 +1,6 @@
 import { StageLogger } from '../logger/stage-logger';
 import { Stage } from '../logger/stage.enum';
-import { isArray, isEmpty, isNil, isObject, isPlainObject, isString } from 'lodash-es';
+import { isArray, isEmpty, isFunction, isNil, isObject, isPlainObject, isString } from 'lodash-es';
 
 export class ValidationUtils {
 
@@ -20,6 +20,11 @@ export class ValidationUtils {
 
     const notValidParams = [];
     for (const [key, value] of Object.entries(params)) {
+      // tslint:disable-next-line:no-string-literal
+      if (isFunction(value) && isFunction(value.constructor) && !value['__resourceName__']) {
+        throw new Error(`Resource '${ value.name }' has not 'resourceName' value. Set it with @HateoasResource decorator on '${ value.name }' class.`);
+      }
+
       if (isNil(value)
         || (isString(value) && !value)
         || (isPlainObject(value) && isEmpty(value))

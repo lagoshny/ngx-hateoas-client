@@ -11,7 +11,7 @@ import { capitalize, isEmpty, isNil, isObject, isString } from 'lodash-es';
 export class StageLogger {
 
   public static resourceBeginLog(resource: object | string, method: string, params?: object): void {
-    if (!LibConfig.config.logs.verboseLogs) {
+    if (!LibConfig.config.logs.verboseLogs && !LibConfig.config.isProduction) {
       return;
     }
     const paramToLog = this.prepareParams(params);
@@ -20,7 +20,7 @@ export class StageLogger {
     if (isString(resource)) {
       resourceName = resource;
     } else if (!isNil(resource)) {
-      resourceName = 'resourceName' in resource ? resource['resourceName'] : 'EmbeddedResource';
+      resourceName = '__resourceName__' in resource ? resource['__resourceName__'] : 'EmbeddedResource';
     } else {
       resourceName = 'NOT_DEFINED_RESOURCE_NAME';
     }
@@ -29,7 +29,7 @@ export class StageLogger {
   }
 
   public static resourceEndLog(resource: object | string, method: string, params: object): void {
-    if (!LibConfig.config.logs.verboseLogs) {
+    if (!LibConfig.config.logs.verboseLogs && !LibConfig.config.isProduction) {
       return;
     }
     const paramToLog = this.prepareParams(params);
@@ -38,7 +38,7 @@ export class StageLogger {
     if (isString(resource)) {
       resourceName = resource;
     } else {
-      resourceName = 'resourceName' in resource ? resource['resourceName'] : 'EmbeddedResource';
+      resourceName = '__resourceName__' in resource ? resource['__resourceName__'] : 'EmbeddedResource';
     }
 
     ConsoleLogger.resourcePrettyInfo(`${ capitalize(resourceName) } ${ method }`,
@@ -46,7 +46,7 @@ export class StageLogger {
   }
 
   public static stageLog(stage: Stage, params: object): void {
-    if (!LibConfig.config.logs.verboseLogs) {
+    if (!LibConfig.config.logs.verboseLogs && !LibConfig.config.isProduction) {
       return;
     }
     const paramToLog = this.prepareParams(params);
@@ -55,12 +55,21 @@ export class StageLogger {
   }
 
   public static stageErrorLog(stage: Stage, params: object): void {
-    if (!LibConfig.config.logs.verboseLogs) {
+    if (LibConfig.config.isProduction) {
       return;
     }
     const paramToLog = this.prepareParams(params);
 
     ConsoleLogger.prettyError(`STAGE ${ stage }`, paramToLog);
+  }
+
+  public static stageWarnLog(stage: Stage, params: object): void {
+    if (LibConfig.config.isProduction) {
+      return;
+    }
+    const paramToLog = this.prepareParams(params);
+
+    ConsoleLogger.prettyWarn(`STAGE ${ stage }`, paramToLog);
   }
 
   private static prepareParams(params: object) {

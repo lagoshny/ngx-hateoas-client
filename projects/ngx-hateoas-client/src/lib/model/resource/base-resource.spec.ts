@@ -316,7 +316,7 @@ describe('BaseResource GET_RELATED_PAGE', () => {
       }
     }).subscribe(() => {
       const resultResourceUrl = pagedResourceCollectionHttpServiceSpy.get.calls.argsFor(0)[0];
-      expect(resultResourceUrl).toBe('http://localhost:8080/api/v1/order/1/products?projection=productProjection');
+      expect(resultResourceUrl).toBe('http://localhost:8080/api/v1/order/1/products?page=0&size=20&projection=productProjection');
     });
   });
 

@@ -1,6 +1,9 @@
 /**
  * Describe all client configuration params.
  */
+import { Resource } from '../model/resource/resource';
+import { EmbeddedResource } from '../model/resource/embedded-resource';
+
 export interface HateoasConfiguration {
 
   /**
@@ -44,6 +47,30 @@ export interface HateoasConfiguration {
      * Time in milliseconds after which cache need to be expired.
      */
     lifeTime?: number;
+  };
+
+  /**
+   * Declared resource/embedded resource types that will be used to create resources from server response that contains resources.
+   */
+  useTypes?: {
+    resources: Array<new (...args: any[]) => Resource>;
+    embeddedResources?: Array<new (...args: any[]) => EmbeddedResource>;
+  };
+
+  /**
+   * {@code true} when running in production environment, {@code false} otherwise.
+   */
+  isProduction?: boolean;
+
+
+  /**
+   * Let to change default page params that is size = 20, page = 0.
+   */
+  pagination?: {
+    defaultPage: {
+      size: number;
+      page?: number;
+    }
   };
 
 }

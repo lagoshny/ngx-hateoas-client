@@ -13,12 +13,12 @@ import { HttpResponse } from '@angular/common/http';
  */
 export class HateoasResourceOperation<T extends Resource> {
 
-  private readonly resourceName: string;
+  private readonly resourceType: new() => T;
 
   private hateoasResourceService: HateoasResourceService;
 
-  constructor(resourceName: string) {
-    this.resourceName = resourceName;
+  constructor(resourceType: new() => T) {
+    this.resourceType = resourceType;
     this.hateoasResourceService = DependencyInjector.get(HateoasResourceService);
   }
 
@@ -26,28 +26,28 @@ export class HateoasResourceOperation<T extends Resource> {
    * {@link HateoasResourceService#getResource}.
    */
   public getResource(id: number | string, options?: GetOption): Observable<T> {
-    return this.hateoasResourceService.getResource(this.resourceName, id, options) as Observable<T>;
+    return this.hateoasResourceService.getResource(this.resourceType, id, options) as Observable<T>;
   }
 
   /**
    * {@link HateoasResourceService#getCollection}.
    */
   public getCollection(options?: GetOption): Observable<ResourceCollection<T>> {
-    return this.hateoasResourceService.getCollection(this.resourceName, options);
+    return this.hateoasResourceService.getCollection(this.resourceType, options);
   }
 
   /**
    * {@link HateoasResourceService#getPage}.
    */
   public getPage(options?: PagedGetOption): Observable<PagedResourceCollection<T>> {
-    return this.hateoasResourceService.getPage(this.resourceName, options);
+    return this.hateoasResourceService.getPage(this.resourceType, options);
   }
 
   /**
    * {@link HateoasResourceService#createResource}.
    */
   public createResource(requestBody: RequestBody<T>): Observable<any> {
-    return this.hateoasResourceService.createResource(this.resourceName, requestBody);
+    return this.hateoasResourceService.createResource(this.resourceType, requestBody);
   }
 
   /**
@@ -61,7 +61,7 @@ export class HateoasResourceOperation<T extends Resource> {
    * {@link HateoasResourceService#updateResourceById}.
    */
   public updateResourceById(id: number | string, requestBody: RequestBody<any>): Observable<T | any> {
-    return this.hateoasResourceService.updateResourceById(this.resourceName, id, requestBody);
+    return this.hateoasResourceService.updateResourceById(this.resourceType, id, requestBody);
   }
 
   /**
@@ -75,7 +75,7 @@ export class HateoasResourceOperation<T extends Resource> {
    * {@link HateoasResourceService#patchResourceById}.
    */
   public patchResourceById(id: number | string, requestBody: RequestBody<any>): Observable<T | any> {
-    return this.hateoasResourceService.patchResourceById(this.resourceName, id, requestBody);
+    return this.hateoasResourceService.patchResourceById(this.resourceType, id, requestBody);
   }
 
   /**
@@ -89,28 +89,28 @@ export class HateoasResourceOperation<T extends Resource> {
    * {@link HateoasResourceService#deleteResourceById}.
    */
   public deleteResourceById(id: number | string, options?: RequestOption): Observable<HttpResponse<any> | any> {
-    return this.hateoasResourceService.deleteResourceById(this.resourceName, id, options);
+    return this.hateoasResourceService.deleteResourceById(this.resourceType, id, options);
   }
 
   /**
    * {@see ResourceCollectionHttpService#search}
    */
   public searchCollection(query: string, options?: GetOption): Observable<ResourceCollection<T>> {
-    return this.hateoasResourceService.searchCollection(this.resourceName, query, options);
+    return this.hateoasResourceService.searchCollection(this.resourceType, query, options);
   }
 
   /**
    * {@see PagedResourceCollection#search}
    */
   public searchPage(query: string, options?: PagedGetOption): Observable<PagedResourceCollection<T>> {
-    return this.hateoasResourceService.searchPage(this.resourceName, query, options);
+    return this.hateoasResourceService.searchPage(this.resourceType, query, options);
   }
 
   /**
    * {@see ResourceHttpService#search}
    */
   public searchResource(query: string, options?: GetOption): Observable<T> {
-    return this.hateoasResourceService.searchResource(this.resourceName, query, options);
+    return this.hateoasResourceService.searchResource(this.resourceType, query, options);
   }
 
   /**
@@ -120,7 +120,7 @@ export class HateoasResourceOperation<T extends Resource> {
                         query: string,
                         requestBody?: RequestBody<any>,
                         options?: PagedGetOption): Observable<R> {
-    return this.hateoasResourceService.customQuery(this.resourceName, method, query, requestBody, options);
+    return this.hateoasResourceService.customQuery(this.resourceType, method, query, requestBody, options);
   }
 
   /**
@@ -130,7 +130,7 @@ export class HateoasResourceOperation<T extends Resource> {
                               searchQuery: string,
                               requestBody?: RequestBody<any>,
                               options?: PagedGetOption): Observable<R> {
-    return this.hateoasResourceService.customSearchQuery(this.resourceName, method, searchQuery, requestBody, options);
+    return this.hateoasResourceService.customSearchQuery(this.resourceType, method, searchQuery, requestBody, options);
   }
 
 }

@@ -49,7 +49,7 @@ describe('ResourceHttpService', () => {
 
     resourceHttpService.get('someUrl').subscribe(() => {
     }, error => {
-      expect(error.message).toBe('You try to get wrong resource type, expected single resource.');
+      expect(error.message).toBe('You try to get wrong resource type: expected Resource type, actual ResourceCollection type.');
     });
   });
 
@@ -58,7 +58,7 @@ describe('ResourceHttpService', () => {
 
     resourceHttpService.get('someUrl').subscribe(() => {
     }, error => {
-      expect(error.message).toBe('You try to get wrong resource type, expected single resource.');
+      expect(error.message).toBe('You try to get wrong resource type: expected Resource type, actual PagedResourceCollection type.');
     });
   });
 
@@ -67,7 +67,7 @@ describe('ResourceHttpService', () => {
 
     resourceHttpService.get('someUrl').subscribe(() => {
     }, error => {
-      expect(error.message).toBe('You try to get wrong resource type, expected single resource.');
+      expect(error.message).toBe('You try to get wrong resource type: expected Resource type, actual Unknown type.');
     });
   });
 

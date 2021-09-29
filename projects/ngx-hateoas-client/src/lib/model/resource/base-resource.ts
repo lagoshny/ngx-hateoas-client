@@ -28,8 +28,8 @@ export abstract class BaseResource extends AbstractResource {
   public getRelation<T extends BaseResource>(relationName: string,
                                              options?: GetOption
   ): Observable<T> {
-    StageLogger.resourceBeginLog(this, 'GET_RELATION', {relationName, options});
     ValidationUtils.validateInputParams({relationName});
+    StageLogger.resourceBeginLog(this, 'GET_RELATION', {relationName, options});
 
     const relationLink = this.getRelationLink(relationName);
 
@@ -52,8 +52,8 @@ export abstract class BaseResource extends AbstractResource {
   public getRelatedCollection<T extends ResourceCollection<BaseResource>>(relationName: string,
                                                                           options?: GetOption
   ): Observable<T> {
-    StageLogger.resourceBeginLog(this, 'GET_RELATED_COLLECTION', {relationName, options});
     ValidationUtils.validateInputParams({relationName});
+    StageLogger.resourceBeginLog(this, 'GET_RELATED_COLLECTION', {relationName, options});
 
     const relationLink = this.getRelationLink(relationName);
 
@@ -76,13 +76,14 @@ export abstract class BaseResource extends AbstractResource {
    */
   public getRelatedPage<T extends PagedResourceCollection<BaseResource>>(relationName: string,
                                                                          options?: PagedGetOption): Observable<T> {
-    StageLogger.resourceBeginLog(this, 'GET_RELATED_PAGE', {relationName, options});
     ValidationUtils.validateInputParams({relationName});
+    StageLogger.resourceBeginLog(this, 'GET_RELATED_PAGE', {relationName, options});
 
     const relationLink = this.getRelationLink(relationName);
 
     return getPagedResourceCollectionHttpService()
-      .get(UrlUtils.generateLinkUrl(relationLink, options), relationLink.templated ? {useCache: options?.useCache} : options)
+      .get(UrlUtils.generateLinkUrl(relationLink, UrlUtils.fillDefaultPageDataIfNoPresent(options)),
+        relationLink.templated ? {useCache: options?.useCache} : options)
       .pipe(
         tap(() => {
           StageLogger.resourceEndLog(this, 'GET_RELATED_PAGE', {result: `related page ${ relationName } was got successful`});
@@ -101,8 +102,8 @@ export abstract class BaseResource extends AbstractResource {
   public postRelation(relationName: string,
                       requestBody: RequestBody<any>,
                       options?: RequestOption): Observable<HttpResponse<any> | any> {
-    StageLogger.resourceBeginLog(this, 'POST_RELATION', {relationName, requestBody, options});
     ValidationUtils.validateInputParams({relationName, requestBody});
+    StageLogger.resourceBeginLog(this, 'POST_RELATION', {relationName, requestBody, options});
 
     const relationLink = this.getRelationLink(relationName);
 
@@ -131,8 +132,8 @@ export abstract class BaseResource extends AbstractResource {
   public patchRelation(relationName: string,
                        requestBody: RequestBody<any>,
                        options?: RequestOption): Observable<HttpResponse<any> | any> {
-    StageLogger.resourceBeginLog(this, 'PATCH_RELATION', {relationName, requestBody, options});
     ValidationUtils.validateInputParams({relationName, requestBody});
+    StageLogger.resourceBeginLog(this, 'PATCH_RELATION', {relationName, requestBody, options});
 
     const relationLink = this.getRelationLink(relationName);
 
@@ -161,8 +162,8 @@ export abstract class BaseResource extends AbstractResource {
   public putRelation(relationName: string,
                      requestBody: RequestBody<any>,
                      options?: RequestOption): Observable<HttpResponse<any> | any> {
-    StageLogger.resourceBeginLog(this, 'PUT_RELATION', {relationName, requestBody, options});
     ValidationUtils.validateInputParams({relationName, requestBody});
+    StageLogger.resourceBeginLog(this, 'PUT_RELATION', {relationName, requestBody, options});
 
     const relationLink = this.getRelationLink(relationName);
 

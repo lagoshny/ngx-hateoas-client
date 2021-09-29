@@ -1,6 +1,8 @@
 import { ResourceCollection } from './resource-collection';
 import { EmbeddedResource } from './embedded-resource';
 import { Resource } from './resource';
+import { HateoasEmbeddedResource, HateoasProjection, HateoasResource, ProjectionRel } from '../decorators';
+import { ProjectionRelType } from '../declarations';
 
 export const rawEmbeddedResource = {
   name: 'Test',
@@ -13,6 +15,10 @@ export const rawEmbeddedResource = {
     }
   }
 };
+
+@HateoasEmbeddedResource(['embedResTest'])
+export class RawEmbeddedResource extends EmbeddedResource {
+}
 
 export const rawResource = {
   name: 'Test',
@@ -29,6 +35,11 @@ export const rawResource = {
   }
 };
 
+@HateoasResource('resource')
+export class RawResource extends Resource {
+}
+
+@HateoasResource('test')
 export class SimpleResource extends Resource {
 
   // tslint:disable-next-line:variable-name
@@ -43,6 +54,24 @@ export class SimpleResource extends Resource {
 
 }
 
+@HateoasProjection(SimpleResource, 'simpleProjection')
+export class SimpleResourceProjection extends Resource {
+  @ProjectionRel(RawResource)
+  public rawResource: ProjectionRelType<RawResource>;
+
+  // tslint:disable-next-line:variable-name
+  _links = {
+    self: {
+      href: 'http://localhost:8080/api/v1/test/1'
+    },
+    test: {
+      href: 'http://localhost:8080/api/v1/test/1'
+    }
+  };
+
+}
+
+@HateoasEmbeddedResource(['anotherResource'])
 export class SimpleEmbeddedResource extends EmbeddedResource {
 
   // tslint:disable-next-line:variable-name

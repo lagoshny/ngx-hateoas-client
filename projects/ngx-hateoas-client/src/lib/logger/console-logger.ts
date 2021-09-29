@@ -5,14 +5,21 @@ import { camelCase, capitalize, isEmpty } from 'lodash-es';
 export class ConsoleLogger {
 
   public static info(message?: any, ...optionalParams: any[]): void {
-    if (!LibConfig.config.logs.verboseLogs) {
+    if (!LibConfig.config.logs.verboseLogs && !LibConfig.config.isProduction) {
       return;
     }
     console.info(message, ...optionalParams);
   }
 
+  public static warn(message?: any, ...optionalParams: any[]): void {
+    if (LibConfig.config.isProduction) {
+      return;
+    }
+    console.warn(message, ...optionalParams);
+  }
+
   public static error(message?: any, ...optionalParams: any[]): void {
-    if (!LibConfig.config.logs.verboseLogs) {
+    if (LibConfig.config.isProduction) {
       return;
     }
     console.error(message, ...optionalParams);
@@ -25,7 +32,7 @@ export class ConsoleLogger {
    * @param params additional params for verbose log
    */
   public static prettyInfo(message: string, params?: object): void {
-    if (!LibConfig.config.logs.verboseLogs) {
+    if (!LibConfig.config.logs.verboseLogs && !LibConfig.config.isProduction) {
       return;
     }
 
@@ -57,7 +64,7 @@ export class ConsoleLogger {
    * @param params additional params for verbose log
    */
   public static resourcePrettyInfo(resourceName: string, message: string, params?: object): void {
-    if (!LibConfig.config.logs.verboseLogs) {
+    if (!LibConfig.config.logs.verboseLogs && !LibConfig.config.isProduction) {
       return;
     }
 
@@ -89,7 +96,7 @@ export class ConsoleLogger {
    * @param params additional params for verbose log
    */
   public static prettyError(message: string, params?: object): void {
-    if (!LibConfig.config.logs.verboseLogs) {
+    if (LibConfig.config.isProduction) {
       return;
     }
 
@@ -111,6 +118,32 @@ export class ConsoleLogger {
     }
 
     ConsoleLogger.error(msg, ...color);
+  }
+
+  /**
+   * Log warn messages in pretty format.
+   *
+   * @param message log message
+   * @param params additional params for verbose log
+   */
+  public static prettyWarn(message: string, params?: object): void {
+    if (LibConfig.config.isProduction) {
+      return;
+    }
+
+    let msg = `%c${ message }\n`;
+    const color = [
+      'color: #ffbe00;'
+    ];
+
+    if (!isEmpty(params)) {
+      for (const [key, value] of Object.entries(params)) {
+        msg += `%c${ capitalize(key) }: %c${ value }\n`;
+        color.push('color: #3AA6D0;', 'color: #000;');
+      }
+    }
+
+    ConsoleLogger.warn(msg, ...color);
   }
 
 }

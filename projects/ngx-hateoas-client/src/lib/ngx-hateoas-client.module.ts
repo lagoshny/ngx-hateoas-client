@@ -1,5 +1,5 @@
 import { ModuleWithProviders, NgModule } from '@angular/core';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { HttpClientModule } from '@angular/common/http';
 import { NgxHateoasClientConfigurationService } from './config/ngx-hateoas-client-configuration.service';
 import { HateoasResourceService } from './service/external/hateoas-resource.service';
 import { ResourceHttpService } from './service/internal/resource-http.service';
@@ -13,9 +13,10 @@ export { Resource } from './model/resource/resource';
 export { EmbeddedResource } from './model/resource/embedded-resource';
 export { ResourceCollection } from './model/resource/resource-collection';
 export { PagedResourceCollection } from './model/resource/paged-resource-collection';
-export { Sort, SortOrder, Include, HttpMethod } from './model/declarations';
+export { Sort, SortOrder, Include, HttpMethod, ProjectionRelType } from './model/declarations';
 export { HateoasResourceOperation } from './service/external/hateoas-resource-operation';
 export { HateoasResourceService } from './service/external/hateoas-resource.service';
+export { HateoasResource, HateoasEmbeddedResource, HateoasProjection, ProjectionRel } from './model/decorators';
 
 @NgModule({
   imports: [

@@ -2,16 +2,22 @@ import { BaseResource } from '../model/resource/base-resource';
 import { isEmbeddedResource, isResource } from '../model/resource-type';
 import { ResourceCollection } from '../model/resource/resource-collection';
 import { PagedResourceCollection } from '../model/resource/paged-resource-collection';
-import { Include, Link, PageData, RequestBody } from '../model/declarations';
+import { GetOption, Include, Link, PageData, RequestBody } from '../model/declarations';
 import { Resource } from '../model/resource/resource';
 import { EmbeddedResource } from '../model/resource/embedded-resource';
 import { UrlUtils } from './url.utils';
 import { Stage } from '../logger/stage.enum';
 import { StageLogger } from '../logger/stage-logger';
-import { isArray, isEmpty, isNil, isObject, upperFirst } from 'lodash-es';
+import { isArray, isEmpty, isNil, isObject, isPlainObject } from 'lodash-es';
+import { ConsoleLogger } from '../logger/console-logger';
 
 /* tslint:disable:no-string-literal */
 export class ResourceUtils {
+
+  public static RESOURCE_NAME_TYPE_MAP: Map<string, any> = new Map<string, any>();
+  public static RESOURCE_NAME_PROJECTION_TYPE_MAP: Map<string, any> = new Map<string, any>();
+  public static RESOURCE_PROJECTION_REL_NAME_TYPE_MAP: Map<string, any> = new Map<string, any>();
+  public static EMBEDDED_RESOURCE_TYPE_MAP: Map<string, any> = new Map<string, any>();
 
   private static resourceType: new() => BaseResource;
 
@@ -39,38 +45,99 @@ export class ResourceUtils {
     this.embeddedResourceType = type;
   }
 
-  public static instantiateResource<T extends BaseResource>(payload: object): T {
+  public static instantiateResource<T extends BaseResource>(payload: object, isProjection?: boolean): T {
     // @ts-ignore
     if (isEmpty(payload)
       || (!isObject(payload['_links']) || isEmpty(payload['_links']))) {
+      ConsoleLogger.warn('Incorrect resource object! Returned \'null\' value, because it has not \'_links\' array. Check that server send right resource object.', {incorrectResource: payload});
       return null;
     }
-    for (const key of Object.keys(payload)) {
-      if (isArray(payload[key])) {
-        for (let i = 0; i < payload[key].length; i++) {
-          if (isEmbeddedResource(payload[key][i])) {
-            payload[key][i] = ResourceUtils.createResource(new this.embeddedResourceType(), payload[key][i]);
-          } else if (isResource(payload[key][i])) {
-            payload[key][i] = ResourceUtils.createResource(new this.resourceType(), payload[key][i]);
-            payload[key][i]['resourceName'] = this.findResourceName(payload[key][i]);
-          }
-        }
-      } else if (isEmbeddedResource(payload[key])) {
-        payload[key] = ResourceUtils.createResource(new this.embeddedResourceType(), payload[key]);
-      } else if (isResource(payload[key])) {
-        payload[key] = ResourceUtils.createResource(new this.resourceType(), payload[key]);
-        payload[key]['resourceName'] = this.findResourceName(payload[key]);
-      }
-    }
 
-    const resource = Object.assign(new this.resourceType() as T, payload);
-    resource['resourceName'] = this.findResourceName(resource);
-
-    return resource;
+    return this.createResource(this.resolvePayloadProperties(payload, isProjection), isProjection);
   }
 
+  private static resolvePayloadProperties<T extends BaseResource>(payload: object, isProjection?: boolean): object {
+    for (const key of Object.keys(payload)) {
+      if (key === 'hibernateLazyInitializer') {
+        delete payload[key];
+        continue;
+      }
+      if (key === '_links') {
+        payload[key] = payload[key];
+        continue;
+      }
+      payload[key] = this.resolvePayloadType(key, payload[key], isProjection);
+    }
 
-  public static instantiateResourceCollection<T extends ResourceCollection<BaseResource>>(payload: object): T {
+    return payload;
+  }
+
+  private static resolvePayloadType<T extends BaseResource>(key: string, payload: object, isProjection?: boolean): object {
+    if (isNil(payload)) {
+      return payload;
+    } else if (isArray(payload)) {
+      for (let i = 0; i < payload.length; i++) {
+        payload[i] = this.resolvePayloadType(key, payload[i], isProjection);
+      }
+    } else if (isProjection && isPlainObject(payload)) {
+      // Need to check resource projection relation props because some inner props can be objects that can be also resources
+      payload = this.resolvePayloadProperties(this.createResourceProjectionRel(key, payload), isProjection);
+    } else if (isEmbeddedResource(payload) || ResourceUtils.EMBEDDED_RESOURCE_TYPE_MAP.get(key)) {
+      // Need to check embedded resource props because some inner props can be objects that can be also resources
+      payload = this.resolvePayloadProperties(this.createEmbeddedResource(key, payload), isProjection);
+    } else if (isResource(payload)) {
+      // Need to check resource props because some inner props can be objects that can be also resources
+      payload = this.resolvePayloadProperties(this.createResource(payload), isProjection);
+    }
+
+    return payload;
+  }
+
+  private static createResource<T extends BaseResource>(payload: any, isProjection?: boolean): T {
+    const resourceName = this.findResourceName(payload);
+    const resourceClass = isProjection
+      ? ResourceUtils.RESOURCE_NAME_PROJECTION_TYPE_MAP.get(resourceName)
+      : ResourceUtils.RESOURCE_NAME_TYPE_MAP.get(resourceName);
+    if (resourceClass) {
+      return Object.assign(new (resourceClass)() as T, payload);
+    } else {
+      ConsoleLogger.prettyWarn('Not found resource type when create resource: \'' + resourceName + '\' so used default Resource type, for this can be some reasons: \n\r' +
+        '1) You did not pass resource property name as \'' + resourceName + '\' with @HateoasResource decorator. \n\r' +
+        '2) You did not declare resource type in configuration "configuration.useTypes.resources". \n\r' +
+        '\n\r Please check both points to to fix this issue.');
+
+      return Object.assign(new this.resourceType(), payload);
+    }
+  }
+
+  private static createResourceProjectionRel<T extends Resource>(relationName: string, payload: any): T {
+    const relationClass = ResourceUtils.RESOURCE_PROJECTION_REL_NAME_TYPE_MAP.get(relationName);
+    if (relationClass) {
+      return Object.assign(new (relationClass)() as T, payload);
+    } else {
+      ConsoleLogger.prettyWarn('Not found resource relation type when create relation: \'' + relationName + '\' so used default Resource type, for this can be some reasons: \n\r' +
+        'You did not pass relation type property with @ProjectionRel decorator on relation property \'' + relationName + '\'. \n\r' +
+        '\n\rPlease check it to to fix this issue.');
+
+      return Object.assign(new this.resourceType(), payload);
+    }
+  }
+
+  private static createEmbeddedResource<T extends BaseResource>(key: string, payload: any): T {
+    const resourceClass = ResourceUtils.EMBEDDED_RESOURCE_TYPE_MAP.get(key);
+    if (resourceClass) {
+      return Object.assign(new (resourceClass)() as T, payload);
+    } else {
+      ConsoleLogger.prettyWarn('Not found embedded resource type when create resource: \'' + key + '\' so used default EmbeddedResource type, for this can be some reasons:. \n\r' +
+        '1) You did not pass embedded resource property name as \'' + key + '\' with @HateoasEmbeddedResource decorator. \n\r' +
+        '2) You did not declare embedded resource type in configuration "configuration.useTypes.embeddedResources". \n\r' +
+        '\n\r Please check both points to to fix this issue.');
+
+      return Object.assign(new this.embeddedResourceType(), payload);
+    }
+  }
+
+  public static instantiateResourceCollection<T extends ResourceCollection<BaseResource>>(payload: object, isProjection?: boolean): T {
     if (isEmpty(payload)
       || (!isObject(payload['_links']) || isEmpty(payload['_links']))
       || (!isObject(payload['_embedded']) || isEmpty(payload['_embedded']))) {
@@ -79,7 +146,7 @@ export class ResourceUtils {
     const result = new this.resourceCollectionType() as T;
     for (const resourceName of Object.keys(payload['_embedded'])) {
       payload['_embedded'][resourceName].forEach((resource) => {
-        result.resources.push(this.instantiateResource(resource));
+        result.resources.push(this.instantiateResource(resource, isProjection));
       });
     }
     result['_links'] = {...payload['_links']};
@@ -87,8 +154,9 @@ export class ResourceUtils {
     return result;
   }
 
-  public static instantiatePagedResourceCollection<T extends PagedResourceCollection<BaseResource>>(payload: object): T {
-    const resourceCollection = this.instantiateResourceCollection(payload);
+  public static instantiatePagedResourceCollection<T extends PagedResourceCollection<BaseResource>>(payload: object,
+                                                                                                    isProjection?: boolean): T {
+    const resourceCollection = this.instantiateResourceCollection(payload, isProjection);
     if (resourceCollection == null) {
       return null;
     }
@@ -145,6 +213,8 @@ export class ResourceUtils {
         });
       } else if (isResource(body[key])) {
         result[key] = body[key]._links?.self?.href;
+      } else if (isPlainObject(body[key])) {
+        result[key] = this.resolveValues({body: body[key], valuesOption: requestBody?.valuesOption});
       } else {
         result[key] = body[key];
       }
@@ -173,25 +243,64 @@ export class ResourceUtils {
    * Define resource name based on resource links.
    * It will get link name that href equals to self href resource link.
    *
-   * @param resource for which to find the name
+   * @param payload that can be a resource for which to find the name
    */
-  private static findResourceName(resource: BaseResource): string {
-    // @ts-ignore
-    const resourceLinks = resource._links as Link;
+  private static findResourceName(payload: object): string {
+    if (!payload || !payload['_links'] || !payload['_links'].self) {
+      return '';
+    }
+    const resourceLinks = payload['_links'] as Link;
     if (isEmpty(resourceLinks) || isEmpty(resourceLinks.self) || isNil(resourceLinks.self.href)) {
-      return undefined;
+      return '';
     }
-    const selfLinkHref = resourceLinks.self.href;
 
-    for (const linkKey of Object.keys(resourceLinks)) {
-      if (linkKey !== 'self' && UrlUtils.removeTemplateParams(resourceLinks[linkKey].href) === selfLinkHref) {
-        return upperFirst(linkKey);
-      }
-    }
+    return UrlUtils.getResourceNameFromUrl(UrlUtils.removeTemplateParams(resourceLinks.self.href));
   }
 
-  private static createResource<T extends BaseResource>(entity: T, payload: any): T {
-    return Object.assign(entity, payload);
+  /**
+   * Checks is a resource projection or not.
+   *
+   * @param payload object that can be resource or resource projection
+   */
+  private static isResourceProjection(payload: object): boolean {
+    if (!payload || !payload['_links'] || !payload['_links'].self) {
+      return false;
+    }
+
+    const selfLink = payload['_links'].self;
+    const resourceLinks = payload['_links'];
+    for (const key of Object.keys(resourceLinks)) {
+      if (key !== 'self' && resourceLinks[key].href.includes(selfLink.href)) {
+        return new URL(resourceLinks[key].href).search.includes('projection');
+      }
+    }
+
+    return false;
+  }
+
+  /**
+   * Try to get projectionName from resource type and set it to options. If resourceType has not projectionName then return options as is.
+   *
+   * @param resourceType from get projectionName
+   * @param options to set projectionName
+   */
+  public static fillProjectionNameFromResourceType<T extends Resource>(resourceType: new () => T, options?: GetOption) {
+    if (!resourceType) {
+      return;
+    }
+    const projectionName = resourceType['__projectionName__'];
+    if (projectionName) {
+      options = options ? options : {params: {}};
+      options = {
+        ...options,
+        params: {
+          ...options.params,
+          projection: projectionName
+        }
+      };
+    }
+
+    return options;
   }
 
 }

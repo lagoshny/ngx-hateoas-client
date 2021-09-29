@@ -1,5 +1,6 @@
 import { ValidationUtils } from './validation.utils';
 import { Resource } from '../model/resource/resource';
+import { SimpleResource } from '../model/resource/resources.test';
 
 describe('ValidationUtils', () => {
 
@@ -41,9 +42,14 @@ describe('ValidationUtils', () => {
     expect(() => ValidationUtils.validateInputParams({obj: {val: 'test'}})).not.toThrow();
   });
 
-  it('CHECK_INPUT_PARAMS should be pass when params is class type', () => {
-    expect(() => ValidationUtils.validateInputParams({type: Resource})).not.toThrow();
+  it('CHECK_INPUT_PARAMS should be pass when params is resource class type with @HateoasResource', () => {
+    expect(() => ValidationUtils.validateInputParams({type: SimpleResource})).not.toThrow();
   });
+
+  it('CHECK_INPUT_PARAMS should throw error when params is class type without @HateoasResource', () => {
+    expect(() => ValidationUtils.validateInputParams({type: Resource})).toThrowError(`Resource 'Resource' has not 'resourceName' value. Set it with @HateoasResource decorator on 'Resource' class.`);
+  });
+
 
   it('CHECK_INPUT_PARAMS should be pass when params is not empty array', () => {
     expect(() => ValidationUtils.validateInputParams({arr: [10]})).not.toThrow();

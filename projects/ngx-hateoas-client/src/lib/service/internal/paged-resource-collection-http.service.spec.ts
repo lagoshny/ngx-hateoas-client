@@ -50,7 +50,8 @@ describe('PagedResourceCollectionHttpService', () => {
 
     pagedResourceCollectionHttpService.get('someUrl').subscribe(() => {
     }, error => {
-      expect(error.message).toBe('You try to get wrong resource type, expected paged resource collection type.');
+      expect(error.message)
+        .toBe('You try to get wrong resource type: expected PagedResourceCollection type, actual EmbeddedResource type.');
     });
   });
 
@@ -59,7 +60,7 @@ describe('PagedResourceCollectionHttpService', () => {
 
     pagedResourceCollectionHttpService.get('someUrl').subscribe(() => {
     }, error => {
-      expect(error.message).toBe('You try to get wrong resource type, expected paged resource collection type.');
+      expect(error.message).toBe('You try to get wrong resource type: expected PagedResourceCollection type, actual Resource type.');
     });
   });
 
@@ -68,7 +69,7 @@ describe('PagedResourceCollectionHttpService', () => {
 
     pagedResourceCollectionHttpService.get('someUrl').subscribe(() => {
     }, error => {
-      expect(error.message).toBe('You try to get wrong resource type, expected paged resource collection type.');
+      expect(error.message).toBe('You try to get wrong resource type: expected PagedResourceCollection type, actual ResourceCollection type.');
     });
   });
 
@@ -77,7 +78,7 @@ describe('PagedResourceCollectionHttpService', () => {
 
     pagedResourceCollectionHttpService.get('someUrl').subscribe(() => {
     }, error => {
-      expect(error.message).toBe('You try to get wrong resource type, expected paged resource collection type.');
+      expect(error.message).toBe('You try to get wrong resource type: expected PagedResourceCollection type, actual Unknown type.');
     });
   });
 
@@ -293,7 +294,7 @@ describe('PagedResourceCollectionHttpService', () => {
 
     pagedResourceCollectionHttpService.search('test', 'someQuery').subscribe(() => {
       const url = httpClientSpy.get.calls.argsFor(0)[0];
-      expect(url).toBe(`${UrlUtils.getApiUrl() }/test/search/someQuery`);
+      expect(url).toBe(`${ UrlUtils.getApiUrl() }/test/search/someQuery`);
     });
   });
 

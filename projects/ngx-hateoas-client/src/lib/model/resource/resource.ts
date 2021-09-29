@@ -9,7 +9,7 @@ import { tap } from 'rxjs/operators';
 import { Stage } from '../../logger/stage.enum';
 import { StageLogger } from '../../logger/stage-logger';
 import { ValidationUtils } from '../../util/validation.utils';
-import { isArray, eq, isNil, isObject, last, split, toLower } from 'lodash-es';
+import { isArray, isNil, last, split } from 'lodash-es';
 
 /**
  * Resource class.
@@ -27,28 +27,6 @@ export class Resource extends BaseResource {
     self: LinkData;
     [key: string]: LinkData;
   };
-
-  /**
-   * Contains information about the resource name as it appears in the resource response in an array of the links.
-   */
-  private resourceName: string;
-
-  /**
-   * Allows to find out if a resource is of the desired type by the resource name.
-   *
-   * @param typeOrName if passed type then compared resource name with type class name
-   *        else comparing passed name with resource name
-   * @throws error when required params are not valid
-   */
-  public isResourceOf<T extends Resource>(typeOrName: (new() => T) | string): boolean {
-    ValidationUtils.validateInputParams({typeOrName});
-    if (isObject(typeOrName)) {
-      const that = new typeOrName() as T;
-      return eq(toLower(this.resourceName), toLower(that.constructor.name));
-    } else {
-      return eq(toLower(this.resourceName), toLower(typeOrName));
-    }
-  }
 
   /**
    * Adding passed entities to the resource collection behind the relation name.

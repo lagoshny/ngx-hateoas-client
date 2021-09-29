@@ -99,6 +99,18 @@ export class UrlUtils {
   }
 
   /**
+   * Retrieve a resource name from resource url.
+   *
+   * @param url resource url
+   */
+  public static getResourceNameFromUrl(url: string): string {
+    ValidationUtils.validateInputParams({url});
+
+    const dividedBySlashUrl = url.replace(`${ UrlUtils.getApiUrl() }/`, '').split('/');
+    return dividedBySlashUrl[0];
+  }
+
+  /**
    * Clear url from template params.
    *
    * @param url to be cleaned
@@ -108,6 +120,19 @@ export class UrlUtils {
     ValidationUtils.validateInputParams({url});
 
     return UrlUtils.fillTemplateParams(url, {});
+  }
+
+  /**
+   * Clear all url params.
+   *
+   * @param url to clear params
+   * @throws error when required params are not valid
+   */
+  public static clearUrlParams(url: string): string {
+    ValidationUtils.validateInputParams({url});
+    const srcUrl = new URL(url);
+
+    return srcUrl.origin + srcUrl.pathname;
   }
 
   /**
@@ -139,6 +164,19 @@ export class UrlUtils {
     }
 
     return resultUrl;
+  }
+
+  public static fillDefaultPageDataIfNoPresent(options: PagedGetOption) {
+    const pagedOptions = !isEmpty(options) ? options : {};
+    if (isEmpty(pagedOptions.pageParams)) {
+      pagedOptions.pageParams = LibConfig.config.pagination.defaultPage;
+    } else if (!pagedOptions.pageParams.size) {
+      pagedOptions.pageParams.size = LibConfig.config.pagination.defaultPage.size;
+    } else if (!pagedOptions.pageParams.page) {
+      pagedOptions.pageParams.page = LibConfig.config.pagination.defaultPage.page;
+    }
+
+    return pagedOptions;
   }
 
   private static generateSortParams(sort: Sort, httpParams?: HttpParams): HttpParams {

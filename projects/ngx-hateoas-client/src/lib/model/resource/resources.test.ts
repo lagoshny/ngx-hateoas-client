@@ -22,13 +22,6 @@ export class RawEmbeddedResource extends EmbeddedResource {
 
 export const rawResource = {
   name: 'Test',
-  _embedded: {
-    resources: [
-      {
-        name: 'test'
-      }
-    ]
-  },
   _links: {
     self: {
       href: 'http://localhost:8080/api/v1/resource/1'

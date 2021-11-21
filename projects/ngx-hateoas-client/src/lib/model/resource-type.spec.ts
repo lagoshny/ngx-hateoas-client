@@ -1,5 +1,10 @@
 import { isEmbeddedResource, isPagedResourceCollection, isResource, isResourceCollection } from './resource-type';
-import { rawEmbeddedResource, rawPagedResourceCollection, rawResource, rawResourceCollection } from './resource/resources.test';
+import {
+  rawEmbeddedResource,
+  rawPagedResourceCollection,
+  rawResource,
+  rawResourceCollection
+} from './resource/resources.test';
 
 describe('ResourceType', () => {
 
@@ -60,6 +65,19 @@ describe('ResourceType', () => {
     expect(isResource(rawResource)).toBeTrue();
   });
 
+  it('object IS RESOURCE with _links object WITH self link and _embedded props', () => {
+    expect(isResource({
+      ...rawResource,
+      _embedded: {
+        resources: [
+          {
+            name: 'test'
+          }
+        ]
+      },
+    })).toBeTrue();
+  });
+
   it('object IS NOT RESOURCE with empty _links object', () => {
     const result = isResource({
       _links: {}
@@ -114,6 +132,13 @@ describe('ResourceType', () => {
     expect(isResourceCollection(rawResourceCollection)).toBeTrue();
   });
 
+  it('object IS NOT RESOURCE COLLECTION if contains more props than _embedded and _links', () => {
+    expect(isResourceCollection({
+      ...rawResourceCollection,
+      additionalProp: 'someValue'
+    })).toBeFalse();
+  });
+
   it('object IS NOT RESOURCE COLLECTION with empty object', () => {
     const result = isResourceCollection({});
 
@@ -156,6 +181,13 @@ describe('ResourceType', () => {
 
   it('object IS PAGED RESOURCE COLLECTION with _embedded AND page object', () => {
     expect(isPagedResourceCollection(rawPagedResourceCollection)).toBeTrue();
+  });
+
+  it('object IS NOT PAGED RESOURCE COLLECTION if contains more props than _embedded, _links, page', () => {
+    expect(isPagedResourceCollection({
+      ...rawPagedResourceCollection,
+      additionalProp: 'someValue'
+    })).toBeFalse();
   });
 
   it('object IS NOT PAGED RESOURCE COLLECTION with _embedded AND WITHOUT page object', () => {

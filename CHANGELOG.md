@@ -1,3 +1,15 @@
+## 2.1.0 (2021-11-21)
+#### Changes
+Changed determination resource type algorithm.
+
+Now:
+
+`ResourceCollection` can contain only two props `_embedded` and `_links`.
+
+`PagedResourceCollection` can contain  three props `_embedded`, `_links`, and `page`.
+
+`Resource` can contain additional `_embedded` property.
+
 ## 2.0.0 (2021-09-29)
 #### Changes
 Release 2.0.0 version

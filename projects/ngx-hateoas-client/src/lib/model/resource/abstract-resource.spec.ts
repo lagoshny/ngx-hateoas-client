@@ -108,7 +108,7 @@ describe('AbstractResource', () => {
     expect(linkAbstractResource.hasRelation('self')).toBeTrue();
   });
 
-  it('should return false if relation links are empty', function () {
+  it('should return false if relation links are empty', () => {
     expect(emptyLinkAbstractResource.hasRelation('self')).toBeFalse();
     expect(emptyLinkAbstractResource.hasRelation('products')).toBeFalse();
   });

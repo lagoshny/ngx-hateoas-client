@@ -41,7 +41,7 @@ export abstract class AbstractResource {
     if (isEmpty(this._links)) {
       return false;
     } else {
-      return Object.keys(this._links).indexOf(relationName) !== -1;
+      return !isEmpty(this._links[relationName]);
     }
   }
 

@@ -52,6 +52,7 @@ You can found examples of usage this client with [task-manager-front](https://gi
   - [@HateoasProjection](#hateoasprojection)
     - [@ProjectionRel](#projectionrel)
 - [BaseResource](#BaseResource)
+  - [HasRelation](#HasRelation)
   - [GetRelation](#GetRelation)
   - [GetRelatedCollection](#GetRelatedCollection)
   - [GetRelatedPage](#GetRelatedPage)
@@ -588,6 +589,19 @@ Examples of usage resource relation methods rely on presets.
 
 Parent class for [Resource](#resource) and [EmbeddedResource](#embeddedresource) classes.
 Contains common resource methods to work with resource relations through resource links (see below).
+
+### HasRelation
+Checks that passed relation name contains in relation `_link` array of the `BaseResource`.
+
+Method signature:
+
+```
+hasRelation(relationName: string): boolean;
+```
+
+- `relationName` - resource relation name used to check.
+- `return value` - `true` if resource has that relation, `false` otherwise.
+
 
 ### GetRelation
 Getting resource relation object by relation name.

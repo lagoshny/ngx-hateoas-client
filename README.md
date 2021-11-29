@@ -24,8 +24,8 @@
 
 **Compatible with Angular 11.**
 
-This client can be used to develop `Angular 6.0+` applications working with RESTful server API.
-By `RESTful API` means when the server application implements all the layers of the [Richardson Maturity Model](https://martinfowler.com/articles/richardsonMaturityModel.html)
+This client can be used to develop `Angular 6.0+` applications working with RESTfull server API.
+By `RESTfull API` means when the server application implements all the layers of the [Richardson Maturity Model](https://martinfowler.com/articles/richardsonMaturityModel.html)
 and the server provides [HAL/JSON](http://stateless.co/hal_specification.html) response type.
 
 This client compatible with Java server-side applications based on [Spring HATEOAS](https://spring.io/projects/spring-hateoas) or [Spring Data REST](https://docs.spring.io/spring-data/rest/docs/current/reference/html/#reference).

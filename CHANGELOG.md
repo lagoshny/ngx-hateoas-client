@@ -1,3 +1,9 @@
+## 2.1.1 (2021-11-29)
+#### Changes
+Added `hasRelation()` function to `Resource` class to check has or not resource some link.
+
+For more information [see pull request](https://github.com/lagoshny/ngx-hateoas-client/pull/20).
+
 ## 2.1.0 (2021-11-21)
 #### Changes
 Changed determination resource type algorithm.

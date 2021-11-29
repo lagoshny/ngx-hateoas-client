@@ -31,4 +31,18 @@ export abstract class AbstractResource {
     return relationLink;
   }
 
+  /**
+   * Checks if relation link is present.
+   *
+   * @param relationName used to check for the specified relation name
+   * @returns true if link is present, false otherwise
+   */
+  public hasRelation(relationName: string): boolean {
+    if (isEmpty(this._links)) {
+      return false;
+    } else {
+      return !isEmpty(this._links[relationName]);
+    }
+  }
+
 }

@@ -19,11 +19,27 @@ class TestAbstractResource extends AbstractResource {
   };
 }
 
+class TestLinkAbstractResource extends AbstractResource {
+  _links = {
+    self: {
+      href: "http://localhost:8080/api/v1/linkResource/1"
+    }
+  }
+}
+
+class TestEmptyLinkAbstractResource extends AbstractResource{
+  _links = {}
+}
+
 describe('AbstractResource', () => {
   let abstractResource: AbstractResource;
+  let linkAbstractResource: AbstractResource;
+  let emptyLinkAbstractResource: AbstractResource;
 
   beforeEach(() => {
     abstractResource = new TestAbstractResource();
+    linkAbstractResource = new TestLinkAbstractResource();
+    emptyLinkAbstractResource = new TestEmptyLinkAbstractResource();
   });
 
   it('should throw error when _links object is empty', () => {
@@ -82,6 +98,19 @@ describe('AbstractResource', () => {
 
     expect(relationLink).toBeDefined();
     expect(relationLink.href).toBe('http://localhost:8080/api/v1/product/1');
+  });
+
+  it('should return false if relation link is not present', () => {
+    expect(linkAbstractResource.hasRelation('products')).toBeFalse();
+  });
+
+  it('should return true if relation link is present',  () => {
+    expect(linkAbstractResource.hasRelation('self')).toBeTrue();
+  });
+
+  it('should return false if relation links are empty', () => {
+    expect(emptyLinkAbstractResource.hasRelation('self')).toBeFalse();
+    expect(emptyLinkAbstractResource.hasRelation('products')).toBeFalse();
   });
 
 });

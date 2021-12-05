@@ -5,7 +5,7 @@ import { AbstractResource } from './abstract-resource';
 import { ResourceCollection } from './resource-collection';
 import { getResourceCollectionHttpService } from '../../service/internal/resource-collection-http.service';
 import { GetOption, PagedGetOption, RequestBody, RequestOption } from '../declarations';
-import { HttpParams, HttpResponse } from '@angular/common/http';
+import { HttpResponse } from '@angular/common/http';
 import { getPagedResourceCollectionHttpService } from '../../service/internal/paged-resource-collection-http.service';
 import { PagedResourceCollection } from './paged-resource-collection';
 import { ResourceUtils } from '../../util/resource.utils';
@@ -34,7 +34,11 @@ export abstract class BaseResource extends AbstractResource {
     const relationLink = this.getRelationLink(relationName);
 
     return getResourceHttpService()
-      .get(UrlUtils.generateLinkUrl(relationLink, options), relationLink.templated ? {useCache: options?.useCache} : options)
+      .get(UrlUtils.generateLinkUrl(relationLink, options),
+        {
+          ...options,
+          params: relationLink.templated ? {} : options?.params
+        })
       .pipe(
         tap(() => {
           StageLogger.resourceEndLog(this, 'GET_RELATION', {result: `relation ${ relationName } was got successful`});
@@ -58,7 +62,11 @@ export abstract class BaseResource extends AbstractResource {
     const relationLink = this.getRelationLink(relationName);
 
     return getResourceCollectionHttpService()
-      .get(UrlUtils.generateLinkUrl(relationLink, options), relationLink.templated ? {useCache: options?.useCache} : options)
+      .get(UrlUtils.generateLinkUrl(relationLink, options),
+        {
+          ...options,
+          params: relationLink.templated ? {} : options?.params
+        })
       .pipe(
         tap(() => {
           StageLogger.resourceEndLog(this, 'GET_RELATED_COLLECTION', {result: `related collection ${ relationName } was got successful`});
@@ -83,7 +91,10 @@ export abstract class BaseResource extends AbstractResource {
 
     return getPagedResourceCollectionHttpService()
       .get(UrlUtils.generateLinkUrl(relationLink, UrlUtils.fillDefaultPageDataIfNoPresent(options)),
-        relationLink.templated ? {useCache: options?.useCache} : options)
+        {
+          ...options,
+          params: relationLink.templated ? {} : options?.params
+        })
       .pipe(
         tap(() => {
           StageLogger.resourceEndLog(this, 'GET_RELATED_PAGE', {result: `related page ${ relationName } was got successful`});
@@ -107,17 +118,20 @@ export abstract class BaseResource extends AbstractResource {
 
     const relationLink = this.getRelationLink(relationName);
 
-    return getResourceHttpService().post(
-      UrlUtils.generateLinkUrl(relationLink, options),
-      ResourceUtils.resolveValues(requestBody),
-      {
-        observe: options?.observe ? options.observe : 'body',
-        params: relationLink.templated ? new HttpParams() : UrlUtils.convertToHttpParams(options)
-      }).pipe(
-      tap(() => {
-        StageLogger.resourceEndLog(this, 'POST_RELATION', {result: `relation ${ relationName } was posted successful`});
-      })
-    );
+    return getResourceHttpService()
+      .post(
+        UrlUtils.generateLinkUrl(relationLink, options),
+        ResourceUtils.resolveValues(requestBody),
+        {
+          ...options,
+          observe: options?.observe ? options.observe : 'body',
+          params: relationLink.templated ? {} : options?.params
+        })
+      .pipe(
+        tap(() => {
+          StageLogger.resourceEndLog(this, 'POST_RELATION', {result: `relation ${ relationName } was posted successful`});
+        })
+      );
   }
 
   /**
@@ -137,17 +151,20 @@ export abstract class BaseResource extends AbstractResource {
 
     const relationLink = this.getRelationLink(relationName);
 
-    return getResourceHttpService().patch(
-      UrlUtils.generateLinkUrl(relationLink, options),
-      ResourceUtils.resolveValues(requestBody),
-      {
-        observe: options?.observe ? options.observe : 'body',
-        params: relationLink.templated ? new HttpParams() : UrlUtils.convertToHttpParams(options)
-      }).pipe(
-      tap(() => {
-        StageLogger.resourceEndLog(this, 'PATCH_RELATION', {result: `relation ${ relationName } was patched successful`});
-      })
-    );
+    return getResourceHttpService()
+      .patch(
+        UrlUtils.generateLinkUrl(relationLink, options),
+        ResourceUtils.resolveValues(requestBody),
+        {
+          ...options,
+          observe: options?.observe ? options.observe : 'body',
+          params: relationLink.templated ? {} : options?.params
+        })
+      .pipe(
+        tap(() => {
+          StageLogger.resourceEndLog(this, 'PATCH_RELATION', {result: `relation ${ relationName } was patched successful`});
+        })
+      );
   }
 
   /**
@@ -167,17 +184,20 @@ export abstract class BaseResource extends AbstractResource {
 
     const relationLink = this.getRelationLink(relationName);
 
-    return getResourceHttpService().put(
-      UrlUtils.generateLinkUrl(relationLink, options),
-      ResourceUtils.resolveValues(requestBody),
-      {
-        observe: options?.observe,
-        params: relationLink.templated ? new HttpParams() : UrlUtils.convertToHttpParams(options)
-      }).pipe(
-      tap(() => {
-        StageLogger.resourceEndLog(this, 'PUT_RELATION', {result: `relation ${ relationName } was put successful`});
-      })
-    );
+    return getResourceHttpService()
+      .put(
+        UrlUtils.generateLinkUrl(relationLink, options),
+        ResourceUtils.resolveValues(requestBody),
+        {
+          ...options,
+          observe: options?.observe ? options.observe : 'body',
+          params: relationLink.templated ? {} : options?.params
+        })
+      .pipe(
+        tap(() => {
+          StageLogger.resourceEndLog(this, 'PUT_RELATION', {result: `relation ${ relationName } was put successful`});
+        })
+      );
   }
 
 }

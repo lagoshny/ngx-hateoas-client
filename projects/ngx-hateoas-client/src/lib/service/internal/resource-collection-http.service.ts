@@ -41,7 +41,8 @@ export class ResourceCollectionHttpService extends HttpExecutor {
    */
   public get<T extends ResourceCollection<BaseResource>>(url: string,
                                                          options?: GetOption): Observable<T> {
-    const httpOptions = {params: UrlUtils.convertToHttpParams(options)};
+    const httpOptions = UrlUtils.convertToHttpOptions(options);
+
     return super.getHttp(url, httpOptions)
       .pipe(
         map((data: any) => {
@@ -54,7 +55,7 @@ export class ResourceCollectionHttpService extends HttpExecutor {
             throw new Error(errMsg);
           }
 
-          return ResourceUtils.instantiateResourceCollection(data, httpOptions.params.has('projection')) as T;
+          return ResourceUtils.instantiateResourceCollection(data, httpOptions?.params?.has('projection')) as T;
         }),
         catchError(error => observableThrowError(error)));
   }

@@ -95,16 +95,25 @@ export class ResourceUtils {
 
   private static createResource<T extends BaseResource>(payload: any, isProjection?: boolean): T {
     const resourceName = this.findResourceName(payload);
-    const resourceClass = isProjection
-      ? ResourceUtils.RESOURCE_NAME_PROJECTION_TYPE_MAP.get(resourceName)
-      : ResourceUtils.RESOURCE_NAME_TYPE_MAP.get(resourceName);
+    let resourceClass;
+    if (isProjection && !ResourceUtils.RESOURCE_NAME_PROJECTION_TYPE_MAP.get(resourceName)) {
+      resourceClass = ResourceUtils.RESOURCE_NAME_TYPE_MAP.get(resourceName);
+      ConsoleLogger.prettyWarn('Not found projection resource type when create resource projection: \'' + resourceName + '\' so used resource type: \'' + (resourceClass ? resourceClass?.name : ' default Resource') + '\'. \n\r' +
+        'It can be when you pass projection param as http request directly instead use projection type with @HateoasProjection.\n\r' +
+        '\n\rSee more how to use @HateoasProjection here https://github.com/lagoshny/ngx-hateoas-client#resource-projection-support.');
+    } else {
+      resourceClass = isProjection
+        ? ResourceUtils.RESOURCE_NAME_PROJECTION_TYPE_MAP.get(resourceName)
+        : ResourceUtils.RESOURCE_NAME_TYPE_MAP.get(resourceName);
+    }
+
     if (resourceClass) {
       return Object.assign(new (resourceClass)() as T, payload);
     } else {
       ConsoleLogger.prettyWarn('Not found resource type when create resource: \'' + resourceName + '\' so used default Resource type, for this can be some reasons: \n\r' +
         '1) You did not pass resource property name as \'' + resourceName + '\' with @HateoasResource decorator. \n\r' +
         '2) You did not declare resource type in configuration "configuration.useTypes.resources". \n\r' +
-        '\n\r Please check both points to to fix this issue.');
+        '\n\rSee more about declare resource types here: https://github.com/lagoshny/ngx-hateoas-client#usetypes-params..');
 
       return Object.assign(new this.resourceType(), payload);
     }
@@ -117,7 +126,7 @@ export class ResourceUtils {
     } else {
       ConsoleLogger.prettyWarn('Not found resource relation type when create relation: \'' + relationName + '\' so used default Resource type, for this can be some reasons: \n\r' +
         'You did not pass relation type property with @ProjectionRel decorator on relation property \'' + relationName + '\'. \n\r' +
-        '\n\rPlease check it to to fix this issue.');
+        '\n\rSee more how to use @ProjectionRel here https://github.com/lagoshny/ngx-hateoas-client#resource-projection-support.');
 
       return Object.assign(new this.resourceType(), payload);
     }
@@ -131,7 +140,7 @@ export class ResourceUtils {
       ConsoleLogger.prettyWarn('Not found embedded resource type when create resource: \'' + key + '\' so used default EmbeddedResource type, for this can be some reasons:. \n\r' +
         '1) You did not pass embedded resource property name as \'' + key + '\' with @HateoasEmbeddedResource decorator. \n\r' +
         '2) You did not declare embedded resource type in configuration "configuration.useTypes.embeddedResources". \n\r' +
-        '\n\r Please check both points to to fix this issue.');
+        '\n\r See more about declare resource types here: https://github.com/lagoshny/ngx-hateoas-client#usetypes-params.');
 
       return Object.assign(new this.embeddedResourceType(), payload);
     }

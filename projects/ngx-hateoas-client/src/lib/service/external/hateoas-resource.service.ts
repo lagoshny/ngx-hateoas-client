@@ -8,7 +8,6 @@ import { ResourceUtils } from '../../util/resource.utils';
 import { ResourceCollection } from '../../model/resource/resource-collection';
 import { ResourceCollectionHttpService } from '../internal/resource-collection-http.service';
 import { CommonResourceHttpService } from '../internal/common-resource-http.service';
-import { UrlUtils } from '../../util/url.utils';
 import { tap } from 'rxjs/operators';
 import { Resource } from '../../model/resource/resource';
 import { StageLogger } from '../../logger/stage-logger';
@@ -97,16 +96,19 @@ export class HateoasResourceService {
    *
    * @param resourceType resource for which will perform request
    * @param requestBody that contains the body directly and optional body values option {@link ValuesOption}
+   * @param options (optional) options that should be applied to the request {@link RequestOption}
    * @throws error when required params are not valid
    */
-  public createResource<T extends Resource>(resourceType: new () => T, requestBody: RequestBody<T>): Observable<T | any> {
+  public createResource<T extends Resource>(resourceType: new () => T,
+                                            requestBody: RequestBody<T>,
+                                            options?: RequestOption): Observable<T | any> {
     ValidationUtils.validateInputParams({resourceType, requestBody});
     const resourceName = resourceType['__resourceName__'];
     StageLogger.resourceBeginLog(resourceName, 'ResourceService CREATE_RESOURCE', {requestBody});
 
     const body = ResourceUtils.resolveValues(requestBody);
 
-    return this.resourceHttpService.postResource(resourceName, body)
+    return this.resourceHttpService.postResource(resourceName, body, options)
       .pipe(tap(() => {
         StageLogger.resourceEndLog(resourceName, 'ResourceService CREATE_RESOURCE',
           {result: `resource '${ resourceName }' was created successful`});
@@ -119,16 +121,19 @@ export class HateoasResourceService {
    *
    * @param entity to update
    * @param requestBody that contains the body directly and optional body values option {@link ValuesOption}
+   * @param options (optional) options that should be applied to the request {@link RequestOption}
    * @throws error when required params are not valid
    */
-  public updateResource<T extends Resource>(entity: T, requestBody?: RequestBody<any>): Observable<T | any> {
+  public updateResource<T extends Resource>(entity: T,
+                                            requestBody?: RequestBody<any>,
+                                            options?: RequestOption): Observable<T | any> {
     ValidationUtils.validateInputParams({entity});
     StageLogger.resourceBeginLog(entity, 'ResourceService UPDATE_RESOURCE', {body: requestBody ? requestBody : entity});
 
     const resource = ResourceUtils.initResource(entity) as Resource;
     const body = ResourceUtils.resolveValues(requestBody ? requestBody : {body: entity});
 
-    return this.resourceHttpService.put(resource.getSelfLinkHref(), body)
+    return this.resourceHttpService.put(resource.getSelfLinkHref(), body, options)
       .pipe(tap(() => {
         StageLogger.resourceEndLog(entity, 'ResourceService UPDATE_RESOURCE',
           {result: `resource '${ resource['__resourceName__'] }' was updated successful`});
@@ -143,18 +148,20 @@ export class HateoasResourceService {
    * @param resourceType resource for which will perform request
    * @param id resource id
    * @param requestBody that contains the body directly and optional body values option {@link ValuesOption}
+   * @param options (optional) options that should be applied to the request {@link RequestOption}
    * @throws error when required params are not valid
    */
   public updateResourceById<T extends Resource>(resourceType: new () => T,
                                                 id: number | string,
-                                                requestBody: RequestBody<any>): Observable<T | any> {
+                                                requestBody: RequestBody<any>,
+                                                options?: RequestOption): Observable<T | any> {
     ValidationUtils.validateInputParams({resourceType, id, requestBody});
     const resourceName = resourceType['__resourceName__'];
     StageLogger.resourceBeginLog(resourceName, 'ResourceService UPDATE_RESOURCE_BY_ID', {id, body: requestBody});
 
     const body = ResourceUtils.resolveValues(requestBody);
 
-    return this.resourceHttpService.putResource(resourceName, id, body)
+    return this.resourceHttpService.putResource(resourceName, id, body, options)
       .pipe(tap(() => {
         StageLogger.resourceEndLog(resourceName, 'ResourceService UPDATE_RESOURCE_BY_ID',
           {result: `resource '${ resourceName }' with id ${ id } was updated successful`});
@@ -169,16 +176,19 @@ export class HateoasResourceService {
    * @param entity to patch
    * @param requestBody (optional) contains the body that will be patched resource and optional body values option {@link ValuesOption}
    *        if not passed then entity will be passed as body directly
+   * @param options (optional) options that should be applied to the request {@link RequestOption}
    * @throws error when required params are not valid
    */
-  public patchResource<T extends Resource>(entity: T, requestBody?: RequestBody<any>): Observable<T | any> {
+  public patchResource<T extends Resource>(entity: T,
+                                           requestBody?: RequestBody<any>,
+                                           options?: RequestOption): Observable<T | any> {
     ValidationUtils.validateInputParams({entity});
     StageLogger.resourceBeginLog(entity, 'ResourceService PATCH_RESOURCE', {body: requestBody ? requestBody : entity});
 
     const resource = ResourceUtils.initResource(entity) as Resource;
     const body = ResourceUtils.resolveValues(requestBody ? requestBody : {body: entity});
 
-    return this.resourceHttpService.patch(resource.getSelfLinkHref(), body)
+    return this.resourceHttpService.patch(resource.getSelfLinkHref(), body, options)
       .pipe(tap(() => {
         StageLogger.resourceEndLog(entity, 'ResourceService PATCH_RESOURCE',
           {result: `resource '${ entity['__resourceName__'] }' was patched successful`});
@@ -193,18 +203,20 @@ export class HateoasResourceService {
    * @param resourceType resource for which will perform request
    * @param id resource id
    * @param requestBody that contains the body directly and optional body values option {@link ValuesOption}
+   * @param options (optional) options that should be applied to the request {@link RequestOption}
    * @throws error when required params are not valid
    */
   public patchResourceById<T extends Resource>(resourceType: new () => T,
                                                id: number | string,
-                                               requestBody: RequestBody<any>): Observable<T | any> {
+                                               requestBody: RequestBody<any>,
+                                               options?: RequestOption): Observable<T | any> {
     ValidationUtils.validateInputParams({resourceType, id, requestBody});
     const resourceName = resourceType['__resourceName__'];
     StageLogger.resourceBeginLog(resourceName, 'ResourceService PATCH_RESOURCE_BY_ID', {id, body: requestBody});
 
     const body = ResourceUtils.resolveValues(requestBody);
 
-    return this.resourceHttpService.patchResource(resourceName, id, body)
+    return this.resourceHttpService.patchResource(resourceName, id, body, options)
       .pipe(tap(() => {
         StageLogger.resourceEndLog(resourceName, 'ResourceService PATCH_RESOURCE_BY_ID',
           {result: `resource '${ resourceName }' with id ${ id } was patched successful`});
@@ -223,10 +235,8 @@ export class HateoasResourceService {
     StageLogger.resourceBeginLog(entity, 'ResourceService DELETE_RESOURCE', {options});
 
     const resource = ResourceUtils.initResource(entity) as Resource;
-    const httpParams = UrlUtils.convertToHttpParams({params: options?.params});
 
-    return this.resourceHttpService.delete(resource.getSelfLinkHref(),
-      {observe: options?.observe ? options?.observe : 'response', params: httpParams})
+    return this.resourceHttpService.delete(resource.getSelfLinkHref(), options)
       .pipe(tap(() => {
         StageLogger.resourceEndLog(entity, 'ResourceService DELETE_RESOURCE',
           {result: `resource '${ resource['__resourceName__'] }' was deleted successful`});
@@ -248,10 +258,7 @@ export class HateoasResourceService {
     const resourceName = resourceType['__resourceName__'];
     StageLogger.resourceBeginLog(resourceName, 'ResourceService DELETE_RESOURCE_BY_ID', {id, options});
 
-    const httpParams = UrlUtils.convertToHttpParams({params: options?.params});
-
-    return this.resourceHttpService.deleteResource(resourceName, id,
-      {observe: options?.observe ? options?.observe : 'response', params: httpParams})
+    return this.resourceHttpService.deleteResource(resourceName, id, options)
       .pipe(tap(() => {
         StageLogger.resourceEndLog(resourceName, 'ResourceService DELETE_RESOURCE_BY_ID',
           {result: `resource '${ resourceName }' with id ${ id } was deleted successful`});

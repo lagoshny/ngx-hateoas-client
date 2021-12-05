@@ -1,4 +1,4 @@
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable, of as observableOf } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { StageLogger } from '../logger/stage-logger';
@@ -8,6 +8,7 @@ import { CacheKey } from './internal/cache/model/cache-key';
 import { isResourceObject } from '../model/resource-type';
 import { ResourceCacheService } from './internal/cache/resource-cache.service';
 import { LibConfig } from '../config/lib-config';
+import { HttpClientOptions } from '../model/declarations';
 
 /**
  * Base class with common logics to perform HTTP requests.
@@ -22,11 +23,7 @@ export class HttpExecutor {
 
   private static logRequest(method: string,
                             url: string,
-                            options: {
-                              headers?: HttpHeaders | { [p: string]: string | string[] };
-                              observe?: 'body' | 'response';
-                              params?: HttpParams
-                            },
+                            options: HttpClientOptions,
                             body?: any) {
     const params = {
       method,
@@ -41,11 +38,7 @@ export class HttpExecutor {
 
   private static logResponse(method: string,
                              url: string,
-                             options: {
-                               headers?: HttpHeaders | { [p: string]: string | string[] };
-                               observe?: 'body' | 'response';
-                               params?: HttpParams
-                             },
+                             options: HttpClientOptions,
                              data: any) {
     StageLogger.stageLog(Stage.HTTP_RESPONSE, {
       method,
@@ -64,13 +57,7 @@ export class HttpExecutor {
    * @throws error when required params are not valid
    */
   public getHttp(url: string,
-                 options?: {
-                   headers?: {
-                     [header: string]: string | string[];
-                   };
-                   observe?: 'body' | 'response';
-                   params?: HttpParams
-                 },
+                 options?: HttpClientOptions,
                  useCache: boolean = true): Observable<any> {
     ValidationUtils.validateInputParams({url});
     if (LibConfig.config.cache.enabled && useCache) {
@@ -106,13 +93,7 @@ export class HttpExecutor {
    * @param options (optional) options that applied to the request
    * @throws error when required params are not valid
    */
-  public postHttp(url: string, body: any | null, options?: {
-    headers?: HttpHeaders | {
-      [header: string]: string | string[];
-    };
-    observe?: 'body' | 'response';
-    params?: HttpParams
-  }): Observable<any> {
+  public postHttp(url: string, body: any | null, options?: HttpClientOptions): Observable<any> {
     HttpExecutor.logRequest('POST', url, options, body);
     ValidationUtils.validateInputParams({url});
 
@@ -141,13 +122,7 @@ export class HttpExecutor {
    * @param options (optional) options that applied to the request
    * @throws error when required params are not valid
    */
-  public putHttp(url: string, body: any | null, options?: {
-    headers?: HttpHeaders | {
-      [header: string]: string | string[];
-    };
-    observe?: 'body' | 'response';
-    params?: HttpParams
-  }): Observable<any> {
+  public putHttp(url: string, body: any | null, options?: HttpClientOptions): Observable<any> {
     HttpExecutor.logRequest('PUT', url, options, body);
     ValidationUtils.validateInputParams({url});
 
@@ -176,13 +151,7 @@ export class HttpExecutor {
    * @param options (optional) options that applied to the request
    * @throws error when required params are not valid
    */
-  public patchHttp(url: string, body: any | null, options?: {
-    headers?: HttpHeaders | {
-      [header: string]: string | string[];
-    };
-    observe?: 'body' | 'response';
-    params?: HttpParams
-  }): Observable<any> {
+  public patchHttp(url: string, body: any | null, options?: HttpClientOptions): Observable<any> {
     HttpExecutor.logRequest('PATCH', url, options, body);
     ValidationUtils.validateInputParams({url});
 
@@ -210,13 +179,7 @@ export class HttpExecutor {
    * @param options (optional) options that applied to the request
    * @throws error when required params are not valid
    */
-  public deleteHttp(url: string, options?: {
-    headers?: HttpHeaders | {
-      [header: string]: string | string[];
-    };
-    observe?: 'body' | 'response';
-    params?: HttpParams
-  }): Observable<any> {
+  public deleteHttp(url: string, options?: HttpClientOptions): Observable<any> {
     HttpExecutor.logRequest('DELETE', url, options);
     ValidationUtils.validateInputParams({url});
 

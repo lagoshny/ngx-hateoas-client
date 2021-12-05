@@ -2,6 +2,7 @@ import { ConsoleLogger } from './console-logger';
 import { Stage } from './stage.enum';
 import { LibConfig } from '../config/lib-config';
 import { capitalize, isEmpty, isNil, isObject, isString } from 'lodash-es';
+import { RequestOption } from '../model/declarations';
 
 /**
  * Simplify logger calls.
@@ -10,11 +11,12 @@ import { capitalize, isEmpty, isNil, isObject, isString } from 'lodash-es';
 /* tslint:disable:no-string-literal */
 export class StageLogger {
 
-  public static resourceBeginLog(resource: object | string, method: string, params?: object): void {
+  public static resourceBeginLog(resource: object | string, method: string, params?: object, options?: RequestOption): void {
     if (!LibConfig.config.logs.verboseLogs && !LibConfig.config.isProduction) {
       return;
     }
     const paramToLog = this.prepareParams(params);
+    const optionToLog = this.prepareParams(options);
 
     let resourceName;
     if (isString(resource)) {
@@ -25,14 +27,15 @@ export class StageLogger {
       resourceName = 'NOT_DEFINED_RESOURCE_NAME';
     }
     ConsoleLogger.resourcePrettyInfo(`${ capitalize(resourceName) } ${ method }`,
-      `STAGE ${ Stage.BEGIN }`, paramToLog);
+      `STAGE ${ Stage.BEGIN }`, paramToLog, optionToLog);
   }
 
-  public static resourceEndLog(resource: object | string, method: string, params: object): void {
+  public static resourceEndLog(resource: object | string, method: string, params: object, options?: RequestOption): void {
     if (!LibConfig.config.logs.verboseLogs && !LibConfig.config.isProduction) {
       return;
     }
     const paramToLog = this.prepareParams(params);
+    const optionToLog = this.prepareParams(options);
 
     let resourceName;
     if (isString(resource)) {
@@ -42,7 +45,7 @@ export class StageLogger {
     }
 
     ConsoleLogger.resourcePrettyInfo(`${ capitalize(resourceName) } ${ method }`,
-      `STAGE ${ Stage.END }`, paramToLog);
+      `STAGE ${ Stage.END }`, paramToLog, optionToLog);
   }
 
   public static stageLog(stage: Stage, params: object): void {

@@ -44,7 +44,8 @@ export class PagedResourceCollectionHttpService extends HttpExecutor {
    */
   public get<T extends PagedResourceCollection<BaseResource>>(url: string,
                                                               options?: PagedGetOption): Observable<T> {
-    const httpOptions = {params: UrlUtils.convertToHttpParams(options)};
+    const httpOptions = UrlUtils.convertToHttpOptions(options);
+
     return super.getHttp(url, httpOptions, options?.useCache)
       .pipe(
         map((data: any) => {
@@ -57,7 +58,7 @@ export class PagedResourceCollectionHttpService extends HttpExecutor {
             throw new Error(errMsg);
           }
 
-          return ResourceUtils.instantiatePagedResourceCollection(data, httpOptions.params.has('projection')) as T;
+          return ResourceUtils.instantiatePagedResourceCollection(data, httpOptions?.params?.has('projection')) as T;
         }),
         catchError(error => observableThrowError(error)));
   }

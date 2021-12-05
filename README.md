@@ -93,9 +93,9 @@ You can found examples of usage this client with [task-manager-front](https://gi
 - [Cache support](#cache-support)
 - [Logging](#Logging)
 6. [Public classes](#Public-classes)
+- [RequestOption](#RequestOption)
 - [GetOption](#GetOption)
 - [PagedGetOption](#PagedGetOption)
-- [RequestOption](#RequestOption)
 - [RequestBody](#RequestBody)
 - [Sort](#Sort)
 - [SortedPageParam](#SortedPageParam)
@@ -2174,10 +2174,11 @@ Creating new resource [Resource](#resource).
 Method signature:
 
 ```
-createResource(requestBody: RequestBody<T>): Observable<T | any>;
+createResource(requestBody: RequestBody<T>, options?: RequestOption): Observable<T | any>;
 ```
 
 - `requestBody` - [RequestBody](#requestbody) contains request body (in this case resource object) and additional body options.
+- `options` - (optional) [RequestOption](#requestoption) that should be applied to the request
 - `return value` - [Resource](#resource) with type `T` or `raw response data` when returned value is not resource object.
 
 ##### Example of usage ([given the presets](#resource-service-presets)):
@@ -2259,11 +2260,12 @@ To update a resource by an `id` directly use [UpdateResourceById](#updateresourc
 Method signature:
 
 ```
-updateResource(entity: T, requestBody?: RequestBody<any>): Observable<T | any>;
+updateResource(entity: T, requestBody?: RequestBody<any>, options?: RequestOption): Observable<T | any>;
 ```
 
 - `entity` - resource to update.
 - `requestBody` - [RequestBody](#requestbody) contains request body (in this case new values for resource) and additional body options.
+- `options` - (optional) [RequestOption](#requestoption) that should be applied to the request
 - `return value` - [Resource](#resource) with type `T` or `raw response data` when returned value is not resource object.
 
 >When passed only `entity` param then values of `entity` will be used to update values of resource.
@@ -2334,11 +2336,12 @@ To update a resource by resource `self link URL` use [UpdateResource](#updateres
 Method signature:
 
 ```
-updateResourceById(id: number | string, requestBody: RequestBody<any>): Observable<T | any>;
+updateResourceById(id: number | string, requestBody: RequestBody<any>, options?: RequestOption): Observable<T | any>;
 ```
 
 - `id` - resource id to update.
 - `requestBody` - [RequestBody](#requestbody) contains request body (in this case new values for resource) and additional body options.
+- `options` - (optional) [RequestOption](#requestoption) that should be applied to the request
 - `return value` - [Resource](#resource) with type `T` or `raw response data` when returned value is not resource object.
 
 ##### Example of usage ([given the presets](#resource-service-presets)):
@@ -2433,11 +2436,12 @@ To patch a resource by an `id` directly use [PatchResourceById](#patchresourceby
 Method signature:
 
 ```
-patchResource(entity: T, requestBody?: RequestBody<any>): Observable<T | any>;
+patchResource(entity: T, requestBody?: RequestBody<any>, options?: RequestOption): Observable<T | any>;
 ```
 
 - `entity` - resource to patch.
 - `requestBody` - [RequestBody](#requestbody) contains request body (in this case new values for resource) and additional body options.
+- `options` - (optional) [RequestOption](#requestoption) that should be applied to the request
 - `return value` - [Resource](#resource) with type `T` or `raw response data` when returned value is not resource object.
 
 >When passed only `entity` param then values of `entity` will be used to patch values of resource.
@@ -2509,11 +2513,12 @@ To patch a resource by resource `self link URL` use [UpdateResource](#updatereso
 Method signature:
 
 ```
-patchResourceById(id: number | string, requestBody: RequestBody<any>): Observable<T | any>;
+patchResourceById(id: number | string, requestBody: RequestBody<any>, options?: RequestOption): Observable<T | any>;
 ```
 
 - `id` - resource id to patch.
 - `requestBody` - [RequestBody](#requestbody) contains request body (in this case new values for resource) and additional body options.
+- `options` - (optional) [RequestOption](#requestoption) that should be applied to the request
 - `return value` - [Resource](#resource) with type `T` or `raw response data` when returned value is not resource object.
 
 ##### Example of usage ([given the presets](#resource-service-presets)):
@@ -3211,22 +3216,41 @@ It, not good practice to show these messages in production therefore warning lev
 ## Public classes
 This section describes public classes available to use in client apps.
 
+### RequestOption
+Contains common options for all requests, it is allowing to add Angular `HttpClient` options to resource request.
+Uses directly as option type in methods that create, change or delete resource.
+
+
+With `RequestOption` you can change response type to `HttpResponse` passing `observe: 'response'`, by default used `observe: body`.
+Also, you can pass `params` that will be added to the HTTP request as HTTP params and other Angular `HttpClient` options.
+
+```
+export interface RequestOption {
+  params?: [paramName: string]: Resource | string | number | boolean;
+  headers?: HttpHeaders | {
+    [header: string]: string | string[];
+  };
+  observe?: 'body' | 'response';
+  reportProgress?: boolean;
+  withCredentials?: boolean;
+}
+```
+- `params` is `key: value` values that will be added to the HTTP request as HTTP params
+- `observe` is response type param
+- `headers` is http headers
+
 ### GetOption
 Uses as option type in methods that retrieve resource or resource collection from the server.
 
-`GetOption` is an interface that describes the next options:
+`GetOption` extends `RequestOption` and adds additional params to GET request.
 
 ```
-export interface GetOption {
-  params?: {
-    [paramName: string]: Resource | string | number | boolean;
-  };
+export interface GetOption extends RequestOption {
   sort?: Sort;
   useCache?: boolean;
 }
 ```
 
-- `params` is `key: value` values that will be added to the HTTP request as HTTP params
 - `sort` is [Sort](#sort) object with response sort options
 - `useCache` is property allows to disable the cache for current request
 
@@ -3248,23 +3272,6 @@ export interface PageParam {
 ```
 - `page` is page number param
 - `size` is page size param
-
-### RequestOption
-Uses as option type in methods that create, change or delete resource.
-
-With `RequestOption` you can change response type to `HttpResponse` passing `observe: 'response'`, by default used `observe: body`.
-Also, you can pass `params` that will be added to the HTTP request as HTTP params.
-
-```
-export interface RequestOption {
-  params?:  {
-    [paramName: string]: Resource | string | number | boolean;
-  },
-  observe?: 'body' | 'response';
-}
-```
-- `params` is `key: value` values that will be added to the HTTP request as HTTP params
-- `observe` is response type param
 
 ### RequestBody
 Uses as request body type in methods that create or change resource.

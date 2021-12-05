@@ -4,7 +4,7 @@ import { HateoasResource, HttpMethod, Include, Resource } from '../../ngx-hateoa
 import { of } from 'rxjs';
 import { SimpleResource } from '../../model/resource/resources.test';
 import { ResourceUtils } from '../../util/resource.utils';
-import { HttpParams } from '@angular/common/http';
+import { RequestParam } from '../../model/declarations';
 import anything = jasmine.anything;
 
 @HateoasResource('resourceRelation')
@@ -356,10 +356,9 @@ describe('HateoasResourceService', () => {
     const simpleResource = new SimpleResource();
     hateoasResourceService.deleteResource(simpleResource, {params: {test: 'param'}})
       .subscribe(() => {
-        const params = resourceHttpServiceSpy.delete.calls.argsFor(0)[1].params as HttpParams;
+        const params = resourceHttpServiceSpy.delete.calls.argsFor(0)[1].params as RequestParam;
         expect(params).toBeDefined();
-        expect(params.has('test')).toBeTrue();
-        expect(params.get('test')).toBe('param');
+        expect(params.test).toBe('param');
       });
   });
 
@@ -395,10 +394,9 @@ describe('HateoasResourceService', () => {
 
     hateoasResourceService.deleteResourceById(SimpleResource, 1, {params: {test: 'param'}})
       .subscribe(() => {
-        const params = resourceHttpServiceSpy.deleteResource.calls.argsFor(0)[2].params as HttpParams;
+        const params = resourceHttpServiceSpy.deleteResource.calls.argsFor(0)[2].params as RequestParam;
         expect(params).toBeDefined();
-        expect(params.has('test')).toBeTrue();
-        expect(params.get('test')).toBe('param');
+        expect(params.test).toBe('param');
       });
   });
 

@@ -1,14 +1,14 @@
 import { BaseResource } from './base-resource';
-import { async, TestBed } from '@angular/core/testing';
+import { TestBed, waitForAsync } from '@angular/core/testing';
 import { of } from 'rxjs';
 import { ResourceHttpService } from '../../service/internal/resource-http.service';
 import { DependencyInjector } from '../../util/dependency-injector';
 import { PagedResourceCollectionHttpService } from '../../service/internal/paged-resource-collection-http.service';
 import { PagedResourceCollection } from './paged-resource-collection';
 import { ResourceCollection } from './resource-collection';
-import { HttpParams } from '@angular/common/http';
 import { ResourceCollectionHttpService } from '../../service/internal/resource-collection-http.service';
 import { LibConfig } from '../../config/lib-config';
+import { RequestParam } from '../declarations';
 
 class TestProductResource extends BaseResource {
   // tslint:disable-next-line:variable-name
@@ -60,7 +60,7 @@ describe('BaseResource GET_RELATION', () => {
   let baseResource: BaseResource;
   let resourceHttpServiceSpy: any;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     resourceHttpServiceSpy = {
       get: jasmine.createSpy('get')
     };
@@ -155,7 +155,7 @@ describe('BaseResource GET_RELATED_COLLECTION', () => {
   let baseResource: BaseResource;
   let resourceCollectionHttpServiceSpy: any;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     resourceCollectionHttpServiceSpy = {
       get: jasmine.createSpy('get')
     };
@@ -246,7 +246,7 @@ describe('BaseResource GET_RELATED_PAGE', () => {
   let baseResource: BaseResource;
   let pagedResourceCollectionHttpServiceSpy: any;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     pagedResourceCollectionHttpServiceSpy = {
       get: jasmine.createSpy('get')
     };
@@ -338,7 +338,7 @@ describe('BaseResource GET_RELATED_PAGE', () => {
     });
   });
 
-  it('should pass only useCache options for TEMPLATED link', () => {
+  it('should undefine params/pageParams/sort options for TEMPLATED link', () => {
     pagedResourceCollectionHttpServiceSpy.get.and.returnValue(of(new PagedResourceCollection(new ResourceCollection())));
 
     baseResource.getRelatedPage('product', {
@@ -352,7 +352,7 @@ describe('BaseResource GET_RELATED_PAGE', () => {
       }
     }).subscribe(() => {
       const options = pagedResourceCollectionHttpServiceSpy.get.calls.argsFor(0)[1];
-      expect(options).toEqual({useCache: undefined});
+      expect(options).toEqual({...options, params: undefined, pageParams: undefined, sort: undefined});
     });
   });
 
@@ -362,7 +362,7 @@ describe('BaseResource POST_RELATION', () => {
   let baseResource: BaseResource;
   let resourceHttpServiceSpy: any;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     resourceHttpServiceSpy = {
       post: jasmine.createSpy('post')
     };
@@ -417,8 +417,8 @@ describe('BaseResource POST_RELATION', () => {
     baseResource.postRelation('updateStatus', {body: {}}, {
       params: {statusId: 1}
     }).subscribe(() => {
-      const httpParams = resourceHttpServiceSpy.post.calls.argsFor(0)[2].params;
-      expect(httpParams.has('statusId')).toBeTrue();
+      const requestParams = resourceHttpServiceSpy.post.calls.argsFor(0)[2].params as RequestParam;
+      expect(requestParams.statusId).toBe(1);
     });
   });
 
@@ -467,7 +467,7 @@ describe('BaseResource POST_RELATION', () => {
 
       const options = resourceHttpServiceSpy.post.calls.argsFor(0)[2];
       expect(options).toBeDefined();
-      expect((options.params as HttpParams).keys().length).toBe(0);
+      expect(options.params).toBeUndefined();
     });
   });
 
@@ -482,7 +482,7 @@ describe('BaseResource POST_RELATION', () => {
 
       const options = resourceHttpServiceSpy.post.calls.argsFor(0)[2];
       expect(options).toBeDefined();
-      expect((options.params as HttpParams).keys().length).toBe(0);
+      expect(options.params).toBeUndefined();
     });
   });
 
@@ -492,7 +492,7 @@ describe('BaseResource PATCH_RELATION', () => {
   let baseResource: BaseResource;
   let resourceHttpServiceSpy: any;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     resourceHttpServiceSpy = {
       patch: jasmine.createSpy('patch')
     };
@@ -547,8 +547,8 @@ describe('BaseResource PATCH_RELATION', () => {
     baseResource.patchRelation('updateStatus', {body: {}}, {
       params: {statusId: 1}
     }).subscribe(() => {
-      const httpParams = resourceHttpServiceSpy.patch.calls.argsFor(0)[2].params;
-      expect(httpParams.has('statusId')).toBeTrue();
+      const httpParams = resourceHttpServiceSpy.patch.calls.argsFor(0)[2].params as RequestParam;
+      expect(httpParams.statusId).toBe(1);
     });
   });
 
@@ -597,7 +597,7 @@ describe('BaseResource PATCH_RELATION', () => {
 
       const options = resourceHttpServiceSpy.patch.calls.argsFor(0)[2];
       expect(options).toBeDefined();
-      expect((options.params as HttpParams).keys().length).toBe(0);
+      expect(options.params).toBeUndefined();
     });
   });
 
@@ -612,7 +612,7 @@ describe('BaseResource PATCH_RELATION', () => {
 
       const options = resourceHttpServiceSpy.patch.calls.argsFor(0)[2];
       expect(options).toBeDefined();
-      expect((options.params as HttpParams).keys().length).toBe(0);
+      expect(options.params).toBeUndefined();
     });
   });
 
@@ -622,7 +622,7 @@ describe('BaseResource PUT_RELATION', () => {
   let baseResource: BaseResource;
   let resourceHttpServiceSpy: any;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     resourceHttpServiceSpy = {
       put: jasmine.createSpy('put')
     };
@@ -671,8 +671,8 @@ describe('BaseResource PUT_RELATION', () => {
     baseResource.putRelation('updateStatus', {body: {}}, {
       params: {statusId: 1}
     }).subscribe(() => {
-      const httpParams = resourceHttpServiceSpy.put.calls.argsFor(0)[2].params;
-      expect(httpParams.has('statusId')).toBeTrue();
+      const httpParams = resourceHttpServiceSpy.put.calls.argsFor(0)[2].params as RequestParam;
+      expect(httpParams.statusId).toBe(1);
     });
   });
 
@@ -710,7 +710,7 @@ describe('BaseResource PUT_RELATION', () => {
 
       const options = resourceHttpServiceSpy.put.calls.argsFor(0)[2];
       expect(options).toBeDefined();
-      expect((options.params as HttpParams).keys().length).toBe(0);
+      expect(options.params).toBeUndefined();
     });
   });
 
@@ -725,7 +725,7 @@ describe('BaseResource PUT_RELATION', () => {
 
       const options = resourceHttpServiceSpy.put.calls.argsFor(0)[2];
       expect(options).toBeDefined();
-      expect((options.params as HttpParams).keys().length).toBe(0);
+      expect(options.params).toBeUndefined();
     });
   });
 

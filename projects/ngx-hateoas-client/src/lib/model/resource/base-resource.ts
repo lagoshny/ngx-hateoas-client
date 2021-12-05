@@ -32,13 +32,12 @@ export abstract class BaseResource extends AbstractResource {
     StageLogger.resourceBeginLog(this, 'GET_RELATION', {relationName, options});
 
     const relationLink = this.getRelationLink(relationName);
+    const optionsToRequest = relationLink.templated
+      ? {...options, params: undefined, sort: undefined}
+      : options;
 
     return getResourceHttpService()
-      .get(UrlUtils.generateLinkUrl(relationLink, options),
-        {
-          ...options,
-          params: relationLink.templated ? {} : options?.params
-        })
+      .get(UrlUtils.generateLinkUrl(relationLink, options), optionsToRequest)
       .pipe(
         tap(() => {
           StageLogger.resourceEndLog(this, 'GET_RELATION', {result: `relation ${ relationName } was got successful`});
@@ -60,13 +59,12 @@ export abstract class BaseResource extends AbstractResource {
     StageLogger.resourceBeginLog(this, 'GET_RELATED_COLLECTION', {relationName, options});
 
     const relationLink = this.getRelationLink(relationName);
+    const optionsToRequest = relationLink.templated
+      ? {...options, params: undefined, sort: undefined}
+      : options;
 
     return getResourceCollectionHttpService()
-      .get(UrlUtils.generateLinkUrl(relationLink, options),
-        {
-          ...options,
-          params: relationLink.templated ? {} : options?.params
-        })
+      .get(UrlUtils.generateLinkUrl(relationLink, options), optionsToRequest)
       .pipe(
         tap(() => {
           StageLogger.resourceEndLog(this, 'GET_RELATED_COLLECTION', {result: `related collection ${ relationName } was got successful`});
@@ -88,13 +86,12 @@ export abstract class BaseResource extends AbstractResource {
     StageLogger.resourceBeginLog(this, 'GET_RELATED_PAGE', {relationName, options});
 
     const relationLink = this.getRelationLink(relationName);
+    const optionsToRequest = relationLink.templated
+      ? {...options, params: undefined, pageParams: undefined, sort: undefined}
+      : options;
 
     return getPagedResourceCollectionHttpService()
-      .get(UrlUtils.generateLinkUrl(relationLink, UrlUtils.fillDefaultPageDataIfNoPresent(options)),
-        {
-          ...options,
-          params: relationLink.templated ? {} : options?.params
-        })
+      .get(UrlUtils.generateLinkUrl(relationLink, UrlUtils.fillDefaultPageDataIfNoPresent(options)), optionsToRequest)
       .pipe(
         tap(() => {
           StageLogger.resourceEndLog(this, 'GET_RELATED_PAGE', {result: `related page ${ relationName } was got successful`});
@@ -158,7 +155,7 @@ export abstract class BaseResource extends AbstractResource {
         {
           ...options,
           observe: options?.observe ? options.observe : 'body',
-          params: relationLink.templated ? {} : options?.params
+          params: relationLink.templated ? undefined : options?.params
         })
       .pipe(
         tap(() => {
@@ -191,7 +188,7 @@ export abstract class BaseResource extends AbstractResource {
         {
           ...options,
           observe: options?.observe ? options.observe : 'body',
-          params: relationLink.templated ? {} : options?.params
+          params: relationLink.templated ? undefined : options?.params
         })
       .pipe(
         tap(() => {

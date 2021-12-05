@@ -1,4 +1,4 @@
-import { async, TestBed } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
 import { ResourceHttpService } from '../../service/internal/resource-http.service';
 import { DependencyInjector } from '../../util/dependency-injector';
 import { Resource } from './resource';
@@ -63,7 +63,7 @@ describe('Resource ADD_RELATION', () => {
   let resource: Resource;
   let resourceHttpServiceSpy: any;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     resourceHttpServiceSpy = {
       post: jasmine.createSpy('post')
     };
@@ -160,7 +160,7 @@ describe('Resource BIND_RELATION', () => {
   let resource: Resource;
   let resourceHttpServiceSpy: any;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     resourceHttpServiceSpy = {
       put: jasmine.createSpy('put')
     };
@@ -252,7 +252,7 @@ describe('Resource UNBIND_RELATION', () => {
   let resource: Resource;
   let resourceHttpServiceSpy: any;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     resourceHttpServiceSpy = {
       delete: jasmine.createSpy('delete')
     };
@@ -312,7 +312,7 @@ describe('Resource UNBIND_COLLECTION_RELATION', () => {
   let resource: Resource;
   let resourceHttpServiceSpy: any;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     resourceHttpServiceSpy = {
       put: jasmine.createSpy('put')
     };
@@ -404,7 +404,7 @@ describe('Resource DELETE_RELATION', () => {
   let resource: Resource;
   let resourceHttpServiceSpy: any;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     resourceHttpServiceSpy = {
       delete: jasmine.createSpy('delete')
     };

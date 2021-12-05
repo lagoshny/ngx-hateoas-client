@@ -149,6 +149,19 @@ describe('BaseResource GET_RELATION', () => {
     });
   });
 
+  it('should undefine params/sort options for TEMPLATED link', () => {
+    resourceHttpServiceSpy.get.and.returnValue(of(new TestOrderResource()));
+
+    baseResource.getRelation('paymentType', {
+      params: {
+        projection: 'paymentProjection'
+      }
+    }).subscribe(() => {
+      const options = resourceHttpServiceSpy.get.calls.argsFor(0)[1];
+      expect(options).toEqual({...options, params: undefined, sort: undefined});
+    });
+  });
+
 });
 
 describe('BaseResource GET_RELATED_COLLECTION', () => {
@@ -237,6 +250,19 @@ describe('BaseResource GET_RELATED_COLLECTION', () => {
     baseResource.getRelatedCollection('paymentType', {}).subscribe(() => {
       const resultResourceUrl = resourceCollectionHttpServiceSpy.get.calls.argsFor(0)[0];
       expect(resultResourceUrl).toBe('http://localhost:8080/api/v1/order/1/payment');
+    });
+  });
+
+  it('should undefine params/sort options for TEMPLATED link', () => {
+    resourceCollectionHttpServiceSpy.get.and.returnValue(of(new TestOrderResource()));
+
+    baseResource.getRelatedCollection('paymentType', {
+      params: {
+        projection: 'paymentProjection'
+      }
+    }).subscribe(() => {
+      const options = resourceCollectionHttpServiceSpy.get.calls.argsFor(0)[1];
+      expect(options).toEqual({...options, params: undefined, sort: undefined});
     });
   });
 
@@ -411,6 +437,17 @@ describe('BaseResource POST_RELATION', () => {
     });
   });
 
+  it('should undefine params options for TEMPLATED link', () => {
+    resourceHttpServiceSpy.post.and.returnValue(of(new TestOrderResource()));
+
+    baseResource.postRelation('updateStatusTemplated', {body: {}}, {
+      params: {statusId: 1}
+    }).subscribe(() => {
+      const options = resourceHttpServiceSpy.post.calls.argsFor(0)[2];
+      expect(options).toEqual({...options, params: undefined});
+    });
+  });
+
   it('should pass http request params when url IS NOT templated', () => {
     resourceHttpServiceSpy.post.and.returnValue(of(new TestOrderResource()));
 
@@ -541,6 +578,17 @@ describe('BaseResource PATCH_RELATION', () => {
     });
   });
 
+  it('should undefine params options for TEMPLATED link', () => {
+    resourceHttpServiceSpy.patch.and.returnValue(of(new TestOrderResource()));
+
+    baseResource.patchRelation('updateStatusTemplated', {body: {}}, {
+      params: {statusId: 1}
+    }).subscribe(() => {
+      const options = resourceHttpServiceSpy.patch.calls.argsFor(0)[2];
+      expect(options).toEqual({...options, params: undefined});
+    });
+  });
+
   it('should pass http request params when url IS NOT templated', () => {
     resourceHttpServiceSpy.patch.and.returnValue(of(new TestOrderResource()));
 
@@ -662,6 +710,17 @@ describe('BaseResource PUT_RELATION', () => {
     }).subscribe(() => {
       const resultResourceUrl = resourceHttpServiceSpy.put.calls.argsFor(0)[0];
       expect(resultResourceUrl).toBe('http://localhost:8080/api/v1/order/1/updateStatus/1');
+    });
+  });
+
+  it('should undefine params options for TEMPLATED link', () => {
+    resourceHttpServiceSpy.put.and.returnValue(of(new TestOrderResource()));
+
+    baseResource.putRelation('updateStatusTemplated', {body: {}}, {
+      params: {statusId: 1}
+    }).subscribe(() => {
+      const options = resourceHttpServiceSpy.put.calls.argsFor(0)[2];
+      expect(options).toEqual({...options, params: undefined});
     });
   });
 

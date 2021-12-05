@@ -66,7 +66,6 @@ export interface RequestOption {
   };
   observe?: 'body' | 'response';
   reportProgress?: boolean;
-  responseType?: 'json';
   withCredentials?: boolean;
 }
 

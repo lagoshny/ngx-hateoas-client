@@ -75,7 +75,6 @@ export class ConsoleLogger {
       'color: #201AB3;'
     ];
 
-    // TODO: duplication
     if (!isEmpty(params)) {
       for (const [key, value] of Object.entries(params)) {
         if (key.toLowerCase() === 'result') {

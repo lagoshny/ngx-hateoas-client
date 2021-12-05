@@ -122,7 +122,7 @@ export abstract class BaseResource extends AbstractResource {
         {
           ...options,
           observe: options?.observe ? options.observe : 'body',
-          params: relationLink.templated ? {} : options?.params
+          params: relationLink.templated ? undefined : options?.params
         })
       .pipe(
         tap(() => {

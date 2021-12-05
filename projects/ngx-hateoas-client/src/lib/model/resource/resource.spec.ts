@@ -1,4 +1,4 @@
-import { TestBed } from '@angular/core/testing';
+import { TestBed, waitForAsync } from '@angular/core/testing';
 import { ResourceHttpService } from '../../service/internal/resource-http.service';
 import { DependencyInjector } from '../../util/dependency-injector';
 import { Resource } from './resource';

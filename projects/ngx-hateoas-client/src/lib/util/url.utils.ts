@@ -61,7 +61,6 @@ export class UrlUtils {
       headers: options.headers,
       observe: options.observe,
       reportProgress: options.reportProgress,
-      responseType: options.responseType,
       withCredentials: options.withCredentials,
     };
   }

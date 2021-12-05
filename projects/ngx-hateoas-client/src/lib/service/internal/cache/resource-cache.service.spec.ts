@@ -2,6 +2,7 @@ import { ResourceCacheService } from './resource-cache.service';
 import { CacheKey } from './model/cache-key';
 import { rawPagedResourceCollection, rawResource, rawResourceCollection } from '../../../model/resource/resources.test';
 import { LibConfig } from '../../../config/lib-config';
+import { waitForAsync } from '@angular/core/testing';
 
 describe('CacheService', () => {
   let cacheService: ResourceCacheService;
@@ -29,15 +30,16 @@ describe('CacheService', () => {
     expect(result).toBeNull();
   });
 
-  it('GET_RESOURCE should return null when a cache has value but it is expired', waitForAsync(() => {
-    LibConfig.config.cache.lifeTime = 1 / 1000;
-    cacheService.putResource(CacheKey.of('someVal', {}), rawResource);
+  it('GET_RESOURCE should return null when a cache has value but it is expired',
+    waitForAsync(() => {
+      LibConfig.config.cache.lifeTime = 1 / 1000;
+      cacheService.putResource(CacheKey.of('someVal', {}), rawResource);
 
-    setTimeout(() => {
-      const result = cacheService.getResource(CacheKey.of('someVal', {}));
-      expect(result).toBe(null);
-    }, 200);
-  }));
+      setTimeout(() => {
+        const result = cacheService.getResource(CacheKey.of('someVal', {}));
+        expect(result).toBe(null);
+      }, 200);
+    }));
 
   it('GET_RESOURCE should return value from a cache', () => {
     cacheService.putResource(CacheKey.of('someVal', {}), rawResource);

@@ -62,9 +62,8 @@ export class ConsoleLogger {
    * @param message log message
    * @param resourceName resource name
    * @param params additional params for verbose log
-   * @param options (optional) options that applied to the request
    */
-  public static resourcePrettyInfo(resourceName: string, message: string, params?: object, options?: object): void {
+  public static resourcePrettyInfo(resourceName: string, message: string, params?: object): void {
     if (!LibConfig.config.logs.verboseLogs && !LibConfig.config.isProduction) {
       return;
     }
@@ -84,13 +83,6 @@ export class ConsoleLogger {
           msg += `%c${ camelCase(key) }: %c${ value }\n`;
           color.push('color: #3AA6D0;', 'color: default;');
         }
-      }
-    }
-
-    if (!isEmpty(options)) {
-      for (const [key, value] of Object.entries(options)) {
-        msg += `%c${ camelCase(key) }: %c${ value }\n`;
-        color.push('color: #3AA6D0;', 'color: default;');
       }
     }
 

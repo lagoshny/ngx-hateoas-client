@@ -43,15 +43,11 @@ export class CommonResourceHttpService extends HttpExecutor {
 
     StageLogger.stageLog(Stage.PREPARE_URL, {
       result: url,
-      urlParts: `baseUrl: '${ UrlUtils.getApiUrl() }', resource: '${ resourceName }', query: '${ query }'`
+      urlParts: `baseUrl: '${ UrlUtils.getApiUrl() }', resource: '${ resourceName }', query: '${ query }'`,
+      options
     });
 
     const httpOptions = UrlUtils.convertToHttpOptions(options);
-
-    StageLogger.stageLog(Stage.PREPARE_URL, {
-      result: url,
-      urlParts: `baseUrl: '${ UrlUtils.getApiUrl() }', resource: '${ resourceName }', query: '${ query }'`
-    });
 
     let result: Observable<any>;
     switch (method) {
@@ -69,7 +65,7 @@ export class CommonResourceHttpService extends HttpExecutor {
         break;
       default:
         const errMsg = `allowed ony GET/POST/PUT/PATCH http methods you pass ${ method }`;
-        StageLogger.stageErrorLog(Stage.HTTP_REQUEST, {error: errMsg});
+        StageLogger.stageErrorLog(Stage.HTTP_REQUEST, {error: errMsg, options});
         return observableThrowError(new Error(errMsg));
     }
 

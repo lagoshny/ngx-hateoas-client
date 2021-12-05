@@ -54,7 +54,7 @@ export class PagedResourceCollectionHttpService extends HttpExecutor {
               this.cacheService.evictResource(CacheKey.of(url, httpOptions));
             }
             const errMsg = `You try to get wrong resource type: expected PagedResourceCollection type, actual ${ getResourceType(data) } type.`;
-            StageLogger.stageErrorLog(Stage.INIT_RESOURCE, {error: errMsg});
+            StageLogger.stageErrorLog(Stage.INIT_RESOURCE, {error: errMsg, options});
             throw new Error(errMsg);
           }
 
@@ -78,7 +78,8 @@ export class PagedResourceCollectionHttpService extends HttpExecutor {
 
     StageLogger.stageLog(Stage.PREPARE_URL, {
       result: url,
-      urlParts: `baseUrl: '${ UrlUtils.getApiUrl() }', resource: '${ resourceName }'`
+      urlParts: `baseUrl: '${ UrlUtils.getApiUrl() }', resource: '${ resourceName }'`,
+      options
     });
 
     return this.get(url, UrlUtils.fillDefaultPageDataIfNoPresent(options));
@@ -102,7 +103,8 @@ export class PagedResourceCollectionHttpService extends HttpExecutor {
 
     StageLogger.stageLog(Stage.PREPARE_URL, {
       result: url,
-      urlParts: `baseUrl: '${ UrlUtils.getApiUrl() }', resource: '${ resourceName }'`
+      urlParts: `baseUrl: '${ UrlUtils.getApiUrl() }', resource: '${ resourceName }'`,
+      options
     });
 
     return this.get(url, UrlUtils.fillDefaultPageDataIfNoPresent(options));

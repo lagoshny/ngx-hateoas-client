@@ -104,7 +104,7 @@ export class HateoasResourceService {
                                             options?: RequestOption): Observable<T | any> {
     ValidationUtils.validateInputParams({resourceType, requestBody});
     const resourceName = resourceType['__resourceName__'];
-    StageLogger.resourceBeginLog(resourceName, 'ResourceService CREATE_RESOURCE', {requestBody});
+    StageLogger.resourceBeginLog(resourceName, 'ResourceService CREATE_RESOURCE', {requestBody, options});
 
     const body = ResourceUtils.resolveValues(requestBody);
 
@@ -128,7 +128,7 @@ export class HateoasResourceService {
                                             requestBody?: RequestBody<any>,
                                             options?: RequestOption): Observable<T | any> {
     ValidationUtils.validateInputParams({entity});
-    StageLogger.resourceBeginLog(entity, 'ResourceService UPDATE_RESOURCE', {body: requestBody ? requestBody : entity});
+    StageLogger.resourceBeginLog(entity, 'ResourceService UPDATE_RESOURCE', {body: requestBody ? requestBody : entity, options});
 
     const resource = ResourceUtils.initResource(entity) as Resource;
     const body = ResourceUtils.resolveValues(requestBody ? requestBody : {body: entity});
@@ -157,7 +157,7 @@ export class HateoasResourceService {
                                                 options?: RequestOption): Observable<T | any> {
     ValidationUtils.validateInputParams({resourceType, id, requestBody});
     const resourceName = resourceType['__resourceName__'];
-    StageLogger.resourceBeginLog(resourceName, 'ResourceService UPDATE_RESOURCE_BY_ID', {id, body: requestBody});
+    StageLogger.resourceBeginLog(resourceName, 'ResourceService UPDATE_RESOURCE_BY_ID', {id, body: requestBody, options});
 
     const body = ResourceUtils.resolveValues(requestBody);
 
@@ -183,7 +183,7 @@ export class HateoasResourceService {
                                            requestBody?: RequestBody<any>,
                                            options?: RequestOption): Observable<T | any> {
     ValidationUtils.validateInputParams({entity});
-    StageLogger.resourceBeginLog(entity, 'ResourceService PATCH_RESOURCE', {body: requestBody ? requestBody : entity});
+    StageLogger.resourceBeginLog(entity, 'ResourceService PATCH_RESOURCE', {body: requestBody ? requestBody : entity, options});
 
     const resource = ResourceUtils.initResource(entity) as Resource;
     const body = ResourceUtils.resolveValues(requestBody ? requestBody : {body: entity});
@@ -212,7 +212,7 @@ export class HateoasResourceService {
                                                options?: RequestOption): Observable<T | any> {
     ValidationUtils.validateInputParams({resourceType, id, requestBody});
     const resourceName = resourceType['__resourceName__'];
-    StageLogger.resourceBeginLog(resourceName, 'ResourceService PATCH_RESOURCE_BY_ID', {id, body: requestBody});
+    StageLogger.resourceBeginLog(resourceName, 'ResourceService PATCH_RESOURCE_BY_ID', {id, body: requestBody, options});
 
     const body = ResourceUtils.resolveValues(requestBody);
 

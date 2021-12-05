@@ -28,7 +28,10 @@ export class HttpExecutor {
     const params = {
       method,
       url,
-      params: options?.params?.keys().length > 0 ? options?.params.toString() : '',
+      options: {
+        ...options,
+        params: options?.params?.keys().length > 0 ? options?.params.toString() : '',
+      }
     };
     if (body) {
       params['body'] = body;
@@ -43,7 +46,10 @@ export class HttpExecutor {
     StageLogger.stageLog(Stage.HTTP_RESPONSE, {
       method,
       url,
-      params: options?.params?.keys().length > 0 ? options?.params.toString() : '',
+      options: {
+        ...options,
+        params: options?.params?.keys().length > 0 ? options?.params.toString() : '',
+      },
       result: data
     });
   }

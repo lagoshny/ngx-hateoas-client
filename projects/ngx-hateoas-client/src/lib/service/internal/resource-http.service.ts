@@ -54,6 +54,7 @@ export class ResourceHttpService extends HttpExecutor {
             }
             const errMsg = `You try to get wrong resource type: expected Resource type, actual ${ getResourceType(data) } type.`;
             StageLogger.stageErrorLog(Stage.INIT_RESOURCE, {
+              options,
               error: errMsg
             });
             throw new Error(errMsg);
@@ -192,7 +193,8 @@ export class ResourceHttpService extends HttpExecutor {
 
     StageLogger.stageLog(Stage.PREPARE_URL, {
       result: url,
-      urlParts: `baseUrl: '${ UrlUtils.getApiUrl() }', resource: '${ resourceName }'`
+      urlParts: `baseUrl: '${ UrlUtils.getApiUrl() }', resource: '${ resourceName }'`,
+      options
     });
 
     return this.post(url, body, options);
@@ -217,7 +219,8 @@ export class ResourceHttpService extends HttpExecutor {
 
     StageLogger.stageLog(Stage.PREPARE_URL, {
       result: url,
-      urlParts: `baseUrl: '${ UrlUtils.getApiUrl() }', resource: '${ resourceName }', resourceId: '${ id }'`
+      urlParts: `baseUrl: '${ UrlUtils.getApiUrl() }', resource: '${ resourceName }', resourceId: '${ id }'`,
+      options
     });
 
     return this.patch(url, body, options);
@@ -242,7 +245,8 @@ export class ResourceHttpService extends HttpExecutor {
 
     StageLogger.stageLog(Stage.PREPARE_URL, {
       result: url,
-      urlParts: `baseUrl: '${ UrlUtils.getApiUrl() }', resource: '${ resourceName }', resourceId: '${ id }'`
+      urlParts: `baseUrl: '${ UrlUtils.getApiUrl() }', resource: '${ resourceName }', resourceId: '${ id }'`,
+      options
     });
 
     return this.put(url, body, options);
@@ -265,7 +269,8 @@ export class ResourceHttpService extends HttpExecutor {
 
     StageLogger.stageLog(Stage.PREPARE_URL, {
       result: url,
-      urlParts: `baseUrl: '${ UrlUtils.getApiUrl() }', resource: '${ resourceName }', resourceId: '${ id }'`
+      urlParts: `baseUrl: '${ UrlUtils.getApiUrl() }', resource: '${ resourceName }', resourceId: '${ id }'`,
+      options
     });
 
     return this.delete(url, options);
@@ -288,7 +293,8 @@ export class ResourceHttpService extends HttpExecutor {
 
     StageLogger.stageLog(Stage.PREPARE_URL, {
       result: url,
-      urlParts: `baseUrl: '${ UrlUtils.getApiUrl() }', resource: '${ resourceName }', searchQuery: '${ searchQuery }'`
+      urlParts: `baseUrl: '${ UrlUtils.getApiUrl() }', resource: '${ resourceName }', searchQuery: '${ searchQuery }'`,
+      options
     });
 
     return this.get(url, options);

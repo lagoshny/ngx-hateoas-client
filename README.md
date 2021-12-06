@@ -1651,6 +1651,9 @@ To create resource projection you need to create a projection class extend it wi
 - `resourceType` should be equals to resource type that use this projection.
 - `projectionName` should be equals to the server-side resource projection name.
 
+> Use [HateoasResourceService](#built-in-hateoasresourceservice) to perform projection request with first param as projection type for all the methods. 
+> You can also create [custom resource service](#create-custom-resource-service) to concreate projection type.
+
 If your projection has property relations to resource classes then you should decorate these properties with [@ProjectionRel](#projectionrel) decorator passing `resourceType` param.
 Besides need to wrap property resource type with  [ProjectionRelType](#projectionreltype) type to hide `Resource`/`EmbeddedResource` methods (see example below).
 

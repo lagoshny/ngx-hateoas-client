@@ -1,3 +1,37 @@
+## 2.2.1 (2021-12-05)
+#### Changes
+Resolved [issue](https://github.com/lagoshny/ngx-hateoas-client/issues/21).
+
+- `RequestOption` changes:
+
+   Added new params to [RequestOption](https://github.com/lagoshny/ngx-hateoas-client#requestoption):
+   ````
+   headers?: HttpHeaders | {[header: string]: string | string[];};
+   reportProgress?: boolean;
+   withCredentials?: boolean;
+   ````
+
+   >Now `RequestOption` is base options for all resource requests. It is contains all usefully params from Angular `HttpClient`.
+
+
+- `GetOption` changes:
+
+   Now `GetOption` extends `RequestOption` that means you can pass `RequestOption` params within `GetOption`.
+
+
+- `HateoasResourceService` changes:
+
+   To `createResource` added optional param: `options?: RequestOption` 
+   
+   To `updateResource` added optional param: `options?: RequestOption` 
+   
+   To `updateResourceById` added optional param: `options?: RequestOption` 
+   
+   To `patchResource` added optional param: `options?: RequestOption` 
+   
+   To `patchResourceById` added optional param: `options?: RequestOption`
+
+
 ## 2.1.1 (2021-11-29)
 #### Changes
 Added `hasRelation()` function to `Resource` class to check has or not resource some link.

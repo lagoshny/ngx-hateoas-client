@@ -1,13 +1,13 @@
 import { Injectable } from '@angular/core';
 import { Observable, throwError as observableThrowError } from 'rxjs';
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { catchError, map } from 'rxjs/operators';
 import { ResourceUtils } from '../../util/resource.utils';
 import { BaseResource } from '../../model/resource/base-resource';
 import { DependencyInjector } from '../../util/dependency-injector';
 import { UrlUtils } from '../../util/url.utils';
 import { getResourceType, isResource } from '../../model/resource-type';
-import { GetOption } from '../../model/declarations';
+import { GetOption, RequestOption } from '../../model/declarations';
 import { HttpExecutor } from '../http-executor';
 import { LibConfig } from '../../config/lib-config';
 import { Stage } from '../../logger/stage.enum';
@@ -44,7 +44,7 @@ export class ResourceHttpService extends HttpExecutor {
    */
   public get<T extends BaseResource>(url: string,
                                      options?: GetOption): Observable<T> {
-    const httpOptions = {params: UrlUtils.convertToHttpParams(options)};
+    const httpOptions = UrlUtils.convertToHttpOptions(options);
     return super.getHttp(url, httpOptions, options?.useCache)
       .pipe(
         map((data: any) => {
@@ -54,12 +54,13 @@ export class ResourceHttpService extends HttpExecutor {
             }
             const errMsg = `You try to get wrong resource type: expected Resource type, actual ${ getResourceType(data) } type.`;
             StageLogger.stageErrorLog(Stage.INIT_RESOURCE, {
+              options,
               error: errMsg
             });
             throw new Error(errMsg);
           }
 
-          return ResourceUtils.instantiateResource(data, httpOptions.params.has('projection')) as T;
+          return ResourceUtils.instantiateResource(data, httpOptions?.params?.has('projection')) as T;
         }),
         catchError(error => observableThrowError(error)));
   }
@@ -72,14 +73,8 @@ export class ResourceHttpService extends HttpExecutor {
    * @param options request options
    * @throws error when required params are not valid
    */
-  public post(url: string, body: any | null, options?: {
-    headers?: HttpHeaders | {
-      [header: string]: string | string[];
-    };
-    observe?: 'body' | 'response';
-    params?: HttpParams
-  }): Observable<any> {
-    return super.postHttp(url, body, options)
+  public post(url: string, body: any | null, options?: RequestOption): Observable<any> {
+    return super.postHttp(url, body, UrlUtils.convertToHttpOptions(options))
       .pipe(
         map((data: any) => {
           if (isResource(data)) {
@@ -99,14 +94,8 @@ export class ResourceHttpService extends HttpExecutor {
    * @param options request options
    * @throws error when required params are not valid
    */
-  public put(url: string, body: any | null, options?: {
-    headers?: HttpHeaders | {
-      [header: string]: string | string[];
-    };
-    observe?: 'body' | 'response';
-    params?: HttpParams
-  }): Observable<any> {
-    return super.putHttp(url, body, options)
+  public put(url: string, body: any | null, options?: RequestOption): Observable<any> {
+    return super.putHttp(url, body, UrlUtils.convertToHttpOptions(options))
       .pipe(
         map((data: any) => {
           if (isResource(data)) {
@@ -126,14 +115,8 @@ export class ResourceHttpService extends HttpExecutor {
    * @param options request options
    * @throws error when required params are not valid
    */
-  public patch(url: string, body: any | null, options?: {
-    headers?: HttpHeaders | {
-      [header: string]: string | string[];
-    };
-    observe?: 'body' | 'response';
-    params?: HttpParams
-  }): Observable<any> {
-    return super.patchHttp(url, body, options)
+  public patch(url: string, body: any | null, options?: RequestOption): Observable<any> {
+    return super.patchHttp(url, body, UrlUtils.convertToHttpOptions(options))
       .pipe(
         map((data: any) => {
           if (isResource(data)) {
@@ -153,14 +136,11 @@ export class ResourceHttpService extends HttpExecutor {
    * @param options request options
    * @throws error when required params are not valid
    */
-  public delete(url: string, options?: {
-    headers?: HttpHeaders | {
-      [header: string]: string | string[];
-    };
-    observe?: 'body' | 'response';
-    params?: HttpParams
-  }): Observable<any> {
-    return super.deleteHttp(url, options)
+  public delete(url: string, options?: RequestOption): Observable<any> {
+    return super.deleteHttp(url, {
+      ...UrlUtils.convertToHttpOptions(options),
+      observe: options?.observe ? options?.observe : 'response'
+    })
       .pipe(
         map((data: any) => {
           if (isResource(data)) {
@@ -201,20 +181,23 @@ export class ResourceHttpService extends HttpExecutor {
    *
    * @param resourceName to be post
    * @param body resource to create
+   * @param options (optional) options that applied to the request
    * @throws error when required params are not valid
    */
   public postResource(resourceName: string,
-                      body: BaseResource): Observable<any> {
+                      body: BaseResource,
+                      options?: RequestOption): Observable<any> {
     ValidationUtils.validateInputParams({resourceName, body});
 
     const url = UrlUtils.generateResourceUrl(UrlUtils.getApiUrl(), resourceName);
 
     StageLogger.stageLog(Stage.PREPARE_URL, {
       result: url,
-      urlParts: `baseUrl: '${ UrlUtils.getApiUrl() }', resource: '${ resourceName }'`
+      urlParts: `baseUrl: '${ UrlUtils.getApiUrl() }', resource: '${ resourceName }'`,
+      options
     });
 
-    return this.post(url, body);
+    return this.post(url, body, options);
   }
 
   /**
@@ -223,21 +206,24 @@ export class ResourceHttpService extends HttpExecutor {
    * @param resourceName to be patched
    * @param id resource id
    * @param body contains data to patch resource properties
+   * @param options (optional) options that applied to the request
    * @throws error when required params are not valid
    */
   public patchResource(resourceName: string,
                        id: number | string,
-                       body: any): Observable<any> {
+                       body: any,
+                       options?: RequestOption): Observable<any> {
     ValidationUtils.validateInputParams({resourceName, id, body});
 
     const url = UrlUtils.generateResourceUrl(UrlUtils.getApiUrl(), resourceName, toString(id));
 
     StageLogger.stageLog(Stage.PREPARE_URL, {
       result: url,
-      urlParts: `baseUrl: '${ UrlUtils.getApiUrl() }', resource: '${ resourceName }', resourceId: '${ id }'`
+      urlParts: `baseUrl: '${ UrlUtils.getApiUrl() }', resource: '${ resourceName }', resourceId: '${ id }'`,
+      options
     });
 
-    return this.patch(url, body);
+    return this.patch(url, body, options);
   }
 
   /**
@@ -246,21 +232,24 @@ export class ResourceHttpService extends HttpExecutor {
    * @param resourceName to be put
    * @param id resource id
    * @param body contains data to replace resource properties
+   * @param options (optional) options that applied to the request
    * @throws error when required params are not valid
    */
   public putResource(resourceName: string,
                      id: number | string,
-                     body: any): Observable<any> {
+                     body: any,
+                     options?: RequestOption): Observable<any> {
     ValidationUtils.validateInputParams({resourceName, id, body});
 
     const url = UrlUtils.generateResourceUrl(UrlUtils.getApiUrl(), resourceName, toString(id));
 
     StageLogger.stageLog(Stage.PREPARE_URL, {
       result: url,
-      urlParts: `baseUrl: '${ UrlUtils.getApiUrl() }', resource: '${ resourceName }', resourceId: '${ id }'`
+      urlParts: `baseUrl: '${ UrlUtils.getApiUrl() }', resource: '${ resourceName }', resourceId: '${ id }'`,
+      options
     });
 
-    return this.put(url, body);
+    return this.put(url, body, options);
   }
 
   /**
@@ -273,20 +262,15 @@ export class ResourceHttpService extends HttpExecutor {
    */
   public deleteResource(resourceName: string,
                         id: number | string,
-                        options?: {
-                          headers?: HttpHeaders | {
-                            [header: string]: string | string[];
-                          };
-                          observe?: 'body' | 'response';
-                          params?: HttpParams
-                        }): Observable<any> {
+                        options?: RequestOption): Observable<any> {
     ValidationUtils.validateInputParams({resourceName, id});
 
     const url = UrlUtils.generateResourceUrl(UrlUtils.getApiUrl(), resourceName, toString(id));
 
     StageLogger.stageLog(Stage.PREPARE_URL, {
       result: url,
-      urlParts: `baseUrl: '${ UrlUtils.getApiUrl() }', resource: '${ resourceName }', resourceId: '${ id }'`
+      urlParts: `baseUrl: '${ UrlUtils.getApiUrl() }', resource: '${ resourceName }', resourceId: '${ id }'`,
+      options
     });
 
     return this.delete(url, options);
@@ -309,7 +293,8 @@ export class ResourceHttpService extends HttpExecutor {
 
     StageLogger.stageLog(Stage.PREPARE_URL, {
       result: url,
-      urlParts: `baseUrl: '${ UrlUtils.getApiUrl() }', resource: '${ resourceName }', searchQuery: '${ searchQuery }'`
+      urlParts: `baseUrl: '${ UrlUtils.getApiUrl() }', resource: '${ resourceName }', searchQuery: '${ searchQuery }'`,
+      options
     });
 
     return this.get(url, options);

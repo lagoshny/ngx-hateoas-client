@@ -43,39 +43,35 @@ export class CommonResourceHttpService extends HttpExecutor {
 
     StageLogger.stageLog(Stage.PREPARE_URL, {
       result: url,
-      urlParts: `baseUrl: '${ UrlUtils.getApiUrl() }', resource: '${ resourceName }', query: '${ query }'`
+      urlParts: `baseUrl: '${ UrlUtils.getApiUrl() }', resource: '${ resourceName }', query: '${ query }'`,
+      options
     });
 
-    const httpParams = UrlUtils.convertToHttpParams(options);
-
-    StageLogger.stageLog(Stage.PREPARE_URL, {
-      result: url,
-      urlParts: `baseUrl: '${ UrlUtils.getApiUrl() }', resource: '${ resourceName }', query: '${ query }'`
-    });
+    const httpOptions = UrlUtils.convertToHttpOptions(options);
 
     let result: Observable<any>;
     switch (method) {
       case HttpMethod.GET:
-        result = super.getHttp(url, {params: httpParams, observe: 'body'}, false);
+        result = super.getHttp(url, httpOptions, false);
         break;
       case HttpMethod.POST:
-        result = super.postHttp(url, body, {params: httpParams, observe: 'body'});
+        result = super.postHttp(url, body, httpOptions);
         break;
       case HttpMethod.PUT:
-        result = super.putHttp(url, body, {params: httpParams, observe: 'body'});
+        result = super.putHttp(url, body, httpOptions);
         break;
       case HttpMethod.PATCH:
-        result = super.patchHttp(url, body, {params: httpParams, observe: 'body'});
+        result = super.patchHttp(url, body, httpOptions);
         break;
       default:
         const errMsg = `allowed ony GET/POST/PUT/PATCH http methods you pass ${ method }`;
-        StageLogger.stageErrorLog(Stage.HTTP_REQUEST, {error: errMsg});
+        StageLogger.stageErrorLog(Stage.HTTP_REQUEST, {error: errMsg, options});
         return observableThrowError(new Error(errMsg));
     }
 
     return result.pipe(
       map(data => {
-        const isProjection = httpParams.has('projection');
+        const isProjection = httpOptions?.params?.has('projection');
         if (isPagedResourceCollection(data)) {
           return ResourceUtils.instantiatePagedResourceCollection(data, isProjection);
         } else if (isResourceCollection(data)) {

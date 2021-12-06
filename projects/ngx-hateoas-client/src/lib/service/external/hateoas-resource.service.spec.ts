@@ -4,7 +4,7 @@ import { HateoasResource, HttpMethod, Include, Resource } from '../../ngx-hateoa
 import { of } from 'rxjs';
 import { SimpleResource } from '../../model/resource/resources.test';
 import { ResourceUtils } from '../../util/resource.utils';
-import { HttpParams } from '@angular/common/http';
+import { RequestOption, RequestParam } from '../../model/declarations';
 import anything = jasmine.anything;
 
 @HateoasResource('resourceRelation')
@@ -118,6 +118,29 @@ describe('HateoasResourceService', () => {
       });
   });
 
+  it('CREATE_RESOURCE should pass options to http request', () => {
+    resourceHttpServiceSpy.postResource.and.returnValue(of(anything()));
+    const resourceWithRelation = new ResourceWithRelation();
+    resourceWithRelation.relation = new ResourceRelation();
+    const requestOption: RequestOption = {
+      params: {
+        testParam: 'testsRequest'
+      },
+      headers: {
+        testHeader: 'test'
+      },
+      observe: 'body',
+      reportProgress: true,
+      withCredentials: false
+    };
+
+    hateoasResourceService.createResource(ResourceWithRelation, {body: resourceWithRelation}, requestOption)
+      .subscribe(() => {
+        const options = resourceHttpServiceSpy.postResource.calls.argsFor(0)[2] as RequestOption;
+        expect(options).toEqual(requestOption);
+      });
+  });
+
   it('UPDATE_RESOURCE should throw error when passed entity is undefined', () => {
     expect(() => hateoasResourceService.updateResource(undefined))
       .toThrowError(`Passed param(s) 'entity = undefined' is not valid`);
@@ -179,6 +202,27 @@ describe('HateoasResourceService', () => {
       });
   });
 
+  it('UPDATE_RESOURCE should pass options to http request', () => {
+    resourceHttpServiceSpy.put.and.returnValue(of(anything()));
+    const requestOption: RequestOption = {
+      params: {
+        testParam: 'testsRequest'
+      },
+      headers: {
+        testHeader: 'test'
+      },
+      observe: 'body',
+      reportProgress: true,
+      withCredentials: false
+    };
+
+    hateoasResourceService.updateResource(new SimpleResource(), {body: {param: 'test'}}, requestOption)
+      .subscribe(() => {
+        const options = resourceHttpServiceSpy.put.calls.argsFor(0)[2] as RequestOption;
+        expect(options).toEqual(requestOption);
+      });
+  });
+
   it('UPDATE_RESOURCE_BY_ID should throw error when passed id is empty', () => {
     expect(() => hateoasResourceService.updateResourceById(SimpleResource, '', {body: {param: 'test'}}))
       .toThrowError(`Passed param(s) 'id = ' is not valid`);
@@ -222,6 +266,30 @@ describe('HateoasResourceService', () => {
         expect(body.name).toBeNull();
       });
   });
+
+  it('UPDATE_RESOURCE_BY_ID should pass options to http request', () => {
+    resourceHttpServiceSpy.putResource.and.returnValue(of(anything()));
+    const resourceWithRelation = new ResourceWithRelation();
+    resourceWithRelation.relation = new ResourceRelation();
+    const requestOption: RequestOption = {
+      params: {
+        testParam: 'testsRequest'
+      },
+      headers: {
+        testHeader: 'test'
+      },
+      observe: 'body',
+      reportProgress: true,
+      withCredentials: false
+    };
+
+    hateoasResourceService.updateResourceById(ResourceWithRelation, 1, {body: resourceWithRelation}, requestOption)
+      .subscribe(() => {
+        const options = resourceHttpServiceSpy.putResource.calls.argsFor(0)[3] as RequestOption;
+        expect(options).toEqual(requestOption);
+      });
+  });
+
 
   it('PATCH_RESOURCE should throw error when passed entity is undefined', () => {
     expect(() => hateoasResourceService.patchResource(undefined))
@@ -273,7 +341,7 @@ describe('HateoasResourceService', () => {
       });
   });
 
-  it('PATCH_RESOURCE should pass requestBody as body', () => {
+  it('PATCH_RESOURCE should pass options to http request', () => {
     resourceHttpServiceSpy.patch.and.returnValue(of(anything()));
 
     hateoasResourceService.patchResource(new SimpleResource(), {body: {param: 'test'}})
@@ -284,6 +352,26 @@ describe('HateoasResourceService', () => {
       });
   });
 
+  it('PATCH_RESOURCE should pass requestBody as body', () => {
+    resourceHttpServiceSpy.patch.and.returnValue(of(anything()));
+    const requestOption: RequestOption = {
+      params: {
+        testParam: 'testsRequest'
+      },
+      headers: {
+        testHeader: 'test'
+      },
+      observe: 'body',
+      reportProgress: true,
+      withCredentials: false
+    };
+
+    hateoasResourceService.patchResource(new SimpleResource(), {body: {param: 'test'}}, requestOption)
+      .subscribe(() => {
+        const options = resourceHttpServiceSpy.patch.calls.argsFor(0)[2] as RequestOption;
+        expect(options).toEqual(requestOption);
+      });
+  });
 
   it('PATCH_RESOURCE_BY_ID should throw error when passed id is empty', () => {
     expect(() => hateoasResourceService.patchResourceById(SimpleResource, '', {body: {param: 'test'}}))
@@ -329,6 +417,29 @@ describe('HateoasResourceService', () => {
       });
   });
 
+  it('PATCH_RESOURCE_BY_ID should pass requestBody as body', () => {
+    resourceHttpServiceSpy.patchResource.and.returnValue(of(anything()));
+    const resourceWithRelation = new ResourceWithRelation();
+    resourceWithRelation.relation = new ResourceRelation();
+    const requestOption: RequestOption = {
+      params: {
+        testParam: 'testsRequest'
+      },
+      headers: {
+        testHeader: 'test'
+      },
+      observe: 'body',
+      reportProgress: true,
+      withCredentials: false
+    };
+
+    hateoasResourceService.patchResourceById(ResourceWithRelation, 1, {body: resourceWithRelation}, requestOption)
+      .subscribe(() => {
+        const options = resourceHttpServiceSpy.patchResource.calls.argsFor(0)[3] as RequestOption;
+        expect(options).toEqual(requestOption);
+      });
+  });
+
   it('DELETE_RESOURCE should throw error when passed entity is undefined', () => {
     expect(() => hateoasResourceService.deleteResource(undefined))
       .toThrowError(`Passed param(s) 'entity = undefined' is not valid`);
@@ -356,10 +467,9 @@ describe('HateoasResourceService', () => {
     const simpleResource = new SimpleResource();
     hateoasResourceService.deleteResource(simpleResource, {params: {test: 'param'}})
       .subscribe(() => {
-        const params = resourceHttpServiceSpy.delete.calls.argsFor(0)[1].params as HttpParams;
+        const params = resourceHttpServiceSpy.delete.calls.argsFor(0)[1].params as RequestParam;
         expect(params).toBeDefined();
-        expect(params.has('test')).toBeTrue();
-        expect(params.get('test')).toBe('param');
+        expect(params.test).toBe('param');
       });
   });
 
@@ -372,6 +482,28 @@ describe('HateoasResourceService', () => {
         const observe = resourceHttpServiceSpy.delete.calls.argsFor(0)[1].observe;
         expect(observe).toBeDefined();
         expect(observe).toBe('response');
+      });
+  });
+
+  it('DELETE_RESOURCE should pass requestBody as body', () => {
+    resourceHttpServiceSpy.delete.and.returnValue(of(anything()));
+    const requestOption: RequestOption = {
+      params: {
+        testParam: 'testsRequest'
+      },
+      headers: {
+        testHeader: 'test'
+      },
+      observe: 'body',
+      reportProgress: true,
+      withCredentials: false
+    };
+
+    const simpleResource = new SimpleResource();
+    hateoasResourceService.deleteResource(simpleResource, requestOption)
+      .subscribe(() => {
+        const options = resourceHttpServiceSpy.delete.calls.argsFor(0)[1] as RequestOption;
+        expect(options).toEqual(requestOption);
       });
   });
 
@@ -395,10 +527,9 @@ describe('HateoasResourceService', () => {
 
     hateoasResourceService.deleteResourceById(SimpleResource, 1, {params: {test: 'param'}})
       .subscribe(() => {
-        const params = resourceHttpServiceSpy.deleteResource.calls.argsFor(0)[2].params as HttpParams;
+        const params = resourceHttpServiceSpy.deleteResource.calls.argsFor(0)[2].params as RequestParam;
         expect(params).toBeDefined();
-        expect(params.has('test')).toBeTrue();
-        expect(params.get('test')).toBe('param');
+        expect(params.test).toBe('param');
       });
   });
 
@@ -410,6 +541,27 @@ describe('HateoasResourceService', () => {
         const observe = resourceHttpServiceSpy.deleteResource.calls.argsFor(0)[2].observe;
         expect(observe).toBeDefined();
         expect(observe).toBe('response');
+      });
+  });
+
+  it('DELETE_RESOURCE_BY_ID should pass requestBody as body', () => {
+    resourceHttpServiceSpy.deleteResource.and.returnValue(of(anything()));
+    const requestOption: RequestOption = {
+      params: {
+        testParam: 'testsRequest'
+      },
+      headers: {
+        testHeader: 'test'
+      },
+      observe: 'body',
+      reportProgress: true,
+      withCredentials: false
+    };
+
+    hateoasResourceService.deleteResourceById(SimpleResource, 1, requestOption)
+      .subscribe(() => {
+        const options = resourceHttpServiceSpy.deleteResource.calls.argsFor(0)[2] as RequestOption;
+        expect(options).toEqual(requestOption);
       });
   });
 

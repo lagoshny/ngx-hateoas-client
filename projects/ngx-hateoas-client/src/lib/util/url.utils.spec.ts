@@ -2,6 +2,7 @@ import { UrlUtils } from './url.utils';
 import { SimpleResource } from '../model/resource/resources.test';
 import { LibConfig } from '../config/lib-config';
 
+/* tslint:disable:no-string-literal */
 describe('UrlUtils', () => {
 
   const baseUrl = 'http://localhost:8080/api/v1';
@@ -84,6 +85,86 @@ describe('UrlUtils', () => {
     expect(result.has('projection')).toBeTrue();
     expect(result.get('projection')).toBe('testProjection');
   });
+
+  it('CONVERT_TO_HTTP_OPTIONS should return an empty object when options is null', () => {
+    const result = UrlUtils.convertToHttpOptions(null);
+
+    expect(result).toEqual({});
+  });
+
+  it('CONVERT_TO_HTTP_OPTIONS should return an empty object when options is undefined', () => {
+    const result = UrlUtils.convertToHttpOptions(null);
+
+    expect(result).toEqual({});
+  });
+
+  it('CONVERT_TO_HTTP_OPTIONS should return an empty object when options is empty object', () => {
+    const result = UrlUtils.convertToHttpOptions(null);
+
+    expect(result).toEqual({});
+  });
+
+
+  it('CONVERT_TO_HTTP_OPTIONS should convert options to HttpOptions with ALL params', () => {
+    const result = UrlUtils.convertToHttpOptions({
+      params: {
+        testParam: 'test'
+      },
+      sort: {
+        prop: 'ASC'
+      },
+      pageParams: {
+        page: 1,
+        size: 0
+      },
+      observe: 'response',
+      withCredentials: true,
+      headers: {
+        testHeader: 'HEADER'
+      },
+      reportProgress: true,
+      useCache: true
+    });
+
+    expect(result.params.get('testParam')).toBe('test');
+    expect(result.params.get('sort')).toBe('prop,ASC');
+    expect(result.params.get('page')).toBe('1');
+    expect(result.params.get('size')).toBe('0');
+    expect(result.observe).toBe('response');
+    expect(result.withCredentials).toBeTrue();
+    expect(result.headers['testHeader']).toBe('HEADER');
+    expect(result.reportProgress).toBeTrue();
+  });
+
+  it('CONVERT_TO_HTTP_OPTIONS should convert options to HttpOptions with SOME params', () => {
+    const result = UrlUtils.convertToHttpOptions({
+      params: {
+        testParam: 'test'
+      },
+      sort: {
+        prop: 'ASC'
+      },
+      pageParams: {
+        page: 1,
+        size: 0
+      },
+      useCache: true
+    });
+
+    console.log('ILOFAW');
+    console.log(result);
+
+    expect(result.params.get('testParam')).toBe('test');
+    expect(result.params.get('sort')).toBe('prop,ASC');
+    expect(result.params.get('page')).toBe('1');
+    expect(result.params.get('size')).toBe('0');
+    expect(result.observe).toBeUndefined();
+    expect(result.withCredentials).toBeUndefined();
+    expect(result.headers).toBeUndefined();
+    expect(result.reportProgress).toBeUndefined();
+  });
+
+
 
   it('GENERATE_RESOURCE_URL should throw error when baseUrl is empty', () => {
     expect(() => UrlUtils.generateResourceUrl('', 'any'))

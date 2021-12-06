@@ -44,7 +44,8 @@ export class PagedResourceCollectionHttpService extends HttpExecutor {
    */
   public get<T extends PagedResourceCollection<BaseResource>>(url: string,
                                                               options?: PagedGetOption): Observable<T> {
-    const httpOptions = {params: UrlUtils.convertToHttpParams(options)};
+    const httpOptions = UrlUtils.convertToHttpOptions(options);
+
     return super.getHttp(url, httpOptions, options?.useCache)
       .pipe(
         map((data: any) => {
@@ -53,11 +54,11 @@ export class PagedResourceCollectionHttpService extends HttpExecutor {
               this.cacheService.evictResource(CacheKey.of(url, httpOptions));
             }
             const errMsg = `You try to get wrong resource type: expected PagedResourceCollection type, actual ${ getResourceType(data) } type.`;
-            StageLogger.stageErrorLog(Stage.INIT_RESOURCE, {error: errMsg});
+            StageLogger.stageErrorLog(Stage.INIT_RESOURCE, {error: errMsg, options});
             throw new Error(errMsg);
           }
 
-          return ResourceUtils.instantiatePagedResourceCollection(data, httpOptions.params.has('projection')) as T;
+          return ResourceUtils.instantiatePagedResourceCollection(data, httpOptions?.params?.has('projection')) as T;
         }),
         catchError(error => observableThrowError(error)));
   }
@@ -77,7 +78,8 @@ export class PagedResourceCollectionHttpService extends HttpExecutor {
 
     StageLogger.stageLog(Stage.PREPARE_URL, {
       result: url,
-      urlParts: `baseUrl: '${ UrlUtils.getApiUrl() }', resource: '${ resourceName }'`
+      urlParts: `baseUrl: '${ UrlUtils.getApiUrl() }', resource: '${ resourceName }'`,
+      options
     });
 
     return this.get(url, UrlUtils.fillDefaultPageDataIfNoPresent(options));
@@ -101,7 +103,8 @@ export class PagedResourceCollectionHttpService extends HttpExecutor {
 
     StageLogger.stageLog(Stage.PREPARE_URL, {
       result: url,
-      urlParts: `baseUrl: '${ UrlUtils.getApiUrl() }', resource: '${ resourceName }'`
+      urlParts: `baseUrl: '${ UrlUtils.getApiUrl() }', resource: '${ resourceName }'`,
+      options
     });
 
     return this.get(url, UrlUtils.fillDefaultPageDataIfNoPresent(options));

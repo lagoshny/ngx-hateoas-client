@@ -41,7 +41,8 @@ export class ResourceCollectionHttpService extends HttpExecutor {
    */
   public get<T extends ResourceCollection<BaseResource>>(url: string,
                                                          options?: GetOption): Observable<T> {
-    const httpOptions = {params: UrlUtils.convertToHttpParams(options)};
+    const httpOptions = UrlUtils.convertToHttpOptions(options);
+
     return super.getHttp(url, httpOptions)
       .pipe(
         map((data: any) => {
@@ -50,11 +51,11 @@ export class ResourceCollectionHttpService extends HttpExecutor {
               this.cacheService.evictResource(CacheKey.of(url, httpOptions));
             }
             const errMsg = `You try to get the wrong resource type: expected ResourceCollection type, actual ${ getResourceType(data) } type.`;
-            StageLogger.stageErrorLog(Stage.INIT_RESOURCE, {error: errMsg});
+            StageLogger.stageErrorLog(Stage.INIT_RESOURCE, {error: errMsg, options});
             throw new Error(errMsg);
           }
 
-          return ResourceUtils.instantiateResourceCollection(data, httpOptions.params.has('projection')) as T;
+          return ResourceUtils.instantiateResourceCollection(data, httpOptions?.params?.has('projection')) as T;
         }),
         catchError(error => observableThrowError(error)));
   }
@@ -73,7 +74,8 @@ export class ResourceCollectionHttpService extends HttpExecutor {
 
     StageLogger.stageLog(Stage.PREPARE_URL, {
       result: url,
-      urlParts: `baseUrl: '${ UrlUtils.getApiUrl() }', resource: '${ resourceName }'`
+      urlParts: `baseUrl: '${ UrlUtils.getApiUrl() }', resource: '${ resourceName }'`,
+      options
     });
 
     return this.get(url, options);
@@ -94,7 +96,8 @@ export class ResourceCollectionHttpService extends HttpExecutor {
 
     StageLogger.stageLog(Stage.PREPARE_URL, {
       result: url,
-      urlParts: `baseUrl: '${ UrlUtils.getApiUrl() }', resource: '${ resourceName }', searchQuery: '${ searchQuery }'`
+      urlParts: `baseUrl: '${ UrlUtils.getApiUrl() }', resource: '${ resourceName }', searchQuery: '${ searchQuery }'`,
+      options
     });
 
     return this.get(url, options);

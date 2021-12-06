@@ -1,6 +1,7 @@
 import { Resource } from './resource/resource';
 import { BaseResource } from './resource/base-resource';
 import { EmbeddedResource } from './resource/embedded-resource';
+import { HttpHeaders, HttpParams } from '@angular/common/http';
 
 /**
  * Resource link object.
@@ -35,6 +36,20 @@ export interface ResourceIdentifiable {
 }
 
 /**
+ * Http options that used by Angular HttpClient.
+ */
+export interface HttpClientOptions {
+  headers?: HttpHeaders | {
+    [header: string]: string | string[];
+  };
+  observe?: 'body' | 'response';
+  params?: HttpParams;
+  reportProgress?: boolean;
+  responseType?: 'json';
+  withCredentials?: boolean;
+}
+
+/**
  * Extend {@link GetOption} with page param.
  */
 export interface PagedGetOption extends GetOption {
@@ -42,27 +57,28 @@ export interface PagedGetOption extends GetOption {
 }
 
 /**
- * Contains options that can be applied to the GET request.
+ * Contains options that can be applied to POST/PUT/PATCH/DELETE request.
  */
-export interface GetOption {
-  params?: {
-    [paramName: string]: Resource | string | number | boolean;
+export interface RequestOption {
+  params?: RequestParam;
+  headers?: HttpHeaders | {
+    [header: string]: string | string[];
   };
+  observe?: 'body' | 'response';
+  reportProgress?: boolean;
+  withCredentials?: boolean;
+}
+
+/**
+ * Contains additional options that can be applied to the GET request.
+ */
+export interface GetOption extends RequestOption {
   /**
    * Sorting options.
    */
   sort?: Sort;
   useCache?: boolean;
 }
-
-/**
- * Contains options that can be applied to POST/PUT/PATCH/DELETE request.
- */
-export interface RequestOption {
-  params?: RequestParam;
-  observe?: 'body' | 'response';
-}
-
 
 /**
  * Request params that will be applied to the result url as http request params.

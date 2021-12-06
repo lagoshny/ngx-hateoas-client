@@ -1,7 +1,7 @@
 import { HttpParams } from '@angular/common/http';
 import { isResource } from '../model/resource-type';
 import { Resource } from '../model/resource/resource';
-import { GetOption, LinkData, PagedGetOption, Sort } from '../model/declarations';
+import { GetOption, HttpClientOptions, LinkData, PagedGetOption, Sort } from '../model/declarations';
 import { ValidationUtils } from './validation.utils';
 import { LibConfig } from '../config/lib-config';
 import { isEmpty, isNil, isObject, toString } from 'lodash-es';
@@ -45,6 +45,24 @@ export class UrlUtils {
     }
 
     return resultParams;
+  }
+
+  /**
+   * Convert ngx-hateoas-client option to Angular HttpClient.
+   * @param options ngx-hateoas-client options
+   */
+  public static convertToHttpOptions(options: PagedGetOption): HttpClientOptions {
+    if (isEmpty(options) || isNil(options)) {
+      return {};
+    }
+
+    return {
+      params: UrlUtils.convertToHttpParams(options),
+      headers: options.headers,
+      observe: options.observe,
+      reportProgress: options.reportProgress,
+      withCredentials: options.withCredentials,
+    };
   }
 
   /**

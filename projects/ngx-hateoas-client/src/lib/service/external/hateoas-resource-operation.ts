@@ -46,36 +46,36 @@ export class HateoasResourceOperation<T extends Resource> {
   /**
    * {@link HateoasResourceService#createResource}.
    */
-  public createResource(requestBody: RequestBody<T>): Observable<any> {
-    return this.hateoasResourceService.createResource(this.resourceType, requestBody);
+  public createResource(requestBody: RequestBody<T>, options?: RequestOption): Observable<any> {
+    return this.hateoasResourceService.createResource(this.resourceType, requestBody, options);
   }
 
   /**
    * {@link HateoasResourceService#updateResource}.
    */
-  public updateResource(entity: T, requestBody?: RequestBody<any>): Observable<T | any> {
-    return this.hateoasResourceService.updateResource(entity, requestBody);
+  public updateResource(entity: T, requestBody?: RequestBody<any>, options?: RequestOption): Observable<T | any> {
+    return this.hateoasResourceService.updateResource(entity, requestBody, options);
   }
 
   /**
    * {@link HateoasResourceService#updateResourceById}.
    */
-  public updateResourceById(id: number | string, requestBody: RequestBody<any>): Observable<T | any> {
-    return this.hateoasResourceService.updateResourceById(this.resourceType, id, requestBody);
+  public updateResourceById(id: number | string, requestBody: RequestBody<any>, options?: RequestOption): Observable<T | any> {
+    return this.hateoasResourceService.updateResourceById(this.resourceType, id, requestBody, options);
   }
 
   /**
    * {@link HateoasResourceService#patchResource}.
    */
-  public patchResource(entity: T, requestBody?: RequestBody<any>): Observable<T | any> {
-    return this.hateoasResourceService.patchResource(entity, requestBody);
+  public patchResource(entity: T, requestBody?: RequestBody<any>, options?: RequestOption): Observable<T | any> {
+    return this.hateoasResourceService.patchResource(entity, requestBody, options);
   }
 
   /**
    * {@link HateoasResourceService#patchResourceById}.
    */
-  public patchResourceById(id: number | string, requestBody: RequestBody<any>): Observable<T | any> {
-    return this.hateoasResourceService.patchResourceById(this.resourceType, id, requestBody);
+  public patchResourceById(id: number | string, requestBody: RequestBody<any>, options?: RequestOption): Observable<T | any> {
+    return this.hateoasResourceService.patchResourceById(this.resourceType, id, requestBody, options);
   }
 
   /**

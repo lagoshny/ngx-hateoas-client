@@ -2,7 +2,7 @@
 
 import { PagedResourceCollection } from './paged-resource-collection';
 import { SimpleResourceCollection } from './resources.test';
-import { async, TestBed } from '@angular/core/testing';
+import { TestBed, waitForAsync } from '@angular/core/testing';
 import { PagedResourceCollectionHttpService } from '../../service/internal/paged-resource-collection-http.service';
 import { DependencyInjector } from '../../util/dependency-injector';
 import { of } from 'rxjs';
@@ -39,7 +39,7 @@ describe('PagedResourceCollection', () => {
   };
   let pagedResourceCollectionHttpServiceSpy: any;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     pagedResourceCollectionHttpServiceSpy = {
       get: jasmine.createSpy('get')
     };

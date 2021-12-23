@@ -1,4 +1,4 @@
-## 3.0.0 (2021-12-23)
+## 3.0.1 (2021-12-23)
 #### Updated angular
 Updated to Angular 13.
 

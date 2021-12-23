@@ -10,7 +10,7 @@ Now it uses only `Ivy` compilation.
 
 Now the `lib` have 2 versions for `Angular 6-12` [2.x.x](https://github.com/lagoshny/ngx-hateoas-client/tree/ng-ve) and `Angular 9-13+` [3.x.x](https://github.com/lagoshny/ngx-hateoas-client) that difference between that one is support old `View Engine` compilation, another uses only new `Ivy` compilation.
 
-###Versions that support old `View Engine` compilation will place on [ng-ve](https://github.com/lagoshny/ngx-hateoas-client/tree/ng-ve) branch of the repo.
+### Versions that support old `View Engine` compilation will place on [ng-ve](https://github.com/lagoshny/ngx-hateoas-client/tree/ng-ve) branch of the repo.
 
 >I strongly recommend migrating to Angular Ivy compilation and use new lib version, because support two versions is not simple and in future old versions can not be supported.
 

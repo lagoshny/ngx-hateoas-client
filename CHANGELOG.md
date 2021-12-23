@@ -1,4 +1,4 @@
-## 2.3.1 (2021-12-23)
+## 2.3.2 (2021-12-23)
 #### Updated angular
 Updated Angular to 12 version.
 

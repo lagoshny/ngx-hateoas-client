@@ -7,7 +7,7 @@
   "author": "Ilya Lagoshny",
   "scripts": {
     "ng": "ng",
-    "prod-build": "ng build --configuration production",
+    "build-prod": "ng build --configuration production",
     "start": "ng serve",
     "build": "ng build",
     "test": "ng test",

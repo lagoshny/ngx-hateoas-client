@@ -1,6 +1,6 @@
 # NgxHateoasClient
-<a href="https://www.npmjs.com/package/@lagoshny/ngx-hateoas-client/v/ve">
-  <img src="https://img.shields.io/npm/v/@lagoshny/ngx-hateoas-client/ve?label=npm" alt="Last Ivy released npm version" />
+<a href="https://www.npmjs.com/package/@lagoshny/ngx-hateoas-client/v/lts-view-engine">
+  <img src="https://img.shields.io/npm/v/@lagoshny/ngx-hateoas-client/lts-view-engine?label=npm" alt="LTS view engine npm version" />
 </a>&nbsp;
 
 <a href="https://github.com/lagoshny/ngx-hateoas-client/actions?query=workflow%3ABuild">
@@ -22,7 +22,7 @@
 <br />
 <br />
 
-## ⚠ Special lib version that compatible with Angular 6-12 versions that uses old `View Engine` or new `Ivy` compilation.
+## ⚠ Special lib version that compatible with Angular 6-12 versions that uses old `View Engine` compilation.
 
 **WARNING**
 
@@ -123,7 +123,7 @@ You can found examples of usage this client with [task-manager-front](https://gi
 To install the latest version use command:
 
 ```
-npm i @lagoshny/ngx-hateoas-client@ve --save
+npm i @lagoshny/ngx-hateoas-client@lts-view-engine --save
 ``` 
 
 ### Configuration

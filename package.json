@@ -1,7 +1,7 @@
 {
   "name": "ngx-hateoas-client",
   "version": "0.0.0",
-  "description": "This client used to develop `Angular 9+` applications working with RESTfull server API with HAL/JSON response type (supports server implementation by Spring HATEOAS)",
+  "description": "This client used to develop `Angular 12+` applications working with RESTfull server API with HAL/JSON response type (supports server implementation by Spring HATEOAS)",
   "readme": "README.md",
   "license": "MIT",
   "author": "Ilya Lagoshny",
@@ -60,9 +60,6 @@
     "HAL",
     "hypermedia",
     "REST",
-    "Angular 9",
-    "Angular 10",
-    "Angular 11",
     "Angular 12",
     "Angular 13",
     "ngx hal client",

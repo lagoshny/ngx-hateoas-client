@@ -22,12 +22,12 @@
 <br />
 <br />
 
-## ⭐Compatible with Angular 9-13+ versions that uses `Ivy compilation`.
+## ⭐Compatible with Angular 12.x.x - 13.x.x versions that uses `Ivy compilation`.
 
 
-### ⚠ If you use old `View Engine` compilation you need to use [2.x.x](https://github.com/lagoshny/ngx-hateoas-client/tree/ng-ve) lib version.
+### ⚠ If you use old `View Engine` compilation or Angular 6.x.x - 11.x.x you need to use [2.x.x](https://github.com/lagoshny/ngx-hateoas-client/tree/ng-ve) lib version.
 >
->See more about it [here](https://github.com/lagoshny/ngx-hateoas-client/blob/master/CHANGELOG.md#302-2021-12-23).
+>See more about it [here](https://github.com/lagoshny/ngx-hateoas-client/blob/master/CHANGELOG.md#303-2021-12-23).
 
 ### 💡 New versioning policy.
 
@@ -35,7 +35,7 @@
 
 - Versions that work with new `Ivy` compilation [`3.0.0`-`x.x.x`].
 
-This client can be used to develop `Angular 9+` applications working with RESTfull server API.
+This client can be used to develop `Angular 12+` applications working with RESTfull server API.
 By `RESTfull API` means when the server application implements all the layers of the [Richardson Maturity Model](https://martinfowler.com/articles/richardsonMaturityModel.html)
 and the server provides [HAL/JSON](http://stateless.co/hal_specification.html) response type.
 

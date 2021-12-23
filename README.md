@@ -1,6 +1,6 @@
 # NgxHateoasClient
-<a href="https://www.npmjs.com/package/@lagoshny/ngx-hateoas-client">
-  <img src="https://img.shields.io/npm/v/@lagoshny/ngx-hateoas-client" alt="Last released npm version" />
+<a href="https://www.npmjs.com/package/@lagoshny/ngx-hateoas-client/v/latest">
+  <img src="https://img.shields.io/npm/v/@lagoshny/ngx-hateoas-client/latest?label=npm" alt="Last released npm version" />
 </a>&nbsp;
 
 <a href="https://github.com/lagoshny/ngx-hateoas-client/actions?query=workflow%3ABuild">
@@ -121,7 +121,7 @@ You can found examples of usage this client with [task-manager-front](https://gi
 To install the latest version use command:
 
 ```
-npm i @lagoshny/ngx-hateoas-client --save
+npm i @lagoshny/ngx-hateoas-client@latest --save
 ``` 
 
 ### Configuration

@@ -8,7 +8,7 @@
       "uri-templates-es": "uri-templates-es"
     }
   },
-  "whitelistedNonPeerDependencies": [
+  "allowedNonPeerDependencies": [
     "uri-templates-es",
     "lodash-es"
   ]

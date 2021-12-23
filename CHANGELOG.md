@@ -1,4 +1,4 @@
-## 3.0.1 (2021-12-23)
+## 3.0.2 (2021-12-23)
 #### Updated angular
 Updated to Angular 13.
 
@@ -8,7 +8,7 @@ Updated to Angular 13.
 >Angular 13 package tools are [no longer support](https://github.com/ng-packagr/ng-packagr/blob/master/CHANGELOG.md#1300-2021-11-03) old `View Engine` compilation.
 Now it uses only `Ivy` compilation. 
 
-Start from this release the `lib` will have 2 versions for `Angular 6-12` and `Angular 9-13+` that difference between that one is support old `View Engine` compilation, another uses only new `Ivy` compilation.
+Now the `lib` have 2 versions for `Angular 6-12` [2.x.x](https://github.com/lagoshny/ngx-hateoas-client/tree/ng-ve) and `Angular 9-13+` [3.x.x](https://github.com/lagoshny/ngx-hateoas-client) that difference between that one is support old `View Engine` compilation, another uses only new `Ivy` compilation.
 
 ###Versions that support old `View Engine` compilation will place on [ng-ve](https://github.com/lagoshny/ngx-hateoas-client/tree/ng-ve) branch of the repo.
 

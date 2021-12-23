@@ -22,17 +22,16 @@
 <br />
 <br />
 
-## ⚠ Compatible with Angular 9-13+ versions that uses `Ivy compilation`.
+## ⭐Compatible with Angular 9-13+ versions that uses `Ivy compilation`.
 
-**WARNING**
 
->If you use old `View Engine` compilation you need to use [this](https://github.com/lagoshny/ngx-hateoas-client/tree/ng-ve) lib version.
+### ⚠ If you use old `View Engine` compilation you need to use [2.x.x](https://github.com/lagoshny/ngx-hateoas-client/tree/ng-ve) lib version.
 >
->See more about it [here](https://github.com/lagoshny/ngx-hateoas-client/blob/ng-ivy/CHANGELOG.md#300-2021-12-23).
+>See more about it [here](https://github.com/lagoshny/ngx-hateoas-client/blob/master/CHANGELOG.md#302-2021-12-23).
 
-### New versioning policy.
+### 💡 New versioning policy.
 
-- Versions that work with old `View Engine` compilation [`2.0.0`-`3.0.0`).
+- Versions that work with old `View Engine` compilation [`2.0.0`-`2.x.x`].
 
 - Versions that work with new `Ivy` compilation [`3.0.0`-`x.x.x`].
 

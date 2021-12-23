@@ -1,6 +1,6 @@
 # NgxHateoasClient
-<a href="https://www.npmjs.com/package/@lagoshny/ngx-hateoas-client">
-  <img src="https://img.shields.io/npm/v/@lagoshny/ngx-hateoas-client" alt="Last released npm version" />
+<a href="https://www.npmjs.com/package/@lagoshny/ngx-hateoas-client/v/ve">
+  <img src="https://img.shields.io/npm/v/@lagoshny/ngx-hateoas-client/ve?label=npm" alt="Last Ivy released npm version" />
 </a>&nbsp;
 
 <a href="https://github.com/lagoshny/ngx-hateoas-client/actions?query=workflow%3ABuild">
@@ -22,7 +22,20 @@
 <br />
 <br />
 
-**Compatible with Angular 12.**
+## ⚠ Special lib version that compatible with Angular 6-12 versions that uses old `View Engine` or new `Ivy` compilation.
+
+**WARNING**
+
+>If you use new `Ivy` compilation you should use the [latest](https://github.com/lagoshny/ngx-hateoas-client) lib version.
+>
+>See more about it [here](https://github.com/lagoshny/ngx-hateoas-client/blob/master/CHANGELOG.md#300-2021-12-23).
+
+### New versioning policy.
+
+- Versions that work with old `View Engine` compilation [`2.0.0`-`2.x.x`].
+
+- Versions that work with new `Ivy` compilation [`3.0.0`-`x.x.x`].
+
 
 This client can be used to develop `Angular 6.0+` applications working with RESTfull server API.
 By `RESTfull API` means when the server application implements all the layers of the [Richardson Maturity Model](https://martinfowler.com/articles/richardsonMaturityModel.html)
@@ -31,8 +44,8 @@ and the server provides [HAL/JSON](http://stateless.co/hal_specification.html) r
 This client compatible with Java server-side applications based on [Spring HATEOAS](https://spring.io/projects/spring-hateoas) or [Spring Data REST](https://docs.spring.io/spring-data/rest/docs/current/reference/html/#reference).
 
 >This client is a continuation of the [@lagoshny/ngx-hal-client](https://github.com/lagoshny/ngx-hal-client).
-You can find out about the motivation to create a new client [here](https://github.com/lagoshny/ngx-hateoas-client/blob/master/migration-guide.md#Motivation).
-To migrate from `@lagoshny/ngx-hal-client` to this client you can use the [migration guide](https://github.com/lagoshny/ngx-hateoas-client/blob/master/migration-guide.md#Motivation).
+You can find out about the motivation to create a new client [here](https://github.com/lagoshny/ngx-hateoas-client/blob/ng-ve/migration-guide.md#Motivation).
+To migrate from `@lagoshny/ngx-hal-client` to this client you can use the [migration guide](https://github.com/lagoshny/ngx-hateoas-client/blob/ng-ve/migration-guide.md#Motivation).
 
 You can found examples of usage this client with [task-manager-front](https://github.com/lagoshny/task-manager-front) application that uses server-side [task-manager-back](https://github.com/lagoshny/task-manager-back) application.
 
@@ -101,7 +114,7 @@ You can found examples of usage this client with [task-manager-front](https://gi
 - [SortedPageParam](#SortedPageParam)
 
 ## Changelog
-[Learn about the latest improvements](https://github.com/lagoshny/ngx-hateoas-client/blob/master/CHANGELOG.md).
+[Learn about the latest improvements](https://github.com/lagoshny/ngx-hateoas-client/blob/ng-ve/CHANGELOG.md).
 
 ## Getting started
 
@@ -110,7 +123,7 @@ You can found examples of usage this client with [task-manager-front](https://gi
 To install the latest version use command:
 
 ```
-npm i @lagoshny/ngx-hateoas-client --save
+npm i @lagoshny/ngx-hateoas-client@ve --save
 ``` 
 
 ### Configuration

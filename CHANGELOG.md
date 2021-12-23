@@ -1,6 +1,14 @@
-## 2.3.0 (2021-12-23)
+## 2.3.1 (2021-12-23)
 #### Updated angular
 Updated Angular to 12 version.
+
+This is the last Angular version for `View Engine` compilation.
+Due this the library will have two versions:
+
+- That support `View Engine` compilation: `[2.0.0 - 2.x.x]`
+- That support `Ivy` compilation: `[3.0.0 - х.x.x]`
+
+If you have `Ivy compilation` or `Angular 13` use the [latest](https://github.com/lagoshny/ngx-hateoas-client) lib version.
 
 ## 2.2.1 (2021-12-05)
 #### Changes

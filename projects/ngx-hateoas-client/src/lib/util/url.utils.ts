@@ -124,7 +124,7 @@ export class UrlUtils {
   public static getResourceNameFromUrl(url: string): string {
     ValidationUtils.validateInputParams({url});
 
-    const dividedBySlashUrl = url.replace(`${ UrlUtils.getApiUrl() }/`, '').split('/');
+    const dividedBySlashUrl = url.toLowerCase().replace(`${ UrlUtils.getApiUrl().toLowerCase() }/`, '').split('/');
     return dividedBySlashUrl[0];
   }
 

@@ -8,6 +8,7 @@
   "scripts": {
     "ng": "ng",
     "build-prod": "ng build --configuration production",
+    "build-publish": "npm run test-flow && npm run build-prod && cd dist/ngx-hateoas-client && npm publish --tag latest",
     "start": "ng serve",
     "build": "ng build",
     "test": "ng test",

@@ -38,4 +38,8 @@ export class NgxHateoasClientModule {
       ]
     };
   }
+
+  constructor(config: NgxHateoasClientConfigurationService) {
+  }
+
 }

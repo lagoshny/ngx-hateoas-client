@@ -56,7 +56,8 @@ You can found examples of usage this client with [task-manager-front](https://gi
   - [Define resource classes](#Define-resource-classes)
   - [Built-in HateoasResourceService](#built-in-hateoasresourceservice)
   - [Create custom Resource service](#Create-custom-Resource-service)
-3. [Resource types](#Resource-types)
+3. [Testing](#Testing)
+4. [Resource types](#Resource-types)
 - [Decorators](#decorators)
   - [@HateoasResource](#hateoasresource)
   - [@HateoasEmbeddedResource](#hateoasembeddedresource)
@@ -82,7 +83,7 @@ You can found examples of usage this client with [task-manager-front](https://gi
 - [Subtypes support](#Subtypes-support)
 - [Resource projection support](#resource-projection-support)
   - [ProjectionRelType](#projectionreltype)
-4. [Resource service](#Resource-service)
+5. [Resource service](#Resource-service)
 - [GetResource](#GetResource)
 - [GetCollection](#GetCollection)
 - [GetPage](#GetPage)
@@ -98,12 +99,12 @@ You can found examples of usage this client with [task-manager-front](https://gi
 - [SearchPage](#SearchPage)
 - [CustomQuery](#CustomQuery)
 - [CustomSearchQuery](#CustomSearchQuery)
-5. [Settings](#settings)
+6. [Settings](#settings)
 - [Configuration params](#Configuration-params)
 - [UseTypes](#usetypes-params)
 - [Cache support](#cache-support)
 - [Logging](#Logging)
-6. [Public classes](#Public-classes)
+7. [Public classes](#Public-classes)
 - [RequestOption](#RequestOption)
 - [GetOption](#GetOption)
 - [PagedGetOption](#PagedGetOption)
@@ -305,6 +306,206 @@ export class ProductService extends HateoasResourceOperation<Product> {
 ```
 
 `HateoasResourceOperation` has the same [methods](#resource-service) as `HateoasResourceService` without `resourceType` as the first param (because you pass `resourceType` with service constructor).
+
+## Testing
+To test your services, that are using `HateoasResourceOperation` or `HateoasResourceService` you need import `NgxHateoasClientModule.forRoot()` in the test module.
+
+After that you can inject or mock the next services (if you need it):
+
+- `NgxHateoasClientConfigurationService`
+- `HateoasResourceService`
+
+Below you can find simple lib test examples:
+
+Suppose you have the `User` and some `UserService` like that:
+
+```ts
+import {
+  HateoasResourceOperation,
+  HateoasResourceService,
+} from '@lagoshny/ngx-hateoas-client';
+
+export class User {
+    name: string;
+    age: number;
+}
+
+@Injectable()
+export class UserService extends HateoasResourceOperation<User> {
+    
+  constructor(public resourceService: HateoasResourceService) {
+    super(User);
+  }
+
+  public create(user: User): Observable<Observable<never> | User> {
+    return super.createResource({body: user});
+  }
+
+  public getAllUsersByAge(age: number): Observable<PagedResourceCollection<User>> {
+    return this.resourceService.searchPage(User, 'allByAge', {
+        params: {
+          age
+        }
+      }
+    );
+  }
+}
+
+```
+
+Note, `UserService` extends `HateoasResourceOperation` and uses `HateoasResourceService` to perform requests.
+
+### Using TestBed
+
+If you prefer to use standard `TestBed` for testing, you can do that in the following way:
+
+````ts
+import {
+  HateoasResourceService,
+  NgxHateoasClientModule,
+  PagedResourceCollection,
+  ResourceCollection
+} from '@lagoshny/ngx-hateoas-client';
+import { TestBed, waitForAsync } from '@angular/core/testing';
+import { of } from 'rxjs';
+
+describe('UserServiceTest', () => {
+  
+  let hateoasResourceServiceSpy;
+  beforeEach(() => {
+    hateoasResourceServiceSpy = {
+      createResource: jasmine.createSpy('createResource'),
+      searchPage: jasmine.createSpy('searchPage')
+    };
+
+    TestBed.configureTestingModule({
+      imports: [
+        NgxHateoasClientModule.forRoot()
+      ],
+      providers: [
+        UserService,
+        {provide: HateoasResourceService, useValue: hateoasResourceServiceSpy}
+      ]
+    });
+  });
+
+  it('should init service', () => {
+    const userService = TestBed.inject(UserService);
+
+    expect(userService).toBeTruthy();
+  });
+
+  it('should create new user', waitForAsync(() => {
+    const userService = TestBed.inject(UserService);
+
+    const newUser = new User();
+    newUser.id = '1';
+    hateoasResourceServiceSpy.createResource.and.returnValue(of(newUser));
+
+    const user = new User();
+    user.name = 'Test user';
+    userService.create(user).subscribe((createdUser: User) => {
+      expect(createdUser).toBeTruthy();
+      expect(createdUser.id).toEqual('1');
+    });
+  }));
+
+  it('should return paged user list', waitForAsync(() => {
+    const userService = TestBed.inject(UserService);
+
+    const returnedUser = new User();
+    returnedUser.id = '1';
+    const resourceCollection = new ResourceCollection<User>();
+    resourceCollection.resources = [returnedUser];
+    hateoasResourceServiceSpy.searchPage.and.returnValue(of(new PagedResourceCollection(resourceCollection)));
+
+    userService.getAllUsersByAge(35).subscribe((users: PagedResourceCollection<User>) => {
+      expect(users).toBeTruthy();
+      expect(users.resources).toBeTruthy();
+      expect(users.resources[0]).toBeTruthy();
+      expect(users.resources[0].id).toEqual('1');
+    });
+  }));
+
+
+});
+
+````
+
+### Using Spectator
+
+If you prefer to use [@ngneat/spectator](https://www.npmjs.com/package/@ngneat/spectator) for testing, you can do that in the following way:
+
+```ts
+import {
+  HateoasResourceService,
+  NgxHateoasClientModule,
+  PagedResourceCollection,
+  ResourceCollection
+} from '@lagoshny/ngx-hateoas-client';
+import { waitForAsync } from '@angular/core/testing';
+import { of } from 'rxjs';
+import { createServiceFactory, SpectatorService } from '@ngneat/spectator';
+
+describe('UserServiceTest', () => {
+
+  let spectator: SpectatorService<UserService>;
+
+  const createService = createServiceFactory({
+    imports: [NgxHateoasClientModule.forRoot()],
+    service: UserService,
+    mocks: [HateoasResourceService]
+  });
+
+  beforeEach(() => {
+    spectator = createService();
+  });
+
+
+  it('should init service', () => {
+    const userService = spectator.inject(UserService);
+
+    expect(userService).toBeTruthy();
+  });
+
+  it('should create new user', waitForAsync(() => {
+    const userService = spectator.inject(UserService);
+
+    const newUser = new User();
+    newUser.id = '1';
+    const hateoasResourceServiceMock = spectator.inject(HateoasResourceService);
+    hateoasResourceServiceMock.createResource.and.returnValue(of(newUser));
+
+    const user = new User();
+    user.name = 'Test user';
+    userService.create(user).subscribe((createdUser: User) => {
+      expect(createdUser).toBeTruthy();
+      expect(createdUser.id).toEqual('1');
+    });
+  }));
+
+  it('should return paged user list', waitForAsync(() => {
+    const userService = spectator.inject(UserService);
+
+    const returnedUser = new User();
+    returnedUser.id = '1';
+    const resourceCollection = new ResourceCollection<User>();
+    resourceCollection.resources = [returnedUser];
+    const hateoasResourceServiceMock = spectator.inject(HateoasResourceService);
+    hateoasResourceServiceMock.searchPage.and.returnValue(of(new PagedResourceCollection(resourceCollection)));
+
+    userService.getAllUsersByAge(35).subscribe((users: PagedResourceCollection<User>) => {
+      expect(users).toBeTruthy();
+      expect(users.resources).toBeTruthy();
+      expect(users.resources[0]).toBeTruthy();
+      expect(users.resources[0].id).toEqual('1');
+    });
+  }));
+
+
+});
+
+```
 
 ## Resource types
 

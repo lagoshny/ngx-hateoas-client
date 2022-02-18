@@ -167,13 +167,13 @@ export class Resource extends BaseResource {
 
     const relationLink = this.getRelationLink(relationName);
     const resource = ResourceUtils.initResource(entity) as Resource;
-    const resourceId = last(split(resource.getSelfLinkHref(), '/'));
+    const resourceId = last(split(UrlUtils.generateLinkUrl(resource._links.self), '/'));
 
     if (isNil(resourceId) || resourceId === '') {
       StageLogger.stageErrorLog(Stage.PREPARE_URL, {
         step: 'ResolveResourceId',
         error: 'Passed resource self link should has id',
-        selfLink: resource.getSelfLinkHref()
+        selfLink: UrlUtils.generateLinkUrl(resource._links.self)
       });
       throw Error('Passed resource self link should has id');
     }

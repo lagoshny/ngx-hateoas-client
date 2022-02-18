@@ -1,4 +1,7 @@
-## 3.0.5 (2022-02-01)
+## 3.0.6 (2022-02-18)
+#### Changes
+Fixed [issue](https://github.com/lagoshny/ngx-hateoas-client/issues/37).
+
 #### Changes
 Fixed [issue](https://github.com/lagoshny/ngx-hateoas-client/issues/28). 
 Added initialization `NgxHateoasClientConfigurationService` to root module constructor that allows using `NgxHateoasClientModule.forRoot()` in test classes.

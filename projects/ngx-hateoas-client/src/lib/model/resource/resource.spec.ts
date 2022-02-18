@@ -20,6 +20,18 @@ class TestProductResource extends Resource {
   };
 }
 
+class TestProductSelfTemplatedResource extends Resource {
+  _links = {
+    self: {
+      href: 'http://localhost:8080/api/v1/product/1{?projection}',
+      templated: true
+    },
+    product: {
+      href: 'http://localhost:8080/api/v1/product/1'
+    }
+  };
+}
+
 class BadTestProductResource extends Resource {
   _links = {
     self: {
@@ -446,6 +458,16 @@ describe('Resource DELETE_RELATION', () => {
     resourceHttpServiceSpy.delete.and.returnValue(of(new HttpResponse()));
 
     resource.deleteRelation('product', new TestProductResource())
+      .subscribe(() => {
+        const resultResourceUrl = resourceHttpServiceSpy.delete.calls.argsFor(0)[0];
+        expect(resultResourceUrl).toBe('http://localhost:8080/api/v1/order/1/products/1');
+      });
+  });
+
+  it('should generate right url from self relation link with template', () => {
+    resourceHttpServiceSpy.delete.and.returnValue(of(new HttpResponse()));
+
+    resource.deleteRelation('product', new TestProductSelfTemplatedResource())
       .subscribe(() => {
         const resultResourceUrl = resourceHttpServiceSpy.delete.calls.argsFor(0)[0];
         expect(resultResourceUrl).toBe('http://localhost:8080/api/v1/order/1/products/1');

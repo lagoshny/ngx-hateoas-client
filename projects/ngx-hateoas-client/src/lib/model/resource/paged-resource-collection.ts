@@ -2,7 +2,6 @@ import { ResourceCollection } from './resource-collection';
 import { BaseResource } from './base-resource';
 import { Observable, throwError as observableThrowError } from 'rxjs';
 import { getPagedResourceCollectionHttpService } from '../../service/internal/paged-resource-collection-http.service';
-import { UrlUtils } from '../../util/url.utils';
 import { LinkData, PageData, Sort, SortedPageParam } from '../declarations';
 import { StageLogger } from '../../logger/stage-logger';
 import { Stage } from '../../logger/stage.enum';
@@ -161,20 +160,24 @@ export class PagedResourceCollection<T extends BaseResource> extends ResourceCol
       });
     }
 
-    const maxPageNumber = (this.totalElements / this.pageSize) - 1;
+    const maxPageNumber = (this.totalElements / params.pageParams.size) - 1;
     if (params.pageParams.page > maxPageNumber) {
-      const errMsg = `Error page number. Max page number is ${ maxPageNumber }`;
+      const errMsg = `Error page number. Max page number is ${ parseInt(maxPageNumber + '', 10) }`;
       StageLogger.stageErrorLog(Stage.PREPARE_PARAMS, {error: errMsg});
       return observableThrowError(errMsg);
     }
-    const maxPageSize = this.totalElements / (this.pageSize + 1);
+    const maxPageSize = this.totalElements / (params.pageParams.size + 1);
     if (params.pageParams.page !== 0 && params.pageParams.size > maxPageSize) {
-      const errMsg = `Error page size. Max page size is ${ maxPageSize }`;
+      const errMsg = `Error page size. Max page size is ${ parseInt(maxPageSize + '', 10) }`;
       StageLogger.stageErrorLog(Stage.PREPARE_PARAMS, {error: errMsg});
       return observableThrowError(errMsg);
     }
 
-    return doRequest<T>(UrlUtils.clearUrlParams(this.selfLink.href), options?.useCache, params).pipe(
+    const requestUrl = new URL(this.selfLink.href);
+    requestUrl.searchParams.delete('page');
+    requestUrl.searchParams.delete('size');
+    requestUrl.searchParams.delete('sort');
+    return doRequest<T>(requestUrl.href, options?.useCache, params).pipe(
       tap(() => {
         StageLogger.resourceEndLog(this.resources[0], 'CustomPage', {result: 'custom page was performed successful'});
       })

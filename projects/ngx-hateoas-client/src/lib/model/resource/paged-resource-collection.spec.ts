@@ -20,7 +20,7 @@ describe('PagedResourceCollection', () => {
     },
     _links: {
       self: {
-        href: 'http://localhost:8080/api/v1/tasks{?projection}',
+        href: 'http://localhost:8080/api/v1/tasks?page=0&size=1{?projection}',
         templated: true
       },
       first: {
@@ -129,6 +129,21 @@ describe('PagedResourceCollection', () => {
         expect(options.sort.first).toEqual('ASC');
         expect(options.sort.second).toBeDefined();
         expect(options.sort.second).toEqual('DESC');
+      });
+  });
+
+  it('CUSTOM_PAGE should clear previous page params', () => {
+    pagedResourceCollectionHttpServiceSpy.get.and.returnValue(of(new PagedResourceCollection(new ResourceCollection())));
+
+    const pagedResourceCollection = new PagedResourceCollection(new SimpleResourceCollection(), pageDataWithLinks);
+    pagedResourceCollection.customPage({pageParams: {page: 2, size: 8}, sort: {first: 'ASC', second: 'DESC'}})
+      .subscribe(() => {
+        const urlString: string = pagedResourceCollectionHttpServiceSpy.get.calls.argsFor(0)[0];
+        const url = new URL(urlString);
+
+        expect(url.searchParams.has('page')).toBeFalse();
+        expect(url.searchParams.has('size')).toBeFalse();
+        expect(url.searchParams.has('sort')).toBeFalse();
       });
   });
 

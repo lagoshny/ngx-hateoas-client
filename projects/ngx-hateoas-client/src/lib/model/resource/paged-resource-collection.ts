@@ -160,15 +160,9 @@ export class PagedResourceCollection<T extends BaseResource> extends ResourceCol
       });
     }
 
-    const maxPageNumber = (this.totalElements / params.pageParams.size) - 1;
+    const maxPageNumber = (this.totalElements / params.pageParams.size);
     if (params.pageParams.page > maxPageNumber) {
       const errMsg = `Error page number. Max page number is ${ parseInt(maxPageNumber + '', 10) }`;
-      StageLogger.stageErrorLog(Stage.PREPARE_PARAMS, {error: errMsg});
-      return observableThrowError(errMsg);
-    }
-    const maxPageSize = this.totalElements / (params.pageParams.size + 1);
-    if (params.pageParams.page !== 0 && params.pageParams.size > maxPageSize) {
-      const errMsg = `Error page size. Max page size is ${ parseInt(maxPageSize + '', 10) }`;
       StageLogger.stageErrorLog(Stage.PREPARE_PARAMS, {error: errMsg});
       return observableThrowError(errMsg);
     }

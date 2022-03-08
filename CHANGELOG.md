@@ -1,3 +1,8 @@
+## 3.0.8 (2022-03-08)
+#### Changes
+Fixed reopened [issue](https://github.com/lagoshny/ngx-hateoas-client/issues/40).
+Deleted unnecessary `customPage` validations.
+
 ## 3.0.7 (2022-03-04)
 #### Changes
 Fixed [issue](https://github.com/lagoshny/ngx-hateoas-client/issues/40).

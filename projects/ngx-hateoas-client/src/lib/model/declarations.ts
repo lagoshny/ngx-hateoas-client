@@ -88,7 +88,7 @@ export interface GetOption extends RequestOption {
  * otherwise exception will be thrown.
  */
 export interface RequestParam {
-  [paramName: string]: Resource | string | number | boolean;
+  [paramName: string]: Resource | string | number | boolean | Array<string> | Array<number>;
 }
 
 /**

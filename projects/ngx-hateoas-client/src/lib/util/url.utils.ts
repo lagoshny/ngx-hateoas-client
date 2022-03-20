@@ -4,7 +4,7 @@ import { Resource } from '../model/resource/resource';
 import { GetOption, HttpClientOptions, LinkData, PagedGetOption, Sort } from '../model/declarations';
 import { ValidationUtils } from './validation.utils';
 import { LibConfig } from '../config/lib-config';
-import { isEmpty, isNil, isObject, toString } from 'lodash-es';
+import { isArray, isEmpty, isNil, isObject, toString } from 'lodash-es';
 import { UriTemplate } from 'uri-templates-es';
 
 export class UrlUtils {
@@ -28,6 +28,10 @@ export class UrlUtils {
           if (isResource(value)) {
             // Append resource as resource link
             resultParams = resultParams.append(key, (value as Resource).getSelfLinkHref());
+          } else if (isArray(options.params[key])) {
+            (options.params[key] as Array<any>).forEach((item) => {
+              console.log(`${ key.toString() } - ${item}`);
+            });
           } else {
             // Else append simple param as is
             resultParams = resultParams.append(key, value.toString());

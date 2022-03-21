@@ -29,8 +29,9 @@ export class UrlUtils {
             // Append resource as resource link
             resultParams = resultParams.append(key, (value as Resource).getSelfLinkHref());
           } else if (isArray(options.params[key])) {
+            // Append arrays params as repeated key with each value from array
             (options.params[key] as Array<any>).forEach((item) => {
-              console.log(`${ key.toString() } - ${item}`);
+              resultParams = resultParams.append(`${ key.toString() }`, item);
             });
           } else {
             // Else append simple param as is

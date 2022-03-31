@@ -54,6 +54,17 @@ export class SimpleResource extends Resource {
 
 }
 
+export const rawCaseSensitiveResource = {
+  _links: {
+    self: {
+      href: 'http://localhost:8080/api/v1/testResource/1'
+    },
+    testResource: {
+      href: 'http://localhost:8080/api/v1/testResource/1'
+    }
+  }
+};
+
 @HateoasProjection(SimpleResource, 'simpleProjection')
 export class SimpleResourceProjection extends Resource {
   @ProjectionRel(RawResource)

@@ -1,3 +1,7 @@
+## 2.3.11 (2022-03-31)
+#### Changes
+Fixed [issue-45](https://github.com/lagoshny/ngx-hateoas-client/issues/45).
+
 ## 2.3.10 (2022-03-21)
 #### Changes
 Fixed typo in [issue-44](https://github.com/lagoshny/ngx-hateoas-client/issues/44).

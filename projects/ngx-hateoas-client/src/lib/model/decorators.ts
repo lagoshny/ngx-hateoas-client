@@ -21,7 +21,7 @@ export function HateoasResource(resourceName: string) {
       throw new Error(`Init resource '${ constructor.name }' error. @HateoasResource decorator applied only to 'Resource' type, you used it with ${ Object.getPrototypeOf(constructor) } type.`);
     }
     constructor['__resourceName__'] = resourceName;
-    ResourceUtils.RESOURCE_NAME_TYPE_MAP.set(resourceName, constructor);
+    ResourceUtils.RESOURCE_NAME_TYPE_MAP.set(resourceName.toLowerCase(), constructor);
 
     return constructor;
   };
@@ -70,7 +70,7 @@ export function HateoasProjection(resourceType: new() => Resource, projectionNam
     }
     constructor['__resourceName__'] = resourceType['__resourceName__'];
     constructor['__projectionName__'] = projectionName;
-    ResourceUtils.RESOURCE_NAME_PROJECTION_TYPE_MAP.set(resourceType['__resourceName__'], constructor);
+    ResourceUtils.RESOURCE_NAME_PROJECTION_TYPE_MAP.set(resourceType['__resourceName__'].toLowerCase(), constructor);
 
     return constructor;
   };

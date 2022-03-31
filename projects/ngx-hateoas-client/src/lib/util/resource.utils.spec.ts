@@ -4,13 +4,19 @@ import { EmbeddedResource } from '../model/resource/embedded-resource';
 import { ResourceCollection } from '../model/resource/resource-collection';
 import { PagedResourceCollection } from '../model/resource/paged-resource-collection';
 import {
+  rawCaseSensitiveResource,
   RawEmbeddedResource,
   rawEmbeddedResource,
-  rawPagedResourceCollection, RawResource,
+  rawPagedResourceCollection,
+  RawResource,
   rawResource,
-  rawResourceCollection, SimpleResource, SimpleResourceProjection
+  rawResourceCollection,
+  SimpleResource,
+  SimpleResourceProjection
 } from '../model/resource/resources.test';
 import { Include } from '../model/declarations';
+import { HateoasResource } from '../model/decorators';
+
 
 /* tslint:disable:no-string-literal */
 describe('ResourceUtils', () => {
@@ -123,6 +129,174 @@ describe('ResourceUtils', () => {
     expect(result instanceof Resource).toBeTrue();
     expect(result['rawResource']).toBeDefined();
     expect(result['rawResource'] instanceof RawResource).toBeTrue();
+  });
+
+  it('INSTANTIATE_RESOURCE define resource type should be case insensitive #1', () => {
+
+    @HateoasResource('testResource')
+    class CaseSensitiveResource1 extends Resource {
+
+      // tslint:disable-next-line:variable-name
+      _links = {
+        self: {
+          href: 'http://localhost:8080/api/v1/testResource/1'
+        },
+        testResource: {
+          href: 'http://localhost:8080/api/v1/testResource/1'
+        }
+      };
+
+    }
+
+    const result = ResourceUtils.instantiateResource(rawCaseSensitiveResource);
+    expect(result instanceof CaseSensitiveResource1).toBeTrue();
+  });
+
+  it('INSTANTIATE_RESOURCE define resource type should be case insensitive #2', () => {
+
+    @HateoasResource('testresource')
+    class CaseSensitiveResource2 extends Resource {
+
+      // tslint:disable-next-line:variable-name
+      _links = {
+        self: {
+          href: 'http://localhost:8080/api/v1/testResource/1'
+        },
+        testResource: {
+          href: 'http://localhost:8080/api/v1/testResource/1'
+        }
+      };
+
+    }
+
+    const result = ResourceUtils.instantiateResource(rawCaseSensitiveResource);
+    expect(result instanceof CaseSensitiveResource2).toBeTrue();
+  });
+
+  it('INSTANTIATE_RESOURCE define resource type should be case insensitive #3', () => {
+
+    @HateoasResource('TESTRESOURCE')
+    class CaseSensitiveResource3 extends Resource {
+
+      // tslint:disable-next-line:variable-name
+      _links = {
+        self: {
+          href: 'http://localhost:8080/api/v1/testResource/1'
+        },
+        testResource: {
+          href: 'http://localhost:8080/api/v1/testResource/1'
+        }
+      };
+
+    }
+
+    const result = ResourceUtils.instantiateResource(rawCaseSensitiveResource);
+    expect(result instanceof CaseSensitiveResource3).toBeTrue();
+  });
+
+  it('INSTANTIATE_RESOURCE define resource type should be case insensitive #4', () => {
+
+    @HateoasResource('tEsTrEsOuRce')
+    class CaseSensitiveResource4 extends Resource {
+
+      // tslint:disable-next-line:variable-name
+      _links = {
+        self: {
+          href: 'http://localhost:8080/api/v1/testResource/1'
+        },
+        testResource: {
+          href: 'http://localhost:8080/api/v1/testResource/1'
+        }
+      };
+
+    }
+
+    const result = ResourceUtils.instantiateResource(rawCaseSensitiveResource);
+    expect(result instanceof CaseSensitiveResource4).toBeTrue();
+  });
+
+  it('INSTANTIATE_RESOURCE PROJECTION define resource type should be case insensitive #1', () => {
+
+    @HateoasResource('testResource')
+    class CaseSensitiveResource1 extends Resource {
+
+      // tslint:disable-next-line:variable-name
+      _links = {
+        self: {
+          href: 'http://localhost:8080/api/v1/testResource/1'
+        },
+        testResource: {
+          href: 'http://localhost:8080/api/v1/testResource/1'
+        }
+      };
+
+    }
+
+    const result = ResourceUtils.instantiateResource(rawCaseSensitiveResource, true);
+    expect(result instanceof CaseSensitiveResource1).toBeTrue();
+  });
+
+  it('INSTANTIATE_RESOURCE PROJECTION define resource type should be case insensitive #2', () => {
+
+    @HateoasResource('testresource')
+    class CaseSensitiveResource2 extends Resource {
+
+      // tslint:disable-next-line:variable-name
+      _links = {
+        self: {
+          href: 'http://localhost:8080/api/v1/testResource/1'
+        },
+        testResource: {
+          href: 'http://localhost:8080/api/v1/testResource/1'
+        }
+      };
+
+    }
+
+    const result = ResourceUtils.instantiateResource(rawCaseSensitiveResource, true);
+    expect(result instanceof CaseSensitiveResource2).toBeTrue();
+  });
+
+  it('INSTANTIATE_RESOURCE PROJECTION define resource type should be case insensitive #3', () => {
+
+    @HateoasResource('TESTRESOURCE')
+    class CaseSensitiveResource3 extends Resource {
+
+      // tslint:disable-next-line:variable-name
+      _links = {
+        self: {
+          href: 'http://localhost:8080/api/v1/testResource/1'
+        },
+        testResource: {
+          href: 'http://localhost:8080/api/v1/testResource/1'
+        }
+      };
+
+    }
+
+    const result = ResourceUtils.instantiateResource(rawCaseSensitiveResource, true);
+    expect(result instanceof CaseSensitiveResource3).toBeTrue();
+  });
+
+  it('INSTANTIATE_RESOURCE PROJECTION define resource type should be case insensitive #4', () => {
+
+    @HateoasResource('tEsTrEsOuRce')
+    class CaseSensitiveResource4 extends Resource {
+
+      // tslint:disable-next-line:variable-name
+      _links = {
+        self: {
+          href: 'http://localhost:8080/api/v1/testResource/1'
+        },
+        testResource: {
+          href: 'http://localhost:8080/api/v1/testResource/1'
+        }
+      };
+
+    }
+
+    const result = ResourceUtils.instantiateResource(rawCaseSensitiveResource, true);
+    expect(result instanceof CaseSensitiveResource4).toBeTrue();
   });
 
   it('INSTANTIATE_COLLECTION_RESOURCE should return "null" when passed payload is empty object', () => {

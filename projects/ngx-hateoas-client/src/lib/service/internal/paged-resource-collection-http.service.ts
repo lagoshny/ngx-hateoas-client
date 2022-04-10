@@ -27,7 +27,9 @@ export function getPagedResourceCollectionHttpService(): PagedResourceCollection
 /**
  * Service to perform HTTP requests to get {@link PagedResourceCollection} type.
  */
-@Injectable()
+@Injectable({
+  providedIn: 'root',
+})
 export class PagedResourceCollectionHttpService extends HttpExecutor {
 
   constructor(httpClient: HttpClient,

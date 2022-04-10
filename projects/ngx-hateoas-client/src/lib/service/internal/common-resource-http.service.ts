@@ -15,7 +15,9 @@ import { ResourceCacheService } from './cache/resource-cache.service';
 /**
  * Service to perform HTTP requests to get any type of the {@link Resource}, {@link PagedResourceCollection}, {@link ResourceCollection}.
  */
-@Injectable()
+@Injectable({
+  providedIn: 'root',
+})
 export class CommonResourceHttpService extends HttpExecutor {
 
   constructor(httpClient: HttpClient,

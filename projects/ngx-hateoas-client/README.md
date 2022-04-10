@@ -126,6 +126,8 @@ npm i @lagoshny/ngx-hateoas-client@latest --save
 ``` 
 
 ### Configuration
+> Important! Starts from 3.1.0 version you need manually import HttpClientModule to provide HttpClient service that required fot this lib.
+> Why it was change you can see this [Angular issue](https://github.com/angular/angular/issues/20575).
 
 Before start, need to configure `NgxHateoasClientModule` and pass configuration through `NgxHateoasClientConfigurationService`.
 
@@ -139,6 +141,7 @@ import { NgxHateoasClientModule } from '@lagoshny/ngx-hateoas-client';
 @NgModule({
   ...
   imports: [
+    HttpClientModule, 
     ...
     NgxHateoasClientModule.forRoot()
     ...

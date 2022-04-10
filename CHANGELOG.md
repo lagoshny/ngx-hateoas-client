@@ -1,3 +1,9 @@
+## 3.1.0 (2022-04-10)
+#### Changes
+- Fixed [issue-49](https://github.com/lagoshny/ngx-hateoas-client/issues/49).
+- Changed the lib services registration to provide service as singletons with Angular tree-shaking.
+- Updated README.md [Configuration section](https://github.com/lagoshny/ngx-hateoas-client#Configuration).
+
 ## 3.0.11 (2022-03-31)
 #### Changes
 Fixed [issue-45](https://github.com/lagoshny/ngx-hateoas-client/issues/45).

@@ -21,7 +21,9 @@ import { HttpResponse } from '@angular/common/http';
  */
 
 /* tslint:disable:no-string-literal */
-@Injectable()
+@Injectable({
+  providedIn: 'root',
+})
 export class HateoasResourceService {
 
   constructor(private commonHttpService: CommonResourceHttpService,

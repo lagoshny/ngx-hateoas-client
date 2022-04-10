@@ -16,7 +16,9 @@ import { ValidationUtils } from '../util/validation.utils';
  * You should inject this service in your main AppModule and pass
  * configuration using {@link #configure()} method.
  */
-@Injectable()
+@Injectable({
+  providedIn: 'root',
+})
 export class NgxHateoasClientConfigurationService {
 
   constructor(private injector: Injector) {

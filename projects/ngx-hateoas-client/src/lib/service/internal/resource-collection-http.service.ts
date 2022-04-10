@@ -24,7 +24,9 @@ export function getResourceCollectionHttpService(): ResourceCollectionHttpServic
 /**
  * Service to perform HTTP requests to get {@link ResourceCollection} type.
  */
-@Injectable()
+@Injectable({
+  providedIn: 'root',
+})
 export class ResourceCollectionHttpService extends HttpExecutor {
 
   constructor(httpClient: HttpClient,

@@ -9,7 +9,9 @@ import { LibConfig } from '../../../config/lib-config';
 import { UrlUtils } from '../../../util/url.utils';
 import { isNil } from 'lodash-es';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root',
+})
 export class ResourceCacheService {
 
   private cacheMap: Map<string, CachedResource> = new Map<string, CachedResource>();

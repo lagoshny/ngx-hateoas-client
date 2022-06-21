@@ -66,6 +66,11 @@ export class ResourceUtils {
         payload[key] = payload[key];
         continue;
       }
+      if (Date.parse(payload[key])) {
+        payload[key] = new Date(payload[key]);
+        continue;
+      }
+
       payload[key] = this.resolvePayloadType(key, payload[key], isProjection);
     }
 

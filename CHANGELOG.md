@@ -1,3 +1,8 @@
+## 2.4.1 (2022-06-21)
+#### Changes
+- Fixed [issue-55](https://github.com/lagoshny/ngx-hateoas-client/issues/55).
+  Now resource's fields with `Date` type will be as `Date` objects (before was as `string`).
+
 ## 2.4.0 (2022-04-10)
 #### Changes
 - Fixed [issue-49](https://github.com/lagoshny/ngx-hateoas-client/issues/49).

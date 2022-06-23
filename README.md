@@ -102,6 +102,7 @@ You can found examples of usage this client with [task-manager-front](https://gi
 6. [Settings](#settings)
 - [Configuration params](#Configuration-params)
 - [UseTypes](#usetypes-params)
+- [TypesFormat](#typesformat)
 - [Cache support](#cache-support)
 - [Logging](#Logging)
 7. [Public classes](#Public-classes)
@@ -1872,9 +1873,9 @@ To create resource projection you need to create a projection class extend it wi
 If your projection has property relations to resource classes then you should decorate these properties with [@ProjectionRel](#projectionrel) decorator passing `resourceType` param.
 Besides need to wrap property resource type with  [ProjectionRelType](#projectionreltype) type to hide `Resource`/`EmbeddedResource` methods (see example below).
 
->As mentioned earlier that projection relations that resources are plain JSON objects. This means that these objects have not resources relations links array and other signs of the resource.
-But in your code when you will use existing resources classes as a relation type in projection class you will have all `Resource`/`EmbeddedResource` methods that can be applied only to resource type.
-To prevent this behavior you need all projection resource relation types to wrap with [ProjectionRelType](#projectionreltype) type.
+> As mentioned earlier that projection relations that resources are plain JSON objects. This means that these objects have not resources relations links array and other signs of the resource.
+> But in your code when you will use existing resources classes as a relation type in projection class you will have all `Resource`/`EmbeddedResource` methods that can be applied only to resource type.
+> To prevent this behavior you need all projection resource relation types to wrap with [ProjectionRelType](#projectionreltype) type.
 
 Resource projection example:
 
@@ -3332,6 +3333,17 @@ The library accepts configuration object:
     resources: Array<new (...args: any[]) => Resource>;
     embeddedResources?: Array<new (...args: any[]) => EmbeddedResource>;
   };
+  pagination?: {
+    defaultPage: {
+      size: number;
+      page?: number;
+    }
+  };
+  typesFormat?: {
+    date?: {
+      patterns: Array<string>;
+    }
+  };
   isProduction?: boolean;
 ```
 #### Http params
@@ -3369,6 +3381,37 @@ The same logic applied to [EmbeddedResource](#embeddedresource)'s. Use `useTypes
 
 - `resources` - an array of the [Resource](#resource) types used to create concrete resource types when parsed server's answer instead of common `Resource` type.
 - `embeddedResources` - an array of the [EmbeddedResource](#embeddedresource) types used to create concrete embedded resource types when parsed server's answer instead of common `EmbeddedResource` type.
+
+#### TypesFormat
+You can set the format for some types.
+
+This format will be used when parse raw `Resource JSON` to determine which `Resource` property type should be used in the result `Resource` instance.
+
+- Define patterns for the `Date` type. 
+  These patterns used when parsed `Resource JSON` and if some `Resource` property match to `Date` pattern then it will have type as `Date` not as raw `string` type.
+ You can define array of `Date` patterns then if `Resource` property match to one of them then it will be as `Date` type.
+
+>[MomentJs](https://momentjs.com/) lib is used as `Date` parser. See date pattern rules [here](https://momentjscom.readthedocs.io/en/latest/moment/04-displaying/01-format/)
+
+
+Example: 
+````ts
+  typesFormat: {
+    date: {
+      patterns: ['DD/MM/YYYY', 'MM/DD/YYYY'];
+    }
+  };
+````
+For the `Resource JSON` like this:
+
+```json
+  "someDate": '23/06/2022',
+  "_links": {
+    ...
+  }
+```
+
+`Resource` instance will have property `someDate` as type `Date`.
 
 #### isProduction param
 Some `hateoas-client` features can change their behaviours depends on this param. For example, [Logging](#logging) disable all `warning` messages when `isProduction` is true.

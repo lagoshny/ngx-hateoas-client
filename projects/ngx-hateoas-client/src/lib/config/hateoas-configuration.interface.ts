@@ -62,6 +62,24 @@ export interface HateoasConfiguration {
    */
   isProduction?: boolean;
 
+  /**
+   * Specifying format for some type values.
+   */
+  typesFormat?: {
+    /**
+     * This date format will be used when parse {@link Resource} properties.
+     * If the property will be match to some one of specified formats, then the property type will be as Date object.
+     * Otherwise, raw type will be used as default.
+     */
+    date?: {
+      /**
+       * Date pattern.
+       * The {@link https://momentjs.com} lib is used to parse date with patterns, use patterns supported by this lib.
+       * See more about supported formats <a href='https://momentjscom.readthedocs.io/en/latest/moment/04-displaying/01-format/'>here</a>.
+       */
+      patterns: Array<string>;
+    }
+  };
 
   /**
    * Let to change default page params that is size = 20, page = 0.

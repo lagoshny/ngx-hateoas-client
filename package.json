@@ -48,6 +48,7 @@
     "karma-jasmine": "~3.0.1",
     "karma-jasmine-html-reporter": "^1.4.2",
     "lodash-es": "^4.17.21",
+    "moment": "^2.29.3",
     "ng-packagr": "^13.1.2",
     "protractor": "~7.0.0",
     "ts-node": "~9.1.1",

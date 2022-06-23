@@ -1,3 +1,8 @@
+## 3.2.0 (2022-06-24)
+#### Changes
+- Realized feature from [issue-57](https://github.com/lagoshny/ngx-hateoas-client/issues/57).
+  >Now you can use different URLs to retrieve resources by configuring several routes. Read more about it in [documentation](https://github.com/lagoshny/ngx-hateoas-client#using-multiple-urls-to-retrieve-resources).
+
 ## 3.1.2 (2022-06-23)
 #### Changes
 - Fixed [issue-58](https://github.com/lagoshny/ngx-hateoas-client/issues/58).

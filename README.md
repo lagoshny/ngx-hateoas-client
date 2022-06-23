@@ -52,6 +52,8 @@ You can found examples of usage this client with [task-manager-front](https://gi
 2. [Getting started](#Getting-started)
 - [Installation](#Installation)
 - [Configuration](#Configuration)
+  - [Common Resource URL](#using-common-url-for-retrieve-resources)
+  - [Multiple Resource URLs](#using-multiple-urls-to-retrieve-resources)
 - [Usage](#Usage)
   - [Define resource classes](#Define-resource-classes)
   - [Built-in HateoasResourceService](#built-in-hateoasresourceservice)
@@ -60,6 +62,8 @@ You can found examples of usage this client with [task-manager-front](https://gi
 4. [Resource types](#Resource-types)
 - [Decorators](#decorators)
   - [@HateoasResource](#hateoasresource)
+    - [resourceName](#resourcename)
+    - [options](#options)
   - [@HateoasEmbeddedResource](#hateoasembeddedresource)
   - [@HateoasProjection](#hateoasprojection)
     - [@ProjectionRel](#projectionrel)
@@ -101,6 +105,7 @@ You can found examples of usage this client with [task-manager-front](https://gi
 - [CustomSearchQuery](#CustomSearchQuery)
 6. [Settings](#settings)
 - [Configuration params](#Configuration-params)
+  - [Http params](#http-params)
 - [UseTypes](#usetypes-params)
 - [TypesFormat](#typesformat)
 - [Cache support](#cache-support)
@@ -156,6 +161,9 @@ export class AppModule {
 
 2) In constructor app root module inject `NgxHateoasClientConfigurationService` and pass a configuration:
 
+Minimal configuration look like this:
+
+#### Using common URL for retrieve `Resources`
 ```ts
 import { ..., NgxHateoasClientConfigurationService } from '@lagoshny/ngx-hateoas-client';
 
@@ -174,10 +182,39 @@ export class AppModule {
 }
 ```
 
->Configuration has only one required param is `rootUrl` mapped to the server API URL.
-Also, you can configure `proxyUrl` when use it in resource links.
-See more about other a configuration params [here](#configuration-params).
+#### Using multiple URLs to retrieve `Resources`
 
+```ts
+import { ..., NgxHateoasClientConfigurationService } from '@lagoshny/ngx-hateoas-client';
+
+...
+
+export class AppModule {
+
+  constructor(hateoasConfig: NgxHateoasClientConfigurationService) {
+    hateoasConfig.configure({
+      http: {
+        // Use this router name for default Resources route
+        defaultRoute: {
+            rootUrl: 'http://localhost:8080/api/v1'
+        },
+        anotherRoute: {
+          rootUrl: 'http://localhost:9090/api/v1'
+        }
+      }
+    });
+  }
+
+}
+```
+
+`defaultRoute` - it is special `router name` that all `Resources` used by default.
+
+`anotherRoute` - additional `Resource` route that can be used in `Resource` [@HateoasResource#options](#options) decorator to specify it.
+<br>
+<br>
+>See more about other configuration params [here](#configuration-params).
+<br>
 ### Usage
 
 ### Define resource classes
@@ -532,7 +569,11 @@ In some cases, the server-side can have an entity inheritance model how to work 
 ### @HateoasResource
 `@HateoasResource` decorator use to register your `Resource` classes in `hateoas-client` with passed `resourceName` as decorator's param.
 
-- `resourceName` should be equals to the server-side resource name that uses to represent self resource link.
+- `resourceName`: `string` should be equals to the server-side resource name that uses to represent self resource link.
+- `options`: `ResourceOption` additional resource options. Find more about these options [here]().
+
+#### resourceName
+Using to specify resource name.
 
 For example, you need to work with `Shop`resource:
 
@@ -549,6 +590,31 @@ export class Shop extends Resource {
 It means that server-side use `shops` as resource name for `Shop` entity and it is resource self-link seem like: `http://localhost:8080/api/v1/shops` (with the assumption that server's root URL is `http://localhost:8080/api/v1`)
 
 >It is required to mark your `Resource` classes with this decorator otherwise you will get an error when performing resource request
+
+#### options
+
+`ResourceOption` contains properties:
+
+```ts
+{
+  routeName: string; // name of Resource route
+}
+```
+
+If you want to use special `URL` to get `Resource` use `options` param:
+
+```ts
+import { Resource, HateoasResource } from '@lagoshny/ngx-hateoas-client';
+
+@HateoasResource('shops', { routeName: 'yourRoute' })
+export class Shop extends Resource {
+ ...
+}
+```
+Make sure that you configure route with name `yourRoute` in lib configuration in `http` section.
+How to do it, can see [here](#using-multiple-urls-to-retrieve-resources).
+
+> If you not specify `routerName` it will be used default router name as `defaultRouter`.
 
 ### @HateoasEmbeddedResource
 `@HateoasEmbeddedResource` decorator use to register your `EmbeddedResource` classes in `hateoas-client` with passed `relationNames` as decorator's param.
@@ -1867,7 +1933,7 @@ To create resource projection you need to create a projection class extend it wi
 - `resourceType` should be equals to resource type that use this projection.
 - `projectionName` should be equals to the server-side resource projection name.
 
-> Use [HateoasResourceService](#built-in-hateoasresourceservice) to perform projection request with first param as projection type for all the methods. 
+> Use [HateoasResourceService](#built-in-hateoasresourceservice) to perform projection request with first param as projection type for all the methods.
 > You can also create [custom resource service](#create-custom-resource-service) to concreate projection type.
 
 If your projection has property relations to resource classes then you should decorate these properties with [@ProjectionRel](#projectionrel) decorator passing `resourceType` param.
@@ -3318,10 +3384,7 @@ This section describes library configuration params.
 The library accepts configuration object:
 
 ```ts
-  http: {
-    rootUrl: string;
-    proxyUrl?: string;
-  };
+  http: ResourceRoute | MultipleResourceRoutes;
   logs?: {
     verboseLogs?: boolean;
   };
@@ -3346,10 +3409,33 @@ The library accepts configuration object:
   };
   isProduction?: boolean;
 ```
-#### Http params
 
-- `rootUrl` (required) - defines root server URL that will be used to perform resource requests.
-- `proxyUrl` (optional) -  defines proxy URL that uses to change rootUrl to proxyUrl when getting a relation link.
+### Http params
+
+#### Common Resource Route
+If you want to use common `URL` to retrieve all `Resources`, use `ResourceRoute` http config:
+
+```ts
+{
+   rootUrl: string; // (required) - defines root server URL that will be used to perform resource requests.
+   proxyUrl? : string; // (optional) -  defines proxy URL that uses to change rootUrl to proxyUrl when getting a relation link.
+}
+```
+
+> This creates default `Resource route` with name `defaultRoute`. You don't need it specify in `@HateoasResource` it would be done by default.
+
+#### Multiple Resource Routes
+
+To configure several `URLs` use `MultipleResourceRoutes`:
+
+```ts
+{
+   [routeName: string]: ResourceRoute;
+}
+```
+After that specify `routerName` on `Resource` decorator `@HateoasResource` in `options` params.
+
+>To specify default `Resource route` use route name `defaultRoute`. This route will used if no route name specified in [@HateoasResource#options](#options) param.
 
 #### Logging params
 
@@ -3387,9 +3473,9 @@ You can set the format for some types.
 
 This format will be used when parse raw `Resource JSON` to determine which `Resource` property type should be used in the result `Resource` instance.
 
-- Define patterns for the `Date` type. 
+- Define patterns for the `Date` type.
   These patterns used when parsed `Resource JSON` and if some `Resource` property match to `Date` pattern then it will have type as `Date` not as raw `string` type.
- You can define array of `Date` patterns then if `Resource` property match to one of them then it will be as `Date` type.
+  You can define array of `Date` patterns then if `Resource` property match to one of them then it will be as `Date` type.
 
 >[date-fns](https://date-fns.org) lib is used as `Date` parser. See date pattern format [here](https://date-fns.org/v2.28.0/docs/parse).
 
@@ -3397,19 +3483,21 @@ This format will be used when parse raw `Resource JSON` to determine which `Reso
 Example:
 ````ts
   typesFormat: {
-  date: {
-    patterns: ['dd/MM/yyyy', 'MM/dd/yyyy'];
-  }
-};
+    date: {
+      patterns: ['dd/MM/yyyy', 'MM/dd/yyyy'];
+    }
+  };
 ````
 
 For the `Resource JSON` like this:
 
 ```json
+{
   "someDate": '23/06/2022',
   "_links": {
     ...
   }
+}
 ```
 
 `Resource` instance will have property `someDate` as type `Date`.

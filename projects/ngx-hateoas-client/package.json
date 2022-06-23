@@ -1,6 +1,6 @@
 {
   "name": "@lagoshny/ngx-hateoas-client",
-  "version": "3.1.1",
+  "version": "3.1.2",
   "description": "This client used to develop `Angular 12+` applications working with RESTfulll server API with HAL/JSON response type (supports server implementation by Spring HATEOAS)",
   "readme": "README.md",
   "license": "MIT",
@@ -12,6 +12,7 @@
   "dependencies": {
     "uri-templates-es": "^1.0.0",
     "lodash-es": "^4.17.21",
+    "date-fns": "^2.28.0",
     "tslib": "^2.1.0"
   },
   "keywords": [

@@ -69,18 +69,20 @@ export class PagedResourceCollectionHttpService extends HttpExecutor {
    * Perform get paged resource collection request with url built by the resource name.
    *
    * @param resourceName used to build root url to the resource
+   * @param resourceSource alias of resource source
    * @param options (optional) options that applied to the request
    * @throws error when required params are not valid
    */
   public getResourcePage<T extends PagedResourceCollection<BaseResource>>(resourceName: string,
+                                                                          resourceSource: string,
                                                                           options?: PagedGetOption): Observable<T> {
     ValidationUtils.validateInputParams({resourceName});
 
-    const url = UrlUtils.removeTemplateParams(UrlUtils.generateResourceUrl(UrlUtils.getApiUrl(), resourceName));
+    const url = UrlUtils.removeTemplateParams(UrlUtils.generateResourceUrl(UrlUtils.getApiUrl(resourceSource), resourceName));
 
     StageLogger.stageLog(Stage.PREPARE_URL, {
       result: url,
-      urlParts: `baseUrl: '${ UrlUtils.getApiUrl() }', resource: '${ resourceName }'`,
+      urlParts: `baseUrl: '${ UrlUtils.getApiUrl(resourceSource) }', resource: '${ resourceName }'`,
       options
     });
 
@@ -91,21 +93,23 @@ export class PagedResourceCollectionHttpService extends HttpExecutor {
    *  Perform search paged resource collection request with url built by the resource name.
    *
    * @param resourceName used to build root url to the resource
+   * @param resourceSource alias of resource source
    * @param searchQuery name of the search method
    * @param options (optional) options that applied to the request
    * @throws error when required params are not valid
    */
   public search<T extends PagedResourceCollection<BaseResource>>(resourceName: string,
+                                                                 resourceSource: string,
                                                                  searchQuery: string,
                                                                  options?: PagedGetOption): Observable<T> {
     ValidationUtils.validateInputParams({resourceName, searchQuery});
 
     const url = UrlUtils.removeTemplateParams(
-      UrlUtils.generateResourceUrl(UrlUtils.getApiUrl(), resourceName)).concat('/search/' + searchQuery);
+      UrlUtils.generateResourceUrl(UrlUtils.getApiUrl(resourceSource), resourceName)).concat('/search/' + searchQuery);
 
     StageLogger.stageLog(Stage.PREPARE_URL, {
       result: url,
-      urlParts: `baseUrl: '${ UrlUtils.getApiUrl() }', resource: '${ resourceName }'`,
+      urlParts: `baseUrl: '${ UrlUtils.getApiUrl(resourceSource) }', resource: '${ resourceName }'`,
       options
     });
 

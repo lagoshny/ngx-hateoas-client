@@ -32,20 +32,26 @@ export class CommonResourceHttpService extends HttpExecutor {
    * {@link PagedResourceCollection} or any data.
    *
    * @param resourceName used to build root url to the resource
+   * @param resourceSource alias of resource source
    * @param method HTTP method that will be perform {@link HttpMethod}
    * @param query url path that applied to the result url at the end
    * @param body (optional) request body
    * @param options (optional) options that applied to the request
    * @throws error when required params are not valid
    */
-  public customQuery(resourceName: string, method: HttpMethod, query: string, body?: any, options?: PagedGetOption): Observable<any> {
+  public customQuery(resourceName: string,
+                     resourceSource: string,
+                     method: HttpMethod,
+                     query: string,
+                     body?: any,
+                     options?: PagedGetOption): Observable<any> {
     ValidationUtils.validateInputParams({resourceName, method, query});
 
-    const url = UrlUtils.generateResourceUrl(UrlUtils.getApiUrl(), resourceName, query);
+    const url = UrlUtils.generateResourceUrl(UrlUtils.getApiUrl(resourceSource), resourceName, query);
 
     StageLogger.stageLog(Stage.PREPARE_URL, {
       result: url,
-      urlParts: `baseUrl: '${ UrlUtils.getApiUrl() }', resource: '${ resourceName }', query: '${ query }'`,
+      urlParts: `baseUrl: '${ UrlUtils.getApiUrl(resourceSource) }', resource: '${ resourceName }', query: '${ query }'`,
       options
     });
 

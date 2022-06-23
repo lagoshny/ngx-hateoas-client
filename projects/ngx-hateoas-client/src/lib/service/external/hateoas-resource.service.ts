@@ -46,7 +46,7 @@ export class HateoasResourceService {
     options = ResourceUtils.fillProjectionNameFromResourceType(resourceType, options);
     StageLogger.resourceBeginLog(resourceName, 'ResourceService GET_RESOURCE', {id, options});
 
-    return this.resourceHttpService.getResource<T>(resourceName, id, options)
+    return this.resourceHttpService.getResource<T>(resourceName, resourceType['__source__'], id, options)
       .pipe(tap(() => {
         StageLogger.resourceEndLog(resourceName, 'ResourceService GET_RESOURCE',
           {result: `get resource '${ resourceName }' was successful`});
@@ -66,7 +66,8 @@ export class HateoasResourceService {
     options = ResourceUtils.fillProjectionNameFromResourceType(resourceType, options);
     StageLogger.resourceBeginLog(resourceName, 'ResourceService GET_COLLECTION', {options});
 
-    return this.resourceCollectionHttpService.getResourceCollection<ResourceCollection<T>>(resourceName, options)
+    return this.resourceCollectionHttpService
+      .getResourceCollection<ResourceCollection<T>>(resourceName, resourceType['__source__'], options)
       .pipe(tap(() => {
         StageLogger.resourceEndLog(resourceName, 'ResourceService GET_COLLECTION',
           {result: `get all resources by '${ resourceName }' was successful`});
@@ -86,7 +87,8 @@ export class HateoasResourceService {
     options = ResourceUtils.fillProjectionNameFromResourceType(resourceType, options);
     StageLogger.resourceBeginLog(resourceName, 'ResourceService GET_PAGE', {options});
 
-    return this.pagedResourceCollectionHttpService.getResourcePage<PagedResourceCollection<T>>(resourceName, options)
+    return this.pagedResourceCollectionHttpService
+      .getResourcePage<PagedResourceCollection<T>>(resourceName, resourceType['__source__'], options)
       .pipe(tap(() => {
         StageLogger.resourceEndLog(resourceName, 'ResourceService GET_PAGE',
           {result: `get all page resources by '${ resourceName }' was successful`});
@@ -110,7 +112,7 @@ export class HateoasResourceService {
 
     const body = ResourceUtils.resolveValues(requestBody);
 
-    return this.resourceHttpService.postResource(resourceName, body, options)
+    return this.resourceHttpService.postResource(resourceName, resourceType['__source__'], body, options)
       .pipe(tap(() => {
         StageLogger.resourceEndLog(resourceName, 'ResourceService CREATE_RESOURCE',
           {result: `resource '${ resourceName }' was created successful`});
@@ -130,7 +132,10 @@ export class HateoasResourceService {
                                             requestBody?: RequestBody<any>,
                                             options?: RequestOption): Observable<T | any> {
     ValidationUtils.validateInputParams({entity});
-    StageLogger.resourceBeginLog(entity, 'ResourceService UPDATE_RESOURCE', {body: requestBody ? requestBody : entity, options});
+    StageLogger.resourceBeginLog(entity, 'ResourceService UPDATE_RESOURCE', {
+      body: requestBody ? requestBody : entity,
+      options
+    });
 
     const resource = ResourceUtils.initResource(entity) as Resource;
     const body = ResourceUtils.resolveValues(requestBody ? requestBody : {body: entity});
@@ -159,11 +164,15 @@ export class HateoasResourceService {
                                                 options?: RequestOption): Observable<T | any> {
     ValidationUtils.validateInputParams({resourceType, id, requestBody});
     const resourceName = resourceType['__resourceName__'];
-    StageLogger.resourceBeginLog(resourceName, 'ResourceService UPDATE_RESOURCE_BY_ID', {id, body: requestBody, options});
+    StageLogger.resourceBeginLog(resourceName, 'ResourceService UPDATE_RESOURCE_BY_ID', {
+      id,
+      body: requestBody,
+      options
+    });
 
     const body = ResourceUtils.resolveValues(requestBody);
 
-    return this.resourceHttpService.putResource(resourceName, id, body, options)
+    return this.resourceHttpService.putResource(resourceName, resourceType['__source__'], id, body, options)
       .pipe(tap(() => {
         StageLogger.resourceEndLog(resourceName, 'ResourceService UPDATE_RESOURCE_BY_ID',
           {result: `resource '${ resourceName }' with id ${ id } was updated successful`});
@@ -185,7 +194,10 @@ export class HateoasResourceService {
                                            requestBody?: RequestBody<any>,
                                            options?: RequestOption): Observable<T | any> {
     ValidationUtils.validateInputParams({entity});
-    StageLogger.resourceBeginLog(entity, 'ResourceService PATCH_RESOURCE', {body: requestBody ? requestBody : entity, options});
+    StageLogger.resourceBeginLog(entity, 'ResourceService PATCH_RESOURCE', {
+      body: requestBody ? requestBody : entity,
+      options
+    });
 
     const resource = ResourceUtils.initResource(entity) as Resource;
     const body = ResourceUtils.resolveValues(requestBody ? requestBody : {body: entity});
@@ -214,11 +226,15 @@ export class HateoasResourceService {
                                                options?: RequestOption): Observable<T | any> {
     ValidationUtils.validateInputParams({resourceType, id, requestBody});
     const resourceName = resourceType['__resourceName__'];
-    StageLogger.resourceBeginLog(resourceName, 'ResourceService PATCH_RESOURCE_BY_ID', {id, body: requestBody, options});
+    StageLogger.resourceBeginLog(resourceName, 'ResourceService PATCH_RESOURCE_BY_ID', {
+      id,
+      body: requestBody,
+      options
+    });
 
     const body = ResourceUtils.resolveValues(requestBody);
 
-    return this.resourceHttpService.patchResource(resourceName, id, body, options)
+    return this.resourceHttpService.patchResource(resourceName, resourceType['__source__'], id, body, options)
       .pipe(tap(() => {
         StageLogger.resourceEndLog(resourceName, 'ResourceService PATCH_RESOURCE_BY_ID',
           {result: `resource '${ resourceName }' with id ${ id } was patched successful`});
@@ -260,7 +276,7 @@ export class HateoasResourceService {
     const resourceName = resourceType['__resourceName__'];
     StageLogger.resourceBeginLog(resourceName, 'ResourceService DELETE_RESOURCE_BY_ID', {id, options});
 
-    return this.resourceHttpService.deleteResource(resourceName, id, options)
+    return this.resourceHttpService.deleteResource(resourceName, resourceType['__source__'], id, options)
       .pipe(tap(() => {
         StageLogger.resourceEndLog(resourceName, 'ResourceService DELETE_RESOURCE_BY_ID',
           {result: `resource '${ resourceName }' with id ${ id } was deleted successful`});
@@ -278,7 +294,7 @@ export class HateoasResourceService {
     options = ResourceUtils.fillProjectionNameFromResourceType(resourceType, options);
     StageLogger.resourceBeginLog(resourceName, 'ResourceService SEARCH_COLLECTION', {query: searchQuery, options});
 
-    return this.resourceCollectionHttpService.search<ResourceCollection<T>>(resourceName, searchQuery, options)
+    return this.resourceCollectionHttpService.search<ResourceCollection<T>>(resourceName, resourceType['__source__'], searchQuery, options)
       .pipe(tap(() => {
         StageLogger.resourceEndLog(resourceName, 'ResourceService SEARCH_COLLECTION',
           {result: `search collection by '${ resourceName }' was performed successful`});
@@ -296,7 +312,8 @@ export class HateoasResourceService {
     options = ResourceUtils.fillProjectionNameFromResourceType(resourceType, options);
     StageLogger.resourceBeginLog(resourceName, 'ResourceService SEARCH_PAGE', {query: searchQuery, options});
 
-    return this.pagedResourceCollectionHttpService.search<PagedResourceCollection<T>>(resourceName, searchQuery, options)
+    return this.pagedResourceCollectionHttpService
+      .search<PagedResourceCollection<T>>(resourceName, resourceType['__source__'], searchQuery, options)
       .pipe(tap(() => {
         StageLogger.resourceEndLog(resourceName, 'ResourceService SEARCH_PAGE',
           {result: `search page by '${ resourceName }' was performed successful`});
@@ -312,7 +329,7 @@ export class HateoasResourceService {
     options = ResourceUtils.fillProjectionNameFromResourceType(resourceType, options);
     StageLogger.resourceBeginLog(resourceName, 'ResourceService SEARCH_SINGLE', {query: searchQuery, options});
 
-    return this.resourceHttpService.search<T>(resourceName, searchQuery, options)
+    return this.resourceHttpService.search<T>(resourceName, resourceType['__source__'], searchQuery, options)
       .pipe(tap(() => {
         StageLogger.resourceEndLog(resourceName, 'ResourceService SEARCH_SINGLE',
           {result: `search single by '${ resourceName }' was performed successful`});
@@ -339,7 +356,7 @@ export class HateoasResourceService {
 
     const body = ResourceUtils.resolveValues(requestBody);
 
-    return this.commonHttpService.customQuery(resourceName, method, query, body, options)
+    return this.commonHttpService.customQuery(resourceName, resourceType['__source__'], method, query, body, options)
       .pipe(tap(() => {
         StageLogger.resourceEndLog(resourceName, 'ResourceService CUSTOM_QUERY',
           {result: `custom query by '${ resourceName }' was performed successful`});
@@ -369,7 +386,7 @@ export class HateoasResourceService {
 
     const body = ResourceUtils.resolveValues(requestBody);
     const query = `/search${ searchQuery.startsWith('/') ? searchQuery : '/' + searchQuery }`;
-    return this.commonHttpService.customQuery(resourceName, method, query, body, options)
+    return this.commonHttpService.customQuery(resourceName, resourceType['__source__'], method, query, body, options)
       .pipe(tap(() => {
         StageLogger.resourceEndLog(resourceName, 'ResourceService CUSTOM_SEARCH_QUERY',
           {result: `custom search query by '${ resourceName }' was performed successful`});

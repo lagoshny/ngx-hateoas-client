@@ -1,13 +1,16 @@
-import { HateoasConfiguration } from './hateoas-configuration.interface';
+import { HateoasConfiguration, HttpConfig, MultiHttpConfig } from './hateoas-configuration.interface';
 
 /**
  * Contains all configuration lib params.
  */
+// tslint:disable:no-string-literal
 export class LibConfig {
 
   public static readonly DEFAULT_CONFIG = {
     http: {
-      rootUrl: 'http://localhost:8080/api/v1'
+      default: {
+        rootUrl: 'http://localhost:8080/api/v1'
+      },
     },
     logs: {
       verboseLogs: false
@@ -35,6 +38,14 @@ export class LibConfig {
       ...LibConfig.DEFAULT_CONFIG,
       ...hateoasConfiguration
     };
+  }
+
+  public static getSourceByAlias(alias: string): HttpConfig {
+    return LibConfig.config.http[alias];
+  }
+
+  public static getSources(): MultiHttpConfig {
+    return LibConfig.config.http as MultiHttpConfig;
   }
 
 }

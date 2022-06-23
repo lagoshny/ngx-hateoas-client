@@ -5,13 +5,16 @@ import { Resource } from './resource/resource';
 import { EmbeddedResource } from './resource/embedded-resource';
 import { BaseResource } from './resource/base-resource';
 
+
+// TODO: Заменить параметры HateoasResource на какой-нибудь интерфейс типа ResourceOptions
 /**
  * Decorator used to classes that extend {@link Resource} class to register 'resourceName' and 'resourceType'
  * information about this resource.
  *
  * @param resourceName resource name which will be used to build a resource URL.
+ * @param source alias of resource source.
  */
-export function HateoasResource(resourceName: string) {
+export function HateoasResource(resourceName: string, source: string = 'default') {
   return <T extends new(...args: any[]) => any>(constructor: T) => {
     if (isNull(resourceName) || isUndefined(resourceName) || !resourceName) {
       throw new Error(`Init resource '${ constructor.name }' error. @HateoasResource decorator param resourceName can not be null/undefined/empty, please pass a valid resourceName.`);
@@ -21,6 +24,7 @@ export function HateoasResource(resourceName: string) {
       throw new Error(`Init resource '${ constructor.name }' error. @HateoasResource decorator applied only to 'Resource' type, you used it with ${ Object.getPrototypeOf(constructor) } type.`);
     }
     constructor['__resourceName__'] = resourceName;
+    constructor['__source__'] = source;
     ResourceUtils.RESOURCE_NAME_TYPE_MAP.set(resourceName.toLowerCase(), constructor);
 
     return constructor;

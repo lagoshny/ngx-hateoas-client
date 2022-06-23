@@ -74,11 +74,12 @@ export class UrlUtils {
    * Generate link url.
    * If proxyUrl is not empty then relation url will be use proxy.
    *
+   * @param source resource source alias
    * @param relationLink resource link to which need to generate the url
    * @param options (optional) additional options that should be applied to the request
    * @throws error when required params are not valid
    */
-  public static generateLinkUrl(relationLink: LinkData, options?: PagedGetOption): string {
+  public static generateLinkUrl(source: string, relationLink: LinkData, options?: PagedGetOption): string {
     ValidationUtils.validateInputParams({relationLink, linkUrl: relationLink?.href});
     let url;
     if (options && !isEmpty(options)) {
@@ -86,8 +87,9 @@ export class UrlUtils {
     } else {
       url = relationLink.templated ? UrlUtils.removeTemplateParams(relationLink.href) : relationLink.href;
     }
-    if (LibConfig.config.http.proxyUrl) {
-      return url.replace(LibConfig.config.http.rootUrl, LibConfig.config.http.proxyUrl);
+    const sourceByAlias = LibConfig.getSourceByAlias(source);
+    if (sourceByAlias.rootUrl) {
+      return url.replace(sourceByAlias.rootUrl, sourceByAlias.proxyUrl);
     }
     return url;
   }
@@ -95,12 +97,30 @@ export class UrlUtils {
   /**
    * Return server api url based on proxy url when it is not empty or root url otherwise.
    */
-  public static getApiUrl(): string {
-    if (LibConfig.config.http.proxyUrl) {
-      return LibConfig.config.http.proxyUrl;
+  public static getApiUrl(source: string): string {
+    const sourceByAlias = LibConfig.getSourceByAlias(source);
+    if (sourceByAlias.proxyUrl) {
+      return sourceByAlias.proxyUrl;
     } else {
-      return LibConfig.config.http.rootUrl;
+      return sourceByAlias.rootUrl;
     }
+  }
+
+  public static identifyApiSource(url: string): string {
+    let source: string;
+    for (const [key, value] of Object.entries(LibConfig.getSources())) {
+      const apiUrl = UrlUtils.getApiUrl(key);
+      if (url.toLowerCase().includes(apiUrl)) {
+        source = apiUrl;
+        break;
+      }
+    }
+
+    if (isEmpty(source)) {
+      throw new Error(`Не удалось определить источник ресурсов по url: ${ url }`);
+    }
+
+    return source;
   }
 
   /**
@@ -129,7 +149,7 @@ export class UrlUtils {
   public static getResourceNameFromUrl(url: string): string {
     ValidationUtils.validateInputParams({url});
 
-    const dividedBySlashUrl = url.toLowerCase().replace(`${ UrlUtils.getApiUrl().toLowerCase() }/`, '').split('/');
+    const dividedBySlashUrl = url.toLowerCase().replace(`${ UrlUtils.identifyApiSource(url) }/`, '').split('/');
     return dividedBySlashUrl[0];
   }
 

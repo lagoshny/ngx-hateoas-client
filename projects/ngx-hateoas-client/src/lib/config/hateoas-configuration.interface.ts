@@ -4,26 +4,36 @@
 import { Resource } from '../model/resource/resource';
 import { EmbeddedResource } from '../model/resource/embedded-resource';
 
+
+export interface HttpConfig {
+  /**
+   * Root server url.
+   *
+   * For default Spring application it looks like: http://localhost:8080.
+   */
+  rootUrl: string;
+  /**
+   * Proxy url on which to send requests.
+   * If passed then it uses to change rootUrl to proxyUrl when get relation link.
+   *
+   * For default Spring application it looks like: http://localhost:8080/api/v1.
+   */
+  proxyUrl?: string;
+}
+
+export interface MultiHttpConfig {
+  /**
+   * Define several resource sources with alias.
+   */
+  [alias: string]: HttpConfig;
+}
+
 export interface HateoasConfiguration {
 
   /**
-   * Http options.
+   * Http options, allowed define several resource sources.
    */
-  http: {
-    /**
-     * Root server url.
-     *
-     * For default Spring application it looks like: http://localhost:8080.
-     */
-    rootUrl: string;
-    /**
-     * Proxy url on which to send requests.
-     * If passed then it uses to change rootUrl to proxyUrl when get relation link.
-     *
-     * For default Spring application it looks like: http://localhost:8080/api/v1.
-     */
-    proxyUrl?: string;
-  };
+  http: HttpConfig | MultiHttpConfig;
 
   /**
    * Logging option.

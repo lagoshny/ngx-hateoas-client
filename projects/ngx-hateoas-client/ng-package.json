@@ -10,6 +10,7 @@
   },
   "allowedNonPeerDependencies": [
     "uri-templates-es",
-    "lodash-es"
+    "lodash-es",
+    "date-fns"
   ]
 }

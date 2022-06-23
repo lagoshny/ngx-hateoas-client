@@ -104,6 +104,7 @@ You can found examples of usage this client with [task-manager-front](https://gi
 6. [Settings](#settings)
 - [Configuration params](#Configuration-params)
 - [UseTypes](#usetypes-params)
+- [TypesFormat](#typesformat)
 - [Cache support](#cache-support)
 - [Logging](#Logging)
 7. [Public classes](#Public-classes)
@@ -3334,6 +3335,17 @@ The library accepts configuration object:
     resources: Array<new (...args: any[]) => Resource>;
     embeddedResources?: Array<new (...args: any[]) => EmbeddedResource>;
   };
+  pagination?: {
+    defaultPage: {
+      size: number;
+      page?: number;
+    }
+  };
+  typesFormat?: {
+    date?: {
+      patterns: Array<string>;
+    }
+  };
   isProduction?: boolean;
 ```
 #### Http params
@@ -3371,6 +3383,38 @@ The same logic applied to [EmbeddedResource](#embeddedresource)'s. Use `useTypes
 
 - `resources` - an array of the [Resource](#resource) types used to create concrete resource types when parsed server's answer instead of common `Resource` type.
 - `embeddedResources` - an array of the [EmbeddedResource](#embeddedresource) types used to create concrete embedded resource types when parsed server's answer instead of common `EmbeddedResource` type.
+
+#### TypesFormat
+You can set the format for some types.
+
+This format will be used when parse raw `Resource JSON` to determine which `Resource` property type should be used in the result `Resource` instance.
+
+- Define patterns for the `Date` type.
+  These patterns used when parsed `Resource JSON` and if some `Resource` property match to `Date` pattern then it will have type as `Date` not as raw `string` type.
+  You can define array of `Date` patterns then if `Resource` property match to one of them then it will be as `Date` type.
+
+>[date-fns](https://date-fns.org) lib is used as `Date` parser. See date pattern format [here](https://date-fns.org/v2.28.0/docs/parse).
+
+
+Example:
+````ts
+  typesFormat: {
+  date: {
+    patterns: ['dd/MM/yyyy', 'MM/dd/yyyy'];
+  }
+};
+````
+
+For the `Resource JSON` like this:
+
+```json
+  "someDate": '23/06/2022',
+  "_links": {
+    ...
+  }
+```
+
+`Resource` instance will have property `someDate` as type `Date`.
 
 #### isProduction param
 Some `hateoas-client` features can change their behaviours depends on this param. For example, [Logging](#logging) disable all `warning` messages when `isProduction` is true.

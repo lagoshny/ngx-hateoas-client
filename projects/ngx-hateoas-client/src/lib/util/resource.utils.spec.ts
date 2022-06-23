@@ -16,6 +16,7 @@ import {
 } from '../model/resource/resources.test';
 import { Include } from '../model/declarations';
 import { HateoasResource } from '../model/decorators';
+import { LibConfig } from '../config/lib-config';
 
 
 /* tslint:disable:no-string-literal */
@@ -26,6 +27,7 @@ describe('ResourceUtils', () => {
     ResourceUtils.useEmbeddedResourceType(EmbeddedResource);
     ResourceUtils.useResourceCollectionType(ResourceCollection);
     ResourceUtils.usePagedResourceCollectionType(PagedResourceCollection);
+    LibConfig.setConfig(LibConfig.DEFAULT_CONFIG);
   });
 
   afterEach(() => {
@@ -192,6 +194,72 @@ describe('ResourceUtils', () => {
 
     const result = ResourceUtils.instantiateResource(rawCaseSensitiveResource);
     expect(result instanceof CaseSensitiveResource3).toBeTrue();
+  });
+
+  it('INSTANTIATE_RESOURCE with Date field as string should be parsed to Date object', () => {
+    LibConfig.config.typesFormat = {
+      date: {
+        patterns: ['dd.MM.yyyy']
+      }
+    };
+
+    const testRawResource = {
+      someDate: '23.06.2022',
+      _links: {
+        self: {
+          href: 'http://localhost:8080/api/v1/testResource/1'
+        },
+        testResource: {
+          href: 'http://localhost:8080/api/v1/testResource/1'
+        }
+      }
+    };
+
+    const result = ResourceUtils.instantiateResource(testRawResource);
+    expect(result instanceof Resource).toBeTrue();
+    expect(result['someDate'] instanceof Date).toBeTrue();
+  });
+
+  it('INSTANTIATE_RESOURCE with Date field as string should be parsed from one of specified Date format', () => {
+    LibConfig.config.typesFormat = {
+      date: {
+        patterns: ['d.MM.yyyy', 'dd.MM.yyyy']
+      }
+    };
+
+    const testRawResource = {
+      someDate: '23.06.2022',
+      _links: {
+        self: {
+          href: 'http://localhost:8080/api/v1/testResource/1'
+        },
+        testResource: {
+          href: 'http://localhost:8080/api/v1/testResource/1'
+        }
+      }
+    };
+
+    const result = ResourceUtils.instantiateResource(testRawResource);
+    expect(result instanceof Resource).toBeTrue();
+    expect(result['someDate'] instanceof Date).toBeTrue();
+  });
+
+  it('INSTANTIATE_RESOURCE with Date field as string result resource filed should be as string without specified Date format', () => {
+    const testRawResource = {
+      someDate: '23.06.2022',
+      _links: {
+        self: {
+          href: 'http://localhost:8080/api/v1/testResource/1'
+        },
+        testResource: {
+          href: 'http://localhost:8080/api/v1/testResource/1'
+        }
+      }
+    };
+
+    const result = ResourceUtils.instantiateResource(testRawResource);
+    expect(result instanceof Resource).toBeTrue();
+    expect(typeof result['someDate'] === 'string').toBeTrue();
   });
 
   it('INSTANTIATE_RESOURCE define resource type should be case insensitive #4', () => {

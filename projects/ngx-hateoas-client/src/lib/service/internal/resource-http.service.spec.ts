@@ -12,6 +12,7 @@ import {
 import { HttpParams } from '@angular/common/http';
 import { LibConfig } from '../../config/lib-config';
 import { UrlUtils } from '../../util/url.utils';
+import { DEFAULT_ROUTE_NAME } from '../../config/hateoas-configuration.interface';
 
 describe('ResourceHttpService', () => {
   let resourceHttpService: ResourceHttpService;
@@ -182,33 +183,33 @@ describe('ResourceHttpService', () => {
   });
 
   it('GET_RESOURCE should throw error when passed resourceName is empty', () => {
-    expect(() => resourceHttpService.getResource('', 2))
+    expect(() => resourceHttpService.getResource('', {routeName: DEFAULT_ROUTE_NAME}, 2))
       .toThrowError(`Passed param(s) 'resourceName = ' is not valid`);
   });
 
   it('GET_RESOURCE should throw error when passed resourceName,id are undefined', () => {
-    expect(() => resourceHttpService.getResource(undefined, undefined))
+    expect(() => resourceHttpService.getResource(undefined, {routeName: DEFAULT_ROUTE_NAME}, undefined))
       .toThrowError(`Passed param(s) 'resourceName = undefined', 'id = undefined' are not valid`);
   });
 
   it('GET_RESOURCE should throw error when passed resourceName,id are null', () => {
-    expect(() => resourceHttpService.getResource(null, null))
+    expect(() => resourceHttpService.getResource(null, {routeName: DEFAULT_ROUTE_NAME}, null))
       .toThrowError(`Passed param(s) 'resourceName = null', 'id = null' are not valid`);
   });
 
   it('GET_RESOURCE should generate resource url', () => {
     httpClientSpy.get.and.returnValue(of(rawResource));
 
-    resourceHttpService.getResource('test', 10).subscribe(() => {
+    resourceHttpService.getResource('test', {routeName: DEFAULT_ROUTE_NAME}, 10).subscribe(() => {
       const url = httpClientSpy.get.calls.argsFor(0)[0];
-      expect(url).toBe(`${ UrlUtils.getApiUrl() }/test/10`);
+      expect(url).toBe(`${ UrlUtils.getApiUrl(DEFAULT_ROUTE_NAME) }/test/10`);
     });
   });
 
   it('GET_RESOURCE should pass http request params when it passed', () => {
     httpClientSpy.get.and.returnValue(of(rawResource));
 
-    resourceHttpService.getResource('test', 5, {
+    resourceHttpService.getResource('test', {routeName: DEFAULT_ROUTE_NAME}, 5, {
       params: {
         projection: 'testProjection',
         test: 'testParam'
@@ -224,33 +225,33 @@ describe('ResourceHttpService', () => {
   });
 
   it('POST_RESOURCE should throw error when passed resourceName is empty', () => {
-    expect(() => resourceHttpService.postResource('', new SimpleResource()))
+    expect(() => resourceHttpService.postResource('', {routeName: DEFAULT_ROUTE_NAME}, new SimpleResource()))
       .toThrowError(`Passed param(s) 'resourceName = ' is not valid`);
   });
 
   it('POST_RESOURCE should throw error when passed resourceName,body are undefined', () => {
-    expect(() => resourceHttpService.postResource(undefined, undefined))
+    expect(() => resourceHttpService.postResource(undefined, {routeName: DEFAULT_ROUTE_NAME}, undefined))
       .toThrowError(`Passed param(s) 'resourceName = undefined', 'body = undefined' are not valid`);
   });
 
   it('POST_RESOURCE should throw error when passed resourceName,body are null', () => {
-    expect(() => resourceHttpService.postResource(null, null))
+    expect(() => resourceHttpService.postResource(null, {routeName: DEFAULT_ROUTE_NAME}, null))
       .toThrowError(`Passed param(s) 'resourceName = null', 'body = null' are not valid`);
   });
 
   it('POST_RESOURCE should generate resource url', () => {
     httpClientSpy.post.and.returnValue(of(rawResource));
 
-    resourceHttpService.postResource('test', new SimpleResource()).subscribe(() => {
+    resourceHttpService.postResource('test', {routeName: DEFAULT_ROUTE_NAME}, new SimpleResource()).subscribe(() => {
       const url = httpClientSpy.post.calls.argsFor(0)[0];
-      expect(url).toBe(`${ UrlUtils.getApiUrl() }/test`);
+      expect(url).toBe(`${ UrlUtils.getApiUrl(DEFAULT_ROUTE_NAME) }/test`);
     });
   });
 
   it('POST_RESOURCE should pass observe "body"', () => {
     httpClientSpy.post.and.returnValue(of(rawResource));
 
-    resourceHttpService.postResource('test', new SimpleResource()).subscribe(() => {
+    resourceHttpService.postResource('test', {routeName: DEFAULT_ROUTE_NAME}, new SimpleResource()).subscribe(() => {
       const observe = httpClientSpy.post.calls.argsFor(0)[2].observe;
       expect(observe).toBe('body');
     });
@@ -259,45 +260,45 @@ describe('ResourceHttpService', () => {
   it('POST_RESOURCE should pass body', () => {
     httpClientSpy.post.and.returnValue(of(rawResource));
 
-    resourceHttpService.postResource('test', new SimpleResource()).subscribe(() => {
+    resourceHttpService.postResource('test', {routeName: DEFAULT_ROUTE_NAME}, new SimpleResource()).subscribe(() => {
       const body = httpClientSpy.post.calls.argsFor(0)[1];
       expect(body).toBeDefined();
     });
   });
 
   it('SEARCH should throw error when passed resourceName is empty', () => {
-    expect(() => resourceHttpService.search('', 'any'))
+    expect(() => resourceHttpService.search('', {routeName: DEFAULT_ROUTE_NAME}, 'any'))
       .toThrowError(`Passed param(s) 'resourceName = ' is not valid`);
   });
 
   it('SEARCH should throw error when passed searchQuery is empty', () => {
-    expect(() => resourceHttpService.search('any', ''))
+    expect(() => resourceHttpService.search('any', {routeName: DEFAULT_ROUTE_NAME}, ''))
       .toThrowError(`Passed param(s) 'searchQuery = ' is not valid`);
   });
 
   it('SEARCH should throw error when passed resourceName,searchQuery are undefined', () => {
-    expect(() => resourceHttpService.search(undefined, undefined))
+    expect(() => resourceHttpService.search(undefined, {routeName: DEFAULT_ROUTE_NAME}, undefined))
       .toThrowError(`Passed param(s) 'resourceName = undefined', 'searchQuery = undefined' are not valid`);
   });
 
   it('SEARCH should throw error when passed resourceName,searchQuery are null', () => {
-    expect(() => resourceHttpService.search(null, null))
+    expect(() => resourceHttpService.search(null, {routeName: DEFAULT_ROUTE_NAME}, null))
       .toThrowError(`Passed param(s) 'resourceName = null', 'searchQuery = null' are not valid`);
   });
 
   it('SEARCH should generate search resource url', () => {
     httpClientSpy.get.and.returnValue(of(rawResource));
 
-    resourceHttpService.search('test', 'someQuery').subscribe(() => {
+    resourceHttpService.search('test', {routeName: DEFAULT_ROUTE_NAME}, 'someQuery').subscribe(() => {
       const url = httpClientSpy.get.calls.argsFor(0)[0];
-      expect(url).toBe(`${ UrlUtils.getApiUrl() }/test/search/someQuery`);
+      expect(url).toBe(`${ UrlUtils.getApiUrl(DEFAULT_ROUTE_NAME) }/test/search/someQuery`);
     });
   });
 
   it('SEARCH should pass http request params when it passed', () => {
     httpClientSpy.get.and.returnValue(of(rawResource));
 
-    resourceHttpService.search('test', 'someQuery', {
+    resourceHttpService.search('test', {routeName: DEFAULT_ROUTE_NAME}, 'someQuery', {
       params: {
         projection: 'testProjection',
         test: 'testParam'

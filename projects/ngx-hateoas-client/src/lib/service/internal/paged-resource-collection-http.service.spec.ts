@@ -13,6 +13,7 @@ import { PagedResourceCollection } from '../../model/resource/paged-resource-col
 import { Resource } from '../../model/resource/resource';
 import { LibConfig } from '../../config/lib-config';
 import { UrlUtils } from '../../util/url.utils';
+import { DEFAULT_ROUTE_NAME } from '../../config/hateoas-configuration.interface';
 
 /* tslint:disable:no-string-literal */
 describe('PagedResourceCollectionHttpService', () => {
@@ -156,33 +157,33 @@ describe('PagedResourceCollectionHttpService', () => {
   });
 
   it('GET_RESOURCE_PAGE throws error when resourceName is empty', () => {
-    expect(() => pagedResourceCollectionHttpService.getResourcePage(''))
+    expect(() => pagedResourceCollectionHttpService.getResourcePage('', {routeName: DEFAULT_ROUTE_NAME}))
       .toThrowError(`Passed param(s) 'resourceName = ' is not valid`);
   });
 
   it('GET_RESOURCE_PAGE throws error when resourceName is null', () => {
-    expect(() => pagedResourceCollectionHttpService.getResourcePage(null))
+    expect(() => pagedResourceCollectionHttpService.getResourcePage(null, {routeName: DEFAULT_ROUTE_NAME}))
       .toThrowError(`Passed param(s) 'resourceName = null' is not valid`);
   });
 
   it('GET_RESOURCE_PAGE throws error when resourceName is undefined', () => {
-    expect(() => pagedResourceCollectionHttpService.getResourcePage(undefined))
+    expect(() => pagedResourceCollectionHttpService.getResourcePage(undefined, {routeName: DEFAULT_ROUTE_NAME}))
       .toThrowError(`Passed param(s) 'resourceName = undefined' is not valid`);
   });
 
   it('GET_RESOURCE_PAGE should generate root resource url', () => {
     httpClientSpy.get.and.returnValue(of(rawPagedResourceCollection));
 
-    pagedResourceCollectionHttpService.getResourcePage('test').subscribe(() => {
+    pagedResourceCollectionHttpService.getResourcePage('test', {routeName: DEFAULT_ROUTE_NAME}).subscribe(() => {
       const url = httpClientSpy.get.calls.argsFor(0)[0];
-      expect(url).toBe(`${ UrlUtils.getApiUrl() }/test`);
+      expect(url).toBe(`${ UrlUtils.getApiUrl(DEFAULT_ROUTE_NAME) }/test`);
     });
   });
 
   it('GET_RESOURCE_PAGE should pass http request params when it passed', () => {
     httpClientSpy.get.and.returnValue(of(rawPagedResourceCollection));
 
-    pagedResourceCollectionHttpService.getResourcePage('test', {
+    pagedResourceCollectionHttpService.getResourcePage('test', {routeName: DEFAULT_ROUTE_NAME}, {
       params: {
         projection: 'testProjection',
         test: 'testParam'
@@ -217,7 +218,7 @@ describe('PagedResourceCollectionHttpService', () => {
   it('GET_RESOURCE_PAGE should use default page options', () => {
     httpClientSpy.get.and.returnValue(of(rawPagedResourceCollection));
 
-    pagedResourceCollectionHttpService.getResourcePage('test', {
+    pagedResourceCollectionHttpService.getResourcePage('test', {routeName: DEFAULT_ROUTE_NAME}, {
       params: {
         projection: 'testProjection',
         test: 'testParam'
@@ -240,7 +241,7 @@ describe('PagedResourceCollectionHttpService', () => {
   it('GET_RESOURCE_PAGE should use default page number options', () => {
     httpClientSpy.get.and.returnValue(of(rawPagedResourceCollection));
 
-    pagedResourceCollectionHttpService.getResourcePage('test', {
+    pagedResourceCollectionHttpService.getResourcePage('test', {routeName: DEFAULT_ROUTE_NAME}, {
       pageParams: {
         size: 10
       }
@@ -256,7 +257,7 @@ describe('PagedResourceCollectionHttpService', () => {
   it('GET_RESOURCE_PAGE should use default page size options', () => {
     httpClientSpy.get.and.returnValue(of(rawPagedResourceCollection));
 
-    pagedResourceCollectionHttpService.getResourcePage('test', {
+    pagedResourceCollectionHttpService.getResourcePage('test', {routeName: DEFAULT_ROUTE_NAME}, {
       pageParams: {
         page: 1
       }
@@ -270,38 +271,38 @@ describe('PagedResourceCollectionHttpService', () => {
   });
 
   it('SEARCH throws error when resourceName is empty', () => {
-    expect(() => pagedResourceCollectionHttpService.search('', 'any'))
+    expect(() => pagedResourceCollectionHttpService.search('', {routeName: DEFAULT_ROUTE_NAME}, 'any'))
       .toThrowError(`Passed param(s) 'resourceName = ' is not valid`);
   });
 
   it('SEARCH throws error when searchQuery is empty', () => {
-    expect(() => pagedResourceCollectionHttpService.search('any', ''))
+    expect(() => pagedResourceCollectionHttpService.search('any', {routeName: DEFAULT_ROUTE_NAME}, ''))
       .toThrowError(`Passed param(s) 'searchQuery = ' is not valid`);
   });
 
   it('SEARCH throws error when resourceName,searchQuery are null', () => {
-    expect(() => pagedResourceCollectionHttpService.search(null, null))
+    expect(() => pagedResourceCollectionHttpService.search(null, {routeName: DEFAULT_ROUTE_NAME}, null))
       .toThrowError(`Passed param(s) 'resourceName = null', 'searchQuery = null' are not valid`);
   });
 
   it('SEARCH throws error when resourceName,searchQuery are undefined', () => {
-    expect(() => pagedResourceCollectionHttpService.search(undefined, undefined))
+    expect(() => pagedResourceCollectionHttpService.search(undefined, {routeName: DEFAULT_ROUTE_NAME}, undefined))
       .toThrowError(`Passed param(s) 'resourceName = undefined', 'searchQuery = undefined' are not valid`);
   });
 
   it('SEARCH should generate search resource url', () => {
     httpClientSpy.get.and.returnValue(of(rawPagedResourceCollection));
 
-    pagedResourceCollectionHttpService.search('test', 'someQuery').subscribe(() => {
+    pagedResourceCollectionHttpService.search('test', {routeName: DEFAULT_ROUTE_NAME}, 'someQuery').subscribe(() => {
       const url = httpClientSpy.get.calls.argsFor(0)[0];
-      expect(url).toBe(`${ UrlUtils.getApiUrl() }/test/search/someQuery`);
+      expect(url).toBe(`${ UrlUtils.getApiUrl(DEFAULT_ROUTE_NAME) }/test/search/someQuery`);
     });
   });
 
   it('SEARCH should pass http request params when it passed', () => {
     httpClientSpy.get.and.returnValue(of(rawPagedResourceCollection));
 
-    pagedResourceCollectionHttpService.search('test', 'someQuery', {
+    pagedResourceCollectionHttpService.search('test', {routeName: DEFAULT_ROUTE_NAME}, 'someQuery', {
       params: {
         projection: 'testProjection',
         test: 'testParam'
@@ -336,7 +337,7 @@ describe('PagedResourceCollectionHttpService', () => {
   it('SEARCH should use default page options', () => {
     httpClientSpy.get.and.returnValue(of(rawPagedResourceCollection));
 
-    pagedResourceCollectionHttpService.search('test', 'someQuery', {
+    pagedResourceCollectionHttpService.search('test', {routeName: DEFAULT_ROUTE_NAME}, 'someQuery', {
       params: {
         projection: 'testProjection',
         test: 'testParam'
@@ -360,7 +361,7 @@ describe('PagedResourceCollectionHttpService', () => {
   it('SEARCH should use default page number options', () => {
     httpClientSpy.get.and.returnValue(of(rawPagedResourceCollection));
 
-    pagedResourceCollectionHttpService.search('test', 'any', {
+    pagedResourceCollectionHttpService.search('test', {routeName: DEFAULT_ROUTE_NAME}, 'any', {
       pageParams: {
         size: 10
       }
@@ -376,7 +377,7 @@ describe('PagedResourceCollectionHttpService', () => {
   it('SEARCH should use default page size options', () => {
     httpClientSpy.get.and.returnValue(of(rawPagedResourceCollection));
 
-    pagedResourceCollectionHttpService.search('test', 'any', {
+    pagedResourceCollectionHttpService.search('test', {routeName: DEFAULT_ROUTE_NAME}, 'any', {
       pageParams: {
         page: 1
       }

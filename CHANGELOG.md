@@ -1,7 +1,7 @@
 ## 3.1.2 (2022-06-23)
 #### Changes
 - Fixed [issue-58](https://github.com/lagoshny/ngx-hateoas-client/issues/58).
-- Added new lib dependency on [momentjs](https://momentjs.com) lib. It allows parsing Dates with formats.
+- Added new lib dependency on [date-fns](https://date-fns.org) lib. It allows parsing Dates with formats.
 - Added new config option that allow to specify Date format.
   This date format will be used to parse `Resource JSON` property with `Date` value as `Date` type object instead of simple string.
   >Read more about this option in [documentation](https://github.com/lagoshny/ngx-hateoas-client#typesformat)

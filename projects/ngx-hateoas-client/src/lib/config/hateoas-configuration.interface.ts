@@ -74,8 +74,8 @@ export interface HateoasConfiguration {
     date?: {
       /**
        * Date pattern.
-       * The {@link https://momentjs.com} lib is used to parse date with patterns, use patterns supported by this lib.
-       * See more about supported formats <a href='https://momentjscom.readthedocs.io/en/latest/moment/04-displaying/01-format/'>here</a>.
+       * The {@link https://date-fns.org} lib is used to parse date with patterns, use patterns supported by this lib.
+       * See more about supported formats <a href='https://date-fns.org/v2.28.0/docs/parse'>here</a>.
        */
       patterns: Array<string>;
     }

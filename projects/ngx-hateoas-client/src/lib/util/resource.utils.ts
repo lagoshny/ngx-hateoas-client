@@ -9,9 +9,9 @@ import { UrlUtils } from './url.utils';
 import { Stage } from '../logger/stage.enum';
 import { StageLogger } from '../logger/stage-logger';
 import { isArray, isEmpty, isNil, isObject, isPlainObject } from 'lodash-es';
-import * as moment from 'moment';
 import { ConsoleLogger } from '../logger/console-logger';
 import { LibConfig } from '../config/lib-config';
+import { isMatch, parse } from 'date-fns';
 
 /* tslint:disable:no-string-literal */
 export class ResourceUtils {
@@ -70,16 +70,18 @@ export class ResourceUtils {
       }
 
       if (LibConfig.config?.typesFormat?.date?.patterns && !isEmpty(LibConfig.config.typesFormat.date.patterns)) {
-        for (const pattern of LibConfig.config.typesFormat.date.patterns) {
-          const momentDate: moment.Moment = moment(payload[key], pattern, true);
-          if (momentDate.isValid()) {
-            payload[key] = momentDate.toDate();
-            break;
+          for (const pattern of LibConfig.config.typesFormat.date.patterns) {
+            if (isMatch(payload[key], pattern)) {
+              const valueAsDate = parse(payload[key], pattern, new Date());
+              if (valueAsDate) {
+                payload[key] = valueAsDate;
+                break;
+              }
+            }
           }
-        }
-        if (payload[key] instanceof Date) {
-          continue;
-        }
+          if (payload[key] instanceof Date) {
+            continue;
+          }
       }
 
       payload[key] = this.resolvePayloadType(key, payload[key], isProjection);

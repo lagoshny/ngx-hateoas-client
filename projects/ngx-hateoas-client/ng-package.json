@@ -7,6 +7,6 @@
   "allowedNonPeerDependencies": [
     "uri-templates-es",
     "lodash-es",
-    "moment"
+    "date-fns"
   ]
 }

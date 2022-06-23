@@ -3392,14 +3392,13 @@ This format will be used when parse raw `Resource JSON` to determine which `Reso
   These patterns used when parsed `Resource JSON` and if some `Resource` property match to `Date` pattern then it will have type as `Date` not as raw `string` type.
   You can define array of `Date` patterns then if `Resource` property match to one of them then it will be as `Date` type.
 
->[MomentJs](https://momentjs.com/) lib is used as `Date` parser. See date pattern rules [here](https://momentjscom.readthedocs.io/en/latest/moment/04-displaying/01-format/)
-
+>[date-fns](https://date-fns.org) lib is used as `Date` parser. See date pattern format [here](https://date-fns.org/v2.28.0/docs/parse).
 
 Example:
 ````ts
   typesFormat: {
     date: {
-      patterns: ['DD/MM/YYYY', 'MM/DD/YYYY'];
+      patterns: ['dd/MM/yyyy', 'MM/dd/yyyy'];
     }
   };
 ````

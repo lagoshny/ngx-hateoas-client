@@ -1,7 +1,7 @@
 import { Injectable, Injector } from '@angular/core';
 import { DependencyInjector } from '../util/dependency-injector';
 import { LibConfig } from './lib-config';
-import { DEFAULT_SOURCE_ALIAS, HateoasConfiguration, HttpConfig } from './hateoas-configuration.interface';
+import { DEFAULT_ROUTE_NAME, HateoasConfiguration, ResourceRoute } from './hateoas-configuration.interface';
 import { ConsoleLogger } from '../logger/console-logger';
 import { ResourceUtils } from '../util/resource.utils';
 import { Resource } from '../model/resource/resource';
@@ -32,7 +32,7 @@ export class NgxHateoasClientConfigurationService {
     ResourceUtils.useEmbeddedResourceType(EmbeddedResource);
   }
 
-  private static isSingleSource(config: HateoasConfiguration): boolean {
+  private static isSimpleRouteConfig(config: HateoasConfiguration): boolean {
     return 'rootUrl' in config.http && isString(config.http['rootUrl']);
   }
 
@@ -42,11 +42,11 @@ export class NgxHateoasClientConfigurationService {
    * @param config suitable client properties needed to properly library work
    */
   public configure(config: HateoasConfiguration): void {
-    if (NgxHateoasClientConfigurationService.isSingleSource(config)) {
+    if (NgxHateoasClientConfigurationService.isSimpleRouteConfig(config)) {
       config = {
         ...config,
         http: {
-          [DEFAULT_SOURCE_ALIAS]: {...config.http as HttpConfig}
+          [DEFAULT_ROUTE_NAME]: {...config.http as ResourceRoute}
         }
       };
     }

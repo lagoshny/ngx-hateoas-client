@@ -4,23 +4,24 @@
 import { Resource } from '../model/resource/resource';
 import { EmbeddedResource } from '../model/resource/embedded-resource';
 
-export const DEFAULT_SOURCE_ALIAS = 'default';
+export const DEFAULT_ROUTE_NAME = 'defaultRoute';
 
 /**
  * Used to specify additional {@link Resource} options.
  */
 export interface ResourceOption {
   /**
-   * Alias of resource source that configured in {@link MultiHttpConfig}.
-   * If you use single {@link HttpConfig} by default alias is 'default'.
+   * Name of the route that configured in {@link HateoasConfiguration#http} as {@link MultipleResourceRoutes}.
+   * If you have single route as simple {@link ResourceRoute} by default route name is 'defaultRoute'.
    */
-  sourceAlias?: string;
+  routeName?: string;
 }
 
 /**
- * Common http config that defined where from retrieve resources.
+ * Resource route config that defined where from retrieve resources.
+ * If you use this config, then a default route with name 'defaultRoute' will be assigned to all resources.
  */
-export interface HttpConfig {
+export interface ResourceRoute {
   /**
    * Root server url.
    *
@@ -37,22 +38,26 @@ export interface HttpConfig {
 }
 
 /**
- * Allow to declare several resource sources with aliases.
+ * Defines several resource routes.
  */
-export interface MultiHttpConfig {
+export interface MultipleResourceRoutes {
   /**
-   * Define several resource sources with aliases.
-   * Alias it key of object. After define alias you can use it in {@link ResourceOption#sourceAlias} to specify resource source.
+   * Each resource route declare as {@link ResourceRoute} object with root and proxy url if need it.
+   * Specified route name use in {@link ResourceOption#routeName} to retrieve resource by this route.
+   *
+   * If you want to declare only one route, you need to use default route name as 'defaultRoute' or use simple {@link ResourceRoute} config.
    */
-  [alias: string]: HttpConfig;
+  [routeName: string]: ResourceRoute;
 }
 
 export interface HateoasConfiguration {
 
   /**
-   * Http options, allowed to define several resource sources using {@link MultiHttpConfig}.
+   * Http options.
+   * {@link ResourceRoute} declare single resource route with default name 'defaultRoute'.
+   * {@link MultipleResourceRoutes} declare several resource routes, to define default route use default route name 'defaultRoute'.
    */
-  http: HttpConfig | MultiHttpConfig;
+  http: ResourceRoute | MultipleResourceRoutes;
 
   /**
    * Logging option.

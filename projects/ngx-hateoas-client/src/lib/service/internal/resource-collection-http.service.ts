@@ -76,11 +76,11 @@ export class ResourceCollectionHttpService extends HttpExecutor {
                                                                            options?: GetOption): Observable<T> {
     ValidationUtils.validateInputParams({resourceName});
 
-    const url = UrlUtils.generateResourceUrl(UrlUtils.getApiUrl(resourceOptions.sourceAlias), resourceName);
+    const url = UrlUtils.generateResourceUrl(UrlUtils.getApiUrl(resourceOptions.routeName), resourceName);
 
     StageLogger.stageLog(Stage.PREPARE_URL, {
       result: url,
-      urlParts: `baseUrl: '${ UrlUtils.getApiUrl(resourceOptions.sourceAlias) }', resource: '${ resourceName }'`,
+      urlParts: `baseUrl: '${ UrlUtils.getApiUrl(resourceOptions.routeName) }', resource: '${ resourceName }'`,
       options
     });
 
@@ -102,12 +102,12 @@ export class ResourceCollectionHttpService extends HttpExecutor {
                                                             options?: GetOption): Observable<T> {
     ValidationUtils.validateInputParams({resourceName, searchQuery});
 
-    const url = UrlUtils.generateResourceUrl(UrlUtils.getApiUrl(resourceOptions.sourceAlias), resourceName)
+    const url = UrlUtils.generateResourceUrl(UrlUtils.getApiUrl(resourceOptions.routeName), resourceName)
       .concat('/search/' + searchQuery);
 
     StageLogger.stageLog(Stage.PREPARE_URL, {
       result: url,
-      urlParts: `baseUrl: '${ UrlUtils.getApiUrl(resourceOptions.sourceAlias) }', resource: '${ resourceName }', searchQuery: '${ searchQuery }'`,
+      urlParts: `baseUrl: '${ UrlUtils.getApiUrl(resourceOptions.routeName) }', resource: '${ resourceName }', searchQuery: '${ searchQuery }'`,
       options
     });
 

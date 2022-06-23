@@ -170,11 +170,11 @@ export class ResourceHttpService extends HttpExecutor {
                                              options?: GetOption): Observable<T> {
     ValidationUtils.validateInputParams({resourceName, id});
 
-    const url = UrlUtils.generateResourceUrl(UrlUtils.getApiUrl(resourceOptions.sourceAlias), resourceName).concat('/', toString(id));
+    const url = UrlUtils.generateResourceUrl(UrlUtils.getApiUrl(resourceOptions.routeName), resourceName).concat('/', toString(id));
 
     StageLogger.stageLog(Stage.PREPARE_URL, {
       result: url,
-      urlParts: `baseUrl: '${ UrlUtils.getApiUrl(resourceOptions.sourceAlias) }', resource: '${ resourceName }', id: '${ id }'`,
+      urlParts: `baseUrl: '${ UrlUtils.getApiUrl(resourceOptions.routeName) }', resource: '${ resourceName }', id: '${ id }'`,
       options
     });
 
@@ -196,11 +196,11 @@ export class ResourceHttpService extends HttpExecutor {
                       options?: RequestOption): Observable<any> {
     ValidationUtils.validateInputParams({resourceName, body});
 
-    const url = UrlUtils.generateResourceUrl(UrlUtils.getApiUrl(resourceOptions.sourceAlias), resourceName);
+    const url = UrlUtils.generateResourceUrl(UrlUtils.getApiUrl(resourceOptions.routeName), resourceName);
 
     StageLogger.stageLog(Stage.PREPARE_URL, {
       result: url,
-      urlParts: `baseUrl: '${ UrlUtils.getApiUrl(resourceOptions.sourceAlias) }', resource: '${ resourceName }'`,
+      urlParts: `baseUrl: '${ UrlUtils.getApiUrl(resourceOptions.routeName) }', resource: '${ resourceName }'`,
       options
     });
 
@@ -224,11 +224,11 @@ export class ResourceHttpService extends HttpExecutor {
                        options?: RequestOption): Observable<any> {
     ValidationUtils.validateInputParams({resourceName, id, body});
 
-    const url = UrlUtils.generateResourceUrl(UrlUtils.getApiUrl(resourceOptions.sourceAlias), resourceName, toString(id));
+    const url = UrlUtils.generateResourceUrl(UrlUtils.getApiUrl(resourceOptions.routeName), resourceName, toString(id));
 
     StageLogger.stageLog(Stage.PREPARE_URL, {
       result: url,
-      urlParts: `baseUrl: '${ UrlUtils.getApiUrl(resourceOptions.sourceAlias) }', resource: '${ resourceName }', resourceId: '${ id }'`,
+      urlParts: `baseUrl: '${ UrlUtils.getApiUrl(resourceOptions.routeName) }', resource: '${ resourceName }', resourceId: '${ id }'`,
       options
     });
 
@@ -252,11 +252,11 @@ export class ResourceHttpService extends HttpExecutor {
                      options?: RequestOption): Observable<any> {
     ValidationUtils.validateInputParams({resourceName, id, body});
 
-    const url = UrlUtils.generateResourceUrl(UrlUtils.getApiUrl(resourceOptions.sourceAlias), resourceName, toString(id));
+    const url = UrlUtils.generateResourceUrl(UrlUtils.getApiUrl(resourceOptions.routeName), resourceName, toString(id));
 
     StageLogger.stageLog(Stage.PREPARE_URL, {
       result: url,
-      urlParts: `baseUrl: '${ UrlUtils.getApiUrl(resourceOptions.sourceAlias) }', resource: '${ resourceName }', resourceId: '${ id }'`,
+      urlParts: `baseUrl: '${ UrlUtils.getApiUrl(resourceOptions.routeName) }', resource: '${ resourceName }', resourceId: '${ id }'`,
       options
     });
 
@@ -278,11 +278,11 @@ export class ResourceHttpService extends HttpExecutor {
                         options?: RequestOption): Observable<any> {
     ValidationUtils.validateInputParams({resourceName, id});
 
-    const url = UrlUtils.generateResourceUrl(UrlUtils.getApiUrl(resourceOptions.sourceAlias), resourceName, toString(id));
+    const url = UrlUtils.generateResourceUrl(UrlUtils.getApiUrl(resourceOptions.routeName), resourceName, toString(id));
 
     StageLogger.stageLog(Stage.PREPARE_URL, {
       result: url,
-      urlParts: `baseUrl: '${ UrlUtils.getApiUrl(resourceOptions.sourceAlias) }', resource: '${ resourceName }', resourceId: '${ id }'`,
+      urlParts: `baseUrl: '${ UrlUtils.getApiUrl(resourceOptions.routeName) }', resource: '${ resourceName }', resourceId: '${ id }'`,
       options
     });
 
@@ -304,12 +304,12 @@ export class ResourceHttpService extends HttpExecutor {
                                         options?: GetOption): Observable<T> {
     ValidationUtils.validateInputParams({resourceName, searchQuery});
 
-    const url = UrlUtils.generateResourceUrl(UrlUtils.getApiUrl(resourceOptions.sourceAlias), resourceName)
+    const url = UrlUtils.generateResourceUrl(UrlUtils.getApiUrl(resourceOptions.routeName), resourceName)
       .concat('/search/' + searchQuery);
 
     StageLogger.stageLog(Stage.PREPARE_URL, {
       result: url,
-      urlParts: `baseUrl: '${ UrlUtils.getApiUrl(resourceOptions.sourceAlias) }', resource: '${ resourceName }', searchQuery: '${ searchQuery }'`,
+      urlParts: `baseUrl: '${ UrlUtils.getApiUrl(resourceOptions.routeName) }', resource: '${ resourceName }', searchQuery: '${ searchQuery }'`,
       options
     });
 

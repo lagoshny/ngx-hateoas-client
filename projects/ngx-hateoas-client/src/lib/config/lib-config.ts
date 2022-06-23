@@ -1,8 +1,8 @@
 import {
-  DEFAULT_SOURCE_ALIAS,
+  DEFAULT_ROUTE_NAME,
   HateoasConfiguration,
-  HttpConfig,
-  MultiHttpConfig
+  MultipleResourceRoutes,
+  ResourceRoute
 } from './hateoas-configuration.interface';
 
 /**
@@ -13,7 +13,7 @@ export class LibConfig {
 
   public static readonly DEFAULT_CONFIG = {
     http: {
-      [DEFAULT_SOURCE_ALIAS]: {
+      [DEFAULT_ROUTE_NAME]: {
         rootUrl: 'http://localhost:8080/api/v1'
       },
     },
@@ -45,12 +45,12 @@ export class LibConfig {
     };
   }
 
-  public static getSourceByAlias(alias: string): HttpConfig {
-    return LibConfig.config.http[alias];
+  public static getRouteByName(routeName: string): ResourceRoute {
+    return LibConfig.config.http[routeName];
   }
 
-  public static getSources(): MultiHttpConfig {
-    return LibConfig.config.http as MultiHttpConfig;
+  public static getRoutes(): MultipleResourceRoutes {
+    return LibConfig.config.http as MultipleResourceRoutes;
   }
 
 }

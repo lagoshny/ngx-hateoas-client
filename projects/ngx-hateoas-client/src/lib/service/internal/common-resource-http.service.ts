@@ -48,11 +48,11 @@ export class CommonResourceHttpService extends HttpExecutor {
                      options?: PagedGetOption): Observable<any> {
     ValidationUtils.validateInputParams({resourceName, method, query});
 
-    const url = UrlUtils.generateResourceUrl(UrlUtils.getApiUrl(resourceOptions.sourceAlias), resourceName, query);
+    const url = UrlUtils.generateResourceUrl(UrlUtils.getApiUrl(resourceOptions.routeName), resourceName, query);
 
     StageLogger.stageLog(Stage.PREPARE_URL, {
       result: url,
-      urlParts: `baseUrl: '${ UrlUtils.getApiUrl(resourceOptions.sourceAlias) }', resource: '${ resourceName }', query: '${ query }'`,
+      urlParts: `baseUrl: '${ UrlUtils.getApiUrl(resourceOptions.routeName) }', resource: '${ resourceName }', query: '${ query }'`,
       options
     });
 

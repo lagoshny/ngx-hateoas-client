@@ -89,49 +89,50 @@ export class UrlUtils {
     } else {
       url = relationLink.templated ? UrlUtils.removeTemplateParams(relationLink.href) : relationLink.href;
     }
-    const sourceByAlias = LibConfig.getSourceByAlias(resourceOptions.sourceAlias);
-    this.checkSource(sourceByAlias, resourceOptions.sourceAlias);
+    const route = LibConfig.getRouteByName(resourceOptions.routeName);
+    this.checkRoute(route, resourceOptions.routeName);
 
-    if (sourceByAlias.proxyUrl) {
-      return url.replace(sourceByAlias.rootUrl, sourceByAlias.proxyUrl);
+    if (route.proxyUrl) {
+      return url.replace(route.rootUrl, route.proxyUrl);
     }
     return url;
   }
 
   /**
    * Return server api url based on proxy url when it is not empty or root url otherwise.
-   * @param sourceAlias resource source alias configured in {@link MultiHttpConfig}.
+   *
+   * @param routeName resource route name that configured in {@link MultipleResourceRoutes}.
    */
-  public static getApiUrl(sourceAlias: string): string {
-    const sourceByAlias = LibConfig.getSourceByAlias(sourceAlias);
-    this.checkSource(sourceByAlias, sourceAlias);
+  public static getApiUrl(routeName: string): string {
+    const route = LibConfig.getRouteByName(routeName);
+    this.checkRoute(route, routeName);
 
-    if (sourceByAlias.proxyUrl) {
-      return sourceByAlias.proxyUrl;
+    if (route.proxyUrl) {
+      return route.proxyUrl;
     } else {
-      return sourceByAlias.rootUrl;
+      return route.rootUrl;
     }
   }
 
   /**
-   * Try to determine resource source by passed resource url.
+   * Try to determine resource route by passed resource url.
    * @param url resource url
    */
-  public static guessResourceSource(url: string): string {
-    let source: string;
-    for (const [key] of Object.entries(LibConfig.getSources())) {
+  public static guessResourceRoute(url: string): string {
+    let route: string;
+    for (const [key] of Object.entries(LibConfig.getRoutes())) {
       const apiUrl = UrlUtils.getApiUrl(key);
       if (url.toLowerCase().includes(apiUrl)) {
-        source = apiUrl;
+        route = apiUrl;
         break;
       }
     }
 
-    if (isEmpty(source)) {
-      throw new Error(`Не удалось определить источник ресурсов по url: ${ url }`);
+    if (isEmpty(route)) {
+      throw new Error(`Не удалось определить resource route по url: ${ url }`);
     }
 
-    return source;
+    return route;
   }
 
   /**
@@ -160,7 +161,7 @@ export class UrlUtils {
   public static getResourceNameFromUrl(url: string): string {
     ValidationUtils.validateInputParams({url});
 
-    const dividedBySlashUrl = url.toLowerCase().replace(`${ UrlUtils.guessResourceSource(url) }/`, '').split('/');
+    const dividedBySlashUrl = url.toLowerCase().replace(`${ UrlUtils.guessResourceRoute(url) }/`, '').split('/');
     return dividedBySlashUrl[0];
   }
 
@@ -253,11 +254,12 @@ export class UrlUtils {
     }
   }
 
-  private static checkSource(sourceByAlias: object, alias: string) {
-    if (isEmpty(sourceByAlias)) {
-      ConsoleLogger.warn(`No Resource sources found by alias: '${alias}'. Check you configuration. Read more about this ...`, {
-        availableSources : LibConfig.getSources()
+  private static checkRoute(route: object, routeName: string) {
+    if (isEmpty(route)) {
+      ConsoleLogger.error(`No Resource route found by name: '${ routeName }'. Check you configuration. Read more about this ...`, {
+        availableRoutes: LibConfig.getRoutes()
       });
+      throw Error(`No Resource route found by name: '${routeName}'.`);
     }
   }
 

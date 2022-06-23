@@ -199,7 +199,7 @@ describe('ResourceUtils', () => {
   it('INSTANTIATE_RESOURCE with Date field as string should be parsed to Date object', () => {
     LibConfig.config.typesFormat = {
       date: {
-        patterns: ['DD.MM.YYYY']
+        patterns: ['dd.MM.yyyy']
       }
     };
 
@@ -223,7 +223,7 @@ describe('ResourceUtils', () => {
   it('INSTANTIATE_RESOURCE with Date field as string should be parsed from one of specified Date format', () => {
     LibConfig.config.typesFormat = {
       date: {
-        patterns: ['D.MM.YYYY', 'DD.MM.YYYY']
+        patterns: ['d.MM.yyyy', 'dd.MM.yyyy']
       }
     };
 

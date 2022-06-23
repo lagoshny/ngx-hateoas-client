@@ -1,4 +1,9 @@
-import { HateoasConfiguration, HttpConfig, MultiHttpConfig } from './hateoas-configuration.interface';
+import {
+  DEFAULT_SOURCE_ALIAS,
+  HateoasConfiguration,
+  HttpConfig,
+  MultiHttpConfig
+} from './hateoas-configuration.interface';
 
 /**
  * Contains all configuration lib params.
@@ -8,7 +13,7 @@ export class LibConfig {
 
   public static readonly DEFAULT_CONFIG = {
     http: {
-      default: {
+      [DEFAULT_SOURCE_ALIAS]: {
         rootUrl: 'http://localhost:8080/api/v1'
       },
     },

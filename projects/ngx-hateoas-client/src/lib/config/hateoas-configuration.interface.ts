@@ -4,7 +4,22 @@
 import { Resource } from '../model/resource/resource';
 import { EmbeddedResource } from '../model/resource/embedded-resource';
 
+export const DEFAULT_SOURCE_ALIAS = 'default';
 
+/**
+ * Used to specify additional {@link Resource} options.
+ */
+export interface ResourceOption {
+  /**
+   * Alias of resource source that configured in {@link MultiHttpConfig}.
+   * If you use single {@link HttpConfig} by default alias is 'default'.
+   */
+  sourceAlias?: string;
+}
+
+/**
+ * Common http config that defined where from retrieve resources.
+ */
 export interface HttpConfig {
   /**
    * Root server url.
@@ -21,9 +36,13 @@ export interface HttpConfig {
   proxyUrl?: string;
 }
 
+/**
+ * Allow to declare several resource sources with aliases.
+ */
 export interface MultiHttpConfig {
   /**
-   * Define several resource sources with alias.
+   * Define several resource sources with aliases.
+   * Alias it key of object. After define alias you can use it in {@link ResourceOption#sourceAlias} to specify resource source.
    */
   [alias: string]: HttpConfig;
 }
@@ -31,7 +50,7 @@ export interface MultiHttpConfig {
 export interface HateoasConfiguration {
 
   /**
-   * Http options, allowed define several resource sources.
+   * Http options, allowed to define several resource sources using {@link MultiHttpConfig}.
    */
   http: HttpConfig | MultiHttpConfig;
 

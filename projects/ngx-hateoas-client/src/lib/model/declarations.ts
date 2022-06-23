@@ -3,6 +3,9 @@ import { BaseResource } from './resource/base-resource';
 import { EmbeddedResource } from './resource/embedded-resource';
 import { HttpHeaders, HttpParams } from '@angular/common/http';
 
+export const RESOURCE_NAME_PROP = '__resourceName__';
+export const RESOURCE_OPTIONS_PROP = '__options__';
+
 /**
  * Resource link object.
  */

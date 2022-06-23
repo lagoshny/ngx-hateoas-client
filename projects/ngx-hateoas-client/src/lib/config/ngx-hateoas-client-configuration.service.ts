@@ -1,7 +1,7 @@
 import { Injectable, Injector } from '@angular/core';
 import { DependencyInjector } from '../util/dependency-injector';
 import { LibConfig } from './lib-config';
-import { HateoasConfiguration, HttpConfig } from './hateoas-configuration.interface';
+import { DEFAULT_SOURCE_ALIAS, HateoasConfiguration, HttpConfig } from './hateoas-configuration.interface';
 import { ConsoleLogger } from '../logger/console-logger';
 import { ResourceUtils } from '../util/resource.utils';
 import { Resource } from '../model/resource/resource';
@@ -9,7 +9,7 @@ import { ResourceCollection } from '../model/resource/resource-collection';
 import { EmbeddedResource } from '../model/resource/embedded-resource';
 import { PagedResourceCollection } from '../model/resource/paged-resource-collection';
 import { ValidationUtils } from '../util/validation.utils';
-import { isObject } from 'lodash-es';
+import { isString } from 'lodash-es';
 
 /**
  * This service for configuration library.
@@ -33,7 +33,7 @@ export class NgxHateoasClientConfigurationService {
   }
 
   private static isSingleSource(config: HateoasConfiguration): boolean {
-    return 'rootUrl' in config.http && isObject(config.http['rootUrl']);
+    return 'rootUrl' in config.http && isString(config.http['rootUrl']);
   }
 
   /**
@@ -46,27 +46,16 @@ export class NgxHateoasClientConfigurationService {
       config = {
         ...config,
         http: {
-          default: {...config.http as HttpConfig}
+          [DEFAULT_SOURCE_ALIAS]: {...config.http as HttpConfig}
         }
       };
     }
-
-    for (const [key, value] of Object.entries(config.http)) {
+    for (const [, value] of Object.entries(config.http)) {
       ValidationUtils.validateInputParams({config, baseApi: value.rootUrl});
     }
-
-    // const httpParams: Array<HttpConfig> = [];
-    // if (isArray(config?.http)) {
-    //   ValidationUtils.validateInputParams({config, baseApi: config?.http[0]?.rootUrl});
-    //   httpParams.push(...config?.http);
-    // } else {
-    //   ValidationUtils.validateInputParams({config, baseApi: config?.http?.rootUrl});
-    //   httpParams.push(config?.http);
-    // }
     LibConfig.setConfig(config);
 
-    // TODO: проверить на нескольких урлах
-    ConsoleLogger.prettyInfo('HateoasClient was configured with options', config.http);
+    ConsoleLogger.objectPrettyInfo('HateoasClient was configured with options', config);
   }
 
 }

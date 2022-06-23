@@ -4,17 +4,18 @@ import { isArray, isEmpty, isNull, isUndefined } from 'lodash-es';
 import { Resource } from './resource/resource';
 import { EmbeddedResource } from './resource/embedded-resource';
 import { BaseResource } from './resource/base-resource';
+import { DEFAULT_SOURCE_ALIAS, ResourceOption } from '../config/hateoas-configuration.interface';
+import { RESOURCE_NAME_PROP, RESOURCE_OPTIONS_PROP } from './declarations';
 
 
-// TODO: Заменить параметры HateoasResource на какой-нибудь интерфейс типа ResourceOptions
 /**
  * Decorator used to classes that extend {@link Resource} class to register 'resourceName' and 'resourceType'
  * information about this resource.
  *
  * @param resourceName resource name which will be used to build a resource URL.
- * @param source alias of resource source.
+ * @param options additional resource options see more {@link ResourceOption}.
  */
-export function HateoasResource(resourceName: string, source: string = 'default') {
+export function HateoasResource(resourceName: string, options: ResourceOption = {sourceAlias: DEFAULT_SOURCE_ALIAS}) {
   return <T extends new(...args: any[]) => any>(constructor: T) => {
     if (isNull(resourceName) || isUndefined(resourceName) || !resourceName) {
       throw new Error(`Init resource '${ constructor.name }' error. @HateoasResource decorator param resourceName can not be null/undefined/empty, please pass a valid resourceName.`);
@@ -23,8 +24,8 @@ export function HateoasResource(resourceName: string, source: string = 'default'
     if (!isInstanceOfParent(constructor, Resource)) {
       throw new Error(`Init resource '${ constructor.name }' error. @HateoasResource decorator applied only to 'Resource' type, you used it with ${ Object.getPrototypeOf(constructor) } type.`);
     }
-    constructor['__resourceName__'] = resourceName;
-    constructor['__source__'] = source;
+    constructor[RESOURCE_NAME_PROP] = resourceName;
+    constructor[RESOURCE_OPTIONS_PROP] = options;
     ResourceUtils.RESOURCE_NAME_TYPE_MAP.set(resourceName.toLowerCase(), constructor);
 
     return constructor;
@@ -72,9 +73,10 @@ export function HateoasProjection(resourceType: new() => Resource, projectionNam
     if (!isInstanceOfParent(constructor, Resource)) {
       throw new Error(`Init resource projection '${ constructor.name }' error. @HateoasProjection decorator applied only to 'Resource' type, you used it with ${ Object.getPrototypeOf(constructor) } type.`);
     }
-    constructor['__resourceName__'] = resourceType['__resourceName__'];
+    constructor[RESOURCE_NAME_PROP] = resourceType[RESOURCE_NAME_PROP];
+    constructor[RESOURCE_OPTIONS_PROP] = resourceType[RESOURCE_OPTIONS_PROP];
     constructor['__projectionName__'] = projectionName;
-    ResourceUtils.RESOURCE_NAME_PROJECTION_TYPE_MAP.set(resourceType['__resourceName__'].toLowerCase(), constructor);
+    ResourceUtils.RESOURCE_NAME_PROJECTION_TYPE_MAP.set(resourceType[RESOURCE_NAME_PROP].toLowerCase(), constructor);
 
     return constructor;
   };

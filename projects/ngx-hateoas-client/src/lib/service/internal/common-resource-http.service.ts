@@ -11,6 +11,7 @@ import { Stage } from '../../logger/stage.enum';
 import { StageLogger } from '../../logger/stage-logger';
 import { ValidationUtils } from '../../util/validation.utils';
 import { ResourceCacheService } from './cache/resource-cache.service';
+import { ResourceOption } from '../../config/hateoas-configuration.interface';
 
 /**
  * Service to perform HTTP requests to get any type of the {@link Resource}, {@link PagedResourceCollection}, {@link ResourceCollection}.
@@ -32,7 +33,7 @@ export class CommonResourceHttpService extends HttpExecutor {
    * {@link PagedResourceCollection} or any data.
    *
    * @param resourceName used to build root url to the resource
-   * @param resourceSource alias of resource source
+   * @param resourceOptions additional resource options {@link ResourceOption}
    * @param method HTTP method that will be perform {@link HttpMethod}
    * @param query url path that applied to the result url at the end
    * @param body (optional) request body
@@ -40,18 +41,18 @@ export class CommonResourceHttpService extends HttpExecutor {
    * @throws error when required params are not valid
    */
   public customQuery(resourceName: string,
-                     resourceSource: string,
+                     resourceOptions: ResourceOption,
                      method: HttpMethod,
                      query: string,
                      body?: any,
                      options?: PagedGetOption): Observable<any> {
     ValidationUtils.validateInputParams({resourceName, method, query});
 
-    const url = UrlUtils.generateResourceUrl(UrlUtils.getApiUrl(resourceSource), resourceName, query);
+    const url = UrlUtils.generateResourceUrl(UrlUtils.getApiUrl(resourceOptions.sourceAlias), resourceName, query);
 
     StageLogger.stageLog(Stage.PREPARE_URL, {
       result: url,
-      urlParts: `baseUrl: '${ UrlUtils.getApiUrl(resourceSource) }', resource: '${ resourceName }', query: '${ query }'`,
+      urlParts: `baseUrl: '${ UrlUtils.getApiUrl(resourceOptions.sourceAlias) }', resource: '${ resourceName }', query: '${ query }'`,
       options
     });
 

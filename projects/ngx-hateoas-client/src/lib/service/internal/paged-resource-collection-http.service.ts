@@ -16,6 +16,7 @@ import { Stage } from '../../logger/stage.enum';
 import { ValidationUtils } from '../../util/validation.utils';
 import { CacheKey } from './cache/model/cache-key';
 import { ResourceCacheService } from './cache/resource-cache.service';
+import { ResourceOption } from '../../config/hateoas-configuration.interface';
 
 /**
  * Get instance of the PagedResourceCollectionHttpService by Angular DependencyInjector.
@@ -69,20 +70,20 @@ export class PagedResourceCollectionHttpService extends HttpExecutor {
    * Perform get paged resource collection request with url built by the resource name.
    *
    * @param resourceName used to build root url to the resource
-   * @param resourceSource alias of resource source
+   * @param resourceOptions additional resource options {@link ResourceOption}
    * @param options (optional) options that applied to the request
    * @throws error when required params are not valid
    */
   public getResourcePage<T extends PagedResourceCollection<BaseResource>>(resourceName: string,
-                                                                          resourceSource: string,
+                                                                          resourceOptions: ResourceOption,
                                                                           options?: PagedGetOption): Observable<T> {
     ValidationUtils.validateInputParams({resourceName});
 
-    const url = UrlUtils.removeTemplateParams(UrlUtils.generateResourceUrl(UrlUtils.getApiUrl(resourceSource), resourceName));
+    const url = UrlUtils.removeTemplateParams(UrlUtils.generateResourceUrl(UrlUtils.getApiUrl(resourceOptions.sourceAlias), resourceName));
 
     StageLogger.stageLog(Stage.PREPARE_URL, {
       result: url,
-      urlParts: `baseUrl: '${ UrlUtils.getApiUrl(resourceSource) }', resource: '${ resourceName }'`,
+      urlParts: `baseUrl: '${ UrlUtils.getApiUrl(resourceOptions.sourceAlias) }', resource: '${ resourceName }'`,
       options
     });
 
@@ -93,23 +94,23 @@ export class PagedResourceCollectionHttpService extends HttpExecutor {
    *  Perform search paged resource collection request with url built by the resource name.
    *
    * @param resourceName used to build root url to the resource
-   * @param resourceSource alias of resource source
+   * @param resourceOptions additional resource options {@link ResourceOption}
    * @param searchQuery name of the search method
    * @param options (optional) options that applied to the request
    * @throws error when required params are not valid
    */
   public search<T extends PagedResourceCollection<BaseResource>>(resourceName: string,
-                                                                 resourceSource: string,
+                                                                 resourceOptions: ResourceOption,
                                                                  searchQuery: string,
                                                                  options?: PagedGetOption): Observable<T> {
     ValidationUtils.validateInputParams({resourceName, searchQuery});
 
     const url = UrlUtils.removeTemplateParams(
-      UrlUtils.generateResourceUrl(UrlUtils.getApiUrl(resourceSource), resourceName)).concat('/search/' + searchQuery);
+      UrlUtils.generateResourceUrl(UrlUtils.getApiUrl(resourceOptions.sourceAlias), resourceName)).concat('/search/' + searchQuery);
 
     StageLogger.stageLog(Stage.PREPARE_URL, {
       result: url,
-      urlParts: `baseUrl: '${ UrlUtils.getApiUrl(resourceSource) }', resource: '${ resourceName }'`,
+      urlParts: `baseUrl: '${ UrlUtils.getApiUrl(resourceOptions.sourceAlias) }', resource: '${ resourceName }'`,
       options
     });
 

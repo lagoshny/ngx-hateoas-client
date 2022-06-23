@@ -6,6 +6,8 @@ import { ValidationUtils } from './validation.utils';
 import { LibConfig } from '../config/lib-config';
 import { isArray, isEmpty, isNil, isObject, toString } from 'lodash-es';
 import { UriTemplate } from 'uri-templates-es';
+import { ResourceOption } from '../config/hateoas-configuration.interface';
+import { ConsoleLogger } from '../logger/console-logger';
 
 export class UrlUtils {
 
@@ -74,12 +76,12 @@ export class UrlUtils {
    * Generate link url.
    * If proxyUrl is not empty then relation url will be use proxy.
    *
-   * @param source resource source alias
+   * @param resourceOptions additional resource options {@link ResourceOption}
    * @param relationLink resource link to which need to generate the url
    * @param options (optional) additional options that should be applied to the request
    * @throws error when required params are not valid
    */
-  public static generateLinkUrl(source: string, relationLink: LinkData, options?: PagedGetOption): string {
+  public static generateLinkUrl(resourceOptions: ResourceOption, relationLink: LinkData, options?: PagedGetOption): string {
     ValidationUtils.validateInputParams({relationLink, linkUrl: relationLink?.href});
     let url;
     if (options && !isEmpty(options)) {
@@ -87,8 +89,10 @@ export class UrlUtils {
     } else {
       url = relationLink.templated ? UrlUtils.removeTemplateParams(relationLink.href) : relationLink.href;
     }
-    const sourceByAlias = LibConfig.getSourceByAlias(source);
-    if (sourceByAlias.rootUrl) {
+    const sourceByAlias = LibConfig.getSourceByAlias(resourceOptions.sourceAlias);
+    this.checkSource(sourceByAlias, resourceOptions.sourceAlias);
+
+    if (sourceByAlias.proxyUrl) {
       return url.replace(sourceByAlias.rootUrl, sourceByAlias.proxyUrl);
     }
     return url;
@@ -96,9 +100,12 @@ export class UrlUtils {
 
   /**
    * Return server api url based on proxy url when it is not empty or root url otherwise.
+   * @param sourceAlias resource source alias configured in {@link MultiHttpConfig}.
    */
-  public static getApiUrl(source: string): string {
-    const sourceByAlias = LibConfig.getSourceByAlias(source);
+  public static getApiUrl(sourceAlias: string): string {
+    const sourceByAlias = LibConfig.getSourceByAlias(sourceAlias);
+    this.checkSource(sourceByAlias, sourceAlias);
+
     if (sourceByAlias.proxyUrl) {
       return sourceByAlias.proxyUrl;
     } else {
@@ -106,9 +113,13 @@ export class UrlUtils {
     }
   }
 
-  public static identifyApiSource(url: string): string {
+  /**
+   * Try to determine resource source by passed resource url.
+   * @param url resource url
+   */
+  public static guessResourceSource(url: string): string {
     let source: string;
-    for (const [key, value] of Object.entries(LibConfig.getSources())) {
+    for (const [key] of Object.entries(LibConfig.getSources())) {
       const apiUrl = UrlUtils.getApiUrl(key);
       if (url.toLowerCase().includes(apiUrl)) {
         source = apiUrl;
@@ -149,7 +160,7 @@ export class UrlUtils {
   public static getResourceNameFromUrl(url: string): string {
     ValidationUtils.validateInputParams({url});
 
-    const dividedBySlashUrl = url.toLowerCase().replace(`${ UrlUtils.identifyApiSource(url) }/`, '').split('/');
+    const dividedBySlashUrl = url.toLowerCase().replace(`${ UrlUtils.guessResourceSource(url) }/`, '').split('/');
     return dividedBySlashUrl[0];
   }
 
@@ -239,6 +250,14 @@ export class UrlUtils {
     }
     if ('page' in options.params || 'size' in options.params) {
       throw Error('Please, pass page params in page object key, not with params object!');
+    }
+  }
+
+  private static checkSource(sourceByAlias: object, alias: string) {
+    if (isEmpty(sourceByAlias)) {
+      ConsoleLogger.warn(`No Resource sources found by alias: '${alias}'. Check you configuration. Read more about this ...`, {
+        availableSources : LibConfig.getSources()
+      });
     }
   }
 

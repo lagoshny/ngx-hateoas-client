@@ -16,6 +16,7 @@ import { Stage } from '../../logger/stage.enum';
 import { ValidationUtils } from '../../util/validation.utils';
 import { CacheKey } from './cache/model/cache-key';
 import { ResourceCacheService } from './cache/resource-cache.service';
+import { ResourceOption } from '../../config/hateoas-configuration.interface';
 
 export function getResourceCollectionHttpService(): ResourceCollectionHttpService {
   return DependencyInjector.get(ResourceCollectionHttpService);
@@ -66,20 +67,20 @@ export class ResourceCollectionHttpService extends HttpExecutor {
    * Perform get resource collection request with url built by the resource name.
    *
    * @param resourceName used to build root url to the resource
-   * @param resourceSource alias of resource source
+   * @param resourceOptions additional resource options {@link ResourceOption}
    * @param options (optional) options that applied to the request
    * @throws error when required params are not valid
    */
   public getResourceCollection<T extends ResourceCollection<BaseResource>>(resourceName: string,
-                                                                           resourceSource: string,
+                                                                           resourceOptions: ResourceOption,
                                                                            options?: GetOption): Observable<T> {
     ValidationUtils.validateInputParams({resourceName});
 
-    const url = UrlUtils.generateResourceUrl(UrlUtils.getApiUrl(resourceSource), resourceName);
+    const url = UrlUtils.generateResourceUrl(UrlUtils.getApiUrl(resourceOptions.sourceAlias), resourceName);
 
     StageLogger.stageLog(Stage.PREPARE_URL, {
       result: url,
-      urlParts: `baseUrl: '${ UrlUtils.getApiUrl(resourceSource) }', resource: '${ resourceName }'`,
+      urlParts: `baseUrl: '${ UrlUtils.getApiUrl(resourceOptions.sourceAlias) }', resource: '${ resourceName }'`,
       options
     });
 
@@ -90,22 +91,23 @@ export class ResourceCollectionHttpService extends HttpExecutor {
    *  Perform search resource collection request with url built by the resource name.
    *
    * @param resourceName used to build root url to the resource
-   * @param resourceSource alias of resource source
+   * @param resourceOptions additional resource options {@link ResourceOption}
    * @param searchQuery name of the search method
    * @param options (optional) options that applied to the request
    * @throws error when required params are not valid
    */
   public search<T extends ResourceCollection<BaseResource>>(resourceName: string,
-                                                            resourceSource: string,
+                                                            resourceOptions: ResourceOption,
                                                             searchQuery: string,
                                                             options?: GetOption): Observable<T> {
     ValidationUtils.validateInputParams({resourceName, searchQuery});
 
-    const url = UrlUtils.generateResourceUrl(UrlUtils.getApiUrl(resourceSource), resourceName).concat('/search/' + searchQuery);
+    const url = UrlUtils.generateResourceUrl(UrlUtils.getApiUrl(resourceOptions.sourceAlias), resourceName)
+      .concat('/search/' + searchQuery);
 
     StageLogger.stageLog(Stage.PREPARE_URL, {
       result: url,
-      urlParts: `baseUrl: '${ UrlUtils.getApiUrl(resourceSource) }', resource: '${ resourceName }', searchQuery: '${ searchQuery }'`,
+      urlParts: `baseUrl: '${ UrlUtils.getApiUrl(resourceOptions.sourceAlias) }', resource: '${ resourceName }', searchQuery: '${ searchQuery }'`,
       options
     });
 

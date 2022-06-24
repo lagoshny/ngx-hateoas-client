@@ -112,7 +112,7 @@ describe('HateoasResourceService', () => {
 
     hateoasResourceService.createResource(ResourceWithRelation, {body: resourceWithRelation})
       .subscribe(() => {
-        const body = resourceHttpServiceSpy.postResource.calls.argsFor(0)[1];
+        const body = resourceHttpServiceSpy.postResource.calls.argsFor(0)[2];
         expect(body).toBeDefined();
         expect(body.relation).toBe('http://localhost:8080/api/v1/resourceRelation/1');
       });
@@ -136,7 +136,7 @@ describe('HateoasResourceService', () => {
 
     hateoasResourceService.createResource(ResourceWithRelation, {body: resourceWithRelation}, requestOption)
       .subscribe(() => {
-        const options = resourceHttpServiceSpy.postResource.calls.argsFor(0)[2] as RequestOption;
+        const options = resourceHttpServiceSpy.postResource.calls.argsFor(0)[3] as RequestOption;
         expect(options).toEqual(requestOption);
       });
   });
@@ -245,7 +245,7 @@ describe('HateoasResourceService', () => {
 
     hateoasResourceService.updateResourceById(ResourceWithRelation, 1, {body: resourceWithRelation})
       .subscribe(() => {
-        const body = resourceHttpServiceSpy.putResource.calls.argsFor(0)[2];
+        const body = resourceHttpServiceSpy.putResource.calls.argsFor(0)[3];
         expect(body).toBeDefined();
         expect(body.relation).toBe('http://localhost:8080/api/v1/resourceRelation/1');
       });
@@ -261,7 +261,7 @@ describe('HateoasResourceService', () => {
       valuesOption: {include: Include.NULL_VALUES}
     })
       .subscribe(() => {
-        const body = resourceHttpServiceSpy.putResource.calls.argsFor(0)[2];
+        const body = resourceHttpServiceSpy.putResource.calls.argsFor(0)[3];
         expect(body).toBeDefined();
         expect(body.name).toBeNull();
       });
@@ -285,7 +285,7 @@ describe('HateoasResourceService', () => {
 
     hateoasResourceService.updateResourceById(ResourceWithRelation, 1, {body: resourceWithRelation}, requestOption)
       .subscribe(() => {
-        const options = resourceHttpServiceSpy.putResource.calls.argsFor(0)[3] as RequestOption;
+        const options = resourceHttpServiceSpy.putResource.calls.argsFor(0)[4] as RequestOption;
         expect(options).toEqual(requestOption);
       });
   });
@@ -395,7 +395,7 @@ describe('HateoasResourceService', () => {
 
     hateoasResourceService.patchResourceById(ResourceWithRelation, 1, {body: resourceWithRelation})
       .subscribe(() => {
-        const body = resourceHttpServiceSpy.patchResource.calls.argsFor(0)[2];
+        const body = resourceHttpServiceSpy.patchResource.calls.argsFor(0)[3];
         expect(body).toBeDefined();
         expect(body.relation).toBe('http://localhost:8080/api/v1/resourceRelation/1');
       });
@@ -411,7 +411,7 @@ describe('HateoasResourceService', () => {
       valuesOption: {include: Include.NULL_VALUES}
     })
       .subscribe(() => {
-        const body = resourceHttpServiceSpy.patchResource.calls.argsFor(0)[2];
+        const body = resourceHttpServiceSpy.patchResource.calls.argsFor(0)[3];
         expect(body).toBeDefined();
         expect(body.name).toBeNull();
       });
@@ -435,7 +435,7 @@ describe('HateoasResourceService', () => {
 
     hateoasResourceService.patchResourceById(ResourceWithRelation, 1, {body: resourceWithRelation}, requestOption)
       .subscribe(() => {
-        const options = resourceHttpServiceSpy.patchResource.calls.argsFor(0)[3] as RequestOption;
+        const options = resourceHttpServiceSpy.patchResource.calls.argsFor(0)[4] as RequestOption;
         expect(options).toEqual(requestOption);
       });
   });
@@ -527,7 +527,7 @@ describe('HateoasResourceService', () => {
 
     hateoasResourceService.deleteResourceById(SimpleResource, 1, {params: {test: 'param'}})
       .subscribe(() => {
-        const params = resourceHttpServiceSpy.deleteResource.calls.argsFor(0)[2].params as RequestParam;
+        const params = resourceHttpServiceSpy.deleteResource.calls.argsFor(0)[3].params as RequestParam;
         expect(params).toBeDefined();
         expect(params.test).toBe('param');
       });
@@ -538,7 +538,7 @@ describe('HateoasResourceService', () => {
 
     hateoasResourceService.deleteResourceById(SimpleResource, 1, {observe: 'response'})
       .subscribe(() => {
-        const observe = resourceHttpServiceSpy.deleteResource.calls.argsFor(0)[2].observe;
+        const observe = resourceHttpServiceSpy.deleteResource.calls.argsFor(0)[3].observe;
         expect(observe).toBeDefined();
         expect(observe).toBe('response');
       });
@@ -560,7 +560,7 @@ describe('HateoasResourceService', () => {
 
     hateoasResourceService.deleteResourceById(SimpleResource, 1, requestOption)
       .subscribe(() => {
-        const options = resourceHttpServiceSpy.deleteResource.calls.argsFor(0)[2] as RequestOption;
+        const options = resourceHttpServiceSpy.deleteResource.calls.argsFor(0)[3] as RequestOption;
         expect(options).toEqual(requestOption);
       });
   });
@@ -633,7 +633,7 @@ describe('HateoasResourceService', () => {
 
     hateoasResourceService.customQuery(ResourceWithRelation, HttpMethod.POST, 'query', {body: resourceWithRelation})
       .subscribe(() => {
-        const body = commonHttpServiceSpy.customQuery.calls.argsFor(0)[3];
+        const body = commonHttpServiceSpy.customQuery.calls.argsFor(0)[4];
         expect(body).toBeDefined();
         expect(body.relation).toBe('http://localhost:8080/api/v1/resourceRelation/1');
       });
@@ -647,7 +647,7 @@ describe('HateoasResourceService', () => {
     hateoasResourceService.customQuery(ResourceWithRelation, HttpMethod.POST, 'query',
       {body: resourceWithRelation, valuesOption: {include: Include.NULL_VALUES}})
       .subscribe(() => {
-        const body = commonHttpServiceSpy.customQuery.calls.argsFor(0)[3];
+        const body = commonHttpServiceSpy.customQuery.calls.argsFor(0)[4];
         expect(body).toBeDefined();
         expect(body.name).toBeNull();
       });
@@ -675,7 +675,7 @@ describe('HateoasResourceService', () => {
 
     hateoasResourceService.customSearchQuery(ResourceWithRelation, HttpMethod.POST, 'searchQuery', {body: resourceWithRelation})
       .subscribe(() => {
-        const body = commonHttpServiceSpy.customQuery.calls.argsFor(0)[3];
+        const body = commonHttpServiceSpy.customQuery.calls.argsFor(0)[4];
         expect(body).toBeDefined();
         expect(body.relation).toBe('http://localhost:8080/api/v1/resourceRelation/1');
       });
@@ -689,7 +689,7 @@ describe('HateoasResourceService', () => {
     hateoasResourceService.customSearchQuery(ResourceWithRelation, HttpMethod.POST, 'searchQuery',
       {body: resourceWithRelation, valuesOption: {include: Include.NULL_VALUES}})
       .subscribe(() => {
-        const body = commonHttpServiceSpy.customQuery.calls.argsFor(0)[3];
+        const body = commonHttpServiceSpy.customQuery.calls.argsFor(0)[4];
         expect(body).toBeDefined();
         expect(body.name).toBeNull();
       });
@@ -700,7 +700,7 @@ describe('HateoasResourceService', () => {
 
     hateoasResourceService.customSearchQuery(SimpleResource, HttpMethod.GET, 'searchQuery')
       .subscribe(() => {
-        const url = commonHttpServiceSpy.customQuery.calls.argsFor(0)[2];
+        const url = commonHttpServiceSpy.customQuery.calls.argsFor(0)[3];
         expect(url).toBeDefined();
         expect(url).toBe('/search/searchQuery');
       });
@@ -711,7 +711,7 @@ describe('HateoasResourceService', () => {
 
     hateoasResourceService.customSearchQuery(SimpleResource, HttpMethod.GET, '/searchQuery')
       .subscribe(() => {
-        const url = commonHttpServiceSpy.customQuery.calls.argsFor(0)[2];
+        const url = commonHttpServiceSpy.customQuery.calls.argsFor(0)[3];
         expect(url).toBeDefined();
         expect(url).toBe('/search/searchQuery');
       });

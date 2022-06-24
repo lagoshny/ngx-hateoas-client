@@ -2,6 +2,7 @@ import { ConsoleLogger } from './console-logger';
 import { Stage } from './stage.enum';
 import { LibConfig } from '../config/lib-config';
 import { capitalize, isEmpty, isNil, isObject, isString } from 'lodash-es';
+import { RESOURCE_NAME_PROP } from '../model/declarations';
 
 /**
  * Simplify logger calls.
@@ -20,7 +21,7 @@ export class StageLogger {
     if (isString(resource)) {
       resourceName = resource;
     } else if (!isNil(resource)) {
-      resourceName = '__resourceName__' in resource ? resource['__resourceName__'] : 'EmbeddedResource';
+      resourceName = RESOURCE_NAME_PROP in resource ? resource[RESOURCE_NAME_PROP] : 'EmbeddedResource';
     } else {
       resourceName = 'NOT_DEFINED_RESOURCE_NAME';
     }
@@ -38,7 +39,7 @@ export class StageLogger {
     if (isString(resource)) {
       resourceName = resource;
     } else {
-      resourceName = '__resourceName__' in resource ? resource['__resourceName__'] : 'EmbeddedResource';
+      resourceName = RESOURCE_NAME_PROP in resource ? resource[RESOURCE_NAME_PROP] : 'EmbeddedResource';
     }
 
     ConsoleLogger.resourcePrettyInfo(`${ capitalize(resourceName) } ${ method }`,

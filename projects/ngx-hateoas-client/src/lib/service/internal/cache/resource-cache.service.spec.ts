@@ -33,18 +33,18 @@ describe('CacheService', () => {
   it('GET_RESOURCE should return null when a cache has value but it is expired',
     waitForAsync(() => {
       LibConfig.config.cache.lifeTime = 1 / 1000;
-      cacheService.putResource(CacheKey.of('someVal', {}), rawResource);
+      cacheService.putResource(CacheKey.of('http://localhost:8080/api/v1', {}), rawResource);
 
       setTimeout(() => {
-        const result = cacheService.getResource(CacheKey.of('someVal', {}));
+        const result = cacheService.getResource(CacheKey.of('http://localhost:8080/api/v1', {}));
         expect(result).toBe(null);
       }, 200);
     }));
 
   it('GET_RESOURCE should return value from a cache', () => {
-    cacheService.putResource(CacheKey.of('someVal', {}), rawResource);
+    cacheService.putResource(CacheKey.of('http://localhost:8080/api/v1', {}), rawResource);
 
-    const result = cacheService.getResource(CacheKey.of('someVal', {}));
+    const result = cacheService.getResource(CacheKey.of('http://localhost:8080/api/v1', {}));
     expect(result).toBeDefined();
     expect(result).toEqual(rawResource);
   });

@@ -1,6 +1,7 @@
 import { UrlUtils } from './url.utils';
 import { SimpleResource } from '../model/resource/resources.test';
 import { LibConfig } from '../config/lib-config';
+import { DEFAULT_ROUTE_NAME } from '../config/hateoas-configuration.interface';
 
 /* tslint:disable:no-string-literal */
 describe('UrlUtils', () => {
@@ -165,7 +166,6 @@ describe('UrlUtils', () => {
   });
 
 
-
   it('GENERATE_RESOURCE_URL should throw error when baseUrl is empty', () => {
     expect(() => UrlUtils.generateResourceUrl('', 'any'))
       .toThrowError(`Passed param(s) 'baseUrl = ' is not valid`);
@@ -275,33 +275,33 @@ describe('UrlUtils', () => {
   });
 
   it('GENERATE_LINK_URL should throw error when relationLink is null', () => {
-    expect(() => UrlUtils.generateLinkUrl(null))
+    expect(() => UrlUtils.generateLinkUrl({routeName: DEFAULT_ROUTE_NAME}, null))
       .toThrowError(`Passed param(s) 'relationLink = null', 'linkUrl = undefined' are not valid`);
   });
 
   it('GENERATE_LINK_URL should throw error when relationLink is undefined', () => {
-    expect(() => UrlUtils.generateLinkUrl(undefined))
+    expect(() => UrlUtils.generateLinkUrl({routeName: DEFAULT_ROUTE_NAME}, undefined))
       .toThrowError(`Passed param(s) 'relationLink = undefined', 'linkUrl = undefined' are not valid`);
   });
 
   it('GENERATE_LINK_URL should throw error when relationLink.href is empty', () => {
-    expect(() => UrlUtils.generateLinkUrl({href: ''}))
+    expect(() => UrlUtils.generateLinkUrl({routeName: DEFAULT_ROUTE_NAME}, {href: ''}))
       .toThrowError(`Passed param(s) 'linkUrl = ' is not valid`);
   });
 
   it('GENERATE_LINK_URL should throw error when relationLink.href is null', () => {
-    expect(() => UrlUtils.generateLinkUrl({href: null}))
+    expect(() => UrlUtils.generateLinkUrl({routeName: DEFAULT_ROUTE_NAME}, {href: null}))
       .toThrowError(`Passed param(s) 'linkUrl = null' is not valid`);
   });
 
   it('GENERATE_LINK_URL should throw error when relationLink.href is undefined', () => {
-    expect(() => UrlUtils.generateLinkUrl({href: undefined}))
+    expect(() => UrlUtils.generateLinkUrl({routeName: DEFAULT_ROUTE_NAME}, {href: undefined}))
       .toThrowError(`Passed param(s) 'linkUrl = undefined' is not valid`);
   });
 
   it('GENERATE_LINK_URL should fill ALL template params when link is templated', () => {
-    const result = UrlUtils.generateLinkUrl(
-      {href: `${ UrlUtils.getApiUrl() }/test{?param1,param2}`, templated: true},
+    const result = UrlUtils.generateLinkUrl({routeName: DEFAULT_ROUTE_NAME},
+      {href: `${ UrlUtils.getApiUrl(DEFAULT_ROUTE_NAME) }/test{?param1,param2}`, templated: true},
       {
         params: {
           param1: '1',
@@ -309,12 +309,12 @@ describe('UrlUtils', () => {
         }
       });
 
-    expect(result).toBe(`${ UrlUtils.getApiUrl() }/test?param1=1&param2=2`);
+    expect(result).toBe(`${ UrlUtils.getApiUrl(DEFAULT_ROUTE_NAME) }/test?param1=1&param2=2`);
   });
 
   it('GENERATE_LINK_URL should fill PART OF template params when link is templated and passed not all params', () => {
-    const result = UrlUtils.generateLinkUrl(
-      {href: `${ UrlUtils.getApiUrl() }/test{?param1,param2,sort,page,size}`, templated: true},
+    const result = UrlUtils.generateLinkUrl({routeName: DEFAULT_ROUTE_NAME},
+      {href: `${ UrlUtils.getApiUrl(DEFAULT_ROUTE_NAME) }/test{?param1,param2,sort,page,size}`, templated: true},
       {
         params: {
           param1: '1'
@@ -328,51 +328,51 @@ describe('UrlUtils', () => {
         }
       });
 
-    expect(result).toBe(`${ UrlUtils.getApiUrl() }/test?param1=1&page=0&size=10&sort=abc,ASC`);
+    expect(result).toBe(`${ UrlUtils.getApiUrl(DEFAULT_ROUTE_NAME) }/test?param1=1&page=0&size=10&sort=abc,ASC`);
   });
 
   it('GENERATE_LINK_URL should REMOVE template params when link is templated and passed params are empty', () => {
-    const result = UrlUtils.generateLinkUrl(
-      {href: `${ UrlUtils.getApiUrl() }/test{?param1,param2}`, templated: true});
+    const result = UrlUtils.generateLinkUrl({routeName: DEFAULT_ROUTE_NAME},
+      {href: `${ UrlUtils.getApiUrl(DEFAULT_ROUTE_NAME) }/test{?param1,param2}`, templated: true});
 
-    expect(result).toBe(`${ UrlUtils.getApiUrl() }/test`);
+    expect(result).toBe(`${ UrlUtils.getApiUrl(DEFAULT_ROUTE_NAME) }/test`);
   });
 
   it('GENERATE_LINK_URL should NOT FILL template params when link is not templated', () => {
-    const result = UrlUtils.generateLinkUrl(
-      {href: `${ UrlUtils.getApiUrl() }/test{?param1,param2}`, templated: false});
+    const result = UrlUtils.generateLinkUrl({routeName: DEFAULT_ROUTE_NAME},
+      {href: `${ UrlUtils.getApiUrl(DEFAULT_ROUTE_NAME) }/test{?param1,param2}`, templated: false});
 
-    expect(result).toBe(`${ UrlUtils.getApiUrl() }/test{?param1,param2}`);
+    expect(result).toBe(`${ UrlUtils.getApiUrl(DEFAULT_ROUTE_NAME) }/test{?param1,param2}`);
   });
 
   it('GENERATE_LINK_URL should replace root link url to proxyUrl', () => {
-    LibConfig.config.http.proxyUrl = 'http://myproxy.ru/api/v1';
-    const result = UrlUtils.generateLinkUrl({href: `${ UrlUtils.getApiUrl() }/test`});
+    LibConfig.config.http[DEFAULT_ROUTE_NAME].proxyUrl = 'http://myproxy.ru/api/v1';
+    const result = UrlUtils.generateLinkUrl({routeName: DEFAULT_ROUTE_NAME}, {href: `${ UrlUtils.getApiUrl(DEFAULT_ROUTE_NAME) }/test`});
 
     expect(result).toBe('http://myproxy.ru/api/v1/test');
-    LibConfig.config.http.proxyUrl = '';
+    LibConfig.config.http[DEFAULT_ROUTE_NAME].proxyUrl = '';
   });
 
   it('GENERATE_LINK_URL should NOT replace root link url to proxyUrl when it is empty', () => {
-    LibConfig.config.http.proxyUrl = '';
-    const result = UrlUtils.generateLinkUrl({href: `${ UrlUtils.getApiUrl() }/test`});
+    LibConfig.config.http[DEFAULT_ROUTE_NAME].proxyUrl = '';
+    const result = UrlUtils.generateLinkUrl({routeName: DEFAULT_ROUTE_NAME}, {href: `${ UrlUtils.getApiUrl(DEFAULT_ROUTE_NAME) }/test`});
 
-    expect(result).toBe(`${ UrlUtils.getApiUrl() }/test`);
+    expect(result).toBe(`${ UrlUtils.getApiUrl(DEFAULT_ROUTE_NAME) }/test`);
   });
 
   it('GET_API_URL should return root link when proxy is empty', () => {
-    LibConfig.config.http.proxyUrl = '';
-    const result = UrlUtils.getApiUrl();
+    LibConfig.config.http[DEFAULT_ROUTE_NAME].proxyUrl = '';
+    const result = UrlUtils.getApiUrl(DEFAULT_ROUTE_NAME);
 
-    expect(result).toBe(LibConfig.config.http.rootUrl);
+    expect(result).toBe(LibConfig.config.http[DEFAULT_ROUTE_NAME].rootUrl);
   });
 
   it('GET_API_URL should return proxy link when proxy is NOT empty', () => {
-    LibConfig.config.http.proxyUrl = 'http://myproxy.ru/api/v1';
-    const result = UrlUtils.getApiUrl();
+    LibConfig.config.http[DEFAULT_ROUTE_NAME].proxyUrl = 'http://myproxy.ru/api/v1';
+    const result = UrlUtils.getApiUrl(DEFAULT_ROUTE_NAME);
 
-    expect(result).toBe(LibConfig.config.http.proxyUrl);
-    LibConfig.config.http.proxyUrl = '';
+    expect(result).toBe(LibConfig.config.http[DEFAULT_ROUTE_NAME].proxyUrl);
+    LibConfig.config.http[DEFAULT_ROUTE_NAME].proxyUrl = '';
   });
 
   it('GET_RESOURCE_NAME_FROM_URL should throw error when url is empty', () => {
@@ -396,9 +396,9 @@ describe('UrlUtils', () => {
   });
 
   it('GET_RESOURCE_NAME_FROM_URL should return resource name with root proxy', () => {
-    LibConfig.config.http.proxyUrl = 'http://proxy-localhost:8080/api/v1';
+    LibConfig.config.http[DEFAULT_ROUTE_NAME].proxyUrl = 'http://proxy-localhost:8080/api/v1';
     const resourceNameFromUrl = UrlUtils.getResourceNameFromUrl('http://proxy-localhost:8080/api/v1/resources/1');
-    LibConfig.config.http.proxyUrl = '';
+    LibConfig.config.http[DEFAULT_ROUTE_NAME].proxyUrl = '';
     expect(resourceNameFromUrl).toEqual('resources');
   });
 

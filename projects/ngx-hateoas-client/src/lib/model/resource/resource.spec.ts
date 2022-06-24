@@ -6,6 +6,7 @@ import { of } from 'rxjs';
 import { ResourceUtils } from '../../util/resource.utils';
 import { HttpHeaders, HttpResponse } from '@angular/common/http';
 import { LibConfig } from '../../config/lib-config';
+import { HateoasResource } from '../decorators';
 
 // tslint:disable:variable-name
 // tslint:disable:no-string-literal
@@ -43,6 +44,7 @@ class BadTestProductResource extends Resource {
   };
 }
 
+@HateoasResource('testOrder')
 class TestOrderResource extends Resource {
   _links = {
     self: {

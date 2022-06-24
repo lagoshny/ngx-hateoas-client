@@ -4,7 +4,7 @@ import { HttpHeaders, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ResourceUtils } from '../../util/resource.utils';
 import { UrlUtils } from '../../util/url.utils';
-import { LinkData } from '../declarations';
+import { LinkData, RESOURCE_OPTIONS_PROP } from '../declarations';
 import { tap } from 'rxjs/operators';
 import { Stage } from '../../logger/stage.enum';
 import { StageLogger } from '../../logger/stage-logger';
@@ -18,6 +18,7 @@ import { isArray, isNil, last, split } from 'lodash-es';
  * If you have an embedded entity then consider to use the {@link EmbeddedResource} class.
  */
 // tslint:disable:variable-name
+// tslint:disable:no-string-literal
 export class Resource extends BaseResource {
 
   /**
@@ -51,7 +52,7 @@ export class Resource extends BaseResource {
       })
       .join('\n');
 
-    return getResourceHttpService().post(UrlUtils.generateLinkUrl(relationLink), body, {
+    return getResourceHttpService().post(UrlUtils.generateLinkUrl(this.constructor[RESOURCE_OPTIONS_PROP], relationLink), body, {
       observe: 'response',
       headers: new HttpHeaders({'Content-Type': 'text/uri-list'})
     }).pipe(
@@ -89,7 +90,7 @@ export class Resource extends BaseResource {
       body = ResourceUtils.initResource(entities).getSelfLinkHref();
     }
 
-    return getResourceHttpService().put(UrlUtils.generateLinkUrl(relationLink), body, {
+    return getResourceHttpService().put(UrlUtils.generateLinkUrl(this.constructor[RESOURCE_OPTIONS_PROP], relationLink), body, {
       observe: 'response',
       headers: new HttpHeaders({'Content-Type': 'text/uri-list'})
     }).pipe(
@@ -115,7 +116,7 @@ export class Resource extends BaseResource {
 
     const relationLink = this.getRelationLink(relationName);
 
-    return getResourceHttpService().delete(UrlUtils.generateLinkUrl(relationLink), {
+    return getResourceHttpService().delete(UrlUtils.generateLinkUrl(this.constructor[RESOURCE_OPTIONS_PROP], relationLink), {
       observe: 'response',
     }).pipe(
       tap(() => {
@@ -140,7 +141,7 @@ export class Resource extends BaseResource {
 
     const relationLink = this.getRelationLink(relationName);
 
-    return getResourceHttpService().put(UrlUtils.generateLinkUrl(relationLink), '', {
+    return getResourceHttpService().put(UrlUtils.generateLinkUrl(this.constructor[RESOURCE_OPTIONS_PROP], relationLink), '', {
       observe: 'response',
       headers: new HttpHeaders({'Content-Type': 'text/uri-list'})
     }).pipe(
@@ -167,13 +168,13 @@ export class Resource extends BaseResource {
 
     const relationLink = this.getRelationLink(relationName);
     const resource = ResourceUtils.initResource(entity) as Resource;
-    const resourceId = last(split(UrlUtils.generateLinkUrl(resource._links.self), '/'));
+    const resourceId = last(split(UrlUtils.generateLinkUrl(this.constructor[RESOURCE_OPTIONS_PROP], resource._links.self), '/'));
 
     if (isNil(resourceId) || resourceId === '') {
       StageLogger.stageErrorLog(Stage.PREPARE_URL, {
         step: 'ResolveResourceId',
         error: 'Passed resource self link should has id',
-        selfLink: UrlUtils.generateLinkUrl(resource._links.self)
+        selfLink: UrlUtils.generateLinkUrl(this.constructor[RESOURCE_OPTIONS_PROP], resource._links.self)
       });
       throw Error('Passed resource self link should has id');
     }
@@ -183,7 +184,7 @@ export class Resource extends BaseResource {
       result: resourceId
     });
 
-    return getResourceHttpService().delete(UrlUtils.generateLinkUrl(relationLink) + '/' + resourceId, {
+    return getResourceHttpService().delete(UrlUtils.generateLinkUrl(this.constructor[RESOURCE_OPTIONS_PROP], relationLink) + '/' + resourceId, {
       observe: 'response'
     }).pipe(
       tap(() => {

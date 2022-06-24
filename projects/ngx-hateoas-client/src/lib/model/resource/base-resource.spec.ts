@@ -1,3 +1,4 @@
+/* tslint:disable:no-string-literal */
 import { BaseResource } from './base-resource';
 import { TestBed, waitForAsync } from '@angular/core/testing';
 import { of } from 'rxjs';
@@ -8,7 +9,8 @@ import { PagedResourceCollection } from './paged-resource-collection';
 import { ResourceCollection } from './resource-collection';
 import { ResourceCollectionHttpService } from '../../service/internal/resource-collection-http.service';
 import { LibConfig } from '../../config/lib-config';
-import { RequestParam } from '../declarations';
+import { RequestParam, RESOURCE_OPTIONS_PROP } from '../declarations';
+import { DEFAULT_ROUTE_NAME } from '../../config/hateoas-configuration.interface';
 
 class TestProductResource extends BaseResource {
   // tslint:disable-next-line:variable-name
@@ -80,6 +82,9 @@ describe('BaseResource GET_RELATION', () => {
 
   beforeEach(() => {
     baseResource = new TestOrderResource();
+    baseResource.constructor[RESOURCE_OPTIONS_PROP] = {
+      routeName: DEFAULT_ROUTE_NAME
+    };
     DependencyInjector.injector = TestBed;
   });
 
@@ -188,6 +193,9 @@ describe('BaseResource GET_RELATED_COLLECTION', () => {
 
   beforeEach(() => {
     baseResource = new TestOrderResource();
+    baseResource.constructor[RESOURCE_OPTIONS_PROP] = {
+      routeName: DEFAULT_ROUTE_NAME
+    };
     DependencyInjector.injector = TestBed;
   });
 
@@ -292,6 +300,9 @@ describe('BaseResource GET_RELATED_PAGE', () => {
 
   beforeEach(() => {
     baseResource = new TestOrderResource();
+    baseResource.constructor[RESOURCE_OPTIONS_PROP] = {
+      routeName: DEFAULT_ROUTE_NAME
+    };
     DependencyInjector.injector = TestBed;
   });
 
@@ -408,6 +419,9 @@ describe('BaseResource POST_RELATION', () => {
 
   beforeEach(() => {
     baseResource = new TestOrderResource();
+    baseResource.constructor[RESOURCE_OPTIONS_PROP] = {
+      routeName: DEFAULT_ROUTE_NAME
+    };
     DependencyInjector.injector = TestBed;
   });
 
@@ -549,6 +563,9 @@ describe('BaseResource PATCH_RELATION', () => {
 
   beforeEach(() => {
     baseResource = new TestOrderResource();
+    baseResource.constructor[RESOURCE_OPTIONS_PROP] = {
+      routeName: DEFAULT_ROUTE_NAME
+    };
     DependencyInjector.injector = TestBed;
   });
 
@@ -684,6 +701,9 @@ describe('BaseResource PUT_RELATION', () => {
 
   beforeEach(() => {
     baseResource = new TestOrderResource();
+    baseResource.constructor[RESOURCE_OPTIONS_PROP] = {
+      routeName: DEFAULT_ROUTE_NAME
+    };
     DependencyInjector.injector = TestBed;
   });
 

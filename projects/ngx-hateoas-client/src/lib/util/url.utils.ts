@@ -6,6 +6,8 @@ import { ValidationUtils } from './validation.utils';
 import { LibConfig } from '../config/lib-config';
 import { isArray, isEmpty, isNil, isObject, toString } from 'lodash-es';
 import { UriTemplate } from 'uri-templates-es';
+import { ResourceOption } from '../config/hateoas-configuration.interface';
+import { ConsoleLogger } from '../logger/console-logger';
 
 export class UrlUtils {
 
@@ -74,11 +76,12 @@ export class UrlUtils {
    * Generate link url.
    * If proxyUrl is not empty then relation url will be use proxy.
    *
+   * @param resourceOptions additional resource options {@link ResourceOption}
    * @param relationLink resource link to which need to generate the url
    * @param options (optional) additional options that should be applied to the request
    * @throws error when required params are not valid
    */
-  public static generateLinkUrl(relationLink: LinkData, options?: PagedGetOption): string {
+  public static generateLinkUrl(resourceOptions: ResourceOption, relationLink: LinkData, options?: PagedGetOption): string {
     ValidationUtils.validateInputParams({relationLink, linkUrl: relationLink?.href});
     let url;
     if (options && !isEmpty(options)) {
@@ -86,21 +89,50 @@ export class UrlUtils {
     } else {
       url = relationLink.templated ? UrlUtils.removeTemplateParams(relationLink.href) : relationLink.href;
     }
-    if (LibConfig.config.http.proxyUrl) {
-      return url.replace(LibConfig.config.http.rootUrl, LibConfig.config.http.proxyUrl);
+    const route = LibConfig.getRouteByName(resourceOptions.routeName);
+    this.checkRoute(route, resourceOptions.routeName);
+
+    if (route.proxyUrl) {
+      return url.replace(route.rootUrl, route.proxyUrl);
     }
     return url;
   }
 
   /**
    * Return server api url based on proxy url when it is not empty or root url otherwise.
+   *
+   * @param routeName resource route name that configured in {@link MultipleResourceRoutes}.
    */
-  public static getApiUrl(): string {
-    if (LibConfig.config.http.proxyUrl) {
-      return LibConfig.config.http.proxyUrl;
+  public static getApiUrl(routeName: string): string {
+    const route = LibConfig.getRouteByName(routeName);
+    this.checkRoute(route, routeName);
+
+    if (route.proxyUrl) {
+      return route.proxyUrl;
     } else {
-      return LibConfig.config.http.rootUrl;
+      return route.rootUrl;
     }
+  }
+
+  /**
+   * Try to determine resource route by passed resource url.
+   * @param url resource url
+   */
+  public static guessResourceRoute(url: string): string {
+    let route: string;
+    for (const [key] of Object.entries(LibConfig.getRoutes())) {
+      const apiUrl = UrlUtils.getApiUrl(key);
+      if (url.toLowerCase().includes(apiUrl)) {
+        route = apiUrl;
+        break;
+      }
+    }
+
+    if (isEmpty(route)) {
+      throw new Error(`Failed to determine resource route by url: ${ url }`);
+    }
+
+    return route;
   }
 
   /**
@@ -129,7 +161,7 @@ export class UrlUtils {
   public static getResourceNameFromUrl(url: string): string {
     ValidationUtils.validateInputParams({url});
 
-    const dividedBySlashUrl = url.toLowerCase().replace(`${ UrlUtils.getApiUrl().toLowerCase() }/`, '').split('/');
+    const dividedBySlashUrl = url.toLowerCase().replace(`${ UrlUtils.guessResourceRoute(url) }/`, '').split('/');
     return dividedBySlashUrl[0];
   }
 
@@ -219,6 +251,15 @@ export class UrlUtils {
     }
     if ('page' in options.params || 'size' in options.params) {
       throw Error('Please, pass page params in page object key, not with params object!');
+    }
+  }
+
+  private static checkRoute(route: object, routeName: string) {
+    if (isEmpty(route)) {
+      ConsoleLogger.error(`No Resource route found by name: '${ routeName }'. Check you configuration. Read more about this ...`, {
+        availableRoutes: LibConfig.getRoutes()
+      });
+      throw Error(`No Resource route found by name: '${routeName}'.`);
     }
   }
 

@@ -4,7 +4,7 @@ import { UrlUtils } from '../../util/url.utils';
 import { AbstractResource } from './abstract-resource';
 import { ResourceCollection } from './resource-collection';
 import { getResourceCollectionHttpService } from '../../service/internal/resource-collection-http.service';
-import { GetOption, PagedGetOption, RequestBody, RequestOption } from '../declarations';
+import { GetOption, PagedGetOption, RequestBody, RequestOption, RESOURCE_OPTIONS_PROP } from '../declarations';
 import { HttpResponse } from '@angular/common/http';
 import { getPagedResourceCollectionHttpService } from '../../service/internal/paged-resource-collection-http.service';
 import { PagedResourceCollection } from './paged-resource-collection';
@@ -16,6 +16,7 @@ import { ValidationUtils } from '../../util/validation.utils';
 /**
  * Common resource class.
  */
+// tslint:disable:no-string-literal
 export abstract class BaseResource extends AbstractResource {
 
   /**
@@ -37,7 +38,7 @@ export abstract class BaseResource extends AbstractResource {
       : options;
 
     return getResourceHttpService()
-      .get(UrlUtils.generateLinkUrl(relationLink, options), optionsToRequest)
+      .get(UrlUtils.generateLinkUrl(this.constructor[RESOURCE_OPTIONS_PROP], relationLink, options), optionsToRequest)
       .pipe(
         tap(() => {
           StageLogger.resourceEndLog(this, 'GET_RELATION', {result: `relation ${ relationName } was got successful`});
@@ -64,7 +65,7 @@ export abstract class BaseResource extends AbstractResource {
       : options;
 
     return getResourceCollectionHttpService()
-      .get(UrlUtils.generateLinkUrl(relationLink, options), optionsToRequest)
+      .get(UrlUtils.generateLinkUrl(this.constructor[RESOURCE_OPTIONS_PROP], relationLink, options), optionsToRequest)
       .pipe(
         tap(() => {
           StageLogger.resourceEndLog(this, 'GET_RELATED_COLLECTION', {result: `related collection ${ relationName } was got successful`});
@@ -91,7 +92,9 @@ export abstract class BaseResource extends AbstractResource {
       : options;
 
     return getPagedResourceCollectionHttpService()
-      .get(UrlUtils.generateLinkUrl(relationLink, UrlUtils.fillDefaultPageDataIfNoPresent(options)), optionsToRequest)
+      .get(
+        UrlUtils.generateLinkUrl(this.constructor[RESOURCE_OPTIONS_PROP], relationLink, UrlUtils.fillDefaultPageDataIfNoPresent(options)),
+        optionsToRequest)
       .pipe(
         tap(() => {
           StageLogger.resourceEndLog(this, 'GET_RELATED_PAGE', {result: `related page ${ relationName } was got successful`});
@@ -117,7 +120,7 @@ export abstract class BaseResource extends AbstractResource {
 
     return getResourceHttpService()
       .post(
-        UrlUtils.generateLinkUrl(relationLink, options),
+        UrlUtils.generateLinkUrl(this.constructor[RESOURCE_OPTIONS_PROP], relationLink, options),
         ResourceUtils.resolveValues(requestBody),
         {
           ...options,
@@ -150,7 +153,7 @@ export abstract class BaseResource extends AbstractResource {
 
     return getResourceHttpService()
       .patch(
-        UrlUtils.generateLinkUrl(relationLink, options),
+        UrlUtils.generateLinkUrl(this.constructor[RESOURCE_OPTIONS_PROP], relationLink, options),
         ResourceUtils.resolveValues(requestBody),
         {
           ...options,
@@ -183,7 +186,7 @@ export abstract class BaseResource extends AbstractResource {
 
     return getResourceHttpService()
       .put(
-        UrlUtils.generateLinkUrl(relationLink, options),
+        UrlUtils.generateLinkUrl(this.constructor[RESOURCE_OPTIONS_PROP], relationLink, options),
         ResourceUtils.resolveValues(requestBody),
         {
           ...options,

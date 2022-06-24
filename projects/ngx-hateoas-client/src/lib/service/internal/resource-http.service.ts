@@ -16,6 +16,7 @@ import { ValidationUtils } from '../../util/validation.utils';
 import { toString } from 'lodash-es';
 import { CacheKey } from './cache/model/cache-key';
 import { ResourceCacheService } from './cache/resource-cache.service';
+import { ResourceOption } from '../../config/hateoas-configuration.interface';
 
 /**
  * Get instance of the ResourceHttpService by Angular DependencyInjector.
@@ -158,20 +159,22 @@ export class ResourceHttpService extends HttpExecutor {
    * Perform get resource request with url built by the resource name.
    *
    * @param resourceName used to build root url to the resource
+   * @param resourceOptions additional resource options {@link ResourceOption}
    * @param id resource id
    * @param options (optional) options that applied to the request
    * @throws error when required params are not valid
    */
   public getResource<T extends BaseResource>(resourceName: string,
+                                             resourceOptions: ResourceOption,
                                              id: number | string,
                                              options?: GetOption): Observable<T> {
     ValidationUtils.validateInputParams({resourceName, id});
 
-    const url = UrlUtils.generateResourceUrl(UrlUtils.getApiUrl(), resourceName).concat('/', toString(id));
+    const url = UrlUtils.generateResourceUrl(UrlUtils.getApiUrl(resourceOptions.routeName), resourceName).concat('/', toString(id));
 
     StageLogger.stageLog(Stage.PREPARE_URL, {
       result: url,
-      urlParts: `baseUrl: '${ UrlUtils.getApiUrl() }', resource: '${ resourceName }', id: '${ id }'`,
+      urlParts: `baseUrl: '${ UrlUtils.getApiUrl(resourceOptions.routeName) }', resource: '${ resourceName }', id: '${ id }'`,
       options
     });
 
@@ -182,20 +185,22 @@ export class ResourceHttpService extends HttpExecutor {
    * Perform POST resource request with url built by the resource name.
    *
    * @param resourceName to be post
+   * @param resourceOptions additional resource options {@link ResourceOption}
    * @param body resource to create
    * @param options (optional) options that applied to the request
    * @throws error when required params are not valid
    */
   public postResource(resourceName: string,
+                      resourceOptions: ResourceOption,
                       body: BaseResource,
                       options?: RequestOption): Observable<any> {
     ValidationUtils.validateInputParams({resourceName, body});
 
-    const url = UrlUtils.generateResourceUrl(UrlUtils.getApiUrl(), resourceName);
+    const url = UrlUtils.generateResourceUrl(UrlUtils.getApiUrl(resourceOptions.routeName), resourceName);
 
     StageLogger.stageLog(Stage.PREPARE_URL, {
       result: url,
-      urlParts: `baseUrl: '${ UrlUtils.getApiUrl() }', resource: '${ resourceName }'`,
+      urlParts: `baseUrl: '${ UrlUtils.getApiUrl(resourceOptions.routeName) }', resource: '${ resourceName }'`,
       options
     });
 
@@ -206,22 +211,24 @@ export class ResourceHttpService extends HttpExecutor {
    * Perform PATCH resource request with url built by the resource name and resource id.
    *
    * @param resourceName to be patched
+   * @param resourceOptions additional resource options {@link ResourceOption}
    * @param id resource id
    * @param body contains data to patch resource properties
    * @param options (optional) options that applied to the request
    * @throws error when required params are not valid
    */
   public patchResource(resourceName: string,
+                       resourceOptions: ResourceOption,
                        id: number | string,
                        body: any,
                        options?: RequestOption): Observable<any> {
     ValidationUtils.validateInputParams({resourceName, id, body});
 
-    const url = UrlUtils.generateResourceUrl(UrlUtils.getApiUrl(), resourceName, toString(id));
+    const url = UrlUtils.generateResourceUrl(UrlUtils.getApiUrl(resourceOptions.routeName), resourceName, toString(id));
 
     StageLogger.stageLog(Stage.PREPARE_URL, {
       result: url,
-      urlParts: `baseUrl: '${ UrlUtils.getApiUrl() }', resource: '${ resourceName }', resourceId: '${ id }'`,
+      urlParts: `baseUrl: '${ UrlUtils.getApiUrl(resourceOptions.routeName) }', resource: '${ resourceName }', resourceId: '${ id }'`,
       options
     });
 
@@ -232,22 +239,24 @@ export class ResourceHttpService extends HttpExecutor {
    * Perform PUT resource request with url built by the resource name and resource id.
    *
    * @param resourceName to be put
+   * @param resourceOptions additional resource options {@link ResourceOption}
    * @param id resource id
    * @param body contains data to replace resource properties
    * @param options (optional) options that applied to the request
    * @throws error when required params are not valid
    */
   public putResource(resourceName: string,
+                     resourceOptions: ResourceOption,
                      id: number | string,
                      body: any,
                      options?: RequestOption): Observable<any> {
     ValidationUtils.validateInputParams({resourceName, id, body});
 
-    const url = UrlUtils.generateResourceUrl(UrlUtils.getApiUrl(), resourceName, toString(id));
+    const url = UrlUtils.generateResourceUrl(UrlUtils.getApiUrl(resourceOptions.routeName), resourceName, toString(id));
 
     StageLogger.stageLog(Stage.PREPARE_URL, {
       result: url,
-      urlParts: `baseUrl: '${ UrlUtils.getApiUrl() }', resource: '${ resourceName }', resourceId: '${ id }'`,
+      urlParts: `baseUrl: '${ UrlUtils.getApiUrl(resourceOptions.routeName) }', resource: '${ resourceName }', resourceId: '${ id }'`,
       options
     });
 
@@ -258,20 +267,22 @@ export class ResourceHttpService extends HttpExecutor {
    * Perform DELETE resource request with url built by the resource name and resource id.
    *
    * @param resourceName to be deleted
+   * @param resourceOptions additional resource options {@link ResourceOption}
    * @param id resource id
    * @param options (optional) additional options that will be applied to the request
    * @throws error when required params are not valid
    */
   public deleteResource(resourceName: string,
+                        resourceOptions: ResourceOption,
                         id: number | string,
                         options?: RequestOption): Observable<any> {
     ValidationUtils.validateInputParams({resourceName, id});
 
-    const url = UrlUtils.generateResourceUrl(UrlUtils.getApiUrl(), resourceName, toString(id));
+    const url = UrlUtils.generateResourceUrl(UrlUtils.getApiUrl(resourceOptions.routeName), resourceName, toString(id));
 
     StageLogger.stageLog(Stage.PREPARE_URL, {
       result: url,
-      urlParts: `baseUrl: '${ UrlUtils.getApiUrl() }', resource: '${ resourceName }', resourceId: '${ id }'`,
+      urlParts: `baseUrl: '${ UrlUtils.getApiUrl(resourceOptions.routeName) }', resource: '${ resourceName }', resourceId: '${ id }'`,
       options
     });
 
@@ -282,20 +293,23 @@ export class ResourceHttpService extends HttpExecutor {
    * Perform search single resource request with url built by the resource name.
    *
    * @param resourceName used to build root url to the resource
+   * @param resourceOptions additional resource options {@link ResourceOption}
    * @param searchQuery name of the search method
    * @param options (optional) options that applied to the request
    * @throws error when required params are not valid
    */
   public search<T extends BaseResource>(resourceName: string,
+                                        resourceOptions: ResourceOption,
                                         searchQuery: string,
                                         options?: GetOption): Observable<T> {
     ValidationUtils.validateInputParams({resourceName, searchQuery});
 
-    const url = UrlUtils.generateResourceUrl(UrlUtils.getApiUrl(), resourceName).concat('/search/' + searchQuery);
+    const url = UrlUtils.generateResourceUrl(UrlUtils.getApiUrl(resourceOptions.routeName), resourceName)
+      .concat('/search/' + searchQuery);
 
     StageLogger.stageLog(Stage.PREPARE_URL, {
       result: url,
-      urlParts: `baseUrl: '${ UrlUtils.getApiUrl() }', resource: '${ resourceName }', searchQuery: '${ searchQuery }'`,
+      urlParts: `baseUrl: '${ UrlUtils.getApiUrl(resourceOptions.routeName) }', resource: '${ resourceName }', searchQuery: '${ searchQuery }'`,
       options
     });
 

@@ -4,26 +4,63 @@
 import { Resource } from '../model/resource/resource';
 import { EmbeddedResource } from '../model/resource/embedded-resource';
 
+export const DEFAULT_ROUTE_NAME = 'defaultRoute';
+
+/**
+ * Used to specify additional {@link Resource} options.
+ */
+export interface ResourceOption {
+  /**
+   * Name of the route that configured in {@link HateoasConfiguration#http} as {@link MultipleResourceRoutes}.
+   * Be default used route with name 'defaultRoute'.
+   *
+   * See more about this option in <a href="https://github.com/lagoshny/ngx-hateoas-client/blob/master/README.md#options">documentation</a>.
+   */
+  routeName?: string;
+}
+
+/**
+ * Resource route config that defined where from retrieve resources.
+ * If you use this config, then a default route created with name 'defaultRoute' will be assigned to all resources.
+ */
+export interface ResourceRoute {
+  /**
+   * Root server url.
+   *
+   * For default Spring application it looks like: http://localhost:8080.
+   */
+  rootUrl: string;
+  /**
+   * Proxy url on which to send requests.
+   * If passed then it uses to change rootUrl to proxyUrl when get relation link.
+   *
+   * For default Spring application it looks like: http://localhost:8080/api/v1.
+   */
+  proxyUrl?: string;
+}
+
+/**
+ * Defines several resource routes.
+ */
+export interface MultipleResourceRoutes {
+  /**
+   * Each resource route is declared as {@link ResourceRoute} object with root and proxy url if need it.
+   * Specified route name  is used in {@link ResourceOption#routeName} to retrieve resource by this route.
+   *
+   * If you want to declare only one route, you need to use default route name as 'defaultRoute' or use simple {@link ResourceRoute} config.
+   */
+  [routeName: string]: ResourceRoute;
+}
+
 export interface HateoasConfiguration {
 
   /**
    * Http options.
+   * {@link ResourceRoute} declare common resource route that created with default name 'defaultRoute'.
+   * {@link MultipleResourceRoutes} declare several resource routes,
+   * to define default route in this case, use default route name 'defaultRoute'.
    */
-  http: {
-    /**
-     * Root server url.
-     *
-     * For default Spring application it looks like: http://localhost:8080.
-     */
-    rootUrl: string;
-    /**
-     * Proxy url on which to send requests.
-     * If passed then it uses to change rootUrl to proxyUrl when get relation link.
-     *
-     * For default Spring application it looks like: http://localhost:8080/api/v1.
-     */
-    proxyUrl?: string;
-  };
+  http: ResourceRoute | MultipleResourceRoutes;
 
   /**
    * Logging option.

@@ -214,7 +214,7 @@ export class AppModule {
 <br>
 <br>
 >See more about other configuration params [here](#configuration-params).
-<br>
+
 ### Usage
 
 ### Define resource classes

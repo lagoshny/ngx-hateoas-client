@@ -129,7 +129,7 @@ export class UrlUtils {
     }
 
     if (isEmpty(route)) {
-      throw new Error(`Не удалось определить resource route по url: ${ url }`);
+      throw new Error(`Failed to determine resource route by url: ${ url }`);
     }
 
     return route;

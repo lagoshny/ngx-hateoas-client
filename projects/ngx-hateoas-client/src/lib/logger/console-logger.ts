@@ -1,5 +1,5 @@
 import { LibConfig } from '../config/lib-config';
-import { camelCase, capitalize, isEmpty, isObject } from 'lodash-es';
+import { camelCase, capitalize, isEmpty } from 'lodash-es';
 
 /* tslint:disable:variable-name no-console */
 export class ConsoleLogger {
@@ -43,9 +43,6 @@ export class ConsoleLogger {
 
     if (!isEmpty(params)) {
       for (const [key, value] of Object.entries(params)) {
-        if (isObject(value)) {
-          console.log(JSON.stringify(value));
-        }
         if (key.toLowerCase() === 'result') {
           msg += `%c${ capitalize(key) }: %c${ value }\n`;
           color.push('color: #3AA6D0;', 'color: #00BA45;');

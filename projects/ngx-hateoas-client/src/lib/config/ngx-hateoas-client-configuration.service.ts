@@ -32,7 +32,7 @@ export class NgxHateoasClientConfigurationService {
     ResourceUtils.useEmbeddedResourceType(EmbeddedResource);
   }
 
-  private static isSimpleRouteConfig(config: HateoasConfiguration): boolean {
+  private static isCommonRouteConfig(config: HateoasConfiguration): boolean {
     return 'rootUrl' in config.http && isString(config.http['rootUrl']);
   }
 
@@ -42,7 +42,7 @@ export class NgxHateoasClientConfigurationService {
    * @param config suitable client properties needed to properly library work
    */
   public configure(config: HateoasConfiguration): void {
-    if (NgxHateoasClientConfigurationService.isSimpleRouteConfig(config)) {
+    if (NgxHateoasClientConfigurationService.isCommonRouteConfig(config)) {
       config = {
         ...config,
         http: {
@@ -50,8 +50,8 @@ export class NgxHateoasClientConfigurationService {
         }
       };
     }
-    for (const [, value] of Object.entries(config.http)) {
-      ValidationUtils.validateInputParams({config, baseApi: value.rootUrl});
+    for (const [key, value] of Object.entries(config.http)) {
+      ValidationUtils.validateInputParams({config, routeName: key, baseApi: value.rootUrl});
     }
     LibConfig.setConfig(config);
 

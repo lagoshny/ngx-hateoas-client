@@ -163,7 +163,7 @@ export class AppModule {
 
 Minimal configuration look like this:
 
-#### Using common URL for retrieve `Resources`
+#### Using common URL to retrieve `Resources`
 ```ts
 import { ..., NgxHateoasClientConfigurationService } from '@lagoshny/ngx-hateoas-client';
 
@@ -210,7 +210,7 @@ export class AppModule {
 
 `defaultRoute` - it is special `router name` that all `Resources` used by default.
 
-`anotherRoute` - additional `Resource` route that can be used in `Resource` [@HateoasResource#options](#options) decorator to specify it.
+`anotherRoute` - additional `Resource` route that can be used in `Resource` [@HateoasResource#options](#options) to specify it.
 <br>
 <br>
 >See more about other configuration params [here](#configuration-params).
@@ -570,7 +570,7 @@ In some cases, the server-side can have an entity inheritance model how to work 
 `@HateoasResource` decorator use to register your `Resource` classes in `hateoas-client` with passed `resourceName` as decorator's param.
 
 - `resourceName`: `string` should be equals to the server-side resource name that uses to represent self resource link.
-- `options`: `ResourceOption` additional resource options. Find more about these options [here]().
+- `options`: `ResourceOption` additional resource options. Find more about these options [here](#options).
 
 #### resourceName
 Using to specify resource name.
@@ -601,7 +601,7 @@ It means that server-side use `shops` as resource name for `Shop` entity and it 
 }
 ```
 
-If you want to use special `URL` to get `Resource` use `options` param:
+If you want to use special `URL` to get `Resource` use `options#routeName` param:
 
 ```ts
 import { Resource, HateoasResource } from '@lagoshny/ngx-hateoas-client';
@@ -611,8 +611,7 @@ export class Shop extends Resource {
  ...
 }
 ```
-Make sure that you configure route with name `yourRoute` in lib configuration in `http` section.
-How to do it, can see [here](#using-multiple-urls-to-retrieve-resources).
+Make sure that you configure route with name `yourRoute` in lib configuration, see [http](#using-multiple-urls-to-retrieve-resources) section.
 
 > If you not specify `routerName` it will be used default router name as `defaultRouter`.
 
@@ -3416,9 +3415,18 @@ The library accepts configuration object:
 If you want to use common `URL` to retrieve all `Resources`, use `ResourceRoute` http config:
 
 ```ts
-{
-   rootUrl: string; // (required) - defines root server URL that will be used to perform resource requests.
-   proxyUrl? : string; // (optional) -  defines proxy URL that uses to change rootUrl to proxyUrl when getting a relation link.
+http: {
+  [routeName1: string]: {
+    rootUrl: string; // (required) - defines root server URL that will be used to perform resource requests.
+    proxyUrl? : string; // (optional) -  defines proxy URL that uses to change rootUrl to proxyUrl when getting a relation link. 
+  },
+
+....
+
+  [routeName2: string]: {
+    rootUrl: string; // (required) - defines root server URL that will be used to perform resource requests.
+    proxyUrl? : string; // (optional) -  defines proxy URL that uses to change rootUrl to proxyUrl when getting a relation link. 
+  };
 }
 ```
 
@@ -3429,13 +3437,24 @@ If you want to use common `URL` to retrieve all `Resources`, use `ResourceRoute`
 To configure several `URLs` use `MultipleResourceRoutes`:
 
 ```ts
-{
-   [routeName: string]: ResourceRoute;
+http: {
+   // Use route name 'defaultRoute' to specify default route for all Resources
+   [routeName1: string]: {
+       rootUrl: string; // (required) - defines root server URL that will be used to perform resource requests.
+       proxyUrl? : string; // (optional) -  defines proxy URL that uses to change rootUrl to proxyUrl when getting a relation link. 
+   },
+  
+   ....
+  
+   [routeName2: string]: {
+      rootUrl: string; // (required) - defines root server URL that will be used to perform resource requests.
+      proxyUrl? : string; // (optional) -  defines proxy URL that uses to change rootUrl to proxyUrl when getting a relation link. 
+   };
 }
 ```
-After that specify `routerName` on `Resource` decorator `@HateoasResource` in `options` params.
+After that, use `routerName` on `Resource` decorator [@HateoasResource#options](#options) param.
 
->To specify default `Resource route` use route name `defaultRoute`. This route will used if no route name specified in [@HateoasResource#options](#options) param.
+>To specify default `Resource route` use route name `defaultRoute`. This route used if no route name specified in [@HateoasResource#options](#options) param.
 
 #### Logging params
 

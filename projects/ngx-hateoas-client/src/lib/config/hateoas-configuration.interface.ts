@@ -12,14 +12,16 @@ export const DEFAULT_ROUTE_NAME = 'defaultRoute';
 export interface ResourceOption {
   /**
    * Name of the route that configured in {@link HateoasConfiguration#http} as {@link MultipleResourceRoutes}.
-   * If you have single route as simple {@link ResourceRoute} by default route name is 'defaultRoute'.
+   * Be default used route with name 'defaultRoute'.
+   *
+   * See more about this option in <a href="https://github.com/lagoshny/ngx-hateoas-client/blob/master/README.md#options">documentation</a>.
    */
   routeName?: string;
 }
 
 /**
  * Resource route config that defined where from retrieve resources.
- * If you use this config, then a default route with name 'defaultRoute' will be assigned to all resources.
+ * If you use this config, then a default route created with name 'defaultRoute' will be assigned to all resources.
  */
 export interface ResourceRoute {
   /**
@@ -42,8 +44,8 @@ export interface ResourceRoute {
  */
 export interface MultipleResourceRoutes {
   /**
-   * Each resource route declare as {@link ResourceRoute} object with root and proxy url if need it.
-   * Specified route name use in {@link ResourceOption#routeName} to retrieve resource by this route.
+   * Each resource route is declared as {@link ResourceRoute} object with root and proxy url if need it.
+   * Specified route name  is used in {@link ResourceOption#routeName} to retrieve resource by this route.
    *
    * If you want to declare only one route, you need to use default route name as 'defaultRoute' or use simple {@link ResourceRoute} config.
    */
@@ -54,8 +56,9 @@ export interface HateoasConfiguration {
 
   /**
    * Http options.
-   * {@link ResourceRoute} declare single resource route with default name 'defaultRoute'.
-   * {@link MultipleResourceRoutes} declare several resource routes, to define default route use default route name 'defaultRoute'.
+   * {@link ResourceRoute} declare common resource route that created with default name 'defaultRoute'.
+   * {@link MultipleResourceRoutes} declare several resource routes,
+   * to define default route in this case, use default route name 'defaultRoute'.
    */
   http: ResourceRoute | MultipleResourceRoutes;
 

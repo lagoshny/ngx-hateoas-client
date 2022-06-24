@@ -12,6 +12,7 @@ import { HttpParams } from '@angular/common/http';
 import { Resource } from '../../model/resource/resource';
 import { LibConfig } from '../../config/lib-config';
 import { UrlUtils } from '../../util/url.utils';
+import { DEFAULT_ROUTE_NAME } from '../../config/hateoas-configuration.interface';
 
 /* tslint:disable:no-string-literal */
 describe('ResourceCollectionHttpService', () => {
@@ -125,33 +126,33 @@ describe('ResourceCollectionHttpService', () => {
   });
 
   it('GET_RESOURCE_COLLECTION throws error when resourceName is empty', () => {
-    expect(() => resourceCollectionHttpService.getResourceCollection(''))
+    expect(() => resourceCollectionHttpService.getResourceCollection('', {routeName: DEFAULT_ROUTE_NAME}))
       .toThrowError(`Passed param(s) 'resourceName = ' is not valid`);
   });
 
   it('GET_RESOURCE_COLLECTION throws error when resourceName is null', () => {
-    expect(() => resourceCollectionHttpService.getResourceCollection(null))
+    expect(() => resourceCollectionHttpService.getResourceCollection(null, {routeName: DEFAULT_ROUTE_NAME}))
       .toThrowError(`Passed param(s) 'resourceName = null' is not valid`);
   });
 
   it('GET_RESOURCE_COLLECTION throws error when resourceName is undefined', () => {
-    expect(() => resourceCollectionHttpService.getResourceCollection(undefined))
+    expect(() => resourceCollectionHttpService.getResourceCollection(undefined, {routeName: DEFAULT_ROUTE_NAME}))
       .toThrowError(`Passed param(s) 'resourceName = undefined' is not valid`);
   });
 
   it('GET_RESOURCE_COLLECTION should generate root resource url', () => {
     httpClientSpy.get.and.returnValue(of(rawResourceCollection));
 
-    resourceCollectionHttpService.getResourceCollection('test').subscribe(() => {
+    resourceCollectionHttpService.getResourceCollection('test', {routeName: DEFAULT_ROUTE_NAME}).subscribe(() => {
       const url = httpClientSpy.get.calls.argsFor(0)[0];
-      expect(url).toBe(`${ UrlUtils.getApiUrl() }/test`);
+      expect(url).toBe(`${ UrlUtils.getApiUrl(DEFAULT_ROUTE_NAME) }/test`);
     });
   });
 
   it('GET_RESOURCE_COLLECTION should pass http request params when it passed', () => {
     httpClientSpy.get.and.returnValue(of(rawResourceCollection));
 
-    resourceCollectionHttpService.getResourceCollection('test', {
+    resourceCollectionHttpService.getResourceCollection('test', {routeName: DEFAULT_ROUTE_NAME}, {
       params: {
         projection: 'testProjection',
         test: 'testParam'
@@ -166,38 +167,38 @@ describe('ResourceCollectionHttpService', () => {
   });
 
   it('SEARCH throws error when resourceName is empty', () => {
-    expect(() => resourceCollectionHttpService.search('', 'any'))
+    expect(() => resourceCollectionHttpService.search('', {routeName: DEFAULT_ROUTE_NAME}, 'any'))
       .toThrowError(`Passed param(s) 'resourceName = ' is not valid`);
   });
 
   it('SEARCH throws error when searchQuery is empty', () => {
-    expect(() => resourceCollectionHttpService.search('any', ''))
+    expect(() => resourceCollectionHttpService.search('any', {routeName: DEFAULT_ROUTE_NAME}, ''))
       .toThrowError(`Passed param(s) 'searchQuery = ' is not valid`);
   });
 
   it('SEARCH throws error when resourceName,searchQuery are null', () => {
-    expect(() => resourceCollectionHttpService.search(null, null))
+    expect(() => resourceCollectionHttpService.search(null, {routeName: DEFAULT_ROUTE_NAME}, null))
       .toThrowError(`Passed param(s) 'resourceName = null', 'searchQuery = null' are not valid`);
   });
 
   it('SEARCH throws error when resourceName,searchQuery are undefined', () => {
-    expect(() => resourceCollectionHttpService.search(undefined, undefined))
+    expect(() => resourceCollectionHttpService.search(undefined, {routeName: DEFAULT_ROUTE_NAME}, undefined))
       .toThrowError(`Passed param(s) 'resourceName = undefined', 'searchQuery = undefined' are not valid`);
   });
 
   it('SEARCH should generate search resource url', () => {
     httpClientSpy.get.and.returnValue(of(rawResourceCollection));
 
-    resourceCollectionHttpService.search('test', 'someQuery').subscribe(() => {
+    resourceCollectionHttpService.search('test', {routeName: DEFAULT_ROUTE_NAME}, 'someQuery').subscribe(() => {
       const url = httpClientSpy.get.calls.argsFor(0)[0];
-      expect(url).toBe(`${ UrlUtils.getApiUrl() }/test/search/someQuery`);
+      expect(url).toBe(`${ UrlUtils.getApiUrl(DEFAULT_ROUTE_NAME) }/test/search/someQuery`);
     });
   });
 
   it('SEARCH should pass http request params when it passed', () => {
     httpClientSpy.get.and.returnValue(of(rawResourceCollection));
 
-    resourceCollectionHttpService.search('test', 'someQuery', {
+    resourceCollectionHttpService.search('test', {routeName: DEFAULT_ROUTE_NAME}, 'someQuery', {
       params: {
         projection: 'testProjection',
         test: 'testParam'

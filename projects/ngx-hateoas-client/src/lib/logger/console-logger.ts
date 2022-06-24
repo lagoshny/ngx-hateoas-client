@@ -56,6 +56,19 @@ export class ConsoleLogger {
     ConsoleLogger.info(msg, ...color);
   }
 
+  public static objectPrettyInfo(message: string, params?: object): void {
+    if (!LibConfig.config.logs.verboseLogs && !LibConfig.config.isProduction) {
+      return;
+    }
+
+    const msg = `%c${ message }\n`;
+    const color = [
+      'color: #201AB3;'
+    ];
+
+    ConsoleLogger.info(msg, ...color, params);
+  }
+
   /**
    * Log resource info messages in pretty format.
    *

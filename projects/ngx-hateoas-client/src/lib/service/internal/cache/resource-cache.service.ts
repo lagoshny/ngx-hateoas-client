@@ -67,13 +67,13 @@ export class ResourceCacheService {
     ValidationUtils.validateInputParams({key});
 
     // Get resource name by url to evict all resource cache with collection/paged collection data
-    const resourceName = key.url.replace(`${ UrlUtils.guessResourceRoute(key.url) }/`, '').split('/')[0];
+    const resourceName = key.url.replace(`${ UrlUtils.guessResourceRouteUrl(key.url) }/`, '').split('/')[0];
     if (!resourceName) {
       return;
     }
     const evictedCache = [];
     for (const cacheKey of this.cacheMap.keys()) {
-      if (cacheKey.startsWith(`url=${ UrlUtils.guessResourceRoute(key.url) }/${ resourceName }`)) {
+      if (cacheKey.startsWith(`url=${ UrlUtils.guessResourceRouteUrl(key.url) }/${ resourceName }`)) {
         evictedCache.push({
           key: cacheKey
         });

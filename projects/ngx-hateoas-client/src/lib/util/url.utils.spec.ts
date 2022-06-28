@@ -469,4 +469,29 @@ describe('UrlUtils', () => {
     expect(clearedUrl).toEqual('http://localhost:8080/api/v1/products');
   });
 
+  it('GUESS_RESOURCE_ROUTE_URL return proxy url if it equals to it', () => {
+    LibConfig.config.http[DEFAULT_ROUTE_NAME].proxyUrl = 'http://myproxy.ru/api/v1';
+
+    const routeUrl = UrlUtils.guessResourceRouteUrl('http://myproxy.ru/api/v1/test-resource/1');
+
+    expect(routeUrl).toBe(LibConfig.config.http[DEFAULT_ROUTE_NAME].proxyUrl);
+  });
+
+  it('GUESS_RESOURCE_ROUTE_URL return base url if it equals to it', () => {
+    LibConfig.config.http[DEFAULT_ROUTE_NAME].rootUrl = 'http://myroot.ru/api/v1';
+
+    const routeUrl = UrlUtils.guessResourceRouteUrl('http://myroot.ru/api/v1/test-resource/1');
+
+    expect(routeUrl).toBe(LibConfig.config.http[DEFAULT_ROUTE_NAME].rootUrl);
+  });
+
+  it('GUESS_RESOURCE_ROUTE_URL throws exception when no route found', () => {
+    LibConfig.config.http[DEFAULT_ROUTE_NAME].rootUrl = 'http://myroot.ru/api/v1';
+    const resourceUrl = 'http://myroot.another.ru/api/v1/test-resource/1';
+
+    expect(() => {
+      UrlUtils.guessResourceRouteUrl(resourceUrl);
+    }).toThrowError(`Failed to determine resource route by url: ${ resourceUrl }`);
+  });
+
 });

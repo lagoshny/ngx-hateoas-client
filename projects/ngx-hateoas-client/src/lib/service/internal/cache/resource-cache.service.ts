@@ -7,7 +7,7 @@ import { ValidationUtils } from '../../../util/validation.utils';
 import { ResourceIdentifiable } from '../../../model/declarations';
 import { LibConfig } from '../../../config/lib-config';
 import { UrlUtils } from '../../../util/url.utils';
-import { isNil } from 'lodash-es';
+import { isEmpty, isNil } from 'lodash-es';
 
 @Injectable({
   providedIn: 'root',
@@ -67,13 +67,17 @@ export class ResourceCacheService {
     ValidationUtils.validateInputParams({key});
 
     // Get resource name by url to evict all resource cache with collection/paged collection data
-    const resourceName = key.url.replace(`${ UrlUtils.guessResourceRouteUrl(key.url) }/`, '').split('/')[0];
+    const resourceName = UrlUtils.getResourceNameFromUrl(key.url);
     if (!resourceName) {
       return;
     }
+
     const evictedCache = [];
     for (const cacheKey of this.cacheMap.keys()) {
-      if (cacheKey.startsWith(`url=${ UrlUtils.guessResourceRouteUrl(key.url) }/${ resourceName }`)) {
+      const resourceRoute = UrlUtils.guessResourceRoute(key.url);
+
+      if (cacheKey.startsWith(`url=${ resourceRoute.rootUrl }/${ resourceName }`) ||
+        (!isEmpty(resourceRoute.proxyUrl) && cacheKey.startsWith(`url=${ resourceRoute.proxyUrl }/${ resourceName }`))) {
         evictedCache.push({
           key: cacheKey
         });

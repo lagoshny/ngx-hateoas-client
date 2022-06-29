@@ -12,7 +12,7 @@ import { RESOURCE_NAME_PROP } from '../model/declarations';
 export class StageLogger {
 
   public static resourceBeginLog(resource: object | string, method: string, params?: object): void {
-    if (!LibConfig.config.logs.verboseLogs && !LibConfig.config.isProduction) {
+    if (!LibConfig.getConfig().logs.verboseLogs && !LibConfig.getConfig().isProduction) {
       return;
     }
     const paramToLog = this.prepareParams(params);
@@ -30,7 +30,7 @@ export class StageLogger {
   }
 
   public static resourceEndLog(resource: object | string, method: string, params: object): void {
-    if (!LibConfig.config.logs.verboseLogs && !LibConfig.config.isProduction) {
+    if (!LibConfig.getConfig().logs.verboseLogs && !LibConfig.getConfig().isProduction) {
       return;
     }
     const paramToLog = this.prepareParams(params);
@@ -47,7 +47,7 @@ export class StageLogger {
   }
 
   public static stageLog(stage: Stage, params: object): void {
-    if (!LibConfig.config.logs.verboseLogs && !LibConfig.config.isProduction) {
+    if (!LibConfig.getConfig().logs.verboseLogs && !LibConfig.getConfig().isProduction) {
       return;
     }
     const paramToLog = this.prepareParams(params);
@@ -56,7 +56,7 @@ export class StageLogger {
   }
 
   public static stageErrorLog(stage: Stage, params: object): void {
-    if (LibConfig.config.isProduction) {
+    if (LibConfig.getConfig().isProduction) {
       return;
     }
     const paramToLog = this.prepareParams(params);
@@ -65,7 +65,7 @@ export class StageLogger {
   }
 
   public static stageWarnLog(stage: Stage, params: object): void {
-    if (LibConfig.config.isProduction) {
+    if (LibConfig.getConfig().isProduction) {
       return;
     }
     const paramToLog = this.prepareParams(params);

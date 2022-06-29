@@ -1,9 +1,4 @@
-import {
-  DEFAULT_ROUTE_NAME,
-  HateoasConfiguration,
-  MultipleResourceRoutes,
-  ResourceRoute
-} from './hateoas-configuration.interface';
+import { DEFAULT_ROUTE_NAME, HateoasConfiguration } from './hateoas-configuration.interface';
 
 /**
  * Contains all configuration lib params.
@@ -11,7 +6,7 @@ import {
 // tslint:disable:no-string-literal
 export class LibConfig {
 
-  public static readonly DEFAULT_CONFIG = {
+  public static readonly DEFAULT_CONFIG: HateoasConfiguration = {
     http: {
       [DEFAULT_ROUTE_NAME]: {
         rootUrl: 'http://localhost:8080/api/v1'
@@ -36,7 +31,7 @@ export class LibConfig {
     isProduction: false
   };
 
-  public static config: HateoasConfiguration = LibConfig.DEFAULT_CONFIG;
+  private static config: HateoasConfiguration = LibConfig.DEFAULT_CONFIG;
 
   public static setConfig(hateoasConfiguration: HateoasConfiguration) {
     LibConfig.config = {
@@ -45,12 +40,8 @@ export class LibConfig {
     };
   }
 
-  public static getRouteByName(routeName: string): ResourceRoute {
-    return LibConfig.config.http[routeName];
-  }
-
-  public static getRoutes(): MultipleResourceRoutes {
-    return LibConfig.config.http as MultipleResourceRoutes;
+  public static getConfig(): HateoasConfiguration {
+    return LibConfig.config;
   }
 
 }

@@ -43,7 +43,6 @@ describe('PagedResourceCollectionHttpService', () => {
     ResourceUtils.useResourceType(null);
     ResourceUtils.useResourceCollectionType(null);
     ResourceUtils.usePagedResourceCollectionType(null);
-    LibConfig.config = LibConfig.DEFAULT_CONFIG;
   });
 
   it('GET REQUEST should throw error when returned object is EMBEDDED_RESOURCE', () => {
@@ -84,7 +83,12 @@ describe('PagedResourceCollectionHttpService', () => {
   });
 
   it('GET REQUEST should evict cache when returned object is not paged resource collection', () => {
-    LibConfig.config.cache.enabled = true;
+    spyOn(LibConfig, 'getConfig').and.returnValue({
+      ...LibConfig.DEFAULT_CONFIG,
+      cache: {
+        enabled: true
+      }
+    });
     httpClientSpy.get.and.returnValue(of({any: 'value'}));
 
     pagedResourceCollectionHttpService.get('someUrl').subscribe(() => {

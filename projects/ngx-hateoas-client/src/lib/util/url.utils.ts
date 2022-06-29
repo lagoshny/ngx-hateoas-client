@@ -6,7 +6,7 @@ import { ValidationUtils } from './validation.utils';
 import { LibConfig } from '../config/lib-config';
 import { isArray, isEmpty, isNil, isObject, toString } from 'lodash-es';
 import { UriTemplate } from 'uri-templates-es';
-import { ResourceOption } from '../config/hateoas-configuration.interface';
+import { MultipleResourceRoutes, ResourceOption, ResourceRoute } from '../config/hateoas-configuration.interface';
 import { ConsoleLogger } from '../logger/console-logger';
 
 export class UrlUtils {
@@ -89,9 +89,7 @@ export class UrlUtils {
     } else {
       url = relationLink.templated ? UrlUtils.removeTemplateParams(relationLink.href) : relationLink.href;
     }
-    const route = LibConfig.getRouteByName(resourceOptions.routeName);
-    this.checkRoute(route, resourceOptions.routeName);
-
+    const route = UrlUtils.getRouteByName(resourceOptions.routeName);
     if (route.proxyUrl) {
       return url.replace(route.rootUrl, route.proxyUrl);
     }
@@ -104,9 +102,7 @@ export class UrlUtils {
    * @param routeName resource route name that configured in {@link MultipleResourceRoutes}.
    */
   public static getApiUrl(routeName: string): string {
-    const route = LibConfig.getRouteByName(routeName);
-    this.checkRoute(route, routeName);
-
+    const route = UrlUtils.getRouteByName(routeName);
     if (route.proxyUrl) {
       return route.proxyUrl;
     } else {
@@ -118,21 +114,26 @@ export class UrlUtils {
    * Try to determine resource route by passed resource url.
    * @param url resource url
    */
-  public static guessResourceRoute(url: string): string {
-    let route: string;
-    for (const [key] of Object.entries(LibConfig.getRoutes())) {
-      const apiUrl = UrlUtils.getApiUrl(key);
-      if (url.toLowerCase().includes(apiUrl)) {
-        route = apiUrl;
+  public static guessResourceRouteUrl(url: string): string {
+    let routeUrl: string;
+    for (const [routeName] of Object.entries(UrlUtils.getRoutes())) {
+      const route = UrlUtils.getRouteByName(routeName);
+      const lowerCaseUrl = url.toLowerCase();
+      if (!isEmpty(route.rootUrl) && lowerCaseUrl.includes(route.rootUrl.toLowerCase())) {
+        routeUrl = route.rootUrl;
+        break;
+      }
+      if (!isEmpty(route.proxyUrl) && lowerCaseUrl.includes(route.proxyUrl.toLowerCase())) {
+        routeUrl = route.proxyUrl;
         break;
       }
     }
 
-    if (isEmpty(route)) {
+    if (isEmpty(routeUrl)) {
       throw new Error(`Failed to determine resource route by url: ${ url }`);
     }
 
-    return route;
+    return routeUrl;
   }
 
   /**
@@ -161,7 +162,7 @@ export class UrlUtils {
   public static getResourceNameFromUrl(url: string): string {
     ValidationUtils.validateInputParams({url});
 
-    const dividedBySlashUrl = url.toLowerCase().replace(`${ UrlUtils.guessResourceRoute(url) }/`, '').split('/');
+    const dividedBySlashUrl = url.toLowerCase().replace(`${ UrlUtils.guessResourceRouteUrl(url) }/`, '').split('/');
     return dividedBySlashUrl[0];
   }
 
@@ -224,11 +225,11 @@ export class UrlUtils {
   public static fillDefaultPageDataIfNoPresent(options: PagedGetOption) {
     const pagedOptions = !isEmpty(options) ? options : {};
     if (isEmpty(pagedOptions.pageParams)) {
-      pagedOptions.pageParams = LibConfig.config.pagination.defaultPage;
+      pagedOptions.pageParams = LibConfig.getConfig().pagination.defaultPage;
     } else if (!pagedOptions.pageParams.size) {
-      pagedOptions.pageParams.size = LibConfig.config.pagination.defaultPage.size;
+      pagedOptions.pageParams.size = LibConfig.getConfig().pagination.defaultPage.size;
     } else if (!pagedOptions.pageParams.page) {
-      pagedOptions.pageParams.page = LibConfig.config.pagination.defaultPage.page;
+      pagedOptions.pageParams.page = LibConfig.getConfig().pagination.defaultPage.page;
     }
 
     return pagedOptions;
@@ -254,13 +255,20 @@ export class UrlUtils {
     }
   }
 
-  private static checkRoute(route: object, routeName: string) {
+  public static getRouteByName(routeName: string): ResourceRoute {
+    const route = LibConfig.getConfig().http[routeName];
     if (isEmpty(route)) {
       ConsoleLogger.error(`No Resource route found by name: '${ routeName }'. Check you configuration. Read more about this ...`, {
-        availableRoutes: LibConfig.getRoutes()
+        availableRoutes: UrlUtils.getRoutes()
       });
-      throw Error(`No Resource route found by name: '${routeName}'.`);
+      throw Error(`No Resource route found by name: '${ routeName }'.`);
     }
+
+    return route;
+  }
+
+  public static getRoutes(): MultipleResourceRoutes {
+    return LibConfig.getConfig().http as MultipleResourceRoutes;
   }
 
 }

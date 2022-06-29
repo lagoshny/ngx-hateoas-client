@@ -42,7 +42,6 @@ describe('ResourceHttpService', () => {
 
   afterEach(() => {
     ResourceUtils.useResourceType(null);
-    LibConfig.config = LibConfig.DEFAULT_CONFIG;
   });
 
   it('GET REQUEST should throw error when returned object is COLLECTION_RESOURCE', () => {
@@ -109,7 +108,12 @@ describe('ResourceHttpService', () => {
   });
 
   it('GET REQUEST should evict cache when returned object is not resource', () => {
-    LibConfig.config.cache.enabled = true;
+    spyOn(LibConfig, 'getConfig').and.returnValue({
+      ...LibConfig.DEFAULT_CONFIG,
+      cache: {
+        enabled: true
+      }
+    });
     httpClientSpy.get.and.returnValue(of({any: 'value'}));
 
     resourceHttpService.get('someUrl').subscribe(() => {

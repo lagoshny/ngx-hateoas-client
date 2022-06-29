@@ -31,7 +31,7 @@ export class LibConfig {
     isProduction: false
   };
 
-  public static config: HateoasConfiguration = LibConfig.DEFAULT_CONFIG;
+  private static config: HateoasConfiguration = LibConfig.DEFAULT_CONFIG;
 
   public static setConfig(hateoasConfiguration: HateoasConfiguration) {
     LibConfig.config = {

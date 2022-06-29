@@ -152,9 +152,6 @@ describe('UrlUtils', () => {
       useCache: true
     });
 
-    console.log('ILOFAW');
-    console.log(result);
-
     expect(result.params.get('testParam')).toBe('test');
     expect(result.params.get('sort')).toBe('prop,ASC');
     expect(result.params.get('page')).toBe('1');

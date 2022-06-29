@@ -114,26 +114,23 @@ export class UrlUtils {
    * Try to determine resource route by passed resource url.
    * @param url resource url
    */
-  public static guessResourceRouteUrl(url: string): string {
-    let routeUrl: string;
+  public static guessResourceRoute(url: string): ResourceRoute {
+    let resourceRoute: ResourceRoute;
     for (const [routeName] of Object.entries(UrlUtils.getRoutes())) {
       const route = UrlUtils.getRouteByName(routeName);
       const lowerCaseUrl = url.toLowerCase();
-      if (!isEmpty(route.rootUrl) && lowerCaseUrl.includes(route.rootUrl.toLowerCase())) {
-        routeUrl = route.rootUrl;
-        break;
-      }
-      if (!isEmpty(route.proxyUrl) && lowerCaseUrl.includes(route.proxyUrl.toLowerCase())) {
-        routeUrl = route.proxyUrl;
+      if (lowerCaseUrl.includes(route.rootUrl.toLowerCase())
+        || (!isEmpty(route.proxyUrl) && lowerCaseUrl.includes(route.proxyUrl.toLowerCase()))) {
+        resourceRoute = route;
         break;
       }
     }
 
-    if (isEmpty(routeUrl)) {
+    if (isEmpty(resourceRoute)) {
       throw new Error(`Failed to determine resource route by url: ${ url }`);
     }
 
-    return routeUrl;
+    return resourceRoute;
   }
 
   /**
@@ -161,9 +158,16 @@ export class UrlUtils {
    */
   public static getResourceNameFromUrl(url: string): string {
     ValidationUtils.validateInputParams({url});
+    const lowerCaseUrl = url.toLowerCase();
+    const resourceRoute = UrlUtils.guessResourceRoute(url);
 
-    const dividedBySlashUrl = url.toLowerCase().replace(`${ UrlUtils.guessResourceRouteUrl(url) }/`, '').split('/');
-    return dividedBySlashUrl[0];
+    if (lowerCaseUrl.includes(resourceRoute.rootUrl)) {
+      return url.toLowerCase().replace(`${ resourceRoute.rootUrl }/`, '').split('/')[0];
+    } else if (!isEmpty(resourceRoute.proxyUrl) && lowerCaseUrl.includes(resourceRoute.proxyUrl)) {
+      return url.toLowerCase().replace(`${ resourceRoute.proxyUrl }/`, '').split('/')[0];
+    } else {
+      throw new Error(`Failed to determine resource name from url: ${ url }, found resource route ${ JSON.stringify(resourceRoute) }`);
+    }
   }
 
   /**

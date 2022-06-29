@@ -514,7 +514,7 @@ describe('UrlUtils', () => {
       }
     });
 
-    const routeUrl = UrlUtils.guessResourceRouteUrl('http://myproxy.ru/api/v1/test-resource/1');
+    const routeUrl = UrlUtils.guessResourceRoute('http://myproxy.ru/api/v1/test-resource/1').proxyUrl;
 
     expect(routeUrl).toBe(LibConfig.getConfig().http[DEFAULT_ROUTE_NAME].proxyUrl);
   });
@@ -529,7 +529,7 @@ describe('UrlUtils', () => {
       }
     });
 
-    const routeUrl = UrlUtils.guessResourceRouteUrl('http://myroot.ru/api/v1/test-resource/1');
+    const routeUrl = UrlUtils.guessResourceRoute('http://myroot.ru/api/v1/test-resource/1').rootUrl;
 
     expect(routeUrl).toBe(LibConfig.getConfig().http[DEFAULT_ROUTE_NAME].rootUrl);
   });
@@ -546,7 +546,7 @@ describe('UrlUtils', () => {
     const resourceUrl = 'http://myroot.another.ru/api/v1/test-resource/1';
 
     expect(() => {
-      UrlUtils.guessResourceRouteUrl(resourceUrl);
+      UrlUtils.guessResourceRoute(resourceUrl);
     }).toThrowError(`Failed to determine resource route by url: ${ resourceUrl }`);
   });
 

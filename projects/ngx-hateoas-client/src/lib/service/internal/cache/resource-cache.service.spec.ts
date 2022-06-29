@@ -11,10 +11,6 @@ describe('CacheService', () => {
     cacheService = new ResourceCacheService();
   }));
 
-  afterEach(() => {
-    LibConfig.config = LibConfig.DEFAULT_CONFIG;
-  });
-
   it('GET_RESOURCE should throw error when passed key is null', () => {
     expect(() => cacheService.getResource(null))
       .toThrowError(`Passed param(s) 'key = null' is not valid`);
@@ -32,7 +28,14 @@ describe('CacheService', () => {
 
   it('GET_RESOURCE should return null when a cache has value but it is expired',
     waitForAsync(() => {
-      LibConfig.config.cache.lifeTime = 1 / 1000;
+      spyOn(LibConfig, 'getConfig').and.returnValue({
+        ...LibConfig.DEFAULT_CONFIG,
+        cache: {
+          enabled: LibConfig.DEFAULT_CONFIG.cache.enabled,
+          lifeTime: 1 / 1000
+        }
+      });
+
       cacheService.putResource(CacheKey.of('http://localhost:8080/api/v1', {}), rawResource);
 
       setTimeout(() => {

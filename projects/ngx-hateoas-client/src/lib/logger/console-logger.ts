@@ -5,21 +5,21 @@ import { camelCase, capitalize, isEmpty } from 'lodash-es';
 export class ConsoleLogger {
 
   public static info(message?: any, ...optionalParams: any[]): void {
-    if (!LibConfig.config.logs.verboseLogs && !LibConfig.config.isProduction) {
+    if (!LibConfig.getConfig().logs.verboseLogs && !LibConfig.getConfig().isProduction) {
       return;
     }
     console.info(message, ...optionalParams);
   }
 
   public static warn(message?: any, ...optionalParams: any[]): void {
-    if (LibConfig.config.isProduction) {
+    if (LibConfig.getConfig().isProduction) {
       return;
     }
     console.warn(message, ...optionalParams);
   }
 
   public static error(message?: any, ...optionalParams: any[]): void {
-    if (LibConfig.config.isProduction) {
+    if (LibConfig.getConfig().isProduction) {
       return;
     }
     console.error(message, ...optionalParams);
@@ -32,7 +32,7 @@ export class ConsoleLogger {
    * @param params additional params for verbose log
    */
   public static prettyInfo(message: string, params?: object): void {
-    if (!LibConfig.config.logs.verboseLogs && !LibConfig.config.isProduction) {
+    if (!LibConfig.getConfig().logs.verboseLogs && !LibConfig.getConfig().isProduction) {
       return;
     }
 
@@ -57,7 +57,7 @@ export class ConsoleLogger {
   }
 
   public static objectPrettyInfo(message: string, params?: object): void {
-    if (!LibConfig.config.logs.verboseLogs && !LibConfig.config.isProduction) {
+    if (!LibConfig.getConfig().logs.verboseLogs && !LibConfig.getConfig().isProduction) {
       return;
     }
 
@@ -77,7 +77,7 @@ export class ConsoleLogger {
    * @param params additional params for verbose log
    */
   public static resourcePrettyInfo(resourceName: string, message: string, params?: object): void {
-    if (!LibConfig.config.logs.verboseLogs && !LibConfig.config.isProduction) {
+    if (!LibConfig.getConfig().logs.verboseLogs && !LibConfig.getConfig().isProduction) {
       return;
     }
 
@@ -109,7 +109,7 @@ export class ConsoleLogger {
    * @param params additional params for verbose log
    */
   public static prettyError(message: string, params?: object): void {
-    if (LibConfig.config.isProduction) {
+    if (LibConfig.getConfig().isProduction) {
       return;
     }
 
@@ -140,7 +140,7 @@ export class ConsoleLogger {
    * @param params additional params for verbose log
    */
   public static prettyWarn(message: string, params?: object): void {
-    if (LibConfig.config.isProduction) {
+    if (LibConfig.getConfig().isProduction) {
       return;
     }
 

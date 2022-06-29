@@ -27,7 +27,6 @@ describe('ResourceUtils', () => {
     ResourceUtils.useEmbeddedResourceType(EmbeddedResource);
     ResourceUtils.useResourceCollectionType(ResourceCollection);
     ResourceUtils.usePagedResourceCollectionType(PagedResourceCollection);
-    LibConfig.setConfig(LibConfig.DEFAULT_CONFIG);
   });
 
   afterEach(() => {
@@ -197,11 +196,14 @@ describe('ResourceUtils', () => {
   });
 
   it('INSTANTIATE_RESOURCE with Date field as string should be parsed to Date object', () => {
-    LibConfig.config.typesFormat = {
-      date: {
-        patterns: ['dd.MM.yyyy']
+    spyOn(LibConfig, 'getConfig').and.returnValue({
+      ...LibConfig.DEFAULT_CONFIG,
+      typesFormat: {
+        date: {
+          patterns: ['dd.MM.yyyy']
+        }
       }
-    };
+    });
 
     const testRawResource = {
       someDate: '23.06.2022',
@@ -221,11 +223,14 @@ describe('ResourceUtils', () => {
   });
 
   it('INSTANTIATE_RESOURCE with Date field as string should be parsed from one of specified Date format', () => {
-    LibConfig.config.typesFormat = {
-      date: {
-        patterns: ['d.MM.yyyy', 'dd.MM.yyyy']
+    spyOn(LibConfig, 'getConfig').and.returnValue({
+      ...LibConfig.DEFAULT_CONFIG,
+      typesFormat: {
+        date: {
+          patterns: ['d.MM.yyyy', 'dd.MM.yyyy']
+        }
       }
-    };
+    });
 
     const testRawResource = {
       someDate: '23.06.2022',

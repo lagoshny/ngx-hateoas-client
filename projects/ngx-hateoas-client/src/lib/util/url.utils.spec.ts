@@ -346,33 +346,63 @@ describe('UrlUtils', () => {
   });
 
   it('GENERATE_LINK_URL should replace root link url to proxyUrl', () => {
-    LibConfig.config.http[DEFAULT_ROUTE_NAME].proxyUrl = 'http://myproxy.ru/api/v1';
+    spyOn(LibConfig, 'getConfig').and.returnValue({
+      ...LibConfig.DEFAULT_CONFIG,
+      http: {
+        [DEFAULT_ROUTE_NAME]: {
+          rootUrl: LibConfig.DEFAULT_CONFIG.http[DEFAULT_ROUTE_NAME].rootUrl,
+          proxyUrl: 'http://myproxy.ru/api/v1'
+        }
+      }
+    });
     const result = UrlUtils.generateLinkUrl({routeName: DEFAULT_ROUTE_NAME}, {href: `${ UrlUtils.getApiUrl(DEFAULT_ROUTE_NAME) }/test`});
 
     expect(result).toBe('http://myproxy.ru/api/v1/test');
-    LibConfig.config.http[DEFAULT_ROUTE_NAME].proxyUrl = '';
   });
 
   it('GENERATE_LINK_URL should NOT replace root link url to proxyUrl when it is empty', () => {
-    LibConfig.config.http[DEFAULT_ROUTE_NAME].proxyUrl = '';
+    spyOn(LibConfig, 'getConfig').and.returnValue({
+      ...LibConfig.DEFAULT_CONFIG,
+      http: {
+        [DEFAULT_ROUTE_NAME]: {
+          rootUrl: LibConfig.DEFAULT_CONFIG.http[DEFAULT_ROUTE_NAME].rootUrl,
+          proxyUrl: ''
+        }
+      }
+    });
     const result = UrlUtils.generateLinkUrl({routeName: DEFAULT_ROUTE_NAME}, {href: `${ UrlUtils.getApiUrl(DEFAULT_ROUTE_NAME) }/test`});
 
     expect(result).toBe(`${ UrlUtils.getApiUrl(DEFAULT_ROUTE_NAME) }/test`);
   });
 
   it('GET_API_URL should return root link when proxy is empty', () => {
-    LibConfig.config.http[DEFAULT_ROUTE_NAME].proxyUrl = '';
+    spyOn(LibConfig, 'getConfig').and.returnValue({
+      ...LibConfig.DEFAULT_CONFIG,
+      http: {
+        [DEFAULT_ROUTE_NAME]: {
+          rootUrl: LibConfig.DEFAULT_CONFIG.http[DEFAULT_ROUTE_NAME].rootUrl,
+          proxyUrl: ''
+        }
+      }
+    });
     const result = UrlUtils.getApiUrl(DEFAULT_ROUTE_NAME);
 
-    expect(result).toBe(LibConfig.config.http[DEFAULT_ROUTE_NAME].rootUrl);
+    expect(result).toBe(LibConfig.getConfig().http[DEFAULT_ROUTE_NAME].rootUrl);
   });
 
   it('GET_API_URL should return proxy link when proxy is NOT empty', () => {
-    LibConfig.config.http[DEFAULT_ROUTE_NAME].proxyUrl = 'http://myproxy.ru/api/v1';
+    spyOn(LibConfig, 'getConfig').and.returnValue({
+      ...LibConfig.DEFAULT_CONFIG,
+      http: {
+        [DEFAULT_ROUTE_NAME]: {
+          rootUrl: LibConfig.DEFAULT_CONFIG.http[DEFAULT_ROUTE_NAME].rootUrl,
+          proxyUrl: 'http://myproxy.ru/api/v1'
+        }
+      }
+    });
     const result = UrlUtils.getApiUrl(DEFAULT_ROUTE_NAME);
 
-    expect(result).toBe(LibConfig.config.http[DEFAULT_ROUTE_NAME].proxyUrl);
-    LibConfig.config.http[DEFAULT_ROUTE_NAME].proxyUrl = '';
+    expect(result).toBe(LibConfig.getConfig().http[DEFAULT_ROUTE_NAME].proxyUrl);
   });
 
   it('GET_RESOURCE_NAME_FROM_URL should throw error when url is empty', () => {
@@ -396,9 +426,16 @@ describe('UrlUtils', () => {
   });
 
   it('GET_RESOURCE_NAME_FROM_URL should return resource name with root proxy', () => {
-    LibConfig.config.http[DEFAULT_ROUTE_NAME].proxyUrl = 'http://proxy-localhost:8080/api/v1';
+    spyOn(LibConfig, 'getConfig').and.returnValue({
+      ...LibConfig.DEFAULT_CONFIG,
+      http: {
+        [DEFAULT_ROUTE_NAME]: {
+          rootUrl: LibConfig.DEFAULT_CONFIG.http[DEFAULT_ROUTE_NAME].rootUrl,
+          proxyUrl: 'http://proxy-localhost:8080/api/v1'
+        }
+      }
+    });
     const resourceNameFromUrl = UrlUtils.getResourceNameFromUrl('http://proxy-localhost:8080/api/v1/resources/1');
-    LibConfig.config.http[DEFAULT_ROUTE_NAME].proxyUrl = '';
     expect(resourceNameFromUrl).toEqual('resources');
   });
 
@@ -407,8 +444,8 @@ describe('UrlUtils', () => {
 
     expect(pagedOptions).toBeDefined();
     expect(pagedOptions.pageParams).toBeDefined();
-    expect(pagedOptions.pageParams.page).toBe(LibConfig.config.pagination.defaultPage.page);
-    expect(pagedOptions.pageParams.size).toBe(LibConfig.config.pagination.defaultPage.size);
+    expect(pagedOptions.pageParams.page).toBe(LibConfig.getConfig().pagination.defaultPage.page);
+    expect(pagedOptions.pageParams.size).toBe(LibConfig.getConfig().pagination.defaultPage.size);
   });
 
   it('FILL_DEFAULT_PAGE_DATA_IF_NO_PRESENT fill all default values when passed options are \'undefined\'', () => {
@@ -416,8 +453,8 @@ describe('UrlUtils', () => {
 
     expect(pagedOptions).toBeDefined();
     expect(pagedOptions.pageParams).toBeDefined();
-    expect(pagedOptions.pageParams.page).toBe(LibConfig.config.pagination.defaultPage.page);
-    expect(pagedOptions.pageParams.size).toBe(LibConfig.config.pagination.defaultPage.size);
+    expect(pagedOptions.pageParams.page).toBe(LibConfig.getConfig().pagination.defaultPage.page);
+    expect(pagedOptions.pageParams.size).toBe(LibConfig.getConfig().pagination.defaultPage.size);
   });
 
   it('FILL_DEFAULT_PAGE_DATA_IF_NO_PRESENT fill all default values when passed options are \'empty object\'', () => {
@@ -425,8 +462,8 @@ describe('UrlUtils', () => {
 
     expect(pagedOptions).toBeDefined();
     expect(pagedOptions.pageParams).toBeDefined();
-    expect(pagedOptions.pageParams.page).toBe(LibConfig.config.pagination.defaultPage.page);
-    expect(pagedOptions.pageParams.size).toBe(LibConfig.config.pagination.defaultPage.size);
+    expect(pagedOptions.pageParams.page).toBe(LibConfig.getConfig().pagination.defaultPage.page);
+    expect(pagedOptions.pageParams.size).toBe(LibConfig.getConfig().pagination.defaultPage.size);
   });
 
   it('FILL_DEFAULT_PAGE_DATA_IF_NO_PRESENT fill page default value when passed options have not it', () => {
@@ -434,7 +471,7 @@ describe('UrlUtils', () => {
 
     expect(pagedOptions).toBeDefined();
     expect(pagedOptions.pageParams).toBeDefined();
-    expect(pagedOptions.pageParams.page).toBe(LibConfig.config.pagination.defaultPage.page);
+    expect(pagedOptions.pageParams.page).toBe(LibConfig.getConfig().pagination.defaultPage.page);
     expect(pagedOptions.pageParams.size).toBe(40);
   });
 
@@ -444,7 +481,7 @@ describe('UrlUtils', () => {
     expect(pagedOptions).toBeDefined();
     expect(pagedOptions.pageParams).toBeDefined();
     expect(pagedOptions.pageParams.page).toBe(4);
-    expect(pagedOptions.pageParams.size).toBe(LibConfig.config.pagination.defaultPage.size);
+    expect(pagedOptions.pageParams.size).toBe(LibConfig.getConfig().pagination.defaultPage.size);
   });
 
   it('CLEAR_URL_PARAMS should throw error when url is empty', () => {
@@ -470,23 +507,45 @@ describe('UrlUtils', () => {
   });
 
   it('GUESS_RESOURCE_ROUTE_URL return proxy url if it equals to it', () => {
-    LibConfig.config.http[DEFAULT_ROUTE_NAME].proxyUrl = 'http://myproxy.ru/api/v1';
+    spyOn(LibConfig, 'getConfig').and.returnValue({
+      ...LibConfig.DEFAULT_CONFIG,
+      http: {
+        [DEFAULT_ROUTE_NAME]: {
+          rootUrl: LibConfig.DEFAULT_CONFIG.http[DEFAULT_ROUTE_NAME].rootUrl,
+          proxyUrl: 'http://myproxy.ru/api/v1'
+        }
+      }
+    });
 
     const routeUrl = UrlUtils.guessResourceRouteUrl('http://myproxy.ru/api/v1/test-resource/1');
 
-    expect(routeUrl).toBe(LibConfig.config.http[DEFAULT_ROUTE_NAME].proxyUrl);
+    expect(routeUrl).toBe(LibConfig.getConfig().http[DEFAULT_ROUTE_NAME].proxyUrl);
   });
 
   it('GUESS_RESOURCE_ROUTE_URL return base url if it equals to it', () => {
-    LibConfig.config.http[DEFAULT_ROUTE_NAME].rootUrl = 'http://myroot.ru/api/v1';
+    spyOn(LibConfig, 'getConfig').and.returnValue({
+      ...LibConfig.DEFAULT_CONFIG,
+      http: {
+        [DEFAULT_ROUTE_NAME]: {
+          rootUrl: 'http://myroot.ru/api/v1'
+        }
+      }
+    });
 
     const routeUrl = UrlUtils.guessResourceRouteUrl('http://myroot.ru/api/v1/test-resource/1');
 
-    expect(routeUrl).toBe(LibConfig.config.http[DEFAULT_ROUTE_NAME].rootUrl);
+    expect(routeUrl).toBe(LibConfig.getConfig().http[DEFAULT_ROUTE_NAME].rootUrl);
   });
 
   it('GUESS_RESOURCE_ROUTE_URL throws exception when no route found', () => {
-    LibConfig.config.http[DEFAULT_ROUTE_NAME].rootUrl = 'http://myroot.ru/api/v1';
+    spyOn(LibConfig, 'getConfig').and.returnValue({
+      ...LibConfig.DEFAULT_CONFIG,
+      http: {
+        [DEFAULT_ROUTE_NAME]: {
+          rootUrl: 'http://myroot.ru/api/v1'
+        }
+      }
+    });
     const resourceUrl = 'http://myroot.another.ru/api/v1/test-resource/1';
 
     expect(() => {

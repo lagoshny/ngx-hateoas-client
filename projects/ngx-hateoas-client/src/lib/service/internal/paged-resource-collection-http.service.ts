@@ -53,7 +53,7 @@ export class PagedResourceCollectionHttpService extends HttpExecutor {
       .pipe(
         map((data: any) => {
           if (!isPagedResourceCollection(data)) {
-            if (LibConfig.config.cache.enabled) {
+            if (LibConfig.getConfig().cache.enabled) {
               this.cacheService.evictResource(CacheKey.of(url, httpOptions));
             }
             const errMsg = `You try to get wrong resource type: expected PagedResourceCollection type, actual ${ getResourceType(data) } type.`;

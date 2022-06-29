@@ -50,7 +50,7 @@ export class ResourceCollectionHttpService extends HttpExecutor {
       .pipe(
         map((data: any) => {
           if (!isResourceCollection(data)) {
-            if (LibConfig.config.cache.enabled) {
+            if (LibConfig.getConfig().cache.enabled) {
               this.cacheService.evictResource(CacheKey.of(url, httpOptions));
             }
             const errMsg = `You try to get the wrong resource type: expected ResourceCollection type, actual ${ getResourceType(data) } type.`;

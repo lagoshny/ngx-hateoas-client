@@ -40,7 +40,6 @@ describe('ResourceCollectionHttpService', () => {
   afterEach(() => {
     ResourceUtils.useResourceType(null);
     ResourceUtils.useResourceCollectionType(null);
-    LibConfig.config = LibConfig.DEFAULT_CONFIG;
   });
 
   it('GET REQUEST should throw error when returned object is EMBEDDED_RESOURCE', () => {
@@ -116,7 +115,12 @@ describe('ResourceCollectionHttpService', () => {
   });
 
   it('GET REQUEST should evict cache when returned object is not resource collection', () => {
-    LibConfig.config.cache.enabled = true;
+    spyOn(LibConfig, 'getConfig').and.returnValue({
+      ...LibConfig.DEFAULT_CONFIG,
+      cache: {
+        enabled: true
+      }
+    });
     httpClientSpy.get.and.returnValue(of({any: 'value'}));
 
     resourceCollectionHttpService.get('someUrl').subscribe(() => {

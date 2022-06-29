@@ -69,8 +69,8 @@ export class ResourceUtils {
         continue;
       }
 
-      if (LibConfig.config?.typesFormat?.date?.patterns && !isEmpty(LibConfig.config.typesFormat.date.patterns)) {
-          for (const pattern of LibConfig.config.typesFormat.date.patterns) {
+      if (LibConfig.getConfig()?.typesFormat?.date?.patterns && !isEmpty(LibConfig.getConfig().typesFormat.date.patterns)) {
+          for (const pattern of LibConfig.getConfig().typesFormat.date.patterns) {
             if (isMatch(payload[key], pattern)) {
               const valueAsDate = parse(payload[key], pattern, new Date());
               if (valueAsDate) {

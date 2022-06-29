@@ -52,7 +52,7 @@ export class ResourceHttpService extends HttpExecutor {
       .pipe(
         map((data: any) => {
           if (!isResource(data)) {
-            if (LibConfig.config.cache.enabled) {
+            if (LibConfig.getConfig().cache.enabled) {
               this.cacheService.evictResource(CacheKey.of(url, httpOptions));
             }
             const errMsg = `You try to get wrong resource type: expected Resource type, actual ${ getResourceType(data) } type.`;

@@ -119,11 +119,11 @@ export class UrlUtils {
     for (const [routeName] of Object.entries(UrlUtils.getRoutes())) {
       const route = UrlUtils.getRouteByName(routeName);
       const lowerCaseUrl = url.toLowerCase();
-      if (lowerCaseUrl.includes(route.rootUrl.toLowerCase())) {
+      if (!isEmpty(route.rootUrl) && lowerCaseUrl.includes(route.rootUrl.toLowerCase())) {
         routeUrl = route.rootUrl;
         break;
       }
-      if (lowerCaseUrl.includes(route.proxyUrl.toLowerCase())) {
+      if (!isEmpty(route.proxyUrl) && lowerCaseUrl.includes(route.proxyUrl.toLowerCase())) {
         routeUrl = route.proxyUrl;
         break;
       }
@@ -225,11 +225,11 @@ export class UrlUtils {
   public static fillDefaultPageDataIfNoPresent(options: PagedGetOption) {
     const pagedOptions = !isEmpty(options) ? options : {};
     if (isEmpty(pagedOptions.pageParams)) {
-      pagedOptions.pageParams = LibConfig.config.pagination.defaultPage;
+      pagedOptions.pageParams = LibConfig.getConfig().pagination.defaultPage;
     } else if (!pagedOptions.pageParams.size) {
-      pagedOptions.pageParams.size = LibConfig.config.pagination.defaultPage.size;
+      pagedOptions.pageParams.size = LibConfig.getConfig().pagination.defaultPage.size;
     } else if (!pagedOptions.pageParams.page) {
-      pagedOptions.pageParams.page = LibConfig.config.pagination.defaultPage.page;
+      pagedOptions.pageParams.page = LibConfig.getConfig().pagination.defaultPage.page;
     }
 
     return pagedOptions;
@@ -256,7 +256,7 @@ export class UrlUtils {
   }
 
   public static getRouteByName(routeName: string): ResourceRoute {
-    const route = LibConfig.config.http[routeName];
+    const route = LibConfig.getConfig().http[routeName];
     if (isEmpty(route)) {
       ConsoleLogger.error(`No Resource route found by name: '${ routeName }'. Check you configuration. Read more about this ...`, {
         availableRoutes: UrlUtils.getRoutes()
@@ -268,7 +268,7 @@ export class UrlUtils {
   }
 
   public static getRoutes(): MultipleResourceRoutes {
-    return LibConfig.config.http as MultipleResourceRoutes;
+    return LibConfig.getConfig().http as MultipleResourceRoutes;
   }
 
 }

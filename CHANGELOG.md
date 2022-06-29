@@ -1,4 +1,4 @@
-## 2.5.1 (2022-06-29)
+## 2.5.2 (2022-06-29)
 #### Changes
 - Fixed [issue-61](https://github.com/lagoshny/ngx-hateoas-client/issues/61).
 

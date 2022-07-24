@@ -128,4 +128,23 @@ export interface HateoasConfiguration {
     }
   };
 
+  /**
+   * Additional configuration to specify settings for HAL format.
+   */
+  halFormat?: {
+    collections?: {
+      /**
+       * If {@code true}, then for empty collections, not required to specify _embedded property.
+       * When {@code false} (be default), you need to specify empty _embedded property for empty collections.
+       *
+       * By default, Spring Data REST includes empty _embedded property for empty collections,
+       * but when using Spring HATEOAS you need to do it manually.
+       *
+       * Recommending use Spring Data REST approach and return empty _embedded property for empty collection
+       * for more predictable determine resource type algorithm.
+       */
+      embeddedOptional: boolean;
+    }
+  };
+
 }

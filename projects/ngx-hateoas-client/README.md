@@ -108,6 +108,7 @@ You can found examples of usage this client with [task-manager-front](https://gi
   - [Http params](#http-params)
 - [UseTypes](#usetypes-params)
 - [TypesFormat](#typesformat)
+- [HALFormat](#halformat)
 - [Cache support](#cache-support)
 - [Logging](#Logging)
 7. [Public classes](#Public-classes)
@@ -3511,6 +3512,32 @@ For the `Resource JSON` like this:
 ```
 
 `Resource` instance will have property `someDate` as type `Date`.
+
+#### HALFormat
+Configuring HAL format that used to parse `JSON` as `Resource`.
+
+Example:
+````ts
+halFormat: {
+    collections: {
+        embeddedOptional: false
+    }
+}
+````
+
+Property `collections` contains all format settings for collections. Available the next settings for `collections`:
+
+- `embeddedOptional` - by default `false`, means that server side should add `_embedded` property when returns empty resource collection like that:
+
+```json
+{
+  "_embedded" : {
+    "orders : [
+    ]
+  }
+}
+```
+when value is set to `true` then it is not required to add `_embedded` property when returns empty resource collection.
 
 #### isProduction param
 Some `hateoas-client` features can change their behaviours depends on this param. For example, [Logging](#logging) disable all `warning` messages when `isProduction` is true.

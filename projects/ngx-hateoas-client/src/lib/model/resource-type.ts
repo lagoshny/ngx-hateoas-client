@@ -1,4 +1,5 @@
 import { isObject } from 'lodash-es';
+import { LibConfig } from '../config/lib-config';
 
 export function isEmbeddedResource(object: any) {
   // Embedded resource doesn't have self link in _links object
@@ -10,19 +11,35 @@ export function isResource(object: any): boolean {
 }
 
 export function isResourceCollection(object: any): boolean {
-  return isObject(object) &&
-         ('_embedded' in object) &&
-         ('_links' in object) &&
-         !('page' in object) &&
-         (Object.keys(object).length === 2);
+  const baseCondition = isObject(object) &&
+    ('_links' in object) &&
+    !('page' in object);
+  if (!baseCondition) {
+    return false;
+  }
+
+  if (LibConfig.getConfig().halFormat.collections.embeddedOptional) {
+    return baseCondition && (Object.keys(object).length === 1 ||
+      '_embedded' in object && Object.keys(object).length === 2);
+  } else {
+    return baseCondition && '_embedded' in object && Object.keys(object).length === 2;
+  }
 }
 
 export function isPagedResourceCollection(object: any): boolean {
-  return isObject(object) &&
-         ('_embedded' in object) &&
-         ('_links' in object) &&
-         ('page' in object) &&
-         (Object.keys(object).length === 3);
+  const baseCondition = isObject(object) &&
+    ('_links' in object) &&
+    ('page' in object);
+  if (!baseCondition) {
+    return false;
+  }
+
+  if (LibConfig.getConfig().halFormat.collections.embeddedOptional) {
+    return baseCondition && (Object.keys(object).length === 2 ||
+      '_embedded' in object && Object.keys(object).length === 3);
+  } else {
+    return baseCondition && '_embedded' in object && Object.keys(object).length === 3;
+  }
 }
 
 /**

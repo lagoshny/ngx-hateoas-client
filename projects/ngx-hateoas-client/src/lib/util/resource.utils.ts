@@ -70,18 +70,18 @@ export class ResourceUtils {
       }
 
       if (LibConfig.getConfig()?.typesFormat?.date?.patterns && !isEmpty(LibConfig.getConfig().typesFormat.date.patterns)) {
-          for (const pattern of LibConfig.getConfig().typesFormat.date.patterns) {
-            if (isMatch(payload[key], pattern)) {
-              const valueAsDate = parse(payload[key], pattern, new Date());
-              if (valueAsDate) {
-                payload[key] = valueAsDate;
-                break;
-              }
+        for (const pattern of LibConfig.getConfig().typesFormat.date.patterns) {
+          if (isMatch(payload[key], pattern)) {
+            const valueAsDate = parse(payload[key], pattern, new Date());
+            if (valueAsDate) {
+              payload[key] = valueAsDate;
+              break;
             }
           }
-          if (payload[key] instanceof Date) {
-            continue;
-          }
+        }
+        if (payload[key] instanceof Date) {
+          continue;
+        }
       }
 
       payload[key] = this.resolvePayloadType(key, payload[key], isProjection);
@@ -167,14 +167,17 @@ export class ResourceUtils {
   public static instantiateResourceCollection<T extends ResourceCollection<BaseResource>>(payload: object, isProjection?: boolean): T {
     if (isEmpty(payload)
       || (!isObject(payload['_links']) || isEmpty(payload['_links']))
-      || (!isObject(payload['_embedded']) || isEmpty(payload['_embedded']))) {
+      || (!LibConfig.getConfig().halFormat.collections.embeddedOptional &&
+        (!('_embedded' in payload) || !isObject(payload['_embedded']) || isEmpty(payload['_embedded'])))) {
       return null;
     }
     const result = new this.resourceCollectionType() as T;
-    for (const resourceName of Object.keys(payload['_embedded'])) {
-      payload['_embedded'][resourceName].forEach((resource) => {
-        result.resources.push(this.instantiateResource(resource, isProjection));
-      });
+    if ('_embedded' in payload && isObject(payload['_embedded']) && !isEmpty(payload['_embedded'])) {
+      for (const resourceName of Object.keys(payload['_embedded'])) {
+        payload['_embedded'][resourceName].forEach((resource) => {
+          result.resources.push(this.instantiateResource(resource, isProjection));
+        });
+      }
     }
     result['_links'] = {...payload['_links']};
 

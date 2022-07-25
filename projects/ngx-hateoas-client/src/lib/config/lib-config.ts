@@ -28,6 +28,11 @@ export class LibConfig {
         page: 0
       }
     },
+    halFormat: {
+      collections: {
+        embeddedOptional: false
+      }
+    },
     isProduction: false
   };
 

@@ -7,6 +7,8 @@ import {
   rawCaseSensitiveResource,
   RawEmbeddedResource,
   rawEmbeddedResource,
+  rawEmptyPagedResourceCollection,
+  rawEmptyResourceCollection,
   rawPagedResourceCollection,
   RawResource,
   rawResource,
@@ -435,6 +437,40 @@ describe('ResourceUtils', () => {
     expect(result['_links']).toEqual(rawResourceCollection._links);
   });
 
+  it('INSTANTIATE_COLLECTION_RESOURCE should return null when _embedded not defined and embeddedOptional is FALSE', () => {
+    spyOn(LibConfig, 'getConfig').and.returnValue({
+      ...LibConfig.DEFAULT_CONFIG,
+      halFormat: {
+        collections: {
+          embeddedOptional: false
+        }
+      }
+    });
+
+    const result = ResourceUtils.instantiateResourceCollection(rawEmptyResourceCollection);
+
+    expect(result).toBeNull();
+  });
+
+  it('INSTANTIATE_COLLECTION_RESOURCE should create empty resource collections when _embedded not defined and embeddedOptional is TRUE',
+    () => {
+      spyOn(LibConfig, 'getConfig').and.returnValue({
+        ...LibConfig.DEFAULT_CONFIG,
+        halFormat: {
+          collections: {
+            embeddedOptional: true
+          }
+        }
+      });
+
+      const result = ResourceUtils.instantiateResourceCollection(rawEmptyResourceCollection);
+
+      expect(result).toBeDefined();
+      expect(result.resources).toEqual([]);
+      expect(result['_links']).toBeDefined();
+      expect(result['_links']).toEqual(rawEmptyResourceCollection._links);
+    });
+
   it('INSTANTIATE_PAGED_COLLECTION_RESOURCE should return "null" when passed payload is empty object', () => {
     expect(ResourceUtils.instantiatePagedResourceCollection({})).toBeNull();
   });
@@ -534,6 +570,45 @@ describe('ResourceUtils', () => {
     expect(result['_links']).toBeDefined();
     expect(result['_links']).toEqual(rawPagedResourceCollection._links);
   });
+
+  it('INSTANTIATE_PAGED_COLLECTION_RESOURCE should return null when _embedded not defined and embeddedOptional is FALSE', () => {
+    spyOn(LibConfig, 'getConfig').and.returnValue({
+      ...LibConfig.DEFAULT_CONFIG,
+      halFormat: {
+        collections: {
+          embeddedOptional: false
+        }
+      }
+    });
+
+    const result = ResourceUtils.instantiatePagedResourceCollection(rawEmptyPagedResourceCollection);
+
+    expect(result).toBeNull();
+  });
+
+  it('INSTANTIATE_PAGED_COLLECTION_RESOURCE should create empty resource collections when _embedded not defined and embeddedOptional is TRUE',
+    () => {
+      spyOn(LibConfig, 'getConfig').and.returnValue({
+        ...LibConfig.DEFAULT_CONFIG,
+        halFormat: {
+          collections: {
+            embeddedOptional: true
+          }
+        }
+      });
+
+      const result = ResourceUtils.instantiatePagedResourceCollection(rawEmptyPagedResourceCollection);
+
+      expect(result).toBeDefined();
+      expect(result.resources).toEqual([]);
+      expect(result['_links']).toBeDefined();
+      expect(result['_links']).toEqual(rawEmptyPagedResourceCollection._links);
+      expect(result instanceof PagedResourceCollection).toBe(true);
+      expect(result.pageNumber).toBe(rawEmptyPagedResourceCollection.page.number);
+      expect(result.pageSize).toBe(rawEmptyPagedResourceCollection.page.size);
+      expect(result.totalElements).toBe(rawEmptyPagedResourceCollection.page.totalElements);
+      expect(result.totalPages).toBe(rawEmptyPagedResourceCollection.page.totalPages);
+    });
 
   it('RESOLVE_VALUES should return "null" when passed requestBody is null', () => {
     expect(ResourceUtils.resolveValues(null)).toBeNull();

@@ -13,7 +13,8 @@ import { RequestParam, RESOURCE_OPTIONS_PROP } from '../declarations';
 import { DEFAULT_ROUTE_NAME } from '../../config/hateoas-configuration.interface';
 
 class TestProductResource extends BaseResource {
-  // tslint:disable-next-line:variable-name
+  public name = 'TestName';
+// tslint:disable-next-line:variable-name
   _links = {
     self: {
       href: 'http://localhost:8080/api/v1/product/1'

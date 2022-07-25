@@ -9,6 +9,7 @@ import anything = jasmine.anything;
 
 @HateoasResource('resourceRelation')
 class ResourceRelation extends Resource {
+  public name = 'Test';
   // tslint:disable-next-line:variable-name
   _links = {
     self: {
@@ -24,7 +25,7 @@ class ResourceRelation extends Resource {
 @HateoasResource('resourceWithRelation')
 class ResourceWithRelation extends SimpleResource {
   public relation: ResourceRelation;
-  public name: 'Test';
+  public name = 'Test';
 }
 
 describe('HateoasResourceService', () => {

@@ -1,3 +1,8 @@
+## 2.6.0 (2022-07-25)
+#### Changes
+- Fixed [issue-66](https://github.com/lagoshny/ngx-hateoas-client/issues/66).
+> Added new Lib configuration that allows to specify HAL format for resource collections. See more in [docs](https://github.com/lagoshny/ngx-hateoas-client#halformat).
+
 ## 2.5.2 (2022-06-29)
 #### Changes
 - Fixed [issue-61](https://github.com/lagoshny/ngx-hateoas-client/issues/61).

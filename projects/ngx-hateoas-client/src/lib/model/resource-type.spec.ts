@@ -1,15 +1,19 @@
 import { isEmbeddedResource, isPagedResourceCollection, isResource, isResourceCollection } from './resource-type';
 import {
   rawEmbeddedResource,
+  rawEmptyPagedResourceCollection,
+  rawEmptyResourceCollection,
   rawPagedResourceCollection,
   rawResource,
   rawResourceCollection
 } from './resource/resources.test';
+import { LibConfig } from '../config/lib-config';
 
 describe('ResourceType', () => {
 
   it('object IS EMBEDDED_RESOURCE with _links object WITHOUT self link', () => {
     const result = isEmbeddedResource({
+      test: 'Test',
       _links: {
         someRelation: {
           href: 'http://localhost:8080/api/v1/someRelation/1'
@@ -21,12 +25,13 @@ describe('ResourceType', () => {
   });
 
   it('object IS EMBEDDED_RESOURCE with empty _links object', () => {
-    expect(isEmbeddedResource({_links: {}})).toBeTrue();
+    expect(isEmbeddedResource({test: 'Test', _links: {}})).toBeTrue();
   });
 
 
   it('object IS NOT EMBEDDED_RESOURCE with _links object WITH self link', () => {
     const result = isEmbeddedResource({
+      test: 'Test',
       _links: {
         self: {
           href: 'http://localhost:8080/api/v1/self/1'
@@ -179,6 +184,32 @@ describe('ResourceType', () => {
     expect(isResourceCollection(rawPagedResourceCollection)).toBeFalse();
   });
 
+  it('empty resource collection without _embedded property IS COLLECTION_RESOURCE when embeddedOptional is TRUE', () => {
+    spyOn(LibConfig, 'getConfig').and.returnValue({
+      ...LibConfig.DEFAULT_CONFIG,
+      halFormat: {
+        collections: {
+          embeddedOptional: true
+        }
+      }
+    });
+
+    expect(isResourceCollection(rawEmptyResourceCollection)).toBeTrue();
+  });
+
+  it('empty resource collection without _embedded property IS NOT COLLECTION_RESOURCE when embeddedOptional is FALSE', () => {
+    spyOn(LibConfig, 'getConfig').and.returnValue({
+      ...LibConfig.DEFAULT_CONFIG,
+      halFormat: {
+        collections: {
+          embeddedOptional: false
+        }
+      }
+    });
+
+    expect(isResourceCollection(rawEmptyResourceCollection)).toBeFalse();
+  });
+
   it('object IS PAGED RESOURCE COLLECTION with _embedded AND page object', () => {
     expect(isPagedResourceCollection(rawPagedResourceCollection)).toBeTrue();
   });
@@ -234,6 +265,30 @@ describe('ResourceType', () => {
 
   it('resource collection object IS NOT PAGE_COLLECTION_RESOURCE', () => {
     expect(isPagedResourceCollection(rawResourceCollection)).toBeFalse();
+  });
+
+  it('empty paged resource collection without _embedded property IS PAGE_COLLECTION_RESOURCE when embeddedOptional is TRUE', () => {
+    spyOn(LibConfig, 'getConfig').and.returnValue({
+      ...LibConfig.DEFAULT_CONFIG,
+      halFormat: {
+        collections: {
+          embeddedOptional: true
+        }
+      }
+    });
+    expect(isPagedResourceCollection(rawEmptyPagedResourceCollection)).toBeTrue();
+  });
+
+  it('empty paged resource collection without _embedded property IS NOT PAGE_COLLECTION_RESOURCE when embeddedOptional is FALSE', () => {
+    spyOn(LibConfig, 'getConfig').and.returnValue({
+      ...LibConfig.DEFAULT_CONFIG,
+      halFormat: {
+        collections: {
+          embeddedOptional: false
+        }
+      }
+    });
+    expect(isPagedResourceCollection(rawEmptyPagedResourceCollection)).toBeFalse();
   });
 
 });

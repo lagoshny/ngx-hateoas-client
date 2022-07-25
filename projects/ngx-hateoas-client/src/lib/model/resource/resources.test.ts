@@ -37,12 +37,14 @@ export const rawResource = {
 
 @HateoasResource('resource')
 export class RawResource extends Resource {
+  public name = 'Test';
 }
 
 @HateoasResource('test')
 export class SimpleResource extends Resource {
+  public name = 'Test';
 
-  // tslint:disable-next-line:variable-name
+// tslint:disable-next-line:variable-name
   _links = {
     self: {
       href: 'http://localhost:8080/api/v1/test/1'
@@ -55,6 +57,7 @@ export class SimpleResource extends Resource {
 }
 
 export const rawCaseSensitiveResource = {
+  name: 'Test',
   _links: {
     self: {
       href: 'http://localhost:8080/api/v1/testResource/1'
@@ -85,6 +88,8 @@ export class SimpleResourceProjection extends Resource {
 @HateoasEmbeddedResource(['anotherResource'])
 export class SimpleEmbeddedResource extends EmbeddedResource {
 
+  public name: string;
+
   // tslint:disable-next-line:variable-name
   _links = {
     anotherResource: {
@@ -93,6 +98,14 @@ export class SimpleEmbeddedResource extends EmbeddedResource {
   };
 
 }
+
+export const rawEmptyResourceCollection = {
+  _links: {
+    self: {
+      href: 'http://localhost:8080/api/v1/collection'
+    }
+  }
+};
 
 export const rawResourceCollection = {
   _embedded: {
@@ -134,6 +147,32 @@ export class SimpleResourceCollection extends ResourceCollection<SimpleResource>
   };
 
 }
+
+export const rawEmptyPagedResourceCollection = {
+  page: {
+    totalElements: 100,
+    number: 2,
+    size: 10,
+    totalPages: 10
+  },
+  _links: {
+    self: {
+      href: 'http://localhost:8080/api/v1/pagedCollection'
+    },
+    first: {
+      href: 'http://localhost:8080/api/v1/pagedCollection?page=0&size=1'
+    },
+    next: {
+      href: 'http://localhost:8080/api/v1/pagedCollection?page=1&size=1'
+    },
+    prev: {
+      href: 'http://localhost:8080/api/v1/pagedCollection?page=0&size=1'
+    },
+    last: {
+      href: 'http://localhost:8080/api/v1/pagedCollection?page=1&size=1'
+    }
+  }
+};
 
 export const rawPagedResourceCollection = {
   _embedded: {

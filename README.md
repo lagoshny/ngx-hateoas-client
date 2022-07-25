@@ -3541,7 +3541,7 @@ Property `collections` contains all format settings for collections. Available t
 ```json
 {
   "_embedded" : {
-    "orders : [
+    "orders" : [
     ]
   }
 }

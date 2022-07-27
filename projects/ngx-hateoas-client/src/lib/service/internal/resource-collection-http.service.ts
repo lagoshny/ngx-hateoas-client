@@ -46,7 +46,7 @@ export class ResourceCollectionHttpService extends HttpExecutor {
                                                          options?: GetOption): Observable<T> {
     const httpOptions = UrlUtils.convertToHttpOptions(options);
 
-    return super.getHttp(url, httpOptions)
+    return super.getHttp(url, httpOptions, options?.useCache)
       .pipe(
         map((data: any) => {
           if (!isResourceCollection(data)) {

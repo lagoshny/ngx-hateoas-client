@@ -10,6 +10,7 @@ import { PagedResourceCollection } from '../../model/resource/paged-resource-col
 import { rawPagedResourceCollection, rawResource, rawResourceCollection } from '../../model/resource/resources.test';
 import { UrlUtils } from '../../util/url.utils';
 import { DEFAULT_ROUTE_NAME } from '../../config/hateoas-configuration.interface';
+import { LibConfig } from '../../config/lib-config';
 import anything = jasmine.anything;
 
 describe('CommonResourceHttpService CUSTOM_QUERY', () => {
@@ -145,6 +146,20 @@ describe('CommonResourceHttpService CUSTOM_QUERY', () => {
 
     commonHttpService.customQuery('test', {routeName: DEFAULT_ROUTE_NAME}, HttpMethod.GET, 'someQuery').subscribe(() => {
       expect(httpClientSpy.get.calls.count()).toBe(1);
+    });
+  });
+
+  it('should NOT use cache for GET HTTP_METHOD', () => {
+    httpClientSpy.get.and.returnValue(of(rawResourceCollection));
+    spyOn(LibConfig, 'getConfig').and.returnValue({
+      ...LibConfig.DEFAULT_CONFIG,
+      cache: {
+        enabled: true
+      }
+    });
+
+    commonHttpService.customQuery('test', {routeName: DEFAULT_ROUTE_NAME}, HttpMethod.GET, 'someQuery').subscribe(() => {
+      expect(cacheServiceSpy.getResource.calls.count()).toBe(0);
     });
   });
 

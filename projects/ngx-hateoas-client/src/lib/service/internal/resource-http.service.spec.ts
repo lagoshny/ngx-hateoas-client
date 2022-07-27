@@ -122,6 +122,38 @@ describe('ResourceHttpService', () => {
     });
   });
 
+  it('GET REQUEST should use cache when useCache param is TRUE', () => {
+    httpClientSpy.get.and.returnValue(of(rawResource));
+    spyOn(LibConfig, 'getConfig').and.returnValue({
+      ...LibConfig.DEFAULT_CONFIG,
+      cache: {
+        enabled: true
+      }
+    });
+
+    resourceHttpService.get('order', {
+      useCache: true
+    }).subscribe(() => {
+      expect(cacheServiceSpy.getResource.calls.count()).toBe(1);
+    });
+  });
+
+  it('GET REQUEST should NOT use cache when useCache param is FALSE', () => {
+    httpClientSpy.get.and.returnValue(of(rawResource));
+    spyOn(LibConfig, 'getConfig').and.returnValue({
+      ...LibConfig.DEFAULT_CONFIG,
+      cache: {
+        enabled: true
+      }
+    });
+
+    resourceHttpService.get('order', {
+      useCache: false
+    }).subscribe(() => {
+      expect(cacheServiceSpy.getResource.calls.count()).toBe(0);
+    });
+  });
+
   it('POST REQUEST should return resource', () => {
     httpClientSpy.post.and.returnValue(of(rawResource));
 

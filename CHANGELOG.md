@@ -1,3 +1,7 @@
+## 3.3.1 (2022-07-27)
+#### Changes
+Fixed [issue-68](https://github.com/lagoshny/ngx-hateoas-client/issues/68).
+
 ## 3.3.0 (2022-07-25)
 #### Changes
 - Fixed [issue-66](https://github.com/lagoshny/ngx-hateoas-client/issues/66).

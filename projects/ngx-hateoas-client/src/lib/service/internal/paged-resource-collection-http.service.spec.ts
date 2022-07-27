@@ -160,6 +160,38 @@ describe('PagedResourceCollectionHttpService', () => {
     });
   });
 
+  it('GET REQUEST should use cache when useCache param is TRUE', () => {
+    httpClientSpy.get.and.returnValue(of(rawPagedResourceCollection));
+    spyOn(LibConfig, 'getConfig').and.returnValue({
+      ...LibConfig.DEFAULT_CONFIG,
+      cache: {
+        enabled: true
+      }
+    });
+
+    pagedResourceCollectionHttpService.get('order', {
+      useCache: true
+    }).subscribe(() => {
+      expect(cacheServiceSpy.getResource.calls.count()).toBe(1);
+    });
+  });
+
+  it('GET REQUEST should NOT use cache when useCache param is FALSE', () => {
+    httpClientSpy.get.and.returnValue(of(rawPagedResourceCollection));
+    spyOn(LibConfig, 'getConfig').and.returnValue({
+      ...LibConfig.DEFAULT_CONFIG,
+      cache: {
+        enabled: true
+      }
+    });
+
+    pagedResourceCollectionHttpService.get('order', {
+      useCache: false
+    }).subscribe(() => {
+      expect(cacheServiceSpy.getResource.calls.count()).toBe(0);
+    });
+  });
+
   it('GET_RESOURCE_PAGE throws error when resourceName is empty', () => {
     expect(() => pagedResourceCollectionHttpService.getResourcePage('', {routeName: DEFAULT_ROUTE_NAME}))
       .toThrowError(`Passed param(s) 'resourceName = ' is not valid`);

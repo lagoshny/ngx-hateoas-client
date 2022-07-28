@@ -1,3 +1,8 @@
+## 2.6.2 (2022-07-28)
+#### Changes
+Implemented enhancement from [issue-70](https://github.com/lagoshny/ngx-hateoas-client/issues/70).
+- Added `HateoasResourceService#evictResourcesCache` method that allows to evict all resources cache.
+
 ## 2.6.1 (2022-07-27)
 #### Changes
 Fixed [issue-68](https://github.com/lagoshny/ngx-hateoas-client/issues/68).

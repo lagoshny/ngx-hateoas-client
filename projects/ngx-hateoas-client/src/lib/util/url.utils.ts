@@ -6,7 +6,7 @@ import { ValidationUtils } from './validation.utils';
 import { LibConfig } from '../config/lib-config';
 import { isArray, isEmpty, isNil, isObject, toString } from 'lodash-es';
 import { UriTemplate } from 'uri-templates-es';
-import { MultipleResourceRoutes, ResourceOption, ResourceRoute } from '../config/hateoas-configuration.interface';
+import { MultipleResourceRoutes, ResourceRoute } from '../config/hateoas-configuration.interface';
 import { ConsoleLogger } from '../logger/console-logger';
 
 export class UrlUtils {
@@ -76,12 +76,11 @@ export class UrlUtils {
    * Generate link url.
    * If proxyUrl is not empty then relation url will be use proxy.
    *
-   * @param resourceOptions additional resource options {@link ResourceOption}
    * @param relationLink resource link to which need to generate the url
    * @param options (optional) additional options that should be applied to the request
    * @throws error when required params are not valid
    */
-  public static generateLinkUrl(resourceOptions: ResourceOption, relationLink: LinkData, options?: PagedGetOption): string {
+  public static generateLinkUrl(relationLink: LinkData, options?: PagedGetOption): string {
     ValidationUtils.validateInputParams({relationLink, linkUrl: relationLink?.href});
     let url;
     if (options && !isEmpty(options)) {
@@ -89,7 +88,8 @@ export class UrlUtils {
     } else {
       url = relationLink.templated ? UrlUtils.removeTemplateParams(relationLink.href) : relationLink.href;
     }
-    const route = UrlUtils.getRouteByName(resourceOptions.routeName);
+
+    const route = UrlUtils.guessResourceRoute(url);
     if (route.proxyUrl) {
       return url.replace(route.rootUrl, route.proxyUrl);
     }

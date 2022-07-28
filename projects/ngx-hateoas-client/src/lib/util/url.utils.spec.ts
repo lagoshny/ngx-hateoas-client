@@ -272,32 +272,32 @@ describe('UrlUtils', () => {
   });
 
   it('GENERATE_LINK_URL should throw error when relationLink is null', () => {
-    expect(() => UrlUtils.generateLinkUrl({routeName: DEFAULT_ROUTE_NAME}, null))
+    expect(() => UrlUtils.generateLinkUrl(null))
       .toThrowError(`Passed param(s) 'relationLink = null', 'linkUrl = undefined' are not valid`);
   });
 
   it('GENERATE_LINK_URL should throw error when relationLink is undefined', () => {
-    expect(() => UrlUtils.generateLinkUrl({routeName: DEFAULT_ROUTE_NAME}, undefined))
+    expect(() => UrlUtils.generateLinkUrl(undefined))
       .toThrowError(`Passed param(s) 'relationLink = undefined', 'linkUrl = undefined' are not valid`);
   });
 
   it('GENERATE_LINK_URL should throw error when relationLink.href is empty', () => {
-    expect(() => UrlUtils.generateLinkUrl({routeName: DEFAULT_ROUTE_NAME}, {href: ''}))
+    expect(() => UrlUtils.generateLinkUrl({href: ''}))
       .toThrowError(`Passed param(s) 'linkUrl = ' is not valid`);
   });
 
   it('GENERATE_LINK_URL should throw error when relationLink.href is null', () => {
-    expect(() => UrlUtils.generateLinkUrl({routeName: DEFAULT_ROUTE_NAME}, {href: null}))
+    expect(() => UrlUtils.generateLinkUrl({href: null}))
       .toThrowError(`Passed param(s) 'linkUrl = null' is not valid`);
   });
 
   it('GENERATE_LINK_URL should throw error when relationLink.href is undefined', () => {
-    expect(() => UrlUtils.generateLinkUrl({routeName: DEFAULT_ROUTE_NAME}, {href: undefined}))
+    expect(() => UrlUtils.generateLinkUrl({href: undefined}))
       .toThrowError(`Passed param(s) 'linkUrl = undefined' is not valid`);
   });
 
   it('GENERATE_LINK_URL should fill ALL template params when link is templated', () => {
-    const result = UrlUtils.generateLinkUrl({routeName: DEFAULT_ROUTE_NAME},
+    const result = UrlUtils.generateLinkUrl(
       {href: `${ UrlUtils.getApiUrl(DEFAULT_ROUTE_NAME) }/test{?param1,param2}`, templated: true},
       {
         params: {
@@ -310,7 +310,7 @@ describe('UrlUtils', () => {
   });
 
   it('GENERATE_LINK_URL should fill PART OF template params when link is templated and passed not all params', () => {
-    const result = UrlUtils.generateLinkUrl({routeName: DEFAULT_ROUTE_NAME},
+    const result = UrlUtils.generateLinkUrl(
       {href: `${ UrlUtils.getApiUrl(DEFAULT_ROUTE_NAME) }/test{?param1,param2,sort,page,size}`, templated: true},
       {
         params: {
@@ -329,14 +329,14 @@ describe('UrlUtils', () => {
   });
 
   it('GENERATE_LINK_URL should REMOVE template params when link is templated and passed params are empty', () => {
-    const result = UrlUtils.generateLinkUrl({routeName: DEFAULT_ROUTE_NAME},
+    const result = UrlUtils.generateLinkUrl(
       {href: `${ UrlUtils.getApiUrl(DEFAULT_ROUTE_NAME) }/test{?param1,param2}`, templated: true});
 
     expect(result).toBe(`${ UrlUtils.getApiUrl(DEFAULT_ROUTE_NAME) }/test`);
   });
 
   it('GENERATE_LINK_URL should NOT FILL template params when link is not templated', () => {
-    const result = UrlUtils.generateLinkUrl({routeName: DEFAULT_ROUTE_NAME},
+    const result = UrlUtils.generateLinkUrl(
       {href: `${ UrlUtils.getApiUrl(DEFAULT_ROUTE_NAME) }/test{?param1,param2}`, templated: false});
 
     expect(result).toBe(`${ UrlUtils.getApiUrl(DEFAULT_ROUTE_NAME) }/test{?param1,param2}`);
@@ -352,7 +352,7 @@ describe('UrlUtils', () => {
         }
       }
     });
-    const result = UrlUtils.generateLinkUrl({routeName: DEFAULT_ROUTE_NAME}, {href: `${ UrlUtils.getApiUrl(DEFAULT_ROUTE_NAME) }/test`});
+    const result = UrlUtils.generateLinkUrl({href: `${ UrlUtils.getApiUrl(DEFAULT_ROUTE_NAME) }/test`});
 
     expect(result).toBe('http://myproxy.ru/api/v1/test');
   });
@@ -367,7 +367,7 @@ describe('UrlUtils', () => {
         }
       }
     });
-    const result = UrlUtils.generateLinkUrl({routeName: DEFAULT_ROUTE_NAME}, {href: `${ UrlUtils.getApiUrl(DEFAULT_ROUTE_NAME) }/test`});
+    const result = UrlUtils.generateLinkUrl({href: `${ UrlUtils.getApiUrl(DEFAULT_ROUTE_NAME) }/test`});
 
     expect(result).toBe(`${ UrlUtils.getApiUrl(DEFAULT_ROUTE_NAME) }/test`);
   });

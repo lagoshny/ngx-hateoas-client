@@ -1,3 +1,7 @@
+## 2.6.3 (2022-07-28)
+#### Changes
+Fixed [issue-72](https://github.com/lagoshny/ngx-hateoas-client/issues/72).
+
 ## 2.6.2 (2022-07-28)
 #### Changes
 Implemented enhancement from [issue-70](https://github.com/lagoshny/ngx-hateoas-client/issues/70).

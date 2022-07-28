@@ -89,4 +89,9 @@ export class ResourceCacheService {
     }
   }
 
+  public evictAll(): void {
+    this.cacheMap.clear();
+    StageLogger.stageLog(Stage.CACHE_EVICT_ALL, {message: 'All resources cache evicted'});
+  }
+
 }

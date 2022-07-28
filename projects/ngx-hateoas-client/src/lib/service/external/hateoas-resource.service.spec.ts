@@ -34,6 +34,7 @@ describe('HateoasResourceService', () => {
   let resourceHttpServiceSpy: any;
   let resourceCollectionHttpServiceSpy: any;
   let pagedResourceCollectionHttpServiceSpy: any;
+  let resourceCacheService: any;
 
   beforeEach(() => {
     commonHttpServiceSpy = {
@@ -54,10 +55,13 @@ describe('HateoasResourceService', () => {
     pagedResourceCollectionHttpServiceSpy = {
       getResourcePage: jasmine.createSpy('getResourcePage')
     };
+    resourceCacheService = {
+      evictAll: jasmine.createSpy('evictAll')
+    };
 
     hateoasResourceService =
       new HateoasResourceService(commonHttpServiceSpy, resourceHttpServiceSpy,
-        resourceCollectionHttpServiceSpy, pagedResourceCollectionHttpServiceSpy);
+        resourceCollectionHttpServiceSpy, pagedResourceCollectionHttpServiceSpy, resourceCacheService);
 
     ResourceUtils.useResourceType(Resource);
   });
@@ -716,6 +720,12 @@ describe('HateoasResourceService', () => {
         expect(url).toBeDefined();
         expect(url).toBe('/search/searchQuery');
       });
+  });
+
+  it('EVICT_RESOURCES_CACHE should evict all resources cache', () => {
+    hateoasResourceService.evictResourcesCache();
+
+    expect(resourceCacheService.evictAll.calls.count()).toBe(1);
   });
 
 });

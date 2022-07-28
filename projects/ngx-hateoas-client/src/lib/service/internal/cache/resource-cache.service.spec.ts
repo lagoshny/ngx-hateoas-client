@@ -89,4 +89,14 @@ describe('CacheService', () => {
     expect(cacheService.getResource(CacheKey.of('http://localhost:8080/api/v1/resources', {}))).toBeNull();
   });
 
+  it('EVICT_ALL should evict all resources cache', () => {
+    cacheService.putResource(CacheKey.of('http://localhost:8080/api/v1/resources1', {}), rawResource);
+    cacheService.putResource(CacheKey.of('http://localhost:8080/api/v1/resources2', {}), rawResourceCollection);
+
+    cacheService.evictAll();
+
+    expect(cacheService.getResource(CacheKey.of('http://localhost:8080/api/v1/resources1', {}))).toBeNull();
+    expect(cacheService.getResource(CacheKey.of('http://localhost:8080/api/v1/resources2', {}))).toBeNull();
+  });
+
 });

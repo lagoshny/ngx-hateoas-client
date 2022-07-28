@@ -21,6 +21,7 @@ import { Resource } from '../../model/resource/resource';
 import { StageLogger } from '../../logger/stage-logger';
 import { ValidationUtils } from '../../util/validation.utils';
 import { HttpResponse } from '@angular/common/http';
+import { ResourceCacheService } from '../internal/cache/resource-cache.service';
 
 /**
  * Service to operate with {@link Resource}.
@@ -37,7 +38,8 @@ export class HateoasResourceService {
   constructor(private commonHttpService: CommonResourceHttpService,
               private resourceHttpService: ResourceHttpService,
               private resourceCollectionHttpService: ResourceCollectionHttpService,
-              private pagedResourceCollectionHttpService: PagedResourceCollectionHttpService) {
+              private pagedResourceCollectionHttpService: PagedResourceCollectionHttpService,
+              private cacheService: ResourceCacheService) {
   }
 
   /**
@@ -400,6 +402,13 @@ export class HateoasResourceService {
         StageLogger.resourceEndLog(resourceName, 'ResourceService CUSTOM_SEARCH_QUERY',
           {result: `custom search query by '${ resourceName }' was performed successful`});
       })) as Observable<R>;
+  }
+
+  /**
+   * Evict all resources cache.
+   */
+  public evictResourcesCache(): void {
+    this.cacheService.evictAll();
   }
 
 }

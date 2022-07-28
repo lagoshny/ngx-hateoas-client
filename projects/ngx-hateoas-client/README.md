@@ -110,6 +110,7 @@ You can found examples of usage this client with [task-manager-front](https://gi
 - [TypesFormat](#typesformat)
 - [HALFormat](#halformat)
 - [Cache support](#cache-support)
+  - [Evict all cache](#evict-all-cache-data)
 - [Logging](#Logging)
 7. [Public classes](#Public-classes)
 - [RequestOption](#RequestOption)
@@ -3560,6 +3561,21 @@ To enable cache pass `cache.enabled = true` to library configuration. Also, you 
 
 Also, methods with options types `GetOption` or `PagedGetOption` has additional param `useCache` that allows to manage the cache.
 By default `useCache` has `true` value, but when the cache disabled then it param ignored.
+
+#### Evict all cache data
+
+If you need to evict all cache data you can use `HateoasResourceService#evictResourcesCache` method for that:
+
+```ts
+...
+    constructor(private resourceService: HateoasResourceService) {}
+
+    public someMethod(): void {
+        this.resourceService.evictResourcesCache();
+    }
+...
+
+```
 
 #### Under the hood
 After each successful GET request to get a resource or resource collection or paginated resource collection, response placed in the `cache map`.

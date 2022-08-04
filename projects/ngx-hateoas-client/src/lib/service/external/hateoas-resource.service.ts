@@ -9,6 +9,7 @@ import {
   PagedGetOption,
   RequestBody,
   RequestOption,
+  RESOURCE_JSON_PROPS,
   RESOURCE_NAME_PROP,
   RESOURCE_OPTIONS_PROP
 } from '../../model/declarations';
@@ -120,7 +121,7 @@ export class HateoasResourceService {
     const resourceName = resourceType[RESOURCE_NAME_PROP];
     StageLogger.resourceBeginLog(resourceName, 'ResourceService CREATE_RESOURCE', {requestBody, options});
 
-    const body = ResourceUtils.resolveValues(requestBody);
+    const body = ResourceUtils.resolveValues(requestBody, resourceType[RESOURCE_JSON_PROPS]);
 
     return this.resourceHttpService.postResource(resourceName, resourceType[RESOURCE_OPTIONS_PROP], body, options)
       .pipe(tap(() => {
@@ -148,7 +149,7 @@ export class HateoasResourceService {
     });
 
     const resource = ResourceUtils.initResource(entity) as Resource;
-    const body = ResourceUtils.resolveValues(requestBody ? requestBody : {body: entity});
+    const body = ResourceUtils.resolveValues(requestBody ? requestBody : {body: entity}, entity.constructor[RESOURCE_JSON_PROPS]);
 
     return this.resourceHttpService.put(resource.getSelfLinkHref(), body, options)
       .pipe(tap(() => {
@@ -180,7 +181,7 @@ export class HateoasResourceService {
       options
     });
 
-    const body = ResourceUtils.resolveValues(requestBody);
+    const body = ResourceUtils.resolveValues(requestBody, resourceType[RESOURCE_JSON_PROPS]);
 
     return this.resourceHttpService.putResource(resourceName, resourceType[RESOURCE_OPTIONS_PROP], id, body, options)
       .pipe(tap(() => {
@@ -210,7 +211,7 @@ export class HateoasResourceService {
     });
 
     const resource = ResourceUtils.initResource(entity) as Resource;
-    const body = ResourceUtils.resolveValues(requestBody ? requestBody : {body: entity});
+    const body = ResourceUtils.resolveValues(requestBody ? requestBody : {body: entity}, entity.constructor[RESOURCE_JSON_PROPS]);
 
     return this.resourceHttpService.patch(resource.getSelfLinkHref(), body, options)
       .pipe(tap(() => {
@@ -242,7 +243,7 @@ export class HateoasResourceService {
       options
     });
 
-    const body = ResourceUtils.resolveValues(requestBody);
+    const body = ResourceUtils.resolveValues(requestBody, resourceType[RESOURCE_JSON_PROPS]);
 
     return this.resourceHttpService.patchResource(resourceName, resourceType[RESOURCE_OPTIONS_PROP], id, body, options)
       .pipe(tap(() => {
@@ -365,7 +366,7 @@ export class HateoasResourceService {
       options
     });
 
-    const body = ResourceUtils.resolveValues(requestBody);
+    const body = ResourceUtils.resolveValues(requestBody, resourceType[RESOURCE_JSON_PROPS]);
 
     return this.commonHttpService.customQuery(resourceName, resourceType[RESOURCE_OPTIONS_PROP], method, query, body, options)
       .pipe(tap(() => {
@@ -395,7 +396,7 @@ export class HateoasResourceService {
       options
     });
 
-    const body = ResourceUtils.resolveValues(requestBody);
+    const body = ResourceUtils.resolveValues(requestBody, resourceType[RESOURCE_JSON_PROPS]);
     const query = `/search${ searchQuery.startsWith('/') ? searchQuery : '/' + searchQuery }`;
     return this.commonHttpService.customQuery(resourceName, resourceType[RESOURCE_OPTIONS_PROP], method, query, body, options)
       .pipe(tap(() => {

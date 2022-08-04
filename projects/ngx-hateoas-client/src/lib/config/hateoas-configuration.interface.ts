@@ -20,6 +20,53 @@ export interface ResourceOption {
 }
 
 /**
+ * Used to specify additional resource property options.
+ */
+export interface PropertyOption {
+  /**
+   * Param allows to specify another JSON name property that should be match to current one.
+   */
+  name?: string;
+  /**
+   * Should try to get property value from JSON response by name that match with this property
+   * name ignoring case-sensitive when perform resource {@code DESERIALIZATION} operation.
+   *
+   * When performing resource {@code SERIALIZATION} for the request,
+   * then property name will be passed as specified in `name` param of this decorator or class property name when `name` param is empty.
+   */
+  ignoreCase?: boolean;
+}
+
+export interface ResourcePropertyConfig {
+  deserialize: {
+    /**
+     * As key value used, passed in {@link PropertyOption#name} value.
+     * When {@link PropertyOption#ignoreCase} is true, then key added in lower-case.
+     */
+    [deserializePropKey: string]: {
+      /**
+       * Target property name that will be assigned to resource class after parsing from response.
+       * Used value as real class property name.
+       */
+      propName: string;
+      ignoreCase: boolean;
+    }
+  };
+  serialize: {
+    /**
+     * As key value used real class property name.
+     */
+    [serializePropKey: string]: {
+      /**
+       * Target property name that will be passed in request.
+       * Used value passed in {@link PropertyOption#name}.
+       */
+      propName: string;
+    }
+  };
+}
+
+/**
  * Resource route config that defined where from retrieve resources.
  * If you use this config, then a default route created with name 'defaultRoute' will be assigned to all resources.
  */

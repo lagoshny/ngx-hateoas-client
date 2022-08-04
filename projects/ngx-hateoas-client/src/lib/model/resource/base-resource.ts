@@ -4,7 +4,7 @@ import { UrlUtils } from '../../util/url.utils';
 import { AbstractResource } from './abstract-resource';
 import { ResourceCollection } from './resource-collection';
 import { getResourceCollectionHttpService } from '../../service/internal/resource-collection-http.service';
-import { GetOption, PagedGetOption, RequestBody, RequestOption } from '../declarations';
+import { GetOption, PagedGetOption, RequestBody, RequestOption, RESOURCE_JSON_PROPS } from '../declarations';
 import { HttpResponse } from '@angular/common/http';
 import { getPagedResourceCollectionHttpService } from '../../service/internal/paged-resource-collection-http.service';
 import { PagedResourceCollection } from './paged-resource-collection';
@@ -121,7 +121,7 @@ export abstract class BaseResource extends AbstractResource {
     return getResourceHttpService()
       .post(
         UrlUtils.generateLinkUrl(relationLink, options),
-        ResourceUtils.resolveValues(requestBody),
+        ResourceUtils.resolveValues(requestBody, this.constructor[RESOURCE_JSON_PROPS]),
         {
           ...options,
           observe: options?.observe ? options.observe : 'body',
@@ -154,7 +154,7 @@ export abstract class BaseResource extends AbstractResource {
     return getResourceHttpService()
       .patch(
         UrlUtils.generateLinkUrl(relationLink, options),
-        ResourceUtils.resolveValues(requestBody),
+        ResourceUtils.resolveValues(requestBody, this.constructor[RESOURCE_JSON_PROPS]),
         {
           ...options,
           observe: options?.observe ? options.observe : 'body',
@@ -187,7 +187,7 @@ export abstract class BaseResource extends AbstractResource {
     return getResourceHttpService()
       .put(
         UrlUtils.generateLinkUrl(relationLink, options),
-        ResourceUtils.resolveValues(requestBody),
+        ResourceUtils.resolveValues(requestBody, this.constructor[RESOURCE_JSON_PROPS]),
         {
           ...options,
           observe: options?.observe ? options.observe : 'body',

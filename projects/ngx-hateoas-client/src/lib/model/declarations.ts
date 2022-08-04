@@ -5,6 +5,7 @@ import { HttpHeaders, HttpParams } from '@angular/common/http';
 
 export const RESOURCE_NAME_PROP = '__resourceName__';
 export const RESOURCE_OPTIONS_PROP = '__options__';
+export const RESOURCE_JSON_PROPS = '__jsonProps__';
 
 /**
  * Resource link object.

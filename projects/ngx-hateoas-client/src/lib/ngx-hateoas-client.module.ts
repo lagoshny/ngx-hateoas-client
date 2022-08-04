@@ -10,7 +10,7 @@ export { PagedResourceCollection } from './model/resource/paged-resource-collect
 export { Sort, SortOrder, Include, HttpMethod, ProjectionRelType, GetOption, PagedGetOption, RequestOption, RequestParam } from './model/declarations';
 export { HateoasResourceOperation } from './service/external/hateoas-resource-operation';
 export { HateoasResourceService } from './service/external/hateoas-resource.service';
-export { HateoasResource, HateoasEmbeddedResource, HateoasProjection, ProjectionRel } from './model/decorators';
+export { HateoasResource, HateoasEmbeddedResource, HateoasProjection, ProjectionRel, JsonProperty } from './model/decorators';
 
 @NgModule()
 export class NgxHateoasClientModule {

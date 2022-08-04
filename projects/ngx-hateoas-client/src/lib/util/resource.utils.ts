@@ -2,7 +2,7 @@ import { BaseResource } from '../model/resource/base-resource';
 import { isEmbeddedResource, isResource } from '../model/resource-type';
 import { ResourceCollection } from '../model/resource/resource-collection';
 import { PagedResourceCollection } from '../model/resource/paged-resource-collection';
-import { GetOption, Include, Link, PageData, RequestBody } from '../model/declarations';
+import { GetOption, Include, Link, PageData, RequestBody, RESOURCE_JSON_PROPS } from '../model/declarations';
 import { Resource } from '../model/resource/resource';
 import { EmbeddedResource } from '../model/resource/embedded-resource';
 import { UrlUtils } from './url.utils';
@@ -12,6 +12,7 @@ import { isArray, isEmpty, isNil, isObject, isPlainObject } from 'lodash-es';
 import { ConsoleLogger } from '../logger/console-logger';
 import { LibConfig } from '../config/lib-config';
 import { isMatch, parse } from 'date-fns';
+import { ResourcePropertyConfig } from '../config/hateoas-configuration.interface';
 
 /* tslint:disable:no-string-literal */
 export class ResourceUtils {
@@ -126,41 +127,66 @@ export class ResourceUtils {
     }
 
     if (resourceClass) {
-      return Object.assign(new (resourceClass)() as T, payload);
+      return this.assignPayloadToResource(new (resourceClass)() as T, payload);
     } else {
       ConsoleLogger.prettyWarn('Not found resource type when create resource: \'' + resourceName + '\' so used default Resource type, for this can be some reasons: \n\r' +
         '1) You did not pass resource property name as \'' + resourceName + '\' with @HateoasResource decorator. \n\r' +
         '2) You did not declare resource type in configuration "configuration.useTypes.resources". \n\r' +
         '\n\rSee more about declare resource types here: https://github.com/lagoshny/ngx-hateoas-client#usetypes-params..');
 
-      return Object.assign(new this.resourceType(), payload);
+      return this.assignPayloadToResource(new this.resourceType() as T, payload);
     }
+  }
+
+  private static assignPayloadToResource<T extends BaseResource>(resourceObject: T, payload: object): T {
+    const jsonDeserializeProps = resourceObject.constructor[RESOURCE_JSON_PROPS]?.deserialize;
+    if (isEmpty(jsonDeserializeProps)) {
+      return Object.assign(resourceObject, payload);
+    }
+
+    // TODO: rename vars
+    for (const propKey of Object.keys(payload)) {
+      const propertyConfig = jsonDeserializeProps[propKey];
+      if (!isEmpty(propertyConfig)) {
+        resourceObject[propertyConfig.propName] = payload[propKey];
+        continue;
+      }
+
+      const insensitivePropertyConfig = jsonDeserializeProps[propKey.toLowerCase()];
+      if (!isEmpty(insensitivePropertyConfig) && insensitivePropertyConfig.ignoreCase) {
+        resourceObject[insensitivePropertyConfig.propName] = payload[propKey];
+        continue;
+      }
+
+      resourceObject[propKey] = payload[propKey];
+    }
+    return resourceObject;
   }
 
   private static createResourceProjectionRel<T extends Resource>(relationName: string, payload: any): T {
     const relationClass = ResourceUtils.RESOURCE_PROJECTION_REL_NAME_TYPE_MAP.get(relationName);
     if (relationClass) {
-      return Object.assign(new (relationClass)() as T, payload);
+      return this.assignPayloadToResource(new (relationClass)() as T, payload);
     } else {
       ConsoleLogger.prettyWarn('Not found resource relation type when create relation: \'' + relationName + '\' so used default Resource type, for this can be some reasons: \n\r' +
         'You did not pass relation type property with @ProjectionRel decorator on relation property \'' + relationName + '\'. \n\r' +
         '\n\rSee more how to use @ProjectionRel here https://github.com/lagoshny/ngx-hateoas-client#resource-projection-support.');
 
-      return Object.assign(new this.resourceType(), payload);
+      return this.assignPayloadToResource(new this.resourceType() as T, payload);
     }
   }
 
   private static createEmbeddedResource<T extends BaseResource>(key: string, payload: any): T {
     const resourceClass = ResourceUtils.EMBEDDED_RESOURCE_TYPE_MAP.get(key);
     if (resourceClass) {
-      return Object.assign(new (resourceClass)() as T, payload);
+      return this.assignPayloadToResource(new (resourceClass)() as T, payload);
     } else {
       ConsoleLogger.prettyWarn('Not found embedded resource type when create resource: \'' + key + '\' so used default EmbeddedResource type, for this can be some reasons:. \n\r' +
         '1) You did not pass embedded resource property name as \'' + key + '\' with @HateoasEmbeddedResource decorator. \n\r' +
         '2) You did not declare embedded resource type in configuration "configuration.useTypes.embeddedResources". \n\r' +
         '\n\r See more about declare resource types here: https://github.com/lagoshny/ngx-hateoas-client#usetypes-params.');
 
-      return Object.assign(new this.embeddedResourceType(), payload);
+      return this.assignPayloadToResource(new this.embeddedResourceType() as T, payload);
     }
   }
 
@@ -206,8 +232,9 @@ export class ResourceUtils {
    * If request body has {@link ValuesOption} it will be applied to body values.
    *
    * @param requestBody that contains the body directly and optional body values option {@link ValuesOption}
+   * @param propertyConfig {@link ResourcePropertyConfig}
    */
-  public static resolveValues(requestBody: RequestBody<any>): any {
+  public static resolveValues(requestBody: RequestBody<any>, propertyConfig: ResourcePropertyConfig): any {
     if (isEmpty(requestBody) || isNil(requestBody.body)
       || (isObject(requestBody.body) && isEmpty(requestBody.body))) {
       StageLogger.stageLog(Stage.RESOLVE_VALUES, {result: 'body is empty return null'});
@@ -238,14 +265,18 @@ export class ResourceUtils {
           if (isResource(element)) {
             result[key].push(element?._links?.self?.href);
           } else {
-            result[key].push(this.resolveValues({body: element, valuesOption: requestBody?.valuesOption}));
+            result[key].push(this.resolveValues({body: element, valuesOption: requestBody?.valuesOption}, propertyConfig));
           }
         });
       } else if (isResource(body[key])) {
         result[key] = body[key]._links?.self?.href;
       } else if (isPlainObject(body[key])) {
-        result[key] = this.resolveValues({body: body[key], valuesOption: requestBody?.valuesOption});
+        result[key] = this.resolveValues({body: body[key], valuesOption: requestBody?.valuesOption}, propertyConfig);
       } else {
+        if (!isEmpty(propertyConfig?.serialize) && !isEmpty(propertyConfig.serialize[key])) {
+          result[propertyConfig.serialize[key].propName] = body[key];
+          continue;
+        }
         result[key] = body[key];
       }
     }
@@ -260,6 +291,7 @@ export class ResourceUtils {
    * @param entity to be converter to resource
    */
   public static initResource(entity: any): BaseResource | any {
+    // TODO:
     if (isResource(entity)) {
       return Object.assign(new this.resourceType(), entity);
     } else if (isEmbeddedResource(entity)) {

@@ -9,6 +9,7 @@ import { isResourceObject } from '../model/resource-type';
 import { ResourceCacheService } from './internal/cache/resource-cache.service';
 import { LibConfig } from '../config/lib-config';
 import { HttpClientOptions } from '../model/declarations';
+import { CacheUtils } from '../util/cache.utils';
 
 /**
  * Base class with common logics to perform HTTP requests.
@@ -64,9 +65,9 @@ export class HttpExecutor {
    */
   public getHttp(url: string,
                  options?: HttpClientOptions,
-                 useCache: boolean = true): Observable<any> {
+                 useCache?: boolean): Observable<any> {
     ValidationUtils.validateInputParams({url});
-    if (LibConfig.getConfig().cache.enabled && useCache) {
+    if (CacheUtils.shouldUseCache(useCache)) {
       const cachedValue = this.cacheService.getResource(CacheKey.of(url, options));
       if (cachedValue != null) {
         return observableOf(cachedValue);
@@ -84,7 +85,7 @@ export class HttpExecutor {
     return response.pipe(
       tap((data: any) => {
         HttpExecutor.logResponse('GET', url, options, data);
-        if (LibConfig.getConfig().cache.enabled && useCache && isResourceObject(data)) {
+        if (CacheUtils.shouldUseCache(useCache) && isResourceObject(data)) {
           this.cacheService.putResource(CacheKey.of(url, options), data);
         }
       })

@@ -1,4 +1,5 @@
 import { DEFAULT_ROUTE_NAME, HateoasConfiguration } from './hateoas-configuration.interface';
+import { CacheMode } from '../model/declarations';
 
 /**
  * Contains all configuration lib params.
@@ -17,6 +18,7 @@ export class LibConfig {
     },
     cache: {
       enabled: true,
+      mode: CacheMode.ALWAYS,
       lifeTime: 5 * 60 * 1000
     },
     useTypes: {
@@ -39,14 +41,22 @@ export class LibConfig {
   private static config: HateoasConfiguration = LibConfig.DEFAULT_CONFIG;
 
   public static setConfig(hateoasConfiguration: HateoasConfiguration) {
-    LibConfig.config = {
-      ...LibConfig.DEFAULT_CONFIG,
-      ...hateoasConfiguration
-    };
+    LibConfig.config = LibConfig.mergeConfigs(hateoasConfiguration);
   }
 
   public static getConfig(): HateoasConfiguration {
     return LibConfig.config;
+  }
+
+  public static mergeConfigs(config: HateoasConfiguration): HateoasConfiguration {
+    return {
+      ...LibConfig.DEFAULT_CONFIG,
+      ...config,
+      cache: {
+        ...LibConfig.DEFAULT_CONFIG.cache,
+        ...config.cache
+      },
+    };
   }
 
 }

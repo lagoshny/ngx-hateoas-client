@@ -204,3 +204,21 @@ type NonResourcePropertyType<T> = {
  */
 export type ProjectionRelType<T extends BaseResource> =
   Pick<T, Exclude<keyof T, keyof Resource | keyof EmbeddedResource> & NonResourcePropertyType<T>>;
+
+/**
+ * Additional cache modes.
+ */
+export enum CacheMode {
+  /**
+   * Default mode.
+   * When cache enable, then all HTTP GET methods will use cache. Except methods where explicitly passed {useCache : false}.
+   */
+  ALWAYS = 'ALWAYS',
+
+  /**
+   * This is opposite option for ALWAYS mode.
+   * When cache enable, that mode will NOT use cache by default on all HTTP GET methods.
+   * Except methods where explicitly passed {useCache : true}.
+   */
+  ON_DEMAND = 'ON_DEMAND'
+}

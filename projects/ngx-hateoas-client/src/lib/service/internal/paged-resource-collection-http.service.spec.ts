@@ -83,12 +83,12 @@ describe('PagedResourceCollectionHttpService', () => {
   });
 
   it('GET REQUEST should evict cache when returned object is not paged resource collection', () => {
-    spyOn(LibConfig, 'getConfig').and.returnValue({
+    spyOn(LibConfig, 'getConfig').and.returnValue(LibConfig.mergeConfigs({
       ...LibConfig.DEFAULT_CONFIG,
       cache: {
         enabled: true
       }
-    });
+    }));
     httpClientSpy.get.and.returnValue(of({any: 'value'}));
 
     pagedResourceCollectionHttpService.get('someUrl').subscribe(() => {
@@ -162,12 +162,12 @@ describe('PagedResourceCollectionHttpService', () => {
 
   it('GET REQUEST should use cache when useCache param is TRUE', () => {
     httpClientSpy.get.and.returnValue(of(rawPagedResourceCollection));
-    spyOn(LibConfig, 'getConfig').and.returnValue({
+    spyOn(LibConfig, 'getConfig').and.returnValue(LibConfig.mergeConfigs({
       ...LibConfig.DEFAULT_CONFIG,
       cache: {
         enabled: true
       }
-    });
+    }));
 
     pagedResourceCollectionHttpService.get('order', {
       useCache: true
@@ -178,12 +178,12 @@ describe('PagedResourceCollectionHttpService', () => {
 
   it('GET REQUEST should NOT use cache when useCache param is FALSE', () => {
     httpClientSpy.get.and.returnValue(of(rawPagedResourceCollection));
-    spyOn(LibConfig, 'getConfig').and.returnValue({
+    spyOn(LibConfig, 'getConfig').and.returnValue(LibConfig.mergeConfigs({
       ...LibConfig.DEFAULT_CONFIG,
       cache: {
         enabled: true
       }
-    });
+    }));
 
     pagedResourceCollectionHttpService.get('order', {
       useCache: false

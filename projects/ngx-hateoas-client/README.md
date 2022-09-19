@@ -3458,7 +3458,13 @@ After that, use `routerName` on `Resource` decorator [@HateoasResource#options](
 #### Cache params
 
 - `enabled` - `true` to use cache for `GET` requests, `false` otherwise, default value is `true`.
+- `mode` - allows to adjust cache more granular using `CacheMode` modes.
 - `lifeTime` - default cache lifetime is 300 000 seconds (=5 minutes) pass new value to change default one.
+
+`CacheMode` has two options:
+
+- `ALWAYS` is default option in this mode, all HTTP GET methods will use cache except methods where explicitly passed `useCache = false`.
+- `ON_DEMAND` is opposite mode, `ALWAYS` mode. Means that all HTTP GET methods will NOT use cache by default except methods where explicitly passed `useCache = true`.
 
 > See more about caching [here](#cache-support).
 
@@ -3556,6 +3562,9 @@ The library supports caching `GET` request response values.
 By default, the cache `enabled`.
 
 To enable cache pass `cache.enabled = true` to library configuration. Also, you can manage the cache expired time with `cache.lifeTime` param.
+
+
+Also, you can specify cache mode that allows to enable cache always except case when explicitly passed `useCache = false` or vice versa use only when passed `useCache = true`.
 
 > More about the cache configuration see [here](#cache-params).
 

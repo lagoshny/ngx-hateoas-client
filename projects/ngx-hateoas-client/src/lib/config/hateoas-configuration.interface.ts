@@ -3,6 +3,7 @@
  */
 import { Resource } from '../model/resource/resource';
 import { EmbeddedResource } from '../model/resource/embedded-resource';
+import { CacheMode } from '../model/declarations';
 
 export const DEFAULT_ROUTE_NAME = 'defaultRoute';
 
@@ -80,6 +81,10 @@ export interface HateoasConfiguration {
      * When {@code true} then cache will be used, {@code false} otherwise.
      */
     enabled: boolean;
+    /**
+     * Allows to adjust cache more granular using {@link CacheMode} modes.
+     */
+    mode?: CacheMode;
     /**
      * Time in milliseconds after which cache need to be expired.
      */

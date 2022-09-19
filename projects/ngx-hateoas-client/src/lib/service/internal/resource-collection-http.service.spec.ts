@@ -115,12 +115,12 @@ describe('ResourceCollectionHttpService', () => {
   });
 
   it('GET REQUEST should evict cache when returned object is not resource collection', () => {
-    spyOn(LibConfig, 'getConfig').and.returnValue({
+    spyOn(LibConfig, 'getConfig').and.returnValue(LibConfig.mergeConfigs({
       ...LibConfig.DEFAULT_CONFIG,
       cache: {
         enabled: true
       }
-    });
+    }));
     httpClientSpy.get.and.returnValue(of({any: 'value'}));
 
     resourceCollectionHttpService.get('someUrl').subscribe(() => {
@@ -131,12 +131,12 @@ describe('ResourceCollectionHttpService', () => {
 
   it('GET REQUEST should use cache when useCache param is TRUE', () => {
     httpClientSpy.get.and.returnValue(of(rawResourceCollection));
-    spyOn(LibConfig, 'getConfig').and.returnValue({
+    spyOn(LibConfig, 'getConfig').and.returnValue(LibConfig.mergeConfigs({
       ...LibConfig.DEFAULT_CONFIG,
       cache: {
         enabled: true
       }
-    });
+    }));
 
     resourceCollectionHttpService.get('order', {
       useCache: true
@@ -147,12 +147,12 @@ describe('ResourceCollectionHttpService', () => {
 
   it('GET REQUEST should NOT use cache when useCache param is FALSE', () => {
     httpClientSpy.get.and.returnValue(of(rawResourceCollection));
-    spyOn(LibConfig, 'getConfig').and.returnValue({
+    spyOn(LibConfig, 'getConfig').and.returnValue(LibConfig.mergeConfigs({
       ...LibConfig.DEFAULT_CONFIG,
       cache: {
         enabled: true
       }
-    });
+    }));
 
     resourceCollectionHttpService.get('order', {
       useCache: false

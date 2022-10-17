@@ -1,3 +1,7 @@
+## 3.3.5 (2022-10-17)
+#### Changes
+Fixed [issue-81](https://github.com/lagoshny/ngx-hateoas-client/issues/81).
+
 ## 3.3.4 (2022-09-19)
 #### Changes
 Added cache modes implemented using [issue-77](https://github.com/lagoshny/ngx-hateoas-client/issues/77).

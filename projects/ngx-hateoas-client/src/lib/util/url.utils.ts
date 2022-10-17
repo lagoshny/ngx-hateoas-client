@@ -161,13 +161,20 @@ export class UrlUtils {
     const lowerCaseUrl = url.toLowerCase();
     const resourceRoute = UrlUtils.guessResourceRoute(url);
 
+    let baseUrl;
     if (lowerCaseUrl.includes(resourceRoute.rootUrl)) {
-      return url.toLowerCase().replace(`${ resourceRoute.rootUrl }/`, '').split('/')[0];
+      baseUrl = resourceRoute.rootUrl;
     } else if (!isEmpty(resourceRoute.proxyUrl) && lowerCaseUrl.includes(resourceRoute.proxyUrl)) {
-      return url.toLowerCase().replace(`${ resourceRoute.proxyUrl }/`, '').split('/')[0];
+      baseUrl = resourceRoute.proxyUrl;
     } else {
       throw new Error(`Failed to determine resource name from url: ${ url }, found resource route ${ JSON.stringify(resourceRoute) }`);
     }
+
+    if (!baseUrl.endsWith('/')) {
+      baseUrl = baseUrl.concat('/');
+    }
+
+    return url.toLowerCase().replace(`${ baseUrl }`, '').split('/')[0];
   }
 
   /**

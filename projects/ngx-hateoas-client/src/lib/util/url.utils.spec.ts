@@ -422,6 +422,33 @@ describe('UrlUtils', () => {
     expect(resourceNameFromUrl).toEqual('resources');
   });
 
+  it('GET_RESOURCE_NAME_FROM_URL should return resource name when rootUrl ends with slash', () => {
+    spyOn(LibConfig, 'getConfig').and.returnValue({
+      ...LibConfig.DEFAULT_CONFIG,
+      http: {
+        [DEFAULT_ROUTE_NAME]: {
+          rootUrl: 'https://localhost:8080/api/v1/'
+        }
+      }
+    });
+    const resourceNameFromUrl = UrlUtils.getResourceNameFromUrl('https://localhost:8080/api/v1/resources/1');
+    expect(resourceNameFromUrl).toEqual('resources');
+  });
+
+  it('GET_RESOURCE_NAME_FROM_URL should return resource name when proxyUrl ends with slash', () => {
+    spyOn(LibConfig, 'getConfig').and.returnValue({
+      ...LibConfig.DEFAULT_CONFIG,
+      http: {
+        [DEFAULT_ROUTE_NAME]: {
+          rootUrl: 'http://localhost:5050/api/v1/',
+          proxyUrl: 'https://localhost:8080/api/v1/'
+        }
+      }
+    });
+    const resourceNameFromUrl = UrlUtils.getResourceNameFromUrl('https://localhost:8080/api/v1/resources/1');
+    expect(resourceNameFromUrl).toEqual('resources');
+  });
+
   it('GET_RESOURCE_NAME_FROM_URL should return resource name with root proxy', () => {
     spyOn(LibConfig, 'getConfig').and.returnValue({
       ...LibConfig.DEFAULT_CONFIG,

@@ -369,9 +369,7 @@ describe('ResourceUtils', () => {
       public brand: string;
       public model: string;
       public garageId: string;
-      // @EmbeddedRel(GarageItemEmb)
       public garage: GarageItemEmb;
-      // @EmbeddedRel(InspectionItemEmb)
       public inspections: InspectionItemEmb[];
     }
 
@@ -381,7 +379,7 @@ describe('ResourceUtils', () => {
     expect(result['garage'] instanceof GarageItemEmb).toBeTruthy('embedded resource garage should be GarageItemEmb type');
     expect(isArray(result['inspections'])).toBeTruthy('embedded resource inspections should be Array');
     expect(isEmpty(result['inspections'])).toBeFalsy('embedded resource inspections should NOT be EMPTY');
-    expect(result['inspections'][0] instanceof  InspectionItemEmb).toBeTruthy('embedded resource inspections should be InspectionItemEmb type');
+    expect(result['inspections'][0] instanceof InspectionItemEmb).toBeTruthy('embedded resource inspections should be InspectionItemEmb type');
   });
 
   it('INSTANTIATE_RESOURCE embedded resources are EMPTY when _embedded resource is EMPTY', () => {
@@ -402,8 +400,7 @@ describe('ResourceUtils', () => {
           href: 'http://localhost:8080/api/v1/garages/456'
         }
       },
-      _embedded: {
-      }
+      _embedded: {}
     };
 
     @HateoasResource('garages')
@@ -429,9 +426,7 @@ describe('ResourceUtils', () => {
       public brand: string;
       public model: string;
       public garageId: string;
-      // @EmbeddedRel(GarageItemEmb)
       public garage: GarageItemEmb;
-      // @EmbeddedRel(InspectionItemEmb)
       public inspections: InspectionItemEmb[];
     }
 
@@ -486,9 +481,7 @@ describe('ResourceUtils', () => {
       public brand: string;
       public model: string;
       public garageId: string;
-      // @EmbeddedRel(GarageItemEmb)
       public garage: GarageItemEmb;
-      // @EmbeddedRel(InspectionItemEmb)
       public inspections: InspectionItemEmb[];
     }
 
@@ -543,9 +536,7 @@ describe('ResourceUtils', () => {
       public brand: string;
       public model: string;
       public garageId: string;
-      // @EmbeddedRel(GarageItemEmb)
       public garage: GarageItemEmb;
-      // @EmbeddedRel(InspectionItemEmb)
       public inspections: InspectionItemEmb[];
     }
 

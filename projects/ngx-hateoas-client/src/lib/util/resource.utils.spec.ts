@@ -19,6 +19,7 @@ import {
 import { Include } from '../model/declarations';
 import { HateoasResource } from '../model/decorators';
 import { LibConfig } from '../config/lib-config';
+import { isArray, isEmpty } from 'lodash-es';
 
 
 /* tslint:disable:no-string-literal */
@@ -289,6 +290,263 @@ describe('ResourceUtils', () => {
     const result = ResourceUtils.instantiateResource(rawCaseSensitiveResource);
     expect(result instanceof CaseSensitiveResource4).toBeTrue();
   });
+
+  it('INSTANTIATE_RESOURCE define right embedded Resource types with _embedded resources', () => {
+    const rawResourceWithEmbedded = {
+      id: '123',
+      color: 'red',
+      brand: 'Volkswagen',
+      model: 'Golf',
+      garageId: '456',
+      _links: {
+        self: {
+          href: 'http://localhost:8080/api/v1/cars/123'
+        },
+        inspections: {
+          href: 'http://localhost:8080/api/v1/cars/123/inspections'
+        },
+        garage: {
+          href: 'http://localhost:8080/api/v1/garages/456'
+        }
+      },
+      _embedded: {
+        inspections: [
+          {
+            id: '789',
+            name: 'XY',
+            date: 'DD.MM.YYYY',
+            carId: '123',
+            _links: {
+              self: {
+                href: 'http://localhost:8080/api/v1/inspections/789'
+              },
+              car: {
+                href: 'http://localhost:8080/api/v1/cars/123'
+              }
+            }
+          }
+        ],
+        garage: {
+          id: '456',
+          location: 'XY',
+          surface: 'pavement',
+          city: 'XY',
+          _links: {
+            self: {
+              href: 'http://localhost:8080/api/v1/garages/456'
+            },
+            cars: {
+              href: 'http://localhost:8080/api/v1/garages/456/cars'
+            },
+            inspections: {
+              href: 'http://localhost:8080/api/v1/garages/456/inspections'
+            }
+          }
+        }
+      }
+    };
+
+    @HateoasResource('garages')
+    class GarageItemEmb extends Resource {
+      public id: string;
+      public location: string;
+      public surface: string;
+      public city: string;
+    }
+
+    @HateoasResource('inspections')
+    class InspectionItemEmb extends Resource {
+      public id: string;
+      public name: string;
+      public date: string;
+      public carId: string;
+    }
+
+    @HateoasResource('cars')
+    class CarItem extends Resource {
+      public id: string;
+      public color: string;
+      public brand: string;
+      public model: string;
+      public garageId: string;
+      public garage: GarageItemEmb;
+      public inspections: InspectionItemEmb[];
+    }
+
+    const result = ResourceUtils.instantiateResource(rawResourceWithEmbedded, false);
+
+    expect(result instanceof CarItem).toBeTruthy('result of resource should be CarItem type');
+    expect(result['garage'] instanceof GarageItemEmb).toBeTruthy('embedded resource garage should be GarageItemEmb type');
+    expect(isArray(result['inspections'])).toBeTruthy('embedded resource inspections should be Array');
+    expect(isEmpty(result['inspections'])).toBeFalsy('embedded resource inspections should NOT be EMPTY');
+    expect(result['inspections'][0] instanceof InspectionItemEmb).toBeTruthy('embedded resource inspections should be InspectionItemEmb type');
+  });
+
+  it('INSTANTIATE_RESOURCE embedded resources are EMPTY when _embedded resource is EMPTY', () => {
+    const rawResourceWithEmbedded = {
+      id: '123',
+      color: 'red',
+      brand: 'Volkswagen',
+      model: 'Golf',
+      garageId: '456',
+      _links: {
+        self: {
+          href: 'http://localhost:8080/api/v1/cars/123'
+        },
+        inspections: {
+          href: 'http://localhost:8080/api/v1/cars/123/inspections'
+        },
+        garage: {
+          href: 'http://localhost:8080/api/v1/garages/456'
+        }
+      },
+      _embedded: {}
+    };
+
+    @HateoasResource('garages')
+    class GarageItemEmb extends Resource {
+      public id: string;
+      public location: string;
+      public surface: string;
+      public city: string;
+    }
+
+    @HateoasResource('inspections')
+    class InspectionItemEmb extends Resource {
+      public id: string;
+      public name: string;
+      public date: string;
+      public carId: string;
+    }
+
+    @HateoasResource('cars')
+    class CarItem extends Resource {
+      public id: string;
+      public color: string;
+      public brand: string;
+      public model: string;
+      public garageId: string;
+      public garage: GarageItemEmb;
+      public inspections: InspectionItemEmb[];
+    }
+
+    const result = ResourceUtils.instantiateResource(rawResourceWithEmbedded, false);
+
+    expect(result instanceof CarItem).toBeTruthy();
+    expect(isEmpty(result['garage'])).toBeTruthy('embedded resource garage should be EMPTY');
+    expect(isEmpty(result['inspections'])).toBeTruthy('embedded resource inspections should be EMPTY');
+  });
+
+  it('INSTANTIATE_RESOURCE embedded Resources are EMPTY when _embedded resource is UNDEFINED', () => {
+    const rawResourceWithEmbedded = {
+      id: '123',
+      color: 'red',
+      brand: 'Volkswagen',
+      model: 'Golf',
+      garageId: '456',
+      _links: {
+        self: {
+          href: 'http://localhost:8080/api/v1/cars/123'
+        },
+        inspections: {
+          href: 'http://localhost:8080/api/v1/cars/123/inspections'
+        },
+        garage: {
+          href: 'http://localhost:8080/api/v1/garages/456'
+        }
+      },
+      _embedded: undefined
+    };
+
+    @HateoasResource('garages')
+    class GarageItemEmb extends Resource {
+      public id: string;
+      public location: string;
+      public surface: string;
+      public city: string;
+    }
+
+    @HateoasResource('inspections')
+    class InspectionItemEmb extends Resource {
+      public id: string;
+      public name: string;
+      public date: string;
+      public carId: string;
+    }
+
+    @HateoasResource('cars')
+    class CarItem extends Resource {
+      public id: string;
+      public color: string;
+      public brand: string;
+      public model: string;
+      public garageId: string;
+      public garage: GarageItemEmb;
+      public inspections: InspectionItemEmb[];
+    }
+
+    const result = ResourceUtils.instantiateResource(rawResourceWithEmbedded, false);
+
+    expect(result instanceof CarItem).toBeTruthy();
+    expect(isEmpty(result['garage'])).toBeTruthy('embedded resource garage should be EMPTY');
+    expect(isEmpty(result['inspections'])).toBeTruthy('embedded resource inspections should be EMPTY');
+  });
+
+  it('INSTANTIATE_RESOURCE embedded resources are EMPTY when _embedded resource is NULL', () => {
+    const rawResourceWithEmbedded = {
+      id: '123',
+      color: 'red',
+      brand: 'Volkswagen',
+      model: 'Golf',
+      garageId: '456',
+      _links: {
+        self: {
+          href: 'http://localhost:8080/api/v1/cars/123'
+        },
+        inspections: {
+          href: 'http://localhost:8080/api/v1/cars/123/inspections'
+        },
+        garage: {
+          href: 'http://localhost:8080/api/v1/garages/456'
+        }
+      },
+      _embedded: null
+    };
+
+    @HateoasResource('garages')
+    class GarageItemEmb extends Resource {
+      public id: string;
+      public location: string;
+      public surface: string;
+      public city: string;
+    }
+
+    @HateoasResource('inspections')
+    class InspectionItemEmb extends Resource {
+      public id: string;
+      public name: string;
+      public date: string;
+      public carId: string;
+    }
+
+    @HateoasResource('cars')
+    class CarItem extends Resource {
+      public id: string;
+      public color: string;
+      public brand: string;
+      public model: string;
+      public garageId: string;
+      public garage: GarageItemEmb;
+      public inspections: InspectionItemEmb[];
+    }
+
+    const result = ResourceUtils.instantiateResource(rawResourceWithEmbedded, false);
+
+    expect(result instanceof CarItem).toBeTruthy();
+    expect(isEmpty(result['garage'])).toBeTruthy('embedded resource garage should be EMPTY');
+    expect(isEmpty(result['inspections'])).toBeTruthy('embedded resource inspections should be EMPTY');
+  });
+
 
   it('INSTANTIATE_RESOURCE PROJECTION define resource type should be case insensitive #1', () => {
 

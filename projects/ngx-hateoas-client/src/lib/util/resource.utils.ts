@@ -69,6 +69,16 @@ export class ResourceUtils {
         continue;
       }
 
+      if (key === '_embedded' && isObject(payload[key])) {
+        payload = {
+          ...payload,
+          ...this.resolvePayloadProperties(payload[key], isProjection)
+        };
+        delete payload['_embedded'];
+
+        continue;
+      }
+
       if (LibConfig.getConfig()?.typesFormat?.date?.patterns && !isEmpty(LibConfig.getConfig().typesFormat.date.patterns)) {
         for (const pattern of LibConfig.getConfig().typesFormat.date.patterns) {
           if (isMatch(payload[key], pattern)) {

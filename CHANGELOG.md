@@ -1,3 +1,8 @@
+## 2.6.6 (2022-10-31)
+#### Changes
+Implemented enhancement from [issue-76](https://github.com/lagoshny/ngx-hateoas-client/issues/76).
+- Added support for `_embedded` Resource properties. [Spring HATEOAS ref](https://docs.spring.io/spring-hateoas/docs/1.1.0.BUILD-SNAPSHOT/reference/html/#mediatypes.hal.models).
+
 ## 2.6.5 (2022-10-17)
 #### Changes
 Fixed [issue-81](https://github.com/lagoshny/ngx-hateoas-client/issues/81).

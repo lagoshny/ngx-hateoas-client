@@ -5,21 +5,21 @@ import { camelCase, capitalize, isEmpty } from 'lodash-es';
 export class ConsoleLogger {
 
   public static info(message?: any, ...optionalParams: any[]): void {
-    if (!LibConfig.getConfig().logs.verboseLogs && !LibConfig.getConfig().isProduction) {
+    if (!this.isLoggingEnabled()) {
       return;
     }
     console.info(message, ...optionalParams);
   }
 
   public static warn(message?: any, ...optionalParams: any[]): void {
-    if (LibConfig.getConfig().isProduction) {
+    if (!this.isLoggingEnabled()) {
       return;
     }
     console.warn(message, ...optionalParams);
   }
 
   public static error(message?: any, ...optionalParams: any[]): void {
-    if (LibConfig.getConfig().isProduction) {
+    if (!this.isLoggingEnabled()) {
       return;
     }
     console.error(message, ...optionalParams);
@@ -32,7 +32,7 @@ export class ConsoleLogger {
    * @param params additional params for verbose log
    */
   public static prettyInfo(message: string, params?: object): void {
-    if (!LibConfig.getConfig().logs.verboseLogs && !LibConfig.getConfig().isProduction) {
+    if (!this.isLoggingEnabled()) {
       return;
     }
 
@@ -57,7 +57,7 @@ export class ConsoleLogger {
   }
 
   public static objectPrettyInfo(message: string, params?: object): void {
-    if (!LibConfig.getConfig().logs.verboseLogs && !LibConfig.getConfig().isProduction) {
+    if (!this.isLoggingEnabled()) {
       return;
     }
 
@@ -77,7 +77,7 @@ export class ConsoleLogger {
    * @param params additional params for verbose log
    */
   public static resourcePrettyInfo(resourceName: string, message: string, params?: object): void {
-    if (!LibConfig.getConfig().logs.verboseLogs && !LibConfig.getConfig().isProduction) {
+    if (!this.isLoggingEnabled()) {
       return;
     }
 
@@ -109,7 +109,7 @@ export class ConsoleLogger {
    * @param params additional params for verbose log
    */
   public static prettyError(message: string, params?: object): void {
-    if (LibConfig.getConfig().isProduction) {
+    if (!this.isLoggingEnabled()) {
       return;
     }
 
@@ -140,7 +140,7 @@ export class ConsoleLogger {
    * @param params additional params for verbose log
    */
   public static prettyWarn(message: string, params?: object): void {
-    if (LibConfig.getConfig().isProduction) {
+    if (!this.isLoggingEnabled()) {
       return;
     }
 
@@ -157,6 +157,11 @@ export class ConsoleLogger {
     }
 
     ConsoleLogger.warn(msg, ...color);
+  }
+
+  private static isLoggingEnabled() {
+    return (!LibConfig.getConfig().isProduction && LibConfig.getConfig().logs.verboseLogs)
+      || LibConfig.getConfig().logs.verboseLogs;
   }
 
 }

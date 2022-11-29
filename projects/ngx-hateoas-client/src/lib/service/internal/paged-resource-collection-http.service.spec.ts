@@ -116,7 +116,7 @@ describe('PagedResourceCollectionHttpService', () => {
     }).toThrowError('Please, pass page params in page object key, not with params object!');
   });
 
-  it('GET REQUEST should pass page params as http request params', () => {
+  it('GET REQUEST should pass page params and sort as http request params', () => {
     httpClientSpy.get.and.returnValue(of(rawPagedResourceCollection));
 
     pagedResourceCollectionHttpService.get('http://localhost:8080/api/v1/order/1/magazine', {

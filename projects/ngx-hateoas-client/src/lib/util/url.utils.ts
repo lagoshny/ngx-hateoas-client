@@ -213,24 +213,18 @@ export class UrlUtils {
     ValidationUtils.validateInputParams({url});
     UrlUtils.checkDuplicateParams(options);
 
+    /*
+       Sort params will be applied through Http request params not with template params
+       because often sort params is not present in template params then sort params need to put through Http request params.
+       But when sort params present in template params we need to avoid duplication sort params from Http request params
+       and template params therefore we need to add it in one place.
+    */
     const paramsWithoutSortParam = {
       ...options,
       ...options?.params,
       ...options?.pageParams,
-      /* Sets sort to null because sort is object and should be applied as multi params with sort name
-         for each sort object property, but uriTemplates can't do that and we need to do it manually */
-      sort: null
     };
-
-    const resultUrl = new UriTemplate(url).fill(isNil(paramsWithoutSortParam) ? {} : paramsWithoutSortParam);
-    if (options?.sort) {
-      const sortParams = UrlUtils.generateSortParams(options.sort);
-      if (sortParams.keys().length > 0) {
-        return resultUrl.concat(resultUrl.includes('?') ? '&' : '').concat(sortParams.toString());
-      }
-    }
-
-    return resultUrl;
+    return new UriTemplate(url).fill(isNil(paramsWithoutSortParam) ? {} : paramsWithoutSortParam);
   }
 
   public static fillDefaultPageDataIfNoPresent(options: PagedGetOption) {

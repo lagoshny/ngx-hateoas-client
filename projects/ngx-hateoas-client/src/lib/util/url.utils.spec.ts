@@ -240,7 +240,7 @@ describe('UrlUtils', () => {
     expect(UrlUtils.fillTemplateParams(templatedUrl, undefined)).toBe('http://localhost:8080/api/v1/pagedResourceCollection');
   });
 
-  it('FILL_TEMPLATE_PARAMS should fill ALL template params', () => {
+  it('FILL_TEMPLATE_PARAMS should fill ALL template params except sort', () => {
     expect(UrlUtils.fillTemplateParams(templatedUrl, {
       params: {
         any: 123,
@@ -249,13 +249,9 @@ describe('UrlUtils', () => {
       pageParams: {
         page: 2,
         size: 30
-      },
-      sort: {
-        first: 'ASC',
-        second: 'DESC'
       }
     }))
-      .toBe('http://localhost:8080/api/v1/pagedResourceCollection?page=2&size=30&projection=testProjection&any=123&sort=first,ASC&sort=second,DESC');
+      .toBe('http://localhost:8080/api/v1/pagedResourceCollection?page=2&size=30&projection=testProjection&any=123');
   });
 
   it('FILL_TEMPLATE_PARAMS should fill passed template params other clear', () => {
@@ -316,16 +312,13 @@ describe('UrlUtils', () => {
         params: {
           param1: '1'
         },
-        sort: {
-          abc: 'ASC'
-        },
         pageParams: {
           size: 10,
           page: 0
         }
       });
 
-    expect(result).toBe(`${ UrlUtils.getApiUrl(DEFAULT_ROUTE_NAME) }/test?param1=1&page=0&size=10&sort=abc,ASC`);
+    expect(result).toBe(`${ UrlUtils.getApiUrl(DEFAULT_ROUTE_NAME) }/test?param1=1&page=0&size=10`);
   });
 
   it('GENERATE_LINK_URL should REMOVE template params when link is templated and passed params are empty', () => {

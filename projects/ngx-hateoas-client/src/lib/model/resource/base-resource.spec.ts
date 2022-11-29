@@ -262,7 +262,7 @@ describe('BaseResource GET_RELATED_COLLECTION', () => {
     });
   });
 
-  it('should undefine params/sort options for TEMPLATED link', () => {
+  it('should undefine request params options for TEMPLATED link because it is already presented in URL', () => {
     resourceCollectionHttpServiceSpy.get.and.returnValue(of(new TestOrderResource()));
 
     baseResource.getRelatedCollection('paymentType', {
@@ -271,7 +271,7 @@ describe('BaseResource GET_RELATED_COLLECTION', () => {
       }
     }).subscribe(() => {
       const options = resourceCollectionHttpServiceSpy.get.calls.argsFor(0)[1];
-      expect(options).toEqual({...options, params: undefined, sort: undefined});
+      expect(options).toEqual({...options, params: undefined});
     });
   });
 
@@ -365,18 +365,14 @@ describe('BaseResource GET_RELATED_PAGE', () => {
       pageParams: {
         page: 1,
         size: 2
-      },
-      sort: {
-        abc: 'ASC',
-        cde: 'DESC'
       }
     }).subscribe(() => {
       const resultResourceUrl = pagedResourceCollectionHttpServiceSpy.get.calls.argsFor(0)[0];
-      expect(resultResourceUrl).toBe('http://localhost:8080/api/v1/order/1/products?page=1&size=2&sort=abc,ASC&sort=cde,DESC');
+      expect(resultResourceUrl).toBe('http://localhost:8080/api/v1/order/1/products?page=1&size=2');
     });
   });
 
-  it('should undefine params/pageParams/sort options for TEMPLATED link', () => {
+  it('should undefine params/pageParams options for TEMPLATED link except sort', () => {
     pagedResourceCollectionHttpServiceSpy.get.and.returnValue(of(new PagedResourceCollection(new ResourceCollection())));
 
     baseResource.getRelatedPage('product', {
@@ -390,7 +386,7 @@ describe('BaseResource GET_RELATED_PAGE', () => {
       }
     }).subscribe(() => {
       const options = pagedResourceCollectionHttpServiceSpy.get.calls.argsFor(0)[1];
-      expect(options).toEqual({...options, params: undefined, pageParams: undefined, sort: undefined});
+      expect(options).toEqual({...options, params: undefined, pageParams: undefined});
     });
   });
 

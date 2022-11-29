@@ -60,8 +60,9 @@ export abstract class BaseResource extends AbstractResource {
     StageLogger.resourceBeginLog(this, 'GET_RELATED_COLLECTION', {relationName, options});
 
     const relationLink = this.getRelationLink(relationName);
+    // For templated links removed some part of params to avoid duplication in template params and http request params
     const optionsToRequest = relationLink.templated
-      ? {...options, params: undefined, sort: undefined}
+      ? {...options, params: undefined}
       : options;
 
     return getResourceCollectionHttpService()
@@ -87,8 +88,9 @@ export abstract class BaseResource extends AbstractResource {
     StageLogger.resourceBeginLog(this, 'GET_RELATED_PAGE', {relationName, options});
 
     const relationLink = this.getRelationLink(relationName);
+    // For templated links removed some part of params to avoid duplication in template params and http request params
     const optionsToRequest = relationLink.templated
-      ? {...options, params: undefined, pageParams: undefined, sort: undefined}
+      ? {...options, params: undefined, pageParams: undefined}
       : options;
 
     return getPagedResourceCollectionHttpService()

@@ -114,6 +114,25 @@ describe('ResourceCollectionHttpService', () => {
     });
   });
 
+  it('GET REQUEST should pass params and sort as http request params', () => {
+    httpClientSpy.get.and.returnValue(of(rawResourceCollection));
+
+    resourceCollectionHttpService.get('http://localhost:8080/api/v1/order/1/magazine', {
+      sort: {
+        abc: 'ASC',
+        cde: 'DESC'
+      }
+    }).subscribe(() => {
+      const resultResourceUrl = httpClientSpy.get.calls.argsFor(0)[0];
+      expect(resultResourceUrl).toBe('http://localhost:8080/api/v1/order/1/magazine');
+
+      const httpParams = httpClientSpy.get.calls.argsFor(0)[1].params;
+      expect(httpParams.has('sort')).toBeTrue();
+      expect(httpParams.getAll('sort')[0]).toBe('abc,ASC');
+      expect(httpParams.getAll('sort')[1]).toBe('cde,DESC');
+    });
+  });
+
   it('GET REQUEST should evict cache when returned object is not resource collection', () => {
     spyOn(LibConfig, 'getConfig').and.returnValue(LibConfig.mergeConfigs({
       ...LibConfig.DEFAULT_CONFIG,

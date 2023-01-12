@@ -42,6 +42,9 @@
           }
         }
       }
-    }},
-  "defaultProject": "ngx-hateoas-client"
+    }
+  },
+  "cli": {
+    "analytics": false
+  }
 }

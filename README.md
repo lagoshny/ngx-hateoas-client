@@ -22,7 +22,7 @@
 <br />
 <br />
 
-## ⭐Compatible with Angular 12.x.x - 14.x.x versions that uses `Ivy compilation`.
+## ⭐Compatible with Angular 12.x.x - 15.x.x versions that uses `Ivy compilation`.
 
 
 ### ⚠ If you use old `View Engine` compilation or Angular 6.x.x - 11.x.x you need to use [2.x.x](https://github.com/lagoshny/ngx-hateoas-client/tree/ng-ve) lib version.

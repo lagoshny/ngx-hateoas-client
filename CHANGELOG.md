@@ -1,3 +1,7 @@
+## 3.5.0 (2023-01-13)
+#### Changes
+Updated to Angular 15.
+
 ## 3.4.0 (2023-01-12)
 #### Changes
 Updated to Angular 14.

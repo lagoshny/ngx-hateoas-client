@@ -3,8 +3,8 @@
   <img src="https://img.shields.io/npm/v/@lagoshny/ngx-hateoas-client/latest?label=npm" alt="Last released npm version" />
 </a>&nbsp;
 
-<a href="https://github.com/lagoshny/ngx-hateoas-client/actions/workflows/nodejs.yml/badge.svg?branch=master">
-  <img src="https://img.shields.io/github/workflow/status/lagoshny/ngx-hateoas-client/Build/master" alt="Pipeline info" />
+<a href="https://github.com/lagoshny/ngx-hateoas-client/actions?query=workflow%3ABuild">
+  <img src="https://github.com/lagoshny/ngx-hateoas-client/actions/workflows/nodejs.yml/badge.svg?branch=master" alt="Pipeline info" />
 </a>&nbsp;
 
 <a href="https://github.com/lagoshny/ngx-hateoas-client/issues">

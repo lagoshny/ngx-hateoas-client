@@ -170,7 +170,10 @@ export class PagedResourceCollection<T extends BaseResource> extends ResourceCol
     const requestUrl = new URL(this.selfLink.href);
     requestUrl.searchParams.delete('page');
     requestUrl.searchParams.delete('size');
-    requestUrl.searchParams.delete('sort');
+    if (!isEmpty(params.sort)) {
+      requestUrl.searchParams.delete('sort');
+    }
+
     return doRequest<T>(requestUrl.href, options?.useCache, params).pipe(
       tap(() => {
         StageLogger.resourceEndLog(this.resources[0], 'CustomPage', {result: 'custom page was performed successful'});

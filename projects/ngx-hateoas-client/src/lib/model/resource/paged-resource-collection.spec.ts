@@ -7,7 +7,7 @@ import { PagedResourceCollectionHttpService } from '../../service/internal/paged
 import { DependencyInjector } from '../../util/dependency-injector';
 import { of } from 'rxjs';
 import { ResourceCollection } from './resource-collection';
-import { PagedGetOption } from '../declarations';
+import { PagedGetOption, Sort } from '../declarations';
 
 describe('PagedResourceCollection', () => {
 
@@ -145,6 +145,63 @@ describe('PagedResourceCollection', () => {
         expect(url.searchParams.has('size')).toBeFalse();
         expect(url.searchParams.has('sort')).toBeFalse();
       });
+  });
+
+  it('CUSTOM_PAGE should use sort params passed as params', () => {
+    pagedResourceCollectionHttpServiceSpy.get.and.returnValue(of(new PagedResourceCollection(new ResourceCollection())));
+
+    const pagedResourceCollection = new PagedResourceCollection(new SimpleResourceCollection(), {
+      ...pageDataWithLinks,
+      _links: {
+        ...pageDataWithLinks._links,
+        self: {
+          href: 'http://localhost:8080/api/v1/tasks?page=0&size=1&sort=first,ASC'
+        }
+      }
+    });
+    const sortParams: Sort = {first: 'ASC', second: 'DESC'};
+    pagedResourceCollection.customPage({pageParams: {page: 2, size: 8}, sort: sortParams})
+      .subscribe((customPageCollection) => {
+        const urlString: string = pagedResourceCollectionHttpServiceSpy.get.calls.argsFor(0)[0];
+        const url = new URL(urlString);
+        expect(url.searchParams.has('page')).toBeFalse();
+        expect(url.searchParams.has('size')).toBeFalse();
+        expect(url.searchParams.has('sort')).toBeFalse();
+
+        const actualSortParams = pagedResourceCollectionHttpServiceSpy.get.calls.argsFor(0)[1].sort;
+        expect(sortParams).toBe(actualSortParams);
+      });
+  });
+
+  it('CUSTOM_PAGE should use previous sort params when sort params is not passed', () => {
+    pagedResourceCollectionHttpServiceSpy.get.and.returnValue(of(new PagedResourceCollection(new ResourceCollection())));
+
+    const pagedResourceCollection = new PagedResourceCollection(new SimpleResourceCollection(), {
+      ...pageDataWithLinks,
+      _links: {
+        ...pageDataWithLinks._links,
+        self: {
+          href: 'http://localhost:8080/api/v1/tasks?page=0&size=1&sort=first,ASC&sort=second,DESC'
+        }
+      }
+    });
+    pagedResourceCollection.customPage({pageParams: {page: 2, size: 8}})
+      .subscribe((customPageCollection) => {
+        const urlString: string = pagedResourceCollectionHttpServiceSpy.get.calls.argsFor(0)[0];
+        const url = new URL(urlString);
+        expect(url.searchParams.has('page')).toBeFalse();
+        expect(url.searchParams.has('size')).toBeFalse();
+        expect(url.searchParams.has('sort')).toBeTrue();
+      });
+  });
+
+  it('PAGE should not change pageSize when request new page', () => {
+    pagedResourceCollectionHttpServiceSpy.get.and.returnValue(of(new PagedResourceCollection(new ResourceCollection(), pageDataWithLinks)));
+
+    const pagedResourceCollection = new PagedResourceCollection(new SimpleResourceCollection(), pageDataWithLinks);
+    pagedResourceCollection.page(2).subscribe(pagedCollection => {
+      expect(pagedCollection.pageSize).toBe(10);
+    });
   });
 
 });

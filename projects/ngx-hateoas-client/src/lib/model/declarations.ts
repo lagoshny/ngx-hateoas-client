@@ -162,7 +162,14 @@ export interface PageData {
 }
 
 export enum Include {
-  NULL_VALUES = 'NULL_VALUES'
+  /**
+   * Allows to include null values to request body
+   */
+  NULL_VALUES = 'NULL_VALUES',
+  /**
+   * Not replace related resources with their self links, instead pass them as JSON objects.
+   */
+  REL_RESOURCES_AS_OBJECTS = 'REL_RESOURCES_AS_OBJECTS'
 }
 
 /**
@@ -170,7 +177,7 @@ export enum Include {
  * (e.q. null values).
  */
 export interface ValuesOption {
-  include: Include;
+  include: Include | Include[];
 }
 
 /**

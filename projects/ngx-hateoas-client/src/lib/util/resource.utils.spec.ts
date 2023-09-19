@@ -1233,6 +1233,87 @@ describe('ResourceUtils', () => {
     });
   });
 
+  it('RESOLVE_VALUES return relations as simple objects when pass Include.RESOURCES_REL_AS_OBJECTS', () => {
+    expect(ResourceUtils.resolveValues({
+      body: {
+        name: 'test',
+        someObject: {
+          innerObject: {
+            innerResource: rawResource
+          }
+        }
+      },
+      valuesOption: {include: Include.REL_RESOURCES_AS_OBJECTS}
+    })).toEqual({
+      name: 'test',
+      someObject: {
+        innerObject: {
+          innerResource: rawResource
+        }
+      }
+    });
+  });
+
+  it('RESOLVE_VALUES return relations as simple objects with array when pass Include.RESOURCES_REL_AS_OBJECTS', () => {
+    expect(ResourceUtils.resolveValues({
+      body: {
+        name: 'test',
+        _embedded: [
+          {
+            someObject: {
+              innerObject: {
+                innerResource: rawResource
+              }
+            }
+          }
+        ]
+      },
+      valuesOption: {include: Include.REL_RESOURCES_AS_OBJECTS}
+    })).toEqual({
+      name: 'test',
+      _embedded: [
+        {
+          someObject: {
+            innerObject: {
+              innerResource: rawResource
+            }
+          }
+        }
+      ]
+    });
+  });
+
+  it('RESOLVE_VALUES return relations as simple objects with nulls when pass RESOURCES_REL_AS_OBJECTS and NULL_VALUES', () => {
+    expect(ResourceUtils.resolveValues({
+      body: {
+        name: 'test',
+        value: null,
+        _embedded: [
+          {
+            someObject: {
+              innerObject: {
+                innerResource: rawResource
+              }
+            }
+          }
+        ]
+      },
+      valuesOption: {include: [Include.REL_RESOURCES_AS_OBJECTS, Include.NULL_VALUES]}
+    })).toEqual({
+      name: 'test',
+      value: null,
+      _embedded: [
+        {
+          someObject: {
+            innerObject: {
+              innerResource: rawResource
+            }
+          }
+        }
+      ]
+    });
+  });
+
   it('INIT_RESOURCE should return resource class object', () => {
     const resourceClass = ResourceUtils.initResource(rawResource);
 

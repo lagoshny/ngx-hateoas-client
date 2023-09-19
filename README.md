@@ -117,6 +117,8 @@ You can found examples of usage this client with [task-manager-front](https://gi
 - [GetOption](#GetOption)
 - [PagedGetOption](#PagedGetOption)
 - [RequestBody](#RequestBody)
+  - [NULL_VALUES](#nullvalues)
+  - [REL_RESOURCES_AS_OBJECTS](#relresourcesasobjects)
 - [Sort](#Sort)
 - [SortedPageParam](#SortedPageParam)
 
@@ -3711,17 +3713,76 @@ export interface ValuesOption {
 }
 
 export enum Include {
-  NULL_VALUES = 'NULL_VALUES'
+  NULL_VALUES = 'NULL_VALUES',
+  RESOURCES_REL_AS_OBJECTS = 'RESOURCES_REL_AS_OBJECTS'
 }
 ```
 
 - `body` is a request body object
 - `valuesOption` are additional options that allows manipulation body object values
 
+##### NULL_VALUES
 For example, passed body as `{body: {name: 'Name', age: null}}` by default any properties that have `null` values will be ignored and will not pass.
 To pass `null` values, need to pass `valuesOption: {include: Include.NULL_VALUES}`.
 
 >When body object has `undefined` property then it will be ignored even you pass  `Include.NULL_VALUES`.
+
+##### REL_RESOURCES_AS_OBJECTS
+By default, the lib replaces all related `Resource`'s with related `Resource` self link before perform request to the server.
+If you want to disable this behavior, you can pass the additional option `valuesOption: {include: Include.RESOURCES_REAL_AS_OBJECTS}` then the lib will pass related `Resources` as a simple `JSON` object.
+
+For example, you want to create some `Resource` like this:
+````json
+{
+  "name": "Test",
+  "status": "NEW",
+  "author": {
+    "id": 1,
+    "username": "authorName",
+    "email": "thebest@author.com",
+    "_links": {
+      "self": {
+        "href": "http://localhost:8080/api/v1/users/1"
+      },
+      "author": {
+        "href": "http://localhost:8080/api/v1/users/1"
+      }
+    }
+  }
+}
+````
+
+By default, the lib will convert this `JSON` to the next view (that fit Spring Data Rest notation):
+
+```json
+{
+  "name": "Test",
+  "status": "NEW",
+  "author": "http://localhost:8080/api/v1/users/1"
+}
+```
+
+Using the `RESOURCES_REL_AS_OBJECTS` option, will pass `author` as `JSON` object:
+
+```json
+{
+  "name": "Test",
+  "status": "NEW",
+  "author": {
+    "id": 1,
+    "username": "authorName",
+    "email": "thebest@author.com",
+    "_links": {
+      "self": {
+        "href": "http://localhost:8080/api/v1/users/1"
+      },
+      "author": {
+        "href": "http://localhost:8080/api/v1/users/1"
+      }
+    }
+  }
+}
+```
 
 ### Sort
 Uses as param type in methods that applied `GetOption`, `PagedGetOption` options.

@@ -8,7 +8,7 @@ import { EmbeddedResource } from '../model/resource/embedded-resource';
 import { UrlUtils } from './url.utils';
 import { Stage } from '../logger/stage.enum';
 import { StageLogger } from '../logger/stage-logger';
-import { isArray, isEmpty, isNil, isObject, isPlainObject } from 'lodash-es';
+import { includes, isArray, isEmpty, isNil, isObject, isPlainObject } from 'lodash-es';
 import { ConsoleLogger } from '../logger/console-logger';
 import { LibConfig } from '../config/lib-config';
 import { isMatch, parse } from 'date-fns';
@@ -229,12 +229,17 @@ export class ResourceUtils {
       return body;
     }
 
+    let includeOptions = requestBody?.valuesOption?.include;
+    if (!isArray(includeOptions)) {
+      includeOptions = [includeOptions];
+    }
+
     const result: object = {};
     for (const key in body) {
       if (!body.hasOwnProperty(key)) {
         continue;
       }
-      if (body[key] == null && Include.NULL_VALUES === requestBody?.valuesOption?.include) {
+      if (body[key] == null && includes(includeOptions, Include.NULL_VALUES)) {
         result[key] = null;
         continue;
       }
@@ -245,13 +250,13 @@ export class ResourceUtils {
         const array: any[] = body[key];
         result[key] = [];
         array.forEach((element) => {
-          if (isResource(element)) {
+          if (isResource(element) && !includes(includeOptions, Include.REL_RESOURCES_AS_OBJECTS)) {
             result[key].push(element?._links?.self?.href);
           } else {
             result[key].push(this.resolveValues({body: element, valuesOption: requestBody?.valuesOption}));
           }
         });
-      } else if (isResource(body[key])) {
+      } else if (isResource(body[key]) && !includes(includeOptions, Include.REL_RESOURCES_AS_OBJECTS)) {
         result[key] = body[key]._links?.self?.href;
       } else if (isPlainObject(body[key])) {
         result[key] = this.resolveValues({body: body[key], valuesOption: requestBody?.valuesOption});

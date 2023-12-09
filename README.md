@@ -3537,11 +3537,16 @@ Configuring HAL format that used to parse `JSON` as `Resource`.
 Example:
 ````ts
 halFormat: {
+    json: {
+      convertEmptyObjectToNull: true
+    },
     collections: {
         embeddedOptional: false
     }
 }
 ````
+Property `json` contains all format settings for json representation.
+- `convertEmptyObjectToNull` - by default `true`. When resource object (or its relations) is empty `{}` object then it converted to `null` value before perform request to the server.
 
 Property `collections` contains all format settings for collections. Available the next settings for `collections`:
 

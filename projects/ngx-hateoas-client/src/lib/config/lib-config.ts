@@ -31,6 +31,9 @@ export class LibConfig {
       }
     },
     halFormat: {
+      json: {
+        convertEmptyObjectToNull: true
+      },
       collections: {
         embeddedOptional: false
       }

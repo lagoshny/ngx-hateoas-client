@@ -137,6 +137,13 @@ export interface HateoasConfiguration {
    * Additional configuration to specify settings for HAL format.
    */
   halFormat?: {
+    json?: {
+      /**
+       * {@code true} when empty object {} should be converted to {@code null} value
+       * {@code false} when empty object {} should be used as is
+       */
+      convertEmptyObjectToNull: boolean;
+    },
     collections?: {
       /**
        * If {@code true}, then for empty collections, not required to specify _embedded property.

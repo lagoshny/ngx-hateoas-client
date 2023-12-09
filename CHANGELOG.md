@@ -1,3 +1,7 @@
+## 3.7.0 (2023-12-09)
+#### Changes
+Fixed [issue-110](https://github.com/lagoshny/ngx-hateoas-client/issues/116).
+
 ## 3.6.2 (2023-09-19)
 #### Changes
 Added ability to pass `Resource`'s relations as `JSON` objects instead their self links, see [issue-113](https://github.com/lagoshny/ngx-hateoas-client/issues/113).

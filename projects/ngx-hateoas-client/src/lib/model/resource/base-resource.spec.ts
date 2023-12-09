@@ -511,7 +511,7 @@ describe('BaseResource POST_RELATION', () => {
 
     baseResource.postRelation('updateStatus', {body: {}}, null).subscribe(() => {
       const body = resourceHttpServiceSpy.post.calls.argsFor(0)[1];
-      expect(body).toEqual({});
+      expect(body).toBe(null);
 
       const options = resourceHttpServiceSpy.post.calls.argsFor(0)[2];
       expect(options).toBeDefined();
@@ -526,7 +526,7 @@ describe('BaseResource POST_RELATION', () => {
 
     baseResource.postRelation('updateStatus', {body: {}}, undefined).subscribe(() => {
       const body = resourceHttpServiceSpy.post.calls.argsFor(0)[1];
-      expect(body).toEqual({});
+      expect(body).toBe(null);
 
       const options = resourceHttpServiceSpy.post.calls.argsFor(0)[2];
       expect(options).toBeDefined();
@@ -655,7 +655,7 @@ describe('BaseResource PATCH_RELATION', () => {
 
     baseResource.patchRelation('updateStatus', {body: {}}, null).subscribe(() => {
       const body = resourceHttpServiceSpy.patch.calls.argsFor(0)[1];
-      expect(body).toEqual({});
+      expect(body).toBe(null);
 
       const options = resourceHttpServiceSpy.patch.calls.argsFor(0)[2];
       expect(options).toBeDefined();
@@ -670,7 +670,7 @@ describe('BaseResource PATCH_RELATION', () => {
 
     baseResource.patchRelation('updateStatus', {body: {}}, undefined).subscribe(() => {
       const body = resourceHttpServiceSpy.patch.calls.argsFor(0)[1];
-      expect(body).toEqual({});
+      expect(body).toBe(null);
 
       const options = resourceHttpServiceSpy.patch.calls.argsFor(0)[2];
       expect(options).toBeDefined();
@@ -782,7 +782,7 @@ describe('BaseResource PUT_RELATION', () => {
 
     baseResource.putRelation('updateStatus', {body: {}}, null).subscribe(() => {
       const body = resourceHttpServiceSpy.put.calls.argsFor(0)[1];
-      expect(body).toEqual({});
+      expect(body).toBe(null);
 
       const options = resourceHttpServiceSpy.put.calls.argsFor(0)[2];
       expect(options).toBeDefined();
@@ -797,7 +797,7 @@ describe('BaseResource PUT_RELATION', () => {
 
     baseResource.putRelation('updateStatus', {body: {}}, undefined).subscribe(() => {
       const body = resourceHttpServiceSpy.put.calls.argsFor(0)[1];
-      expect(body).toEqual({});
+      expect(body).toBe(null);
 
       const options = resourceHttpServiceSpy.put.calls.argsFor(0)[2];
       expect(options).toBeDefined();

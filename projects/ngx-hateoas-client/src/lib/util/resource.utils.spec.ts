@@ -884,7 +884,29 @@ describe('ResourceUtils', () => {
     expect(ResourceUtils.resolveValues({body: undefined})).toBeNull();
   });
 
+  it('RESOLVE_VALUES should return "null" when passed requestBody.body is empty', () => {
+    spyOn(LibConfig, 'getConfig').and.returnValue({
+      ...LibConfig.DEFAULT_CONFIG,
+      halFormat: {
+        json: {
+          convertEmptyObjectToNull: true
+        }
+      }
+    });
+
+    expect(ResourceUtils.resolveValues({body: {}})).toBeNull();
+  });
+
   it('RESOLVE_VALUES should return the empty value when passed requestBody.body is empty object', () => {
+    spyOn(LibConfig, 'getConfig').and.returnValue({
+      ...LibConfig.DEFAULT_CONFIG,
+      halFormat: {
+        json: {
+          convertEmptyObjectToNull: false
+        }
+      }
+    });
+
     expect(ResourceUtils.resolveValues({body: {}})).toEqual({});
   });
 

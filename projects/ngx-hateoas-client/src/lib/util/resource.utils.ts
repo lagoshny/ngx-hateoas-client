@@ -218,16 +218,14 @@ export class ResourceUtils {
    * @param requestBody that contains the body directly and optional body values option {@link ValuesOption}
    */
   public static resolveValues(requestBody: RequestBody<any>): any {
-    if (isEmpty(requestBody) || isNil(requestBody.body)) {
+    if (isEmpty(requestBody) || isNil(requestBody.body)
+      || (LibConfig.getConfig().halFormat.json.convertEmptyObjectToNull
+        && !isArray(requestBody.body) && isObject(requestBody.body) && isEmpty(requestBody.body))) {
       StageLogger.stageLog(Stage.RESOLVE_VALUES, {result: 'body is empty return null'});
       return null;
     }
-    const body = requestBody.body;
-    if (isEmpty(body) && (isObject(body) || isArray(body))) {
-      StageLogger.stageLog(Stage.RESOLVE_VALUES, {result: 'body is empty object or array return empty value'});
-      return body;
-    }
 
+    const body = requestBody.body;
     if (!isObject(body) || isArray(body)) {
       StageLogger.stageLog(Stage.RESOLVE_VALUES, {result: 'body is not object or array return as is'});
       return body;

@@ -884,8 +884,12 @@ describe('ResourceUtils', () => {
     expect(ResourceUtils.resolveValues({body: undefined})).toBeNull();
   });
 
-  it('RESOLVE_VALUES should return "null" when passed requestBody.body is empty', () => {
-    expect(ResourceUtils.resolveValues({body: {}})).toBeNull();
+  it('RESOLVE_VALUES should return the empty value when passed requestBody.body is empty object', () => {
+    expect(ResourceUtils.resolveValues({body: {}})).toEqual({});
+  });
+
+  it('RESOLVE_VALUES should return the empty value when passed requestBody.body is empty array', () => {
+    expect(ResourceUtils.resolveValues({body: []})).toEqual([]);
   });
 
   it('RESOLVE_VALUES should return the same value when passed requestBody.body is not object', () => {

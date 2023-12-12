@@ -1,3 +1,7 @@
+## 3.8.0 (2023-12-12)
+#### Changes
+Updated to Angular 17.
+
 ## 3.7.0 (2023-12-09)
 #### Changes
 Fixed [issue-110](https://github.com/lagoshny/ngx-hateoas-client/issues/116).

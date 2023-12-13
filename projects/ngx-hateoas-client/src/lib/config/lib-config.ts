@@ -55,9 +55,25 @@ export class LibConfig {
     return {
       ...LibConfig.DEFAULT_CONFIG,
       ...config,
+      halFormat: {
+        json: {
+          ...LibConfig.DEFAULT_CONFIG.halFormat.json,
+          ...config?.halFormat?.json
+        },
+        collections: {
+          ...LibConfig.DEFAULT_CONFIG.halFormat.collections,
+          ...config?.halFormat?.collections
+        }
+      },
+      pagination: {
+        defaultPage: {
+          ...LibConfig.DEFAULT_CONFIG.pagination.defaultPage,
+          ...config?.pagination?.defaultPage
+        }
+      },
       cache: {
         ...LibConfig.DEFAULT_CONFIG.cache,
-        ...config.cache
+        ...config?.cache
       },
     };
   }

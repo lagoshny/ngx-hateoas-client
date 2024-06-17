@@ -1,6 +1,6 @@
 {
   "name": "@lagoshny/ngx-hateoas-client",
-  "version": "3.8.1",
+  "version": "3.9.0",
   "description": "This client used to develop `Angular 12+` applications working with RESTfulll server API with HAL/JSON response type (supports server implementation by Spring HATEOAS)",
   "readme": "README.md",
   "license": "MIT",
@@ -12,8 +12,8 @@
   "dependencies": {
     "uri-templates-es": "^1.0.0",
     "lodash-es": "^4.17.21",
-    "date-fns": "^2.28.0",
-    "tslib": "^2.1.0"
+    "date-fns": "^3.6.0",
+    "tslib": "^2.6.3"
   },
   "keywords": [
     "Spring Data Rest",
@@ -27,6 +27,7 @@
     "Angular 15",
     "Angular 16",
     "Angular 17",
+    "Angular 18",
     "ngx hal client",
     "ngx hateoas client",
     "hateoas client",

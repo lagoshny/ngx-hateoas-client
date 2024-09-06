@@ -20,6 +20,7 @@ export class ResourceCollection<T extends BaseResource> extends AbstractResource
     super();
     if (that) {
       this._links = that._links;
+      this._templates = that._templates;
       this.resources = that.resources;
     }
   }

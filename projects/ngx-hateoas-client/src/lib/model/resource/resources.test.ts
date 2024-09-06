@@ -35,6 +35,21 @@ export const rawResource = {
   }
 };
 
+export const rawHalFormsResource = {
+  ...rawResource,
+  _templates: {
+    default: {
+      method: 'POST',
+      contentType: 'application/json',
+      properties: {
+        name: {
+          type: 'text'
+        }
+      }
+    }
+  }
+};
+
 @HateoasResource('resource')
 export class RawResource extends Resource {
   public name = 'Test';
@@ -107,6 +122,21 @@ export const rawEmptyResourceCollection = {
   }
 };
 
+export const rawEmptyHalFormsResourceCollection = {
+  ...rawEmptyResourceCollection,
+  _templates: {
+    default: {
+      method: 'POST',
+      contentType: 'application/json',
+      properties: {
+        name: {
+          type: 'text'
+        }
+      }
+    }
+  }
+};
+
 export const rawResourceCollection = {
   _embedded: {
     tests: [
@@ -134,6 +164,12 @@ export const rawResourceCollection = {
     }
   }
 };
+
+export const rawHalFormsResourceCollection = {
+  ...rawEmptyHalFormsResourceCollection,
+  ...rawResourceCollection
+};
+
 
 export class SimpleResourceCollection extends ResourceCollection<SimpleResource> {
 
@@ -172,6 +208,11 @@ export const rawEmptyPagedResourceCollection = {
       href: 'http://localhost:8080/api/v1/pagedCollection?page=1&size=1'
     }
   }
+};
+
+export const rawEmptyHalFormsPagedResourceCollection = {
+  ...rawEmptyHalFormsResourceCollection,
+  ...rawEmptyPagedResourceCollection
 };
 
 export const rawPagedResourceCollection = {
@@ -218,6 +259,11 @@ export const rawPagedResourceCollection = {
       href: 'http://localhost:8080/api/v1/pagedCollection?page=1&size=1'
     }
   }
+};
+
+export const rawHalFormsPagedResourceCollection = {
+  ...rawEmptyHalFormsPagedResourceCollection,
+  ...rawPagedResourceCollection
 };
 
 export class SimplePagedResourceCollection extends SimpleResourceCollection {

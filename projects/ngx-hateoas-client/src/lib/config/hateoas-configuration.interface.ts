@@ -155,7 +155,13 @@ export interface HateoasConfiguration {
        * Recommending use Spring Data REST approach and return empty _embedded property for empty collection
        * for more predictable determine resource type algorithm.
        */
-      embeddedOptional: boolean;
+      embeddedOptional?: boolean;
+
+      /**
+       * If {@code true}, allow presence of the _templates property, when using HAL-FORMS.
+       * When {@code false} (be default), collections cannot have the _templates property.
+       */
+      allowTemplates?: boolean;
     }
   };
 

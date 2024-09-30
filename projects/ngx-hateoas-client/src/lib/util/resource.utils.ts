@@ -2,7 +2,7 @@ import { BaseResource } from '../model/resource/base-resource';
 import { isEmbeddedResource, isResource } from '../model/resource-type';
 import { ResourceCollection } from '../model/resource/resource-collection';
 import { PagedResourceCollection } from '../model/resource/paged-resource-collection';
-import { GetOption, Include, Link, PageData, RequestBody } from '../model/declarations';
+import {GetOption, Include, Link, PageData, RequestBody, Templates} from '../model/declarations'
 import { Resource } from '../model/resource/resource';
 import { EmbeddedResource } from '../model/resource/embedded-resource';
 import { UrlUtils } from './url.utils';
@@ -64,8 +64,7 @@ export class ResourceUtils {
         delete payload[key];
         continue;
       }
-      if (key === '_links') {
-        payload[key] = payload[key];
+      if (key === '_links' || key === '_templates') {
         continue;
       }
 
@@ -190,6 +189,9 @@ export class ResourceUtils {
       }
     }
     result['_links'] = {...payload['_links']};
+    if ('_templates' in payload && isObject(payload['_templates']) && 'default' in payload['_templates']) {
+      result['_templates'] = {...(payload['_templates'] as Templates)};
+    }
 
     return result;
   }

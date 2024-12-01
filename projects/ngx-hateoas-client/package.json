@@ -1,6 +1,6 @@
 {
   "name": "@lagoshny/ngx-hateoas-client",
-  "version": "3.9.0",
+  "version": "3.10.0",
   "description": "This client used to develop `Angular 12+` applications working with RESTfulll server API with HAL/JSON response type (supports server implementation by Spring HATEOAS)",
   "readme": "README.md",
   "license": "MIT",
@@ -28,6 +28,7 @@
     "Angular 16",
     "Angular 17",
     "Angular 18",
+    "Angular 19",
     "ngx hal client",
     "ngx hateoas client",
     "hateoas client",

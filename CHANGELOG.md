@@ -1,3 +1,7 @@
+## 3.10.0 (2024-12-01)
+#### Changes
+Updated to Angular 19.
+
 ## 3.9.0 (2024-06-17)
 #### Changes
 Updated to Angular 18.

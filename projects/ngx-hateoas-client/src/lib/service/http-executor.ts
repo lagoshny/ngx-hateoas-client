@@ -8,7 +8,7 @@ import { CacheKey } from './internal/cache/model/cache-key';
 import { isResourceObject } from '../model/resource-type';
 import { ResourceCacheService } from './internal/cache/resource-cache.service';
 import { LibConfig } from '../config/lib-config';
-import { HttpClientOptions } from '../model/declarations';
+import { HttpClientOptions, ResourceIdentifiable } from '../model/declarations';
 import { CacheUtils } from '../util/cache.utils';
 
 /**
@@ -75,7 +75,7 @@ export class HttpExecutor {
     }
     HttpExecutor.logRequest('GET', url, options);
 
-    let response;
+    let response: Observable<object>;
     if (options?.observe === 'response') {
       response = this.httpClient.get(url, {...options, observe: 'response'});
     } else {
@@ -86,7 +86,7 @@ export class HttpExecutor {
       tap((data: any) => {
         HttpExecutor.logResponse('GET', url, options, data);
         if (CacheUtils.shouldUseCache(useCache) && isResourceObject(data)) {
-          this.cacheService.putResource(CacheKey.of(url, options), data);
+          this.cacheService.putResource(CacheKey.of(url, options), data as ResourceIdentifiable);
         }
       })
     );
@@ -104,7 +104,7 @@ export class HttpExecutor {
     HttpExecutor.logRequest('POST', url, options, body);
     ValidationUtils.validateInputParams({url});
 
-    let response;
+    let response: Observable<object>;
     if (options?.observe === 'response') {
       response = this.httpClient.post(url, body, {...options, observe: 'response'});
     } else {
@@ -133,7 +133,7 @@ export class HttpExecutor {
     HttpExecutor.logRequest('PUT', url, options, body);
     ValidationUtils.validateInputParams({url});
 
-    let response;
+    let response: Observable<object>;
     if (options?.observe === 'response') {
       response = this.httpClient.put(url, body, {...options, observe: 'response'});
     } else {
@@ -162,7 +162,7 @@ export class HttpExecutor {
     HttpExecutor.logRequest('PATCH', url, options, body);
     ValidationUtils.validateInputParams({url});
 
-    let response;
+    let response: Observable<object>;
     if (options?.observe === 'response') {
       response = this.httpClient.patch(url, body, {...options, observe: 'response'});
     } else {
@@ -190,7 +190,7 @@ export class HttpExecutor {
     HttpExecutor.logRequest('DELETE', url, options);
     ValidationUtils.validateInputParams({url});
 
-    let response;
+    let response: Observable<object>;
     if (options?.observe === 'response') {
       response = this.httpClient.delete(url, {...options, observe: 'response'});
     } else {

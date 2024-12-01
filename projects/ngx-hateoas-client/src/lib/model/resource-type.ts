@@ -3,11 +3,13 @@ import { LibConfig } from '../config/lib-config';
 
 export function isEmbeddedResource(object: any) {
   // Embedded resource doesn't have self link in _links object
-  return !isPagedResourceCollection(object) && !isResourceCollection(object) && isResourceObject(object) && !('self' in object._links);
+  return !isPagedResourceCollection(object) && !isResourceCollection(object)
+    && isResourceObject(object) && !('self' in (object._links as object));
 }
 
 export function isResource(object: any): boolean {
-  return !isPagedResourceCollection(object) && !isResourceCollection(object) && isResourceObject(object) && ('self' in object._links);
+  return !isPagedResourceCollection(object) && !isResourceCollection(object)
+    && isResourceObject(object) && ('self' in (object._links as object));
 }
 
 export function isResourceCollection(object: any): boolean {

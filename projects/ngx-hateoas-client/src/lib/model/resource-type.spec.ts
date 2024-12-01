@@ -1,12 +1,12 @@
 import { isEmbeddedResource, isPagedResourceCollection, isResource, isResourceCollection } from './resource-type';
 import {
-  rawEmbeddedResource,
+  rawEmbeddedResource, rawEmptyHalFormsPagedResourceCollection, rawEmptyHalFormsResourceCollection,
   rawEmptyPagedResourceCollection,
-  rawEmptyResourceCollection,
+  rawEmptyResourceCollection, rawHalFormsPagedResourceCollection, rawHalFormsResourceCollection,
   rawPagedResourceCollection,
   rawResource,
-  rawResourceCollection
-} from './resource/resources.test';
+  rawResourceCollection,
+} from './resource/resources.test'
 import { LibConfig } from '../config/lib-config';
 
 describe('ResourceType', () => {
@@ -144,6 +144,23 @@ describe('ResourceType', () => {
     })).toBeFalse();
   });
 
+  it('object IS NOT RESOURCE COLLECTION if contains _templates', () => {
+    expect(isResourceCollection(rawHalFormsResourceCollection)).toBeFalse();
+  });
+
+  it('object IS RESOURCE COLLECTION if contains _templates when allowTemplates is TRUE', () => {
+    spyOn(LibConfig, 'getConfig').and.returnValue({
+      ...LibConfig.DEFAULT_CONFIG,
+      halFormat: {
+        collections: {
+          allowTemplates: true
+        }
+      }
+    });
+
+    expect(isResourceCollection(rawHalFormsResourceCollection)).toBeTrue();
+  });
+
   it('object IS NOT RESOURCE COLLECTION with empty object', () => {
     const result = isResourceCollection({});
 
@@ -210,6 +227,60 @@ describe('ResourceType', () => {
     expect(isResourceCollection(rawEmptyResourceCollection)).toBeFalse();
   });
 
+  it('empty resource collection with _templates IS NOT COLLECTION_RESOURCE when allowTemplates is FALSE', () => {
+    spyOn(LibConfig, 'getConfig').and.returnValue({
+      ...LibConfig.DEFAULT_CONFIG,
+      halFormat: {
+        collections: {
+          embeddedOptional: true
+        }
+      }
+    });
+
+    expect(isResourceCollection(rawEmptyHalFormsResourceCollection)).toBeFalse();
+  });
+
+  it('empty resource collection with _templates IS COLLECTION_RESOURCE when allowTemplates is TRUE', () => {
+    spyOn(LibConfig, 'getConfig').and.returnValue({
+      ...LibConfig.DEFAULT_CONFIG,
+      halFormat: {
+        collections: {
+          embeddedOptional: true,
+          allowTemplates: true
+        }
+      }
+    });
+
+    expect(isResourceCollection(rawEmptyHalFormsResourceCollection)).toBeTrue();
+  });
+
+  it('empty resource collection with _templates IS NOT COLLECTION_RESOURCE when embeddedOptional is FALSE', () => {
+    spyOn(LibConfig, 'getConfig').and.returnValue({
+      ...LibConfig.DEFAULT_CONFIG,
+      halFormat: {
+        collections: {
+          embeddedOptional: false
+        }
+      }
+    });
+
+    expect(isResourceCollection(rawEmptyHalFormsResourceCollection)).toBeFalse();
+  });
+
+  it('empty resource collection with _templates IS NOT COLLECTION_RESOURCE when embeddedOptional is FALSE and allowTemplates is TRUE', () => {
+    spyOn(LibConfig, 'getConfig').and.returnValue({
+      ...LibConfig.DEFAULT_CONFIG,
+      halFormat: {
+        collections: {
+          embeddedOptional: false,
+          allowTemplates: true
+        }
+      }
+    });
+
+    expect(isResourceCollection(rawEmptyHalFormsResourceCollection)).toBeFalse();
+  });
+
   it('object IS PAGED RESOURCE COLLECTION with _embedded AND page object', () => {
     expect(isPagedResourceCollection(rawPagedResourceCollection)).toBeTrue();
   });
@@ -219,6 +290,23 @@ describe('ResourceType', () => {
       ...rawPagedResourceCollection,
       additionalProp: 'someValue'
     })).toBeFalse();
+  });
+
+  it('object IS NOT PAGED RESOURCE COLLECTION if contains _templates', () => {
+    expect(isPagedResourceCollection(rawHalFormsPagedResourceCollection)).toBeFalse();
+  });
+
+  it('object IS PAGED RESOURCE COLLECTION if contains _templates when allowTemplates is TRUE', () => {
+    spyOn(LibConfig, 'getConfig').and.returnValue({
+      ...LibConfig.DEFAULT_CONFIG,
+      halFormat: {
+        collections: {
+          allowTemplates: true
+        }
+      }
+    });
+
+    expect(isPagedResourceCollection(rawHalFormsPagedResourceCollection)).toBeTrue();
   });
 
   it('object IS NOT PAGED RESOURCE COLLECTION with _embedded AND WITHOUT page object', () => {
@@ -290,5 +378,60 @@ describe('ResourceType', () => {
     });
     expect(isPagedResourceCollection(rawEmptyPagedResourceCollection)).toBeFalse();
   });
+
+  it('empty paged resource collection with _templates IS NOT PAGE_COLLECTION_RESOURCE when allowTemplates is FALSE', () => {
+    spyOn(LibConfig, 'getConfig').and.returnValue({
+      ...LibConfig.DEFAULT_CONFIG,
+      halFormat: {
+        collections: {
+          embeddedOptional: true
+        }
+      }
+    });
+
+    expect(isPagedResourceCollection(rawEmptyHalFormsPagedResourceCollection)).toBeFalse();
+  });
+
+  it('empty paged resource collection with _templates IS PAGE_COLLECTION_RESOURCE when allowTemplates is TRUE', () => {
+    spyOn(LibConfig, 'getConfig').and.returnValue({
+      ...LibConfig.DEFAULT_CONFIG,
+      halFormat: {
+        collections: {
+          embeddedOptional: true,
+          allowTemplates: true
+        }
+      }
+    });
+
+    expect(isPagedResourceCollection(rawEmptyHalFormsPagedResourceCollection)).toBeTrue();
+  });
+
+  it('empty paged resource collection with _templates IS NOT PAGE_COLLECTION_RESOURCE when embeddedOptional is FALSE', () => {
+    spyOn(LibConfig, 'getConfig').and.returnValue({
+      ...LibConfig.DEFAULT_CONFIG,
+      halFormat: {
+        collections: {
+          embeddedOptional: false
+        }
+      }
+    });
+
+    expect(isPagedResourceCollection(rawEmptyHalFormsPagedResourceCollection)).toBeFalse();
+  });
+
+  it('empty resource collection with _templates IS NOT PAGE_COLLECTION_RESOURCE when embeddedOptional is FALSE and allowTemplates is TRUE', () => {
+    spyOn(LibConfig, 'getConfig').and.returnValue({
+      ...LibConfig.DEFAULT_CONFIG,
+      halFormat: {
+        collections: {
+          embeddedOptional: false,
+          allowTemplates: true
+        }
+      }
+    });
+
+    expect(isPagedResourceCollection(rawEmptyHalFormsPagedResourceCollection)).toBeFalse();
+  });
+
 
 });

@@ -8,14 +8,14 @@ import {
   RawEmbeddedResource,
   rawEmbeddedResource,
   rawEmptyPagedResourceCollection,
-  rawEmptyResourceCollection,
+  rawEmptyResourceCollection, rawHalFormsPagedResourceCollection, rawHalFormsResource, rawHalFormsResourceCollection,
   rawPagedResourceCollection,
   RawResource,
   rawResource,
   rawResourceCollection,
   SimpleResource,
-  SimpleResourceProjection
-} from '../model/resource/resources.test';
+  SimpleResourceProjection,
+} from '../model/resource/resources.test'
 import { Include } from '../model/declarations';
 import { HateoasResource } from '../model/decorators';
 import { LibConfig } from '../config/lib-config';
@@ -111,6 +111,16 @@ describe('ResourceUtils', () => {
     });
 
     expect(result instanceof RawResource).toBeTrue();
+  });
+
+  it('INSTANTIATE_RESOURCE should create Resource with _templates', () => {
+    const result = ResourceUtils.instantiateResource({
+      ...rawHalFormsResource
+    });
+
+    expect(result instanceof Resource).toBeTrue();
+    expect(result['_templates']).toBeDefined();
+    expect(result.hasTemplate('default')).toBeTrue();
   });
 
   it('INSTANTIATE_RESOURCE should create EmbeddedResource with concrete embedded resource type not with common ', () => {
@@ -687,6 +697,21 @@ describe('ResourceUtils', () => {
     expect(result.resources[1]['text']).toBe('Second object');
   });
 
+  it('INSTANTIATE_COLLECTION_RESOURCE should create resource collections with _templates', () => {
+    const result = ResourceUtils.instantiateResourceCollection(rawHalFormsResourceCollection);
+
+    expect(result).toBeDefined();
+    expect(result instanceof ResourceCollection).toBe(true);
+    expect(result.resources).toBeDefined();
+    expect(result.resources.length).toBe(2);
+    expect(result.resources[0] instanceof Resource).toBe(true);
+    expect(result.resources[0]['text']).toBe('hello world');
+    expect(result.resources[1] instanceof Resource).toBe(true);
+    expect(result.resources[1]['text']).toBe('Second object');
+    expect(result['_templates']).toBeDefined();
+    expect(result.hasTemplate('default')).toBeTrue();
+  });
+
   it('INSTANTIATE_COLLECTION_RESOURCE should copy root _links object', () => {
     const result = ResourceUtils.instantiateResourceCollection(rawResourceCollection);
 
@@ -797,6 +822,30 @@ describe('ResourceUtils', () => {
     expect(result.resources[0]['text']).toBe('hello world');
     expect(result.resources[1] instanceof Resource).toBe(true);
     expect(result.resources[1]['text']).toBe('Second object');
+  });
+
+  it('INSTANTIATE_PAGED_COLLECTION_RESOURCE should create paged resource collections with _templates', () => {
+    const result = ResourceUtils.instantiatePagedResourceCollection({...rawHalFormsPagedResourceCollection, page: null});
+
+    expect(result).toBeDefined();
+    expect(result instanceof PagedResourceCollection).toBe(true);
+    expect(result.pageNumber).toBe(0);
+    expect(result.pageSize).toBe(20);
+    expect(result.totalElements).toBe(0);
+    expect(result.totalPages).toBe(1);
+    expect(result.hasFirst()).toBeFalse();
+    expect(result.hasNext()).toBeFalse();
+    expect(result.hasPrev()).toBeFalse();
+    expect(result.hasLast()).toBeFalse();
+
+    expect(result.resources).toBeDefined();
+    expect(result.resources.length).toBe(2);
+    expect(result.resources[0] instanceof Resource).toBe(true);
+    expect(result.resources[0]['text']).toBe('hello world');
+    expect(result.resources[1] instanceof Resource).toBe(true);
+    expect(result.resources[1]['text']).toBe('Second object');
+    expect(result['_templates']).toBeDefined();
+    expect(result.hasTemplate('default')).toBeTrue();
   });
 
   it('INSTANTIATE_PAGED_COLLECTION_RESOURCE should create paged resource collections with passed page options', () => {

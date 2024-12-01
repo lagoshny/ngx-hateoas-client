@@ -12,36 +12,35 @@ export function isResource(object: any): boolean {
     && isResourceObject(object) && ('self' in (object._links as object));
 }
 
+function isCollectionWithPropertyCount(object: any, expectedPropertyCount: number): boolean {
+  let actualPropertyCount = Object.keys(object).length;
+
+  if (LibConfig.getConfig().halFormat.collections.allowTemplates && '_templates' in object) {
+    expectedPropertyCount++;
+  }
+
+  if (LibConfig.getConfig().halFormat.collections.embeddedOptional) {
+    return (actualPropertyCount === expectedPropertyCount - 1 ||
+      '_embedded' in object && actualPropertyCount === expectedPropertyCount);
+  } else {
+    return '_embedded' in object && actualPropertyCount === expectedPropertyCount;
+  }
+}
+
 export function isResourceCollection(object: any): boolean {
   const baseCondition = isObject(object) &&
     ('_links' in object) &&
     !('page' in object);
-  if (!baseCondition) {
-    return false;
-  }
 
-  if (LibConfig.getConfig().halFormat.collections.embeddedOptional) {
-    return baseCondition && (Object.keys(object).length === 1 ||
-      '_embedded' in object && Object.keys(object).length === 2);
-  } else {
-    return baseCondition && '_embedded' in object && Object.keys(object).length === 2;
-  }
+  return baseCondition && isCollectionWithPropertyCount(object, 2);
 }
 
 export function isPagedResourceCollection(object: any): boolean {
   const baseCondition = isObject(object) &&
     ('_links' in object) &&
     ('page' in object);
-  if (!baseCondition) {
-    return false;
-  }
 
-  if (LibConfig.getConfig().halFormat.collections.embeddedOptional) {
-    return baseCondition && (Object.keys(object).length === 2 ||
-      '_embedded' in object && Object.keys(object).length === 3);
-  } else {
-    return baseCondition && '_embedded' in object && Object.keys(object).length === 3;
-  }
+  return baseCondition && isCollectionWithPropertyCount(object, 3);
 }
 
 /**

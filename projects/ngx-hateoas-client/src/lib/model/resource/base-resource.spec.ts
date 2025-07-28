@@ -1,16 +1,17 @@
 /* tslint:disable:no-string-literal */
-import { BaseResource } from './base-resource';
-import { TestBed, waitForAsync } from '@angular/core/testing';
-import { of } from 'rxjs';
-import { ResourceHttpService } from '../../service/internal/resource-http.service';
-import { DependencyInjector } from '../../util/dependency-injector';
-import { PagedResourceCollectionHttpService } from '../../service/internal/paged-resource-collection-http.service';
-import { PagedResourceCollection } from './paged-resource-collection';
-import { ResourceCollection } from './resource-collection';
-import { ResourceCollectionHttpService } from '../../service/internal/resource-collection-http.service';
-import { LibConfig } from '../../config/lib-config';
-import { RequestParam, RESOURCE_OPTIONS_PROP } from '../declarations';
-import { DEFAULT_ROUTE_NAME } from '../../config/hateoas-configuration.interface';
+import {BaseResource} from './base-resource';
+import {TestBed, waitForAsync} from '@angular/core/testing';
+import {of} from 'rxjs';
+import {ResourceHttpService} from '../../service/internal/resource-http.service';
+import {DependencyInjector} from '../../util/dependency-injector';
+import {PagedResourceCollectionHttpService} from '../../service/internal/paged-resource-collection-http.service';
+import {PagedResourceCollection} from './paged-resource-collection';
+import {ResourceCollection} from './resource-collection';
+import {ResourceCollectionHttpService} from '../../service/internal/resource-collection-http.service';
+import {LibConfig} from '../../config/lib-config';
+import {RequestParam, RESOURCE_OPTIONS_PROP} from '../declarations';
+import {DEFAULT_ROUTE_NAME} from '../../config/hateoas-configuration.interface';
+import {Injector} from '@angular/core';
 
 class TestProductResource extends BaseResource {
   public name = 'TestName';
@@ -86,7 +87,7 @@ describe('BaseResource GET_RELATION', () => {
     baseResource.constructor[RESOURCE_OPTIONS_PROP] = {
       routeName: DEFAULT_ROUTE_NAME
     };
-    DependencyInjector.injector = TestBed;
+    DependencyInjector.injector = TestBed.inject(Injector);
   });
 
   afterEach(() => {
@@ -197,7 +198,7 @@ describe('BaseResource GET_RELATED_COLLECTION', () => {
     baseResource.constructor[RESOURCE_OPTIONS_PROP] = {
       routeName: DEFAULT_ROUTE_NAME
     };
-    DependencyInjector.injector = TestBed;
+    DependencyInjector.injector = TestBed.inject(Injector);
   });
 
   it('should throw error when passed relationName is empty', () => {
@@ -304,7 +305,7 @@ describe('BaseResource GET_RELATED_PAGE', () => {
     baseResource.constructor[RESOURCE_OPTIONS_PROP] = {
       routeName: DEFAULT_ROUTE_NAME
     };
-    DependencyInjector.injector = TestBed;
+    DependencyInjector.injector = TestBed.inject(Injector);
   });
 
   it('should throw error when passed relationName is empty', () => {
@@ -419,7 +420,7 @@ describe('BaseResource POST_RELATION', () => {
     baseResource.constructor[RESOURCE_OPTIONS_PROP] = {
       routeName: DEFAULT_ROUTE_NAME
     };
-    DependencyInjector.injector = TestBed;
+    DependencyInjector.injector = TestBed.inject(Injector);
   });
 
   it('should throw error when passed relationName is empty', () => {
@@ -563,7 +564,7 @@ describe('BaseResource PATCH_RELATION', () => {
     baseResource.constructor[RESOURCE_OPTIONS_PROP] = {
       routeName: DEFAULT_ROUTE_NAME
     };
-    DependencyInjector.injector = TestBed;
+    DependencyInjector.injector = TestBed.inject(Injector);
   });
 
   it('should throw error when passed relationName is empty', () => {
@@ -701,7 +702,7 @@ describe('BaseResource PUT_RELATION', () => {
     baseResource.constructor[RESOURCE_OPTIONS_PROP] = {
       routeName: DEFAULT_ROUTE_NAME
     };
-    DependencyInjector.injector = TestBed;
+    DependencyInjector.injector = TestBed.inject(Injector);
   });
 
   it('should throw error when passed relationName is empty', () => {

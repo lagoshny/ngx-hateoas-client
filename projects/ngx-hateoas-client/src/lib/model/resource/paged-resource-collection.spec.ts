@@ -1,13 +1,14 @@
 /* tslint:disable:no-string-literal */
 
-import { PagedResourceCollection } from './paged-resource-collection';
-import { SimpleResourceCollection } from './resources.test';
-import { TestBed, waitForAsync } from '@angular/core/testing';
-import { PagedResourceCollectionHttpService } from '../../service/internal/paged-resource-collection-http.service';
-import { DependencyInjector } from '../../util/dependency-injector';
-import { of } from 'rxjs';
-import { ResourceCollection } from './resource-collection';
-import { PagedGetOption, Sort } from '../declarations';
+import {PagedResourceCollection} from './paged-resource-collection';
+import {SimpleResourceCollection} from './resources.test';
+import {TestBed, waitForAsync} from '@angular/core/testing';
+import {PagedResourceCollectionHttpService} from '../../service/internal/paged-resource-collection-http.service';
+import {DependencyInjector} from '../../util/dependency-injector';
+import {of} from 'rxjs';
+import {ResourceCollection} from './resource-collection';
+import {PagedGetOption, Sort} from '../declarations';
+import {Injector} from '@angular/core';
 
 describe('PagedResourceCollection', () => {
 
@@ -52,7 +53,7 @@ describe('PagedResourceCollection', () => {
   }));
 
   beforeEach(() => {
-    DependencyInjector.injector = TestBed;
+    DependencyInjector.injector = TestBed.inject(Injector);
   });
 
   afterEach(() => {

@@ -1,12 +1,13 @@
-import { TestBed, waitForAsync } from '@angular/core/testing';
-import { ResourceHttpService } from '../../service/internal/resource-http.service';
-import { DependencyInjector } from '../../util/dependency-injector';
-import { Resource } from './resource';
-import { of } from 'rxjs';
-import { ResourceUtils } from '../../util/resource.utils';
-import { HttpHeaders, HttpResponse } from '@angular/common/http';
-import { LibConfig } from '../../config/lib-config';
-import { HateoasResource } from '../decorators';
+import {TestBed, waitForAsync} from '@angular/core/testing';
+import {ResourceHttpService} from '../../service/internal/resource-http.service';
+import {DependencyInjector} from '../../util/dependency-injector';
+import {Resource} from './resource';
+import {of} from 'rxjs';
+import {ResourceUtils} from '../../util/resource.utils';
+import {HttpHeaders, HttpResponse} from '@angular/common/http';
+import {LibConfig} from '../../config/lib-config';
+import {HateoasResource} from '../decorators';
+import {Injector} from '@angular/core';
 
 // tslint:disable:variable-name
 // tslint:disable:no-string-literal
@@ -97,7 +98,7 @@ describe('Resource ADD_RELATION', () => {
 
   beforeEach(() => {
     resource = new TestOrderResource();
-    DependencyInjector.injector = TestBed;
+    DependencyInjector.injector = TestBed.inject(Injector);
     ResourceUtils.useResourceType(Resource);
   });
 
@@ -193,7 +194,7 @@ describe('Resource BIND_RELATION', () => {
   }));
 
   beforeEach(() => {
-    DependencyInjector.injector = TestBed;
+    DependencyInjector.injector = TestBed.inject(Injector);
     ResourceUtils.useResourceType(Resource);
     resource = new TestOrderResource();
   });
@@ -285,7 +286,7 @@ describe('Resource UNBIND_RELATION', () => {
   }));
 
   beforeEach(() => {
-    DependencyInjector.injector = TestBed;
+    DependencyInjector.injector = TestBed.inject(Injector);
     ResourceUtils.useResourceType(Resource);
     resource = new TestOrderResource();
   });
@@ -345,7 +346,7 @@ describe('Resource UNBIND_COLLECTION_RELATION', () => {
   }));
 
   beforeEach(() => {
-    DependencyInjector.injector = TestBed;
+    DependencyInjector.injector = TestBed.inject(Injector);
     ResourceUtils.useResourceType(Resource);
     resource = new TestOrderResource();
   });
@@ -431,7 +432,7 @@ describe('Resource DELETE_RELATION', () => {
   }));
 
   beforeEach(() => {
-    DependencyInjector.injector = TestBed;
+    DependencyInjector.injector = TestBed.inject(Injector);
     ResourceUtils.useResourceType(Resource);
     resource = new TestOrderResource();
   });

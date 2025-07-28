@@ -35,7 +35,8 @@ export class LibConfig {
         convertEmptyObjectToNull: true
       },
       collections: {
-        embeddedOptional: false
+        embeddedOptional: false,
+        allowTemplates: false
       }
     },
     isProduction: false

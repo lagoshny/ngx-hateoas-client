@@ -229,3 +229,98 @@ export enum CacheMode {
    */
   ON_DEMAND = 'ON_DEMAND'
 }
+
+export type FieldType =
+  | 'hidden'
+  | 'text'
+  | 'textarea'
+  | 'search'
+  | 'tel'
+  | 'url'
+  | 'email'
+  | 'password'
+  | 'number'
+  | 'date'
+  | 'month'
+  | 'week'
+  | 'time'
+  | 'datetime-local'
+  | 'range'
+  | 'color';
+
+export interface Template {
+  /**
+   * HTTP method.
+   */
+  method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
+  contentType?: string;
+  properties: {
+    /** The property name. */
+    name: string;
+
+    /** A short hint that describes the expected value of an input field */
+    placeholder?: string;
+
+    /**
+     * The type of the input element that should be rendered
+     * Default is 'text'
+     */
+    type?: FieldType;
+
+    /**The property value. This is a valid JSON string.
+     * Default is the empty string
+     */
+    value?: string;
+
+    /**
+     * Whether the value element contains a URI Template [RFC6570] string for the client to resolve.
+     * Default is false
+     */
+    templated?: boolean;
+
+    /**
+     * Indicates whether the parameter is required.
+     * Default is false
+     */
+    required?: boolean;
+
+    /** A regular expression string to be applied to the value of the parameter. */
+    regex?: string;
+
+    /**the minimum number of characters allowed in the value property */
+    minLength?: number;
+    /**the maximum number of characters allowed in the value property */
+    maxLength?: number;
+
+    /** Set of possible values for the value property */
+    options?: {
+      inline?: string[] | Record<string, string>[];
+      link?: {
+        href: string,
+        templated?: boolean;
+        type: string
+      },
+      selectedValues?: string[];
+      minItems?: number;
+      maxItems?: number;
+      promptField?: string;
+      valueField?: string;
+    };
+
+    // for number type
+
+    /** Minimum numeric value for the value setting of a property element. */
+    min?: number;
+    /** Maximum numeric value for the value setting of a property element. */
+    max?: number;
+    /** Numeric increment value for the value setting of a property element. */
+    step?: number;
+  }[]
+  target?: string;
+  title?: string;
+}
+
+export interface Templates {
+  default: Template;
+  [key: string]: Template;
+}

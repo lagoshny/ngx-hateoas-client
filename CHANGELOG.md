@@ -1,3 +1,7 @@
+## 3.12.0 (2025-11-29)
+#### Changes
+Updated to Angular 21.
+
 ## 3.11.0 (2025-07-28)
 #### Changes
 Updated to Angular 20.

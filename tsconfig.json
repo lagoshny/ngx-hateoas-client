@@ -11,10 +11,6 @@
     "moduleResolution": "bundler",
     "importHelpers": true,
     "target": "ES2022",
-    "lib": [
-      "es2018",
-      "dom"
-    ],
     "paths": {
       "ngx-hateoas-client": [
         "dist/ngx-hateoas-client/ngx-hateoas-client",

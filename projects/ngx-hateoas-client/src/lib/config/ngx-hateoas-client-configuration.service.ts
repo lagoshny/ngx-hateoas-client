@@ -1,4 +1,4 @@
-import { Injectable, Injector } from '@angular/core';
+import { Inject, Injectable, Injector, Optional } from '@angular/core';
 import { DependencyInjector } from '../util/dependency-injector';
 import { LibConfig } from './lib-config';
 import { DEFAULT_ROUTE_NAME, HateoasConfiguration, ResourceRoute } from './hateoas-configuration.interface';
@@ -10,6 +10,7 @@ import { EmbeddedResource } from '../model/resource/embedded-resource';
 import { PagedResourceCollection } from '../model/resource/paged-resource-collection';
 import { ValidationUtils } from '../util/validation.utils';
 import { isString } from 'lodash-es';
+import { NGX_HATEOAS_CONFIG } from './ngx-hateoas-config';
 
 /**
  * This service for configuration library.
@@ -23,13 +24,27 @@ import { isString } from 'lodash-es';
 })
 export class NgxHateoasClientConfigurationService {
 
-  constructor(private injector: Injector) {
-    DependencyInjector.injector = injector;
+  constructor(
+    private injector: Injector,
+    // Backward compatibility, for latest version it will be required param
+    @Optional() @Inject(NGX_HATEOAS_CONFIG) private config?: HateoasConfiguration
+  ) {
+    DependencyInjector.injector = this.injector;
     // Setting resource types to prevent circular dependencies
     ResourceUtils.useResourceType(Resource);
     ResourceUtils.useResourceCollectionType(ResourceCollection);
     ResourceUtils.usePagedResourceCollectionType(PagedResourceCollection);
     ResourceUtils.useEmbeddedResourceType(EmbeddedResource);
+    if (this.config) {
+      this.configure(this.config);
+    } else {
+      if (LibConfig.getConfig().isProduction) {
+        return;
+      }
+      console.warn('You use old lib configuration method that will be removed ' +
+        'in the next lib version. Please follow instruction ' +
+        'https://github.com/lagoshny/ngx-hateoas-client?tab=readme-ov-file#migrate-to-standalone to configure lib "');
+    }
   }
 
   private static isCommonRouteConfig(config: HateoasConfiguration): boolean {
@@ -54,8 +69,7 @@ export class NgxHateoasClientConfigurationService {
       ValidationUtils.validateInputParams({config, routeName: key, baseApi: value.rootUrl});
     }
     LibConfig.setConfig(config);
-
-    ConsoleLogger.objectPrettyInfo('HateoasClient was configured with options', config);
+    ConsoleLogger.objectPrettyInfo('HateoasClient configured with', config);
   }
 
 }

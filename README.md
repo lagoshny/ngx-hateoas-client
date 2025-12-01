@@ -49,6 +49,7 @@ You can found examples of usage this client with [task-manager-front](https://gi
 
 ## Contents
 1. [Changelog](#Changelog)
+2. [Migrate to standalone](#migrate-to-standalone)
 2. [Getting started](#Getting-started)
 - [Installation](#Installation)
 - [Configuration](#Configuration)
@@ -125,23 +126,11 @@ You can found examples of usage this client with [task-manager-front](https://gi
 ## Changelog
 [Learn about the latest improvements](https://github.com/lagoshny/ngx-hateoas-client/blob/master/CHANGELOG.md).
 
-## Getting started
+## Migrate to standalone
 
-### Installation
+To migrate to standalone system instead `NgModule` use need to change lib configuration.
 
-To install the latest version use command:
-
-```
-npm i @lagoshny/ngx-hateoas-client@latest --save
-``` 
-
-### Configuration
-> Important! Starts from 3.1.0 version you need manually import HttpClientModule to provide HttpClient service that required fot this lib.
-> Why it was change you can see this [Angular issue](https://github.com/angular/angular/issues/20575).
-
-Before start, need to configure `NgxHateoasClientModule` and pass configuration through `NgxHateoasClientConfigurationService`.
-
-1) `NgxHateoasClientModule` configuration:
+Before with `NgModule` system you configured library as:
 
 ```ts
 import { NgxHateoasClientModule } from '@lagoshny/ngx-hateoas-client';
@@ -159,22 +148,6 @@ import { NgxHateoasClientModule } from '@lagoshny/ngx-hateoas-client';
   ...
 })
 export class AppModule {
-  ...
-}
-```
-
-2) In constructor app root module inject `NgxHateoasClientConfigurationService` and pass a configuration:
-
-Minimal configuration look like this:
-
-#### Using common URL to retrieve `Resources`
-```ts
-import { ..., NgxHateoasClientConfigurationService } from '@lagoshny/ngx-hateoas-client';
-
-...
-
-export class AppModule {
-
   constructor(hateoasConfig: NgxHateoasClientConfigurationService) {
     hateoasConfig.configure({
       http: {
@@ -182,33 +155,162 @@ export class AppModule {
       }
     });
   }
+}
 
+---
+```
+> `NgModule` lib configuration method will be removed in the next lib releases, please migrate your code to new standalone configuration
+> No matter your project used `NgModule` system or standalone you can configure standalone lib in both types
+
+Now with standalone system:
+
+```ts
+import { provideNgxHateoasClient } from '@lagoshny/ngx-hateoas-client';
+
+export const appConfig: ApplicationConfig = {
+  providers: [
+    // ...
+    provideHttpClient(),
+    provideNgxHateoasClient({
+        http: {
+          rootUrl: 'http://localhost:8080/api/v1'
+        }
+    }),
+    // ...
+  ],
+}
+```
+
+Note that you don't need anymore inject manually `NgxHateoasClientConfigurationService` and configure it.
+Now you simple use `provideNgxHateoasClient` and pass all configuration there.
+
+If you use old `NgModule` system then you can use standalone lib version like this:
+
+```ts
+import { provideNgxHateoasClient } from '@lagoshny/ngx-hateoas-client';
+
+@NgModule({
+  ...
+  imports: [
+    HttpClientModule,
+  ],
+  providers: [
+    ...
+    provideNgxHateoasClient(
+      {
+        http: {
+          rootUrl: 'http://localhost:8080/api/v1'
+        }
+      }
+    ),    
+    ...
+  ]
+  ...
+})
+export class AppModule {
+  // removed constructor with NgxHateoasClientConfigurationService
+}
+```
+
+## Getting started
+
+### Installation
+
+To install the latest version use command:
+
+```
+npm i @lagoshny/ngx-hateoas-client@latest --save
+``` 
+
+### Configuration
+
+To configure lib you need to import `provideNgxHateoasClient` provider and setup lib configuration.
+Minimal configuration looks like this:
+
+```ts
+import { provideNgxHateoasClient } from '@lagoshny/ngx-hateoas-client';
+
+export const appConfig: ApplicationConfig = {
+  providers: [
+    // ...
+    provideHttpClient(),
+    provideNgxHateoasClient({
+        http: {
+          rootUrl: 'http://localhost:8080/api/v1'
+        }
+    }),
+    // ...
+  ],
+}
+```
+
+If you use `NgModule` system and want configure lib use the next approach:
+
+```ts
+import { provideNgxHateoasClient } from '@lagoshny/ngx-hateoas-client';
+
+@NgModule({
+  ...
+  imports: [
+    HttpClientModule,
+  ],  
+  providers: [
+    provideNgxHateoasClient({
+        http: {
+          rootUrl: 'http://localhost:8080/api/v1'
+        }
+    }),    
+    ...
+  ]
+  ...
+})
+export class AppModule {
+  ...
+}
+```
+### Different configuration URLs
+
+#### Using common URL to retrieve `Resources`
+```ts
+import { provideNgxHateoasClient } from '@lagoshny/ngx-hateoas-client';
+
+export const appConfig: ApplicationConfig = {
+  providers: [
+    // ...
+    provideHttpClient(),
+    provideNgxHateoasClient({
+        // All Resources will use this url as base url
+        http: {
+          rootUrl: 'http://localhost:8080/api/v1'
+        }
+    }),
+    // ...
+  ],
 }
 ```
 
 #### Using multiple URLs to retrieve `Resources`
 
 ```ts
-import { ..., NgxHateoasClientConfigurationService } from '@lagoshny/ngx-hateoas-client';
+import { provideNgxHateoasClient } from '@lagoshny/ngx-hateoas-client';
 
-...
-
-export class AppModule {
-
-  constructor(hateoasConfig: NgxHateoasClientConfigurationService) {
-    hateoasConfig.configure({
-      http: {
-        // Use this router name for default Resources route
-        defaultRoute: {
+export const appConfig: ApplicationConfig = {
+  providers: [
+    // ...
+    provideHttpClient(),
+    provideNgxHateoasClient({
+        http: {
+          // Use this router name for default Resources route
+          defaultRoute: {
             rootUrl: 'http://localhost:8080/api/v1'
-        },
-        anotherRoute: {
-          rootUrl: 'http://localhost:9090/api/v1'
+          },
+          anotherRoute: {
+            rootUrl: 'http://localhost:9090/api/v1'
+          }
         }
-      }
-    });
-  }
-
+    }),
+    // ...
+  ],
 }
 ```
 
@@ -267,12 +369,14 @@ It is recommended also to declare the `Product` resource class (others `Resource
 
 ```ts
 ...
-  hateoasConfig.configure({
-    ...
+provideNgxHateoasClient(
+  {
+    // ...
     useTypes: {
         resources: [Product]
     }
   }
+),
 ...
 ```
 >See more about `useTypes` in the configuration section [here](#usetypes-params).
@@ -779,7 +883,7 @@ Examples of usage resource relation methods rely on presets.
 
 - HateoasClientConfiguration:
   ```ts
-    hateoasConfig.configure({
+    provideNgxHateoasClient({
         http: {
             rootUrl: 'http://localhost:8080/api/v1'    
         },
@@ -1895,11 +1999,11 @@ Of course, resource types are set in the configuration [useTypes](#configuration
 
 ```ts
 ...
-  hateoasConfig.configure({
+  provideNgxHateoasClient({
     useTypes: {
-        resources: [Cart, Client, PhysicalClient, JuridicalClient]
+      resources: [Cart, Client, PhysicalClient, JuridicalClient]
     }
-  }
+  })
 ...
 ```
 
@@ -2094,7 +2198,7 @@ Examples of usage resource service methods rely on this presets.
 
 - HateoasClientConfiguration:
   ```ts
-    hateoasConfig.configure({
+    provideNgxHateoasClient({
         http: {
             rootUrl: 'http://localhost:8080/api/v1'    
         },

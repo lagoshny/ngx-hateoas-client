@@ -1,3 +1,8 @@
+## 3.13.0 (2025-12-01)
+#### Changes
+Migrate to standalone component system.
+See more [here](https://github.com/lagoshny/ngx-hateoas-client?tab=readme-ov-file#migrate-to-standalone).
+
 ## 3.12.0 (2025-11-29)
 #### Changes
 Updated to Angular 21.

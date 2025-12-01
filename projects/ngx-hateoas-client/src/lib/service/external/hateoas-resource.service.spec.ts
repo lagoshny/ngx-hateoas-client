@@ -1,6 +1,6 @@
 /* tslint:disable:no-string-literal */
 import { HateoasResourceService } from './hateoas-resource.service';
-import { HateoasResource, HttpMethod, Include, Resource } from '../../ngx-hateoas-client.module';
+import { HateoasResource, HttpMethod, Include, Resource } from '../../ngx-hateoas-client.providers';
 import { of } from 'rxjs';
 import { SimpleResource } from '../../model/resource/resources.test';
 import { ResourceUtils } from '../../util/resource.utils';

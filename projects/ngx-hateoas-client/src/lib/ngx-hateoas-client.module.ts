@@ -1,30 +1,17 @@
-import { ModuleWithProviders, NgModule } from '@angular/core';
-import { NgxHateoasClientConfigurationService } from './config/ngx-hateoas-client-configuration.service';
-import { HateoasResourceService } from './service/external/hateoas-resource.service';
-
-export { NgxHateoasClientConfigurationService } from './config/ngx-hateoas-client-configuration.service';
-export { Resource } from './model/resource/resource';
-export { EmbeddedResource } from './model/resource/embedded-resource';
-export { ResourceCollection } from './model/resource/resource-collection';
-export { PagedResourceCollection } from './model/resource/paged-resource-collection';
-export {
-  Sort,
-  SortOrder,
-  Include,
-  HttpMethod,
-  ProjectionRelType,
-  GetOption,
-  PagedGetOption,
-  RequestOption,
-  RequestParam,
-  CacheMode
-} from './model/declarations';
-export { HateoasResourceOperation } from './service/external/hateoas-resource-operation';
-export { HateoasResourceService } from './service/external/hateoas-resource.service';
-export { HateoasResource, HateoasEmbeddedResource, HateoasProjection, ProjectionRel } from './model/decorators';
+import {ModuleWithProviders, NgModule} from '@angular/core';
+import {NgxHateoasClientConfigurationService} from './config/ngx-hateoas-client-configuration.service';
 
 @NgModule()
 export class NgxHateoasClientModule {
+
+  /**
+   * NgModule style lib configuration.
+   *
+   * Deprecated: configure lib using standalone provider: [provideNgxHateoasClient].
+   * How to configure it now see <a href="https://github.com/lagoshny/ngx-hateoas-client?tab=readme-ov-file#migrate-to-standalone">here</a>.
+   *
+   * Warning: this configuration method will be removed in the next lib releases.
+   */
   static forRoot(): ModuleWithProviders<NgxHateoasClientModule> {
     return {
       ngModule: NgxHateoasClientModule

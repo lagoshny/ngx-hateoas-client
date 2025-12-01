@@ -148,17 +148,6 @@ import { NgxHateoasClientModule } from '@lagoshny/ngx-hateoas-client';
   ...
 })
 export class AppModule {
-  ...
-}
-
----
-
-import { ..., NgxHateoasClientConfigurationService } from '@lagoshny/ngx-hateoas-client';
-
-...
-
-export class AppModule {
-
   constructor(hateoasConfig: NgxHateoasClientConfigurationService) {
     hateoasConfig.configure({
       http: {
@@ -166,8 +155,9 @@ export class AppModule {
       }
     });
   }
-
 }
+
+---
 ```
 > `NgModule` lib configuration method will be removed in the next lib releases, please migrate your code to new standalone configuration
 > No matter your project used `NgModule` system or standalone you can configure standalone lib in both types
@@ -201,8 +191,10 @@ import { provideNgxHateoasClient } from '@lagoshny/ngx-hateoas-client';
 
 @NgModule({
   ...
-  providers: [
+  imports: [
     HttpClientModule,
+  ],
+  providers: [
     ...
     provideNgxHateoasClient(
       {
@@ -216,7 +208,7 @@ import { provideNgxHateoasClient } from '@lagoshny/ngx-hateoas-client';
   ...
 })
 export class AppModule {
-  ...
+  // removed constructor with NgxHateoasClientConfigurationService
 }
 ```
 
@@ -242,13 +234,11 @@ export const appConfig: ApplicationConfig = {
   providers: [
     // ...
     provideHttpClient(),
-    provideNgxHateoasClient(
-      {
+    provideNgxHateoasClient({
         http: {
           rootUrl: 'http://localhost:8080/api/v1'
         }
-      }
-    ),
+    }),
     // ...
   ],
 }
@@ -261,16 +251,15 @@ import { provideNgxHateoasClient } from '@lagoshny/ngx-hateoas-client';
 
 @NgModule({
   ...
-  providers: [
+  imports: [
     HttpClientModule,
-    ...
-    provideNgxHateoasClient(
-      {
+  ],  
+  providers: [
+    provideNgxHateoasClient({
         http: {
           rootUrl: 'http://localhost:8080/api/v1'
         }
-      }
-    ),    
+    }),    
     ...
   ]
   ...
@@ -289,14 +278,12 @@ export const appConfig: ApplicationConfig = {
   providers: [
     // ...
     provideHttpClient(),
-    provideNgxHateoasClient(
-      {
+    provideNgxHateoasClient({
         // All Resources will use this url as base url
         http: {
           rootUrl: 'http://localhost:8080/api/v1'
         }
-      }
-    ),
+    }),
     // ...
   ],
 }
@@ -311,8 +298,7 @@ export const appConfig: ApplicationConfig = {
   providers: [
     // ...
     provideHttpClient(),
-    provideNgxHateoasClient(
-      {
+    provideNgxHateoasClient({
         http: {
           // Use this router name for default Resources route
           defaultRoute: {
@@ -322,8 +308,7 @@ export const appConfig: ApplicationConfig = {
             rootUrl: 'http://localhost:9090/api/v1'
           }
         }
-      }
-    ),
+    }),
     // ...
   ],
 }
@@ -471,7 +456,6 @@ export class ProductService extends HateoasResourceOperation<Product> {
 
 `HateoasResourceOperation` has the same [methods](#resource-service) as `HateoasResourceService` without `resourceType` as the first param (because you pass `resourceType` with service constructor).
 
-// TODO:
 ## Testing
 To test your services, that are using `HateoasResourceOperation` or `HateoasResourceService` you need import `NgxHateoasClientModule.forRoot()` in the test module.
 
@@ -520,7 +504,6 @@ export class UserService extends HateoasResourceOperation<User> {
 
 Note, `UserService` extends `HateoasResourceOperation` and uses `HateoasResourceService` to perform requests.
 
-// TODO:
 ### Using TestBed
 
 If you prefer to use standard `TestBed` for testing, you can do that in the following way:
@@ -602,7 +585,6 @@ describe('UserServiceTest', () => {
 
 If you prefer to use [@ngneat/spectator](https://www.npmjs.com/package/@ngneat/spectator) for testing, you can do that in the following way:
 
-// TODO:
 ```ts
 import {
   HateoasResourceService,

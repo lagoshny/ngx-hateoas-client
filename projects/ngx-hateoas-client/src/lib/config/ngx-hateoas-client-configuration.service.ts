@@ -1,4 +1,4 @@
-import { Inject, Injectable, Injector } from '@angular/core';
+import { Inject, Injectable, Injector, Optional } from '@angular/core';
 import { DependencyInjector } from '../util/dependency-injector';
 import { LibConfig } from './lib-config';
 import { DEFAULT_ROUTE_NAME, HateoasConfiguration, ResourceRoute } from './hateoas-configuration.interface';
@@ -26,7 +26,8 @@ export class NgxHateoasClientConfigurationService {
 
   constructor(
     private injector: Injector,
-    @Inject(NGX_HATEOAS_CONFIG) private config: HateoasConfiguration
+    // Backward compatibility, for latest version it will be required param
+    @Optional() @Inject(NGX_HATEOAS_CONFIG) private config?: HateoasConfiguration
   ) {
     DependencyInjector.injector = this.injector;
     // Setting resource types to prevent circular dependencies
@@ -34,7 +35,16 @@ export class NgxHateoasClientConfigurationService {
     ResourceUtils.useResourceCollectionType(ResourceCollection);
     ResourceUtils.usePagedResourceCollectionType(PagedResourceCollection);
     ResourceUtils.useEmbeddedResourceType(EmbeddedResource);
-    this.configure(this.config);
+    if (this.config) {
+      this.configure(this.config);
+    } else {
+      if (LibConfig.getConfig().isProduction) {
+        return;
+      }
+      console.warn('You use old lib configuration method that will be removed ' +
+        'in the next lib version. Please follow instruction ' +
+        'https://github.com/lagoshny/ngx-hateoas-client?tab=readme-ov-file#migrate-to-standalone to configure lib "');
+    }
   }
 
   private static isCommonRouteConfig(config: HateoasConfiguration): boolean {

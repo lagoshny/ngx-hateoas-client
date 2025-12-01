@@ -1,4 +1,4 @@
-import { ENVIRONMENT_INITIALIZER, EnvironmentProviders, inject, makeEnvironmentProviders } from '@angular/core';
+import { ENVIRONMENT_INITIALIZER, inject, Provider } from '@angular/core';
 import { HateoasConfiguration } from './config/hateoas-configuration.interface';
 import { NGX_HATEOAS_CONFIG } from './config/ngx-hateoas-config';
 import { NgxHateoasClientConfigurationService } from './config/ngx-hateoas-client-configuration.service';
@@ -25,8 +25,8 @@ export { HateoasResourceOperation } from './service/external/hateoas-resource-op
 export { HateoasResourceService } from './service/external/hateoas-resource.service';
 export { HateoasResource, HateoasEmbeddedResource, HateoasProjection, ProjectionRel } from './model/decorators';
 
-export function provideNgxHateoasClient(config: HateoasConfiguration): EnvironmentProviders {
-  return makeEnvironmentProviders([
+export function provideNgxHateoasClient(config: HateoasConfiguration): Provider[] {
+  return [
     {
       provide: NGX_HATEOAS_CONFIG,
       useValue: config
@@ -40,5 +40,5 @@ export function provideNgxHateoasClient(config: HateoasConfiguration): Environme
         };
       }
     },
-  ]);
+  ];
 }

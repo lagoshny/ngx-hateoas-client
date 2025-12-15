@@ -81,7 +81,7 @@ export class ResourceUtils {
 
       if (LibConfig.getConfig()?.typesFormat?.date?.patterns && !isEmpty(LibConfig.getConfig().typesFormat.date.patterns)) {
         for (const pattern of LibConfig.getConfig().typesFormat.date.patterns) {
-          if (isMatch(payload[key], pattern)) {
+          if (typeof payload[key] === 'string' && isMatch(payload[key], pattern)) {
             const valueAsDate = parse(payload[key], pattern, new Date());
             if (valueAsDate) {
               payload[key] = valueAsDate;
@@ -177,7 +177,7 @@ export class ResourceUtils {
   public static instantiateResourceCollection<T extends ResourceCollection<BaseResource>>(payload: object, isProjection?: boolean): T {
     if (isEmpty(payload)
       || (!isObject(payload['_links']) || isEmpty(payload['_links']))
-      || (!LibConfig.getConfig().halFormat.collections.embeddedOptional &&
+      || (!LibConfig.getConfig().halFormat?.collections?.embeddedOptional &&
         (!('_embedded' in payload) || !isObject(payload['_embedded']) || isEmpty(payload['_embedded'])))) {
       return null;
     }
@@ -201,7 +201,7 @@ export class ResourceUtils {
       return null;
     }
 
-    let result;
+    let result: PagedResourceCollection<BaseResource>;
     if (payload['page']) {
       result = new this.pagedResourceCollectionType(resourceCollection, payload as PageData);
     } else {
@@ -297,11 +297,11 @@ export class ResourceUtils {
       return '';
     }
     const resourceLinks = payload['_links'] as Link;
-    if (isEmpty(resourceLinks) || isEmpty(resourceLinks.self) || isNil(resourceLinks.self.href)) {
+    if (isEmpty(resourceLinks) || isEmpty(resourceLinks['self']) || isNil(resourceLinks['self'].href)) {
       return '';
     }
 
-    return UrlUtils.getResourceNameFromUrl(UrlUtils.removeTemplateParams(resourceLinks.self.href));
+    return UrlUtils.getResourceNameFromUrl(UrlUtils.removeTemplateParams(resourceLinks['self'].href));
   }
 
   /**
@@ -333,7 +333,7 @@ export class ResourceUtils {
    */
   public static fillProjectionNameFromResourceType<T extends Resource>(resourceType: new () => T, options?: GetOption) {
     if (!resourceType) {
-      return;
+      return undefined;
     }
     const projectionName = resourceType['__projectionName__'];
     if (projectionName) {

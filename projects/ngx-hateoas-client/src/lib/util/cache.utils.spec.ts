@@ -1,160 +1,161 @@
+import { describe, expect, it, vi } from "vitest";
 import { LibConfig } from '../config/lib-config';
 import { CacheUtils } from './cache.utils';
 import { CacheMode } from '../model/declarations';
 
 describe('CacheUtils', () => {
 
-  it('should NOT USE cache when cache enabled is FALSE', () => {
-    spyOn(LibConfig, 'getConfig').and.returnValue({
-      ...LibConfig.DEFAULT_CONFIG,
-      cache: {
-        enabled: false
-      }
+    it('should NOT USE cache when cache enabled is FALSE', () => {
+        vi.spyOn(LibConfig, 'getConfig').mockReturnValue({
+            ...LibConfig.DEFAULT_CONFIG,
+            cache: {
+                enabled: false
+            }
+        });
+
+        const result = CacheUtils.shouldUseCache(true);
+
+        expect(result).toBe(false);
     });
 
-    const result = CacheUtils.shouldUseCache(true);
+    it('should NOT USE cache when cache enabled is FALSE and mode is ALWAYS', () => {
+        vi.spyOn(LibConfig, 'getConfig').mockReturnValue({
+            ...LibConfig.DEFAULT_CONFIG,
+            cache: {
+                enabled: false,
+                mode: CacheMode.ALWAYS
+            }
+        });
 
-    expect(result).toBeFalse();
-  });
+        const result = CacheUtils.shouldUseCache(true);
 
-  it('should NOT USE cache when cache enabled is FALSE and mode is ALWAYS', () => {
-    spyOn(LibConfig, 'getConfig').and.returnValue({
-      ...LibConfig.DEFAULT_CONFIG,
-      cache: {
-        enabled: false,
-        mode: CacheMode.ALWAYS
-      }
+        expect(result).toBe(false);
     });
 
-    const result = CacheUtils.shouldUseCache(true);
+    it('should NOT USE cache when cache enabled is FALSE and mode is ON_DEMAND', () => {
+        vi.spyOn(LibConfig, 'getConfig').mockReturnValue({
+            ...LibConfig.DEFAULT_CONFIG,
+            cache: {
+                enabled: false,
+                mode: CacheMode.ON_DEMAND
+            }
+        });
 
-    expect(result).toBeFalse();
-  });
+        const result = CacheUtils.shouldUseCache(true);
 
-  it('should NOT USE cache when cache enabled is FALSE and mode is ON_DEMAND', () => {
-    spyOn(LibConfig, 'getConfig').and.returnValue({
-      ...LibConfig.DEFAULT_CONFIG,
-      cache: {
-        enabled: false,
-        mode: CacheMode.ON_DEMAND
-      }
+        expect(result).toBe(false);
     });
 
-    const result = CacheUtils.shouldUseCache(true);
+    it('should USE cache when mode is ALWAYS and useCache is TRUE', () => {
+        vi.spyOn(LibConfig, 'getConfig').mockReturnValue({
+            ...LibConfig.DEFAULT_CONFIG,
+            cache: {
+                enabled: true,
+                mode: CacheMode.ALWAYS
+            }
+        });
 
-    expect(result).toBeFalse();
-  });
+        const result = CacheUtils.shouldUseCache(true);
 
-  it('should USE cache when mode is ALWAYS and useCache is TRUE', () => {
-    spyOn(LibConfig, 'getConfig').and.returnValue({
-      ...LibConfig.DEFAULT_CONFIG,
-      cache: {
-        enabled: true,
-        mode: CacheMode.ALWAYS
-      }
+        expect(result).toBe(true);
     });
 
-    const result = CacheUtils.shouldUseCache(true);
+    it('should USE cache when mode is ALWAYS and useCache is UNDEFINED', () => {
+        vi.spyOn(LibConfig, 'getConfig').mockReturnValue({
+            ...LibConfig.DEFAULT_CONFIG,
+            cache: {
+                enabled: true,
+                mode: CacheMode.ALWAYS
+            }
+        });
 
-    expect(result).toBeTrue();
-  });
+        const result = CacheUtils.shouldUseCache(undefined);
 
-  it('should USE cache when mode is ALWAYS and useCache is UNDEFINED', () => {
-    spyOn(LibConfig, 'getConfig').and.returnValue({
-      ...LibConfig.DEFAULT_CONFIG,
-      cache: {
-        enabled: true,
-        mode: CacheMode.ALWAYS
-      }
+        expect(result).toBe(true);
     });
 
-    const result = CacheUtils.shouldUseCache(undefined);
+    it('should USE cache when mode is ALWAYS and useCache is NULL', () => {
+        vi.spyOn(LibConfig, 'getConfig').mockReturnValue({
+            ...LibConfig.DEFAULT_CONFIG,
+            cache: {
+                enabled: true,
+                mode: CacheMode.ALWAYS
+            }
+        });
 
-    expect(result).toBeTrue();
-  });
+        const result = CacheUtils.shouldUseCache(null);
 
-  it('should USE cache when mode is ALWAYS and useCache is NULL', () => {
-    spyOn(LibConfig, 'getConfig').and.returnValue({
-      ...LibConfig.DEFAULT_CONFIG,
-      cache: {
-        enabled: true,
-        mode: CacheMode.ALWAYS
-      }
+        expect(result).toBe(true);
     });
 
-    const result = CacheUtils.shouldUseCache(null);
+    it('should NOT USE cache when mode is ALWAYS and useCache is FALSE', () => {
+        vi.spyOn(LibConfig, 'getConfig').mockReturnValue({
+            ...LibConfig.DEFAULT_CONFIG,
+            cache: {
+                enabled: true,
+                mode: CacheMode.ALWAYS
+            }
+        });
 
-    expect(result).toBeTrue();
-  });
+        const result = CacheUtils.shouldUseCache(false);
 
-  it('should NOT USE cache when mode is ALWAYS and useCache is FALSE', () => {
-    spyOn(LibConfig, 'getConfig').and.returnValue({
-      ...LibConfig.DEFAULT_CONFIG,
-      cache: {
-        enabled: true,
-        mode: CacheMode.ALWAYS
-      }
+        expect(result).toBe(false);
     });
 
-    const result = CacheUtils.shouldUseCache(false);
+    it('should NOT USE cache when mode is ON_DEMAND and useCache is FALSE', () => {
+        vi.spyOn(LibConfig, 'getConfig').mockReturnValue({
+            ...LibConfig.DEFAULT_CONFIG,
+            cache: {
+                enabled: true,
+                mode: CacheMode.ON_DEMAND
+            }
+        });
 
-    expect(result).toBeFalse();
-  });
+        const result = CacheUtils.shouldUseCache(false);
 
-  it('should NOT USE cache when mode is ON_DEMAND and useCache is FALSE', () => {
-    spyOn(LibConfig, 'getConfig').and.returnValue({
-      ...LibConfig.DEFAULT_CONFIG,
-      cache: {
-        enabled: true,
-        mode: CacheMode.ON_DEMAND
-      }
+        expect(result).toBe(false);
     });
 
-    const result = CacheUtils.shouldUseCache(false);
+    it('should NOT USE cache when mode is ON_DEMAND and useCache is UNDEFINED', () => {
+        vi.spyOn(LibConfig, 'getConfig').mockReturnValue({
+            ...LibConfig.DEFAULT_CONFIG,
+            cache: {
+                enabled: true,
+                mode: CacheMode.ON_DEMAND
+            }
+        });
 
-    expect(result).toBeFalse();
-  });
+        const result = CacheUtils.shouldUseCache(undefined);
 
-  it('should NOT USE cache when mode is ON_DEMAND and useCache is UNDEFINED', () => {
-    spyOn(LibConfig, 'getConfig').and.returnValue({
-      ...LibConfig.DEFAULT_CONFIG,
-      cache: {
-        enabled: true,
-        mode: CacheMode.ON_DEMAND
-      }
+        expect(result).toBe(false);
     });
 
-    const result = CacheUtils.shouldUseCache(undefined);
+    it('should NOT USE cache when mode is ON_DEMAND and useCache is NULL', () => {
+        vi.spyOn(LibConfig, 'getConfig').mockReturnValue({
+            ...LibConfig.DEFAULT_CONFIG,
+            cache: {
+                enabled: true,
+                mode: CacheMode.ON_DEMAND
+            }
+        });
 
-    expect(result).toBeFalse();
-  });
+        const result = CacheUtils.shouldUseCache(null);
 
-  it('should NOT USE cache when mode is ON_DEMAND and useCache is NULL', () => {
-    spyOn(LibConfig, 'getConfig').and.returnValue({
-      ...LibConfig.DEFAULT_CONFIG,
-      cache: {
-        enabled: true,
-        mode: CacheMode.ON_DEMAND
-      }
+        expect(result).toBe(false);
     });
 
-    const result = CacheUtils.shouldUseCache(null);
+    it('should USE cache when mode is ON_DEMAND and useCache is TRUE', () => {
+        vi.spyOn(LibConfig, 'getConfig').mockReturnValue({
+            ...LibConfig.DEFAULT_CONFIG,
+            cache: {
+                enabled: true,
+                mode: CacheMode.ON_DEMAND
+            }
+        });
 
-    expect(result).toBeFalse();
-  });
+        const result = CacheUtils.shouldUseCache(true);
 
-  it('should USE cache when mode is ON_DEMAND and useCache is TRUE', () => {
-    spyOn(LibConfig, 'getConfig').and.returnValue({
-      ...LibConfig.DEFAULT_CONFIG,
-      cache: {
-        enabled: true,
-        mode: CacheMode.ON_DEMAND
-      }
+        expect(result).toBe(true);
     });
-
-    const result = CacheUtils.shouldUseCache(true);
-
-    expect(result).toBeTrue();
-  });
 
 });

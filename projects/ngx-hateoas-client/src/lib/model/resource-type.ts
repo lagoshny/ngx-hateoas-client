@@ -20,7 +20,7 @@ export function isResourceCollection(object: any): boolean {
     return false;
   }
 
-  if (LibConfig.getConfig().halFormat.collections.embeddedOptional) {
+  if (LibConfig.getConfig().halFormat?.collections?.embeddedOptional) {
     return baseCondition && (Object.keys(object).length === 1 ||
       '_embedded' in object && Object.keys(object).length === 2);
   } else {

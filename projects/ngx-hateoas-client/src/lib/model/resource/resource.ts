@@ -24,7 +24,7 @@ export class Resource extends BaseResource {
   /**
    * Resource should has self link.
    */
-  protected _links: {
+  protected declare _links: {
     self: LinkData;
     [key: string]: LinkData;
   };

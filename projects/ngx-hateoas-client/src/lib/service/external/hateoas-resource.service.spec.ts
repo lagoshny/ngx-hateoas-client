@@ -1,17 +1,17 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 /* tslint:disable:no-string-literal */
 import { HateoasResourceService } from './hateoas-resource.service';
 import { HateoasResource, HttpMethod, Include, Resource } from '../../ngx-hateoas-client.providers';
 import { of } from 'rxjs';
-import { SimpleResource } from '../../model/resource/resources.test';
+import { SimpleResource } from '../../model/resource/resources.test-utils';
 import { ResourceUtils } from '../../util/resource.utils';
 import { RequestOption, RequestParam } from '../../model/declarations';
-import anything = jasmine.anything;
 
 @HateoasResource('resourceRelation')
 class ResourceRelation extends Resource {
   public name = 'Test';
   // tslint:disable-next-line:variable-name
-  _links = {
+  override _links = {
     self: {
       href: 'http://localhost:8080/api/v1/resourceRelation/1'
     },
@@ -19,13 +19,12 @@ class ResourceRelation extends Resource {
       href: 'http://localhost:8080/api/v1/resourceRelation/1'
     }
   };
-
 }
 
 @HateoasResource('resourceWithRelation')
 class ResourceWithRelation extends SimpleResource {
   public relation: ResourceRelation;
-  public name = 'Test';
+  public override name = 'Test';
 }
 
 describe('HateoasResourceService', () => {
@@ -38,25 +37,25 @@ describe('HateoasResourceService', () => {
 
   beforeEach(() => {
     commonHttpServiceSpy = {
-      customQuery: jasmine.createSpy('customQuery')
+      customQuery: vi.fn()
     };
     resourceHttpServiceSpy = {
-      postResource: jasmine.createSpy('postResource'),
-      put: jasmine.createSpy('put'),
-      putResource: jasmine.createSpy('putResource'),
-      patch: jasmine.createSpy('patch'),
-      patchResource: jasmine.createSpy('patchResource'),
-      delete: jasmine.createSpy('delete'),
-      deleteResource: jasmine.createSpy('deleteResource')
+      postResource: vi.fn(),
+      put: vi.fn(),
+      putResource: vi.fn(),
+      patch: vi.fn(),
+      patchResource: vi.fn(),
+      delete: vi.fn(),
+      deleteResource: vi.fn()
     };
     resourceCollectionHttpServiceSpy = {
-      getResourceCollection: jasmine.createSpy('getResourceCollection')
+      getResourceCollection: vi.fn()
     };
     pagedResourceCollectionHttpServiceSpy = {
-      getResourcePage: jasmine.createSpy('getResourcePage')
+      getResourcePage: vi.fn()
     };
     resourceCacheService = {
-      evictAll: jasmine.createSpy('evictAll')
+      evictAll: vi.fn()
     };
 
     hateoasResourceService =
@@ -111,20 +110,20 @@ describe('HateoasResourceService', () => {
   });
 
   it('CREATE_RESOURCE should resolve resource values', () => {
-    resourceHttpServiceSpy.postResource.and.returnValue(of(anything()));
+    resourceHttpServiceSpy.postResource.mockReturnValue(of({}));
     const resourceWithRelation = new ResourceWithRelation();
     resourceWithRelation.relation = new ResourceRelation();
 
-    hateoasResourceService.createResource(ResourceWithRelation, {body: resourceWithRelation})
+    hateoasResourceService.createResource(ResourceWithRelation, { body: resourceWithRelation })
       .subscribe(() => {
-        const body = resourceHttpServiceSpy.postResource.calls.argsFor(0)[2];
+        const body = vi.mocked(resourceHttpServiceSpy.postResource).mock.calls[0][2];
         expect(body).toBeDefined();
         expect(body.relation).toBe('http://localhost:8080/api/v1/resourceRelation/1');
       });
   });
 
   it('CREATE_RESOURCE should pass options to http request', () => {
-    resourceHttpServiceSpy.postResource.and.returnValue(of(anything()));
+    resourceHttpServiceSpy.postResource.mockReturnValue(of({}));
     const resourceWithRelation = new ResourceWithRelation();
     resourceWithRelation.relation = new ResourceRelation();
     const requestOption: RequestOption = {
@@ -139,9 +138,9 @@ describe('HateoasResourceService', () => {
       withCredentials: false
     };
 
-    hateoasResourceService.createResource(ResourceWithRelation, {body: resourceWithRelation}, requestOption)
+    hateoasResourceService.createResource(ResourceWithRelation, { body: resourceWithRelation }, requestOption)
       .subscribe(() => {
-        const options = resourceHttpServiceSpy.postResource.calls.argsFor(0)[3] as RequestOption;
+        const options = vi.mocked(resourceHttpServiceSpy.postResource).mock.calls[0][3] as RequestOption;
         expect(options).toEqual(requestOption);
       });
   });
@@ -157,58 +156,58 @@ describe('HateoasResourceService', () => {
   });
 
   it('UPDATE_RESOURCE should doing the request to the passed resource self link', () => {
-    resourceHttpServiceSpy.put.and.returnValue(of(anything()));
+    resourceHttpServiceSpy.put.mockReturnValue(of({}));
 
     const simpleResource = new SimpleResource();
     hateoasResourceService.updateResource(simpleResource)
       .subscribe(() => {
-        const url = resourceHttpServiceSpy.put.calls.argsFor(0)[0];
+        const url = vi.mocked(resourceHttpServiceSpy.put).mock.calls[0][0];
         expect(url).toBe(simpleResource._links.self.href);
       });
   });
 
   it('UPDATE_RESOURCE should resolve resource values', () => {
-    resourceHttpServiceSpy.put.and.returnValue(of(anything()));
+    resourceHttpServiceSpy.put.mockReturnValue(of({}));
     const resourceWithRelation = new ResourceWithRelation();
     resourceWithRelation.relation = new ResourceRelation();
 
     hateoasResourceService.updateResource(resourceWithRelation)
       .subscribe(() => {
-        const body = resourceHttpServiceSpy.put.calls.argsFor(0)[1];
+        const body = vi.mocked(resourceHttpServiceSpy.put).mock.calls[0][1];
         expect(body).toBeDefined();
         expect(body.relation).toBe('http://localhost:8080/api/v1/resourceRelation/1');
       });
   });
 
   it('UPDATE_RESOURCE should resolve resource values considering null values', () => {
-    resourceHttpServiceSpy.put.and.returnValue(of(anything()));
+    resourceHttpServiceSpy.put.mockReturnValue(of({}));
     const resourceWithRelation = new ResourceWithRelation();
     resourceWithRelation.name = null;
 
     hateoasResourceService.updateResource(resourceWithRelation, {
       body: resourceWithRelation,
-      valuesOption: {include: Include.NULL_VALUES}
+      valuesOption: { include: Include.NULL_VALUES }
     })
       .subscribe(() => {
-        const body = resourceHttpServiceSpy.put.calls.argsFor(0)[1];
+        const body = vi.mocked(resourceHttpServiceSpy.put).mock.calls[0][1];
         expect(body).toBeDefined();
         expect(body.name).toBeNull();
       });
   });
 
   it('UPDATE_RESOURCE should pass requestBody as body', () => {
-    resourceHttpServiceSpy.put.and.returnValue(of(anything()));
+    resourceHttpServiceSpy.put.mockReturnValue(of({}));
 
-    hateoasResourceService.updateResource(new SimpleResource(), {body: {param: 'test'}})
+    hateoasResourceService.updateResource(new SimpleResource(), { body: { param: 'test' } })
       .subscribe(() => {
-        const body = resourceHttpServiceSpy.put.calls.argsFor(0)[1];
+        const body = vi.mocked(resourceHttpServiceSpy.put).mock.calls[0][1];
         expect(body).toBeDefined();
-        expect(body).toEqual({param: 'test'});
+        expect(body).toEqual({ param: 'test' });
       });
   });
 
   it('UPDATE_RESOURCE should pass options to http request', () => {
-    resourceHttpServiceSpy.put.and.returnValue(of(anything()));
+    resourceHttpServiceSpy.put.mockReturnValue(of({}));
     const requestOption: RequestOption = {
       params: {
         testParam: 'testsRequest'
@@ -221,15 +220,15 @@ describe('HateoasResourceService', () => {
       withCredentials: false
     };
 
-    hateoasResourceService.updateResource(new SimpleResource(), {body: {param: 'test'}}, requestOption)
+    hateoasResourceService.updateResource(new SimpleResource(), { body: { param: 'test' } }, requestOption)
       .subscribe(() => {
-        const options = resourceHttpServiceSpy.put.calls.argsFor(0)[2] as RequestOption;
+        const options = vi.mocked(resourceHttpServiceSpy.put).mock.calls[0][2] as RequestOption;
         expect(options).toEqual(requestOption);
       });
   });
 
   it('UPDATE_RESOURCE_BY_ID should throw error when passed id is empty', () => {
-    expect(() => hateoasResourceService.updateResourceById(SimpleResource, '', {body: {param: 'test'}}))
+    expect(() => hateoasResourceService.updateResourceById(SimpleResource, '', { body: { param: 'test' } }))
       .toThrowError(`Passed param(s) 'id = ' is not valid`);
   });
 
@@ -244,36 +243,36 @@ describe('HateoasResourceService', () => {
   });
 
   it('UPDATE_RESOURCE_BY_ID should resolve resource values', () => {
-    resourceHttpServiceSpy.putResource.and.returnValue(of(anything()));
+    resourceHttpServiceSpy.putResource.mockReturnValue(of({}));
     const resourceWithRelation = new ResourceWithRelation();
     resourceWithRelation.relation = new ResourceRelation();
 
-    hateoasResourceService.updateResourceById(ResourceWithRelation, 1, {body: resourceWithRelation})
+    hateoasResourceService.updateResourceById(ResourceWithRelation, 1, { body: resourceWithRelation })
       .subscribe(() => {
-        const body = resourceHttpServiceSpy.putResource.calls.argsFor(0)[3];
+        const body = vi.mocked(resourceHttpServiceSpy.putResource).mock.calls[0][3];
         expect(body).toBeDefined();
         expect(body.relation).toBe('http://localhost:8080/api/v1/resourceRelation/1');
       });
   });
 
   it('UPDATE_RESOURCE_BY_ID should resolve resource values considering null values', () => {
-    resourceHttpServiceSpy.putResource.and.returnValue(of(anything()));
+    resourceHttpServiceSpy.putResource.mockReturnValue(of({}));
     const resourceWithRelation = new ResourceWithRelation();
     resourceWithRelation.name = null;
 
     hateoasResourceService.updateResourceById(ResourceWithRelation, 1, {
       body: resourceWithRelation,
-      valuesOption: {include: Include.NULL_VALUES}
+      valuesOption: { include: Include.NULL_VALUES }
     })
       .subscribe(() => {
-        const body = resourceHttpServiceSpy.putResource.calls.argsFor(0)[3];
+        const body = vi.mocked(resourceHttpServiceSpy.putResource).mock.calls[0][3];
         expect(body).toBeDefined();
         expect(body.name).toBeNull();
       });
   });
 
   it('UPDATE_RESOURCE_BY_ID should pass options to http request', () => {
-    resourceHttpServiceSpy.putResource.and.returnValue(of(anything()));
+    resourceHttpServiceSpy.putResource.mockReturnValue(of({}));
     const resourceWithRelation = new ResourceWithRelation();
     resourceWithRelation.relation = new ResourceRelation();
     const requestOption: RequestOption = {
@@ -288,9 +287,9 @@ describe('HateoasResourceService', () => {
       withCredentials: false
     };
 
-    hateoasResourceService.updateResourceById(ResourceWithRelation, 1, {body: resourceWithRelation}, requestOption)
+    hateoasResourceService.updateResourceById(ResourceWithRelation, 1, { body: resourceWithRelation }, requestOption)
       .subscribe(() => {
-        const options = resourceHttpServiceSpy.putResource.calls.argsFor(0)[4] as RequestOption;
+        const options = vi.mocked(resourceHttpServiceSpy.putResource).mock.calls[0][4] as RequestOption;
         expect(options).toEqual(requestOption);
       });
   });
@@ -307,58 +306,58 @@ describe('HateoasResourceService', () => {
   });
 
   it('PATCH_RESOURCE should doing the request to the passed resource self link', () => {
-    resourceHttpServiceSpy.patch.and.returnValue(of(anything()));
+    resourceHttpServiceSpy.patch.mockReturnValue(of({}));
 
     const simpleResource = new SimpleResource();
     hateoasResourceService.patchResource(simpleResource)
       .subscribe(() => {
-        const url = resourceHttpServiceSpy.patch.calls.argsFor(0)[0];
+        const url = vi.mocked(resourceHttpServiceSpy.patch).mock.calls[0][0];
         expect(url).toBe(simpleResource._links.self.href);
       });
   });
 
   it('PATCH_RESOURCE should resolve resource values', () => {
-    resourceHttpServiceSpy.patch.and.returnValue(of(anything()));
+    resourceHttpServiceSpy.patch.mockReturnValue(of({}));
     const resourceWithRelation = new ResourceWithRelation();
     resourceWithRelation.relation = new ResourceRelation();
 
     hateoasResourceService.patchResource(resourceWithRelation)
       .subscribe(() => {
-        const body = resourceHttpServiceSpy.patch.calls.argsFor(0)[1];
+        const body = vi.mocked(resourceHttpServiceSpy.patch).mock.calls[0][1];
         expect(body).toBeDefined();
         expect(body.relation).toBe('http://localhost:8080/api/v1/resourceRelation/1');
       });
   });
 
   it('PATCH_RESOURCE should resolve resource values considering null values', () => {
-    resourceHttpServiceSpy.patch.and.returnValue(of(anything()));
+    resourceHttpServiceSpy.patch.mockReturnValue(of({}));
     const resourceWithRelation = new ResourceWithRelation();
     resourceWithRelation.name = null;
 
     hateoasResourceService.patchResource(resourceWithRelation, {
       body: resourceWithRelation,
-      valuesOption: {include: Include.NULL_VALUES}
+      valuesOption: { include: Include.NULL_VALUES }
     })
       .subscribe(() => {
-        const body = resourceHttpServiceSpy.patch.calls.argsFor(0)[1];
+        const body = vi.mocked(resourceHttpServiceSpy.patch).mock.calls[0][1];
         expect(body).toBeDefined();
         expect(body.name).toBeNull();
       });
   });
 
   it('PATCH_RESOURCE should pass options to http request', () => {
-    resourceHttpServiceSpy.patch.and.returnValue(of(anything()));
+    resourceHttpServiceSpy.patch.mockReturnValue(of({}));
 
-    hateoasResourceService.patchResource(new SimpleResource(), {body: {param: 'test'}})
+    hateoasResourceService.patchResource(new SimpleResource(), { body: { param: 'test' } })
       .subscribe(() => {
-        const body = resourceHttpServiceSpy.patch.calls.argsFor(0)[1];
+        const body = vi.mocked(resourceHttpServiceSpy.patch).mock.calls[0][1];
         expect(body).toBeDefined();
-        expect(body).toEqual({param: 'test'});
+        expect(body).toEqual({ param: 'test' });
       });
   });
 
   it('PATCH_RESOURCE should pass requestBody as body', () => {
-    resourceHttpServiceSpy.patch.and.returnValue(of(anything()));
+    resourceHttpServiceSpy.patch.mockReturnValue(of({}));
     const requestOption: RequestOption = {
       params: {
         testParam: 'testsRequest'
@@ -371,15 +370,15 @@ describe('HateoasResourceService', () => {
       withCredentials: false
     };
 
-    hateoasResourceService.patchResource(new SimpleResource(), {body: {param: 'test'}}, requestOption)
+    hateoasResourceService.patchResource(new SimpleResource(), { body: { param: 'test' } }, requestOption)
       .subscribe(() => {
-        const options = resourceHttpServiceSpy.patch.calls.argsFor(0)[2] as RequestOption;
+        const options = vi.mocked(resourceHttpServiceSpy.patch).mock.calls[0][2] as RequestOption;
         expect(options).toEqual(requestOption);
       });
   });
 
   it('PATCH_RESOURCE_BY_ID should throw error when passed id is empty', () => {
-    expect(() => hateoasResourceService.patchResourceById(SimpleResource, '', {body: {param: 'test'}}))
+    expect(() => hateoasResourceService.patchResourceById(SimpleResource, '', { body: { param: 'test' } }))
       .toThrowError(`Passed param(s) 'id = ' is not valid`);
   });
 
@@ -394,36 +393,36 @@ describe('HateoasResourceService', () => {
   });
 
   it('PATCH_RESOURCE_BY_ID should resolve resource values', () => {
-    resourceHttpServiceSpy.patchResource.and.returnValue(of(anything()));
+    resourceHttpServiceSpy.patchResource.mockReturnValue(of({}));
     const resourceWithRelation = new ResourceWithRelation();
     resourceWithRelation.relation = new ResourceRelation();
 
-    hateoasResourceService.patchResourceById(ResourceWithRelation, 1, {body: resourceWithRelation})
+    hateoasResourceService.patchResourceById(ResourceWithRelation, 1, { body: resourceWithRelation })
       .subscribe(() => {
-        const body = resourceHttpServiceSpy.patchResource.calls.argsFor(0)[3];
+        const body = vi.mocked(resourceHttpServiceSpy.patchResource).mock.calls[0][3];
         expect(body).toBeDefined();
         expect(body.relation).toBe('http://localhost:8080/api/v1/resourceRelation/1');
       });
   });
 
   it('PATCH_RESOURCE_BY_ID should resolve resource values considering null values', () => {
-    resourceHttpServiceSpy.patchResource.and.returnValue(of(anything()));
+    resourceHttpServiceSpy.patchResource.mockReturnValue(of({}));
     const resourceWithRelation = new ResourceWithRelation();
     resourceWithRelation.name = null;
 
     hateoasResourceService.patchResourceById(ResourceWithRelation, 1, {
       body: resourceWithRelation,
-      valuesOption: {include: Include.NULL_VALUES}
+      valuesOption: { include: Include.NULL_VALUES }
     })
       .subscribe(() => {
-        const body = resourceHttpServiceSpy.patchResource.calls.argsFor(0)[3];
+        const body = vi.mocked(resourceHttpServiceSpy.patchResource).mock.calls[0][3];
         expect(body).toBeDefined();
         expect(body.name).toBeNull();
       });
   });
 
   it('PATCH_RESOURCE_BY_ID should pass requestBody as body', () => {
-    resourceHttpServiceSpy.patchResource.and.returnValue(of(anything()));
+    resourceHttpServiceSpy.patchResource.mockReturnValue(of({}));
     const resourceWithRelation = new ResourceWithRelation();
     resourceWithRelation.relation = new ResourceRelation();
     const requestOption: RequestOption = {
@@ -438,9 +437,9 @@ describe('HateoasResourceService', () => {
       withCredentials: false
     };
 
-    hateoasResourceService.patchResourceById(ResourceWithRelation, 1, {body: resourceWithRelation}, requestOption)
+    hateoasResourceService.patchResourceById(ResourceWithRelation, 1, { body: resourceWithRelation }, requestOption)
       .subscribe(() => {
-        const options = resourceHttpServiceSpy.patchResource.calls.argsFor(0)[4] as RequestOption;
+        const options = vi.mocked(resourceHttpServiceSpy.patchResource).mock.calls[0][4] as RequestOption;
         expect(options).toEqual(requestOption);
       });
   });
@@ -456,42 +455,42 @@ describe('HateoasResourceService', () => {
   });
 
   it('DELETE_RESOURCE should doing the request to the passed resource self link', () => {
-    resourceHttpServiceSpy.delete.and.returnValue(of(anything()));
+    resourceHttpServiceSpy.delete.mockReturnValue(of({}));
 
     const simpleResource = new SimpleResource();
     hateoasResourceService.deleteResource(simpleResource)
       .subscribe(() => {
-        const url = resourceHttpServiceSpy.delete.calls.argsFor(0)[0];
+        const url = vi.mocked(resourceHttpServiceSpy.delete).mock.calls[0][0];
         expect(url).toBe(simpleResource._links.self.href);
       });
   });
 
   it('DELETE_RESOURCE should pass option params as http request params', () => {
-    resourceHttpServiceSpy.delete.and.returnValue(of(anything()));
+    resourceHttpServiceSpy.delete.mockReturnValue(of({}));
 
     const simpleResource = new SimpleResource();
-    hateoasResourceService.deleteResource(simpleResource, {params: {test: 'param'}})
+    hateoasResourceService.deleteResource(simpleResource, { params: { test: 'param' } })
       .subscribe(() => {
-        const params = resourceHttpServiceSpy.delete.calls.argsFor(0)[1].params as RequestParam;
+        const params = vi.mocked(resourceHttpServiceSpy.delete).mock.calls[0][1].params as RequestParam;
         expect(params).toBeDefined();
-        expect(params.test).toBe('param');
+        expect(params['test']).toBe('param');
       });
   });
 
   it('DELETE_RESOURCE should pass observe value if it specified', () => {
-    resourceHttpServiceSpy.delete.and.returnValue(of(anything()));
+    resourceHttpServiceSpy.delete.mockReturnValue(of({}));
 
     const simpleResource = new SimpleResource();
-    hateoasResourceService.deleteResource(simpleResource, {observe: 'response'})
+    hateoasResourceService.deleteResource(simpleResource, { observe: 'response' })
       .subscribe(() => {
-        const observe = resourceHttpServiceSpy.delete.calls.argsFor(0)[1].observe;
+        const observe = vi.mocked(resourceHttpServiceSpy.delete).mock.calls[0][1].observe;
         expect(observe).toBeDefined();
         expect(observe).toBe('response');
       });
   });
 
   it('DELETE_RESOURCE should pass requestBody as body', () => {
-    resourceHttpServiceSpy.delete.and.returnValue(of(anything()));
+    resourceHttpServiceSpy.delete.mockReturnValue(of({}));
     const requestOption: RequestOption = {
       params: {
         testParam: 'testsRequest'
@@ -507,7 +506,7 @@ describe('HateoasResourceService', () => {
     const simpleResource = new SimpleResource();
     hateoasResourceService.deleteResource(simpleResource, requestOption)
       .subscribe(() => {
-        const options = resourceHttpServiceSpy.delete.calls.argsFor(0)[1] as RequestOption;
+        const options = vi.mocked(resourceHttpServiceSpy.delete).mock.calls[0][1] as RequestOption;
         expect(options).toEqual(requestOption);
       });
   });
@@ -528,29 +527,29 @@ describe('HateoasResourceService', () => {
   });
 
   it('DELETE_RESOURCE_BY_ID should pass option params as http request params', () => {
-    resourceHttpServiceSpy.deleteResource.and.returnValue(of(anything()));
+    resourceHttpServiceSpy.deleteResource.mockReturnValue(of({}));
 
-    hateoasResourceService.deleteResourceById(SimpleResource, 1, {params: {test: 'param'}})
+    hateoasResourceService.deleteResourceById(SimpleResource, 1, { params: { test: 'param' } })
       .subscribe(() => {
-        const params = resourceHttpServiceSpy.deleteResource.calls.argsFor(0)[3].params as RequestParam;
+        const params = vi.mocked(resourceHttpServiceSpy.deleteResource).mock.calls[0][3].params as RequestParam;
         expect(params).toBeDefined();
-        expect(params.test).toBe('param');
+        expect(params['test']).toBe('param');
       });
   });
 
   it('DELETE_RESOURCE_BY_ID should pass observe value if it specified', () => {
-    resourceHttpServiceSpy.deleteResource.and.returnValue(of(anything()));
+    resourceHttpServiceSpy.deleteResource.mockReturnValue(of({}));
 
-    hateoasResourceService.deleteResourceById(SimpleResource, 1, {observe: 'response'})
+    hateoasResourceService.deleteResourceById(SimpleResource, 1, { observe: 'response' })
       .subscribe(() => {
-        const observe = resourceHttpServiceSpy.deleteResource.calls.argsFor(0)[3].observe;
+        const observe = vi.mocked(resourceHttpServiceSpy.deleteResource).mock.calls[0][3].observe;
         expect(observe).toBeDefined();
         expect(observe).toBe('response');
       });
   });
 
   it('DELETE_RESOURCE_BY_ID should pass requestBody as body', () => {
-    resourceHttpServiceSpy.deleteResource.and.returnValue(of(anything()));
+    resourceHttpServiceSpy.deleteResource.mockReturnValue(of({}));
     const requestOption: RequestOption = {
       params: {
         testParam: 'testsRequest'
@@ -565,7 +564,7 @@ describe('HateoasResourceService', () => {
 
     hateoasResourceService.deleteResourceById(SimpleResource, 1, requestOption)
       .subscribe(() => {
-        const options = resourceHttpServiceSpy.deleteResource.calls.argsFor(0)[3] as RequestOption;
+        const options = vi.mocked(resourceHttpServiceSpy.deleteResource).mock.calls[0][3] as RequestOption;
         expect(options).toEqual(requestOption);
       });
   });
@@ -617,7 +616,7 @@ describe('HateoasResourceService', () => {
 
 
   it('CUSTOM_QUERY should throw error when passed query is empty', () => {
-    expect(() => hateoasResourceService.customQuery(SimpleResource, HttpMethod.POST, '', {body: new SimpleResource()}))
+    expect(() => hateoasResourceService.customQuery(SimpleResource, HttpMethod.POST, '', { body: new SimpleResource() }))
       .toThrowError(`Passed param(s) 'query = ' is not valid`);
   });
 
@@ -632,34 +631,34 @@ describe('HateoasResourceService', () => {
   });
 
   it('CUSTOM_QUERY should resolve resource values', () => {
-    commonHttpServiceSpy.customQuery.and.returnValue(of(anything()));
+    commonHttpServiceSpy.customQuery.mockReturnValue(of({}));
     const resourceWithRelation = new ResourceWithRelation();
     resourceWithRelation.relation = new ResourceRelation();
 
-    hateoasResourceService.customQuery(ResourceWithRelation, HttpMethod.POST, 'query', {body: resourceWithRelation})
+    hateoasResourceService.customQuery(ResourceWithRelation, HttpMethod.POST, 'query', { body: resourceWithRelation })
       .subscribe(() => {
-        const body = commonHttpServiceSpy.customQuery.calls.argsFor(0)[4];
+        const body = vi.mocked(commonHttpServiceSpy.customQuery).mock.calls[0][4];
         expect(body).toBeDefined();
         expect(body.relation).toBe('http://localhost:8080/api/v1/resourceRelation/1');
       });
   });
 
   it('CUSTOM_QUERY should resolve resource values considering null values', () => {
-    commonHttpServiceSpy.customQuery.and.returnValue(of(anything()));
+    commonHttpServiceSpy.customQuery.mockReturnValue(of({}));
     const resourceWithRelation = new ResourceWithRelation();
     resourceWithRelation.name = null;
 
-    hateoasResourceService.customQuery(ResourceWithRelation, HttpMethod.POST, 'query',
-      {body: resourceWithRelation, valuesOption: {include: Include.NULL_VALUES}})
+    hateoasResourceService.customQuery(ResourceWithRelation, HttpMethod.POST,
+      'query', { body: resourceWithRelation, valuesOption: { include: Include.NULL_VALUES } })
       .subscribe(() => {
-        const body = commonHttpServiceSpy.customQuery.calls.argsFor(0)[4];
+        const body = vi.mocked(commonHttpServiceSpy.customQuery).mock.calls[0][4];
         expect(body).toBeDefined();
         expect(body.name).toBeNull();
       });
   });
 
   it('CUSTOM_SEARCH_QUERY should throw error when passed query is empty', () => {
-    expect(() => hateoasResourceService.customSearchQuery(SimpleResource, HttpMethod.POST, '', {body: new SimpleResource()}))
+    expect(() => hateoasResourceService.customSearchQuery(SimpleResource, HttpMethod.POST, '', { body: new SimpleResource() }))
       .toThrowError(`Passed param(s) 'searchQuery = ' is not valid`);
   });
 
@@ -674,49 +673,51 @@ describe('HateoasResourceService', () => {
   });
 
   it('CUSTOM_SEARCH_QUERY should resolve resource values', () => {
-    commonHttpServiceSpy.customQuery.and.returnValue(of(anything()));
+    commonHttpServiceSpy.customQuery.mockReturnValue(of({}));
     const resourceWithRelation = new ResourceWithRelation();
     resourceWithRelation.relation = new ResourceRelation();
 
-    hateoasResourceService.customSearchQuery(ResourceWithRelation, HttpMethod.POST, 'searchQuery', {body: resourceWithRelation})
+    hateoasResourceService.customSearchQuery(ResourceWithRelation, HttpMethod.POST, 'searchQuery', { body: resourceWithRelation })
       .subscribe(() => {
-        const body = commonHttpServiceSpy.customQuery.calls.argsFor(0)[4];
+        const body = vi.mocked(commonHttpServiceSpy.customQuery).mock.calls[0][4];
         expect(body).toBeDefined();
         expect(body.relation).toBe('http://localhost:8080/api/v1/resourceRelation/1');
       });
   });
 
   it('CUSTOM_SEARCH_QUERY should resolve resource values considering null values', () => {
-    commonHttpServiceSpy.customQuery.and.returnValue(of(anything()));
+    commonHttpServiceSpy.customQuery.mockReturnValue(of({}));
     const resourceWithRelation = new ResourceWithRelation();
     resourceWithRelation.name = null;
 
-    hateoasResourceService.customSearchQuery(ResourceWithRelation, HttpMethod.POST, 'searchQuery',
-      {body: resourceWithRelation, valuesOption: {include: Include.NULL_VALUES}})
+    hateoasResourceService.customSearchQuery(ResourceWithRelation, HttpMethod.POST, 'searchQuery', {
+      body: resourceWithRelation,
+      valuesOption: { include: Include.NULL_VALUES }
+    })
       .subscribe(() => {
-        const body = commonHttpServiceSpy.customQuery.calls.argsFor(0)[4];
+        const body = vi.mocked(commonHttpServiceSpy.customQuery).mock.calls[0][4];
         expect(body).toBeDefined();
         expect(body.name).toBeNull();
       });
   });
 
   it('CUSTOM_SEARCH_QUERY should put \'search\' path to result url', () => {
-    commonHttpServiceSpy.customQuery.and.returnValue(of(anything()));
+    commonHttpServiceSpy.customQuery.mockReturnValue(of({}));
 
     hateoasResourceService.customSearchQuery(SimpleResource, HttpMethod.GET, 'searchQuery')
       .subscribe(() => {
-        const url = commonHttpServiceSpy.customQuery.calls.argsFor(0)[3];
+        const url = vi.mocked(commonHttpServiceSpy.customQuery).mock.calls[0][3];
         expect(url).toBeDefined();
         expect(url).toBe('/search/searchQuery');
       });
   });
 
   it('CUSTOM_SEARCH_QUERY should put \'search\' path without additional slash to result url', () => {
-    commonHttpServiceSpy.customQuery.and.returnValue(of(anything()));
+    commonHttpServiceSpy.customQuery.mockReturnValue(of({}));
 
     hateoasResourceService.customSearchQuery(SimpleResource, HttpMethod.GET, '/searchQuery')
       .subscribe(() => {
-        const url = commonHttpServiceSpy.customQuery.calls.argsFor(0)[3];
+        const url = vi.mocked(commonHttpServiceSpy.customQuery).mock.calls[0][3];
         expect(url).toBeDefined();
         expect(url).toBe('/search/searchQuery');
       });
@@ -725,7 +726,7 @@ describe('HateoasResourceService', () => {
   it('EVICT_RESOURCES_CACHE should evict all resources cache', () => {
     hateoasResourceService.evictResourcesCache();
 
-    expect(resourceCacheService.evictAll.calls.count()).toBe(1);
+    expect(vi.mocked(resourceCacheService.evictAll).mock.calls.length).toBe(1);
   });
 
 });

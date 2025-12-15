@@ -1,14 +1,14 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 /* tslint:disable:no-string-literal */
-
-import {PagedResourceCollection} from './paged-resource-collection';
-import {SimpleResourceCollection} from './resources.test';
-import {TestBed, waitForAsync} from '@angular/core/testing';
-import {PagedResourceCollectionHttpService} from '../../service/internal/paged-resource-collection-http.service';
-import {DependencyInjector} from '../../util/dependency-injector';
-import {of} from 'rxjs';
-import {ResourceCollection} from './resource-collection';
-import {PagedGetOption, Sort} from '../declarations';
-import {Injector} from '@angular/core';
+import { PagedResourceCollection } from './paged-resource-collection';
+import { SimpleResourceCollection } from './resources.test-utils';
+import { TestBed } from '@angular/core/testing';
+import { PagedResourceCollectionHttpService } from '../../service/internal/paged-resource-collection-http.service';
+import { DependencyInjector } from '../../util/dependency-injector';
+import { of } from 'rxjs';
+import { ResourceCollection } from './resource-collection';
+import { PagedGetOption, Sort } from '../declarations';
+import { Injector } from '@angular/core';
 
 describe('PagedResourceCollection', () => {
 
@@ -40,17 +40,17 @@ describe('PagedResourceCollection', () => {
   };
   let pagedResourceCollectionHttpServiceSpy: any;
 
-  beforeEach(waitForAsync(() => {
+  beforeEach(async () => {
     pagedResourceCollectionHttpServiceSpy = {
-      get: jasmine.createSpy('get')
+      get: vi.fn()
     };
 
-    TestBed.configureTestingModule({
+    await TestBed.configureTestingModule({
       providers: [
-        {provide: PagedResourceCollectionHttpService, useValue: pagedResourceCollectionHttpServiceSpy}
+        { provide: PagedResourceCollectionHttpService, useValue: pagedResourceCollectionHttpServiceSpy }
       ]
     }).compileComponents();
-  }));
+  });
 
   beforeEach(() => {
     DependencyInjector.injector = TestBed.inject(Injector);
@@ -68,10 +68,10 @@ describe('PagedResourceCollection', () => {
     expect(pagedResourceCollection.pageSize).toBe(20);
     expect(pagedResourceCollection.totalElements).toBe(0);
     expect(pagedResourceCollection.totalPages).toBe(1);
-    expect(pagedResourceCollection.hasFirst()).toBeFalse();
-    expect(pagedResourceCollection.hasNext()).toBeFalse();
-    expect(pagedResourceCollection.hasPrev()).toBeFalse();
-    expect(pagedResourceCollection.hasLast()).toBeFalse();
+    expect(pagedResourceCollection.hasFirst()).toBe(false);
+    expect(pagedResourceCollection.hasNext()).toBe(false);
+    expect(pagedResourceCollection.hasPrev()).toBe(false);
+    expect(pagedResourceCollection.hasLast()).toBe(false);
   });
 
   it('should sets passed PageData', () => {
@@ -90,10 +90,10 @@ describe('PagedResourceCollection', () => {
     expect(pagedResourceCollection.pageSize).toBe(pageData.page.size);
     expect(pagedResourceCollection.totalElements).toBe(pageData.page.totalElements);
     expect(pagedResourceCollection.totalPages).toBe(pageData.page.totalPages);
-    expect(pagedResourceCollection.hasFirst()).toBeFalse();
-    expect(pagedResourceCollection.hasNext()).toBeFalse();
-    expect(pagedResourceCollection.hasPrev()).toBeFalse();
-    expect(pagedResourceCollection.hasLast()).toBeFalse();
+    expect(pagedResourceCollection.hasFirst()).toBe(false);
+    expect(pagedResourceCollection.hasNext()).toBe(false);
+    expect(pagedResourceCollection.hasPrev()).toBe(false);
+    expect(pagedResourceCollection.hasLast()).toBe(false);
   });
 
   it('should sets passed PageData with links', () => {
@@ -104,19 +104,19 @@ describe('PagedResourceCollection', () => {
     expect(pagedResourceCollection.pageSize).toBe(pageDataWithLinks.page.size);
     expect(pagedResourceCollection.totalElements).toBe(pageDataWithLinks.page.totalElements);
     expect(pagedResourceCollection.totalPages).toBe(pageDataWithLinks.page.totalPages);
-    expect(pagedResourceCollection.hasFirst()).toBeTrue();
-    expect(pagedResourceCollection.hasNext()).toBeTrue();
-    expect(pagedResourceCollection.hasPrev()).toBeTrue();
-    expect(pagedResourceCollection.hasLast()).toBeTrue();
+    expect(pagedResourceCollection.hasFirst()).toBe(true);
+    expect(pagedResourceCollection.hasNext()).toBe(true);
+    expect(pagedResourceCollection.hasPrev()).toBe(true);
+    expect(pagedResourceCollection.hasLast()).toBe(true);
   });
 
   it('CUSTOM_PAGE should apply page params when perform custom page query', () => {
-    pagedResourceCollectionHttpServiceSpy.get.and.returnValue(of(new PagedResourceCollection(new ResourceCollection())));
+    pagedResourceCollectionHttpServiceSpy.get.mockReturnValue(of(new PagedResourceCollection(new ResourceCollection())));
 
     const pagedResourceCollection = new PagedResourceCollection(new SimpleResourceCollection(), pageDataWithLinks);
-    pagedResourceCollection.customPage({pageParams: {page: 2, size: 8}, sort: {first: 'ASC', second: 'DESC'}})
+    pagedResourceCollection.customPage({ pageParams: { page: 2, size: 8 }, sort: { first: 'ASC', second: 'DESC' } })
       .subscribe(() => {
-        const options: PagedGetOption = pagedResourceCollectionHttpServiceSpy.get.calls.argsFor(0)[1];
+        const options: PagedGetOption = vi.mocked(pagedResourceCollectionHttpServiceSpy.get).mock.calls[0][1];
         expect(options).toBeDefined();
         expect(options.pageParams).toBeDefined();
         expect(options.pageParams.page).toBeDefined();
@@ -126,30 +126,30 @@ describe('PagedResourceCollection', () => {
         expect(options.pageParams.size).toEqual(8);
 
         expect(options.sort).toBeDefined();
-        expect(options.sort.first).toBeDefined();
-        expect(options.sort.first).toEqual('ASC');
-        expect(options.sort.second).toBeDefined();
-        expect(options.sort.second).toEqual('DESC');
+        expect(options.sort['first']).toBeDefined();
+        expect(options.sort['first']).toEqual('ASC');
+        expect(options.sort['second']).toBeDefined();
+        expect(options.sort['second']).toEqual('DESC');
       });
   });
 
   it('CUSTOM_PAGE should clear previous page params', () => {
-    pagedResourceCollectionHttpServiceSpy.get.and.returnValue(of(new PagedResourceCollection(new ResourceCollection())));
+    pagedResourceCollectionHttpServiceSpy.get.mockReturnValue(of(new PagedResourceCollection(new ResourceCollection())));
 
     const pagedResourceCollection = new PagedResourceCollection(new SimpleResourceCollection(), pageDataWithLinks);
-    pagedResourceCollection.customPage({pageParams: {page: 2, size: 8}, sort: {first: 'ASC', second: 'DESC'}})
+    pagedResourceCollection.customPage({ pageParams: { page: 2, size: 8 }, sort: { first: 'ASC', second: 'DESC' } })
       .subscribe(() => {
-        const urlString: string = pagedResourceCollectionHttpServiceSpy.get.calls.argsFor(0)[0];
+        const urlString: string = vi.mocked(pagedResourceCollectionHttpServiceSpy.get).mock.calls[0][0];
         const url = new URL(urlString);
 
-        expect(url.searchParams.has('page')).toBeFalse();
-        expect(url.searchParams.has('size')).toBeFalse();
-        expect(url.searchParams.has('sort')).toBeFalse();
+        expect(url.searchParams.has('page')).toBe(false);
+        expect(url.searchParams.has('size')).toBe(false);
+        expect(url.searchParams.has('sort')).toBe(false);
       });
   });
 
   it('CUSTOM_PAGE should use sort params passed as params', () => {
-    pagedResourceCollectionHttpServiceSpy.get.and.returnValue(of(new PagedResourceCollection(new ResourceCollection())));
+    pagedResourceCollectionHttpServiceSpy.get.mockReturnValue(of(new PagedResourceCollection(new ResourceCollection())));
 
     const pagedResourceCollection = new PagedResourceCollection(new SimpleResourceCollection(), {
       ...pageDataWithLinks,
@@ -160,22 +160,22 @@ describe('PagedResourceCollection', () => {
         }
       }
     });
-    const sortParams: Sort = {first: 'ASC', second: 'DESC'};
-    pagedResourceCollection.customPage({pageParams: {page: 2, size: 8}, sort: sortParams})
+    const sortParams: Sort = { first: 'ASC', second: 'DESC' };
+    pagedResourceCollection.customPage({ pageParams: { page: 2, size: 8 }, sort: sortParams })
       .subscribe((customPageCollection) => {
-        const urlString: string = pagedResourceCollectionHttpServiceSpy.get.calls.argsFor(0)[0];
+        const urlString: string = vi.mocked(pagedResourceCollectionHttpServiceSpy.get).mock.calls[0][0];
         const url = new URL(urlString);
-        expect(url.searchParams.has('page')).toBeFalse();
-        expect(url.searchParams.has('size')).toBeFalse();
-        expect(url.searchParams.has('sort')).toBeFalse();
+        expect(url.searchParams.has('page')).toBe(false);
+        expect(url.searchParams.has('size')).toBe(false);
+        expect(url.searchParams.has('sort')).toBe(false);
 
-        const actualSortParams = pagedResourceCollectionHttpServiceSpy.get.calls.argsFor(0)[1].sort;
+        const actualSortParams = vi.mocked(pagedResourceCollectionHttpServiceSpy.get).mock.calls[0][1].sort;
         expect(sortParams).toBe(actualSortParams);
       });
   });
 
   it('CUSTOM_PAGE should use previous sort params when sort params is not passed', () => {
-    pagedResourceCollectionHttpServiceSpy.get.and.returnValue(of(new PagedResourceCollection(new ResourceCollection())));
+    pagedResourceCollectionHttpServiceSpy.get.mockReturnValue(of(new PagedResourceCollection(new ResourceCollection())));
 
     const pagedResourceCollection = new PagedResourceCollection(new SimpleResourceCollection(), {
       ...pageDataWithLinks,
@@ -186,18 +186,19 @@ describe('PagedResourceCollection', () => {
         }
       }
     });
-    pagedResourceCollection.customPage({pageParams: {page: 2, size: 8}})
+    pagedResourceCollection.customPage({ pageParams: { page: 2, size: 8 } })
       .subscribe((customPageCollection) => {
-        const urlString: string = pagedResourceCollectionHttpServiceSpy.get.calls.argsFor(0)[0];
+        const urlString: string = vi.mocked(pagedResourceCollectionHttpServiceSpy.get).mock.calls[0][0];
         const url = new URL(urlString);
-        expect(url.searchParams.has('page')).toBeFalse();
-        expect(url.searchParams.has('size')).toBeFalse();
-        expect(url.searchParams.has('sort')).toBeTrue();
+        expect(url.searchParams.has('page')).toBe(false);
+        expect(url.searchParams.has('size')).toBe(false);
+        expect(url.searchParams.has('sort')).toBe(true);
       });
   });
 
   it('PAGE should not change pageSize when request new page', () => {
-    pagedResourceCollectionHttpServiceSpy.get.and.returnValue(of(new PagedResourceCollection(new ResourceCollection(), pageDataWithLinks)));
+    pagedResourceCollectionHttpServiceSpy.get.mockReturnValue(of(
+      new PagedResourceCollection(new ResourceCollection(), pageDataWithLinks)));
 
     const pagedResourceCollection = new PagedResourceCollection(new SimpleResourceCollection(), pageDataWithLinks);
     pagedResourceCollection.page(2).subscribe(pagedCollection => {
@@ -206,4 +207,3 @@ describe('PagedResourceCollection', () => {
   });
 
 });
-

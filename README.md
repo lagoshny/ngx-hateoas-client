@@ -509,31 +509,33 @@ Note, `UserService` extends `HateoasResourceOperation` and uses `HateoasResource
 If you prefer to use standard `TestBed` for testing, you can do that in the following way:
 
 ````ts
+// TODO: check test example
 import {
   HateoasResourceService,
   NgxHateoasClientModule,
   PagedResourceCollection,
   ResourceCollection
 } from '@lagoshny/ngx-hateoas-client';
-// TODO: 
 import { TestBed } from '@angular/core/testing';
 import { of } from 'rxjs';
 
 describe('UserServiceTest', () => {
   
-  let hateoasResourceServiceSpy;
+  let hateoasResourceServiceSpy: Mocked<Pick<HateoasResourceService, 'createResource' | 'searchPage'>>;
   beforeEach(() => {
     hateoasResourceServiceSpy = {
-      createResource: jasmine.createSpy('createResource'),
-      searchPage: jasmine.createSpy('searchPage')
+      createResource: vi.fn(),
+      searchPage: vi.fn(),
     };
 
     TestBed.configureTestingModule({
-      imports: [
-        NgxHateoasClientModule.forRoot()
-      ],
       providers: [
         UserService,
+        provideNgxHateoasClient({
+          http: {
+            rootUrl: 'http://localhost:8080/api/v1'
+          },
+        }),
         {provide: HateoasResourceService, useValue: hateoasResourceServiceSpy}
       ]
     });
@@ -545,13 +547,12 @@ describe('UserServiceTest', () => {
     expect(userService).toBeTruthy();
   });
 
-// TODO:
-  it('should create new user', waitForAsync(() => {
+  it('should create new user', () => {
     const userService = TestBed.inject(UserService);
 
     const newUser = new User();
     newUser.id = '1';
-    hateoasResourceServiceSpy.createResource.and.returnValue(of(newUser));
+    hateoasResourceServiceSpy.createResource.mockReturnValue(of(newUser));
 
     const user = new User();
     user.name = 'Test user';
@@ -559,17 +560,16 @@ describe('UserServiceTest', () => {
       expect(createdUser).toBeTruthy();
       expect(createdUser.id).toEqual('1');
     });
-  }));
-// TODO: 
+  });
 
-  it('should return paged user list', waitForAsync(() => {
+  it('should return paged user list', () => {
     const userService = TestBed.inject(UserService);
 
     const returnedUser = new User();
     returnedUser.id = '1';
     const resourceCollection = new ResourceCollection<User>();
     resourceCollection.resources = [returnedUser];
-    hateoasResourceServiceSpy.searchPage.and.returnValue(of(new PagedResourceCollection(resourceCollection)));
+    hateoasResourceServiceSpy.searchPage.mockReturnValue(of(new PagedResourceCollection(resourceCollection)));
 
     userService.getAllUsersByAge(35).subscribe((users: PagedResourceCollection<User>) => {
       expect(users).toBeTruthy();
@@ -577,8 +577,7 @@ describe('UserServiceTest', () => {
       expect(users.resources[0]).toBeTruthy();
       expect(users.resources[0].id).toEqual('1');
     });
-  }));
-
+  });
 
 });
 
@@ -589,14 +588,13 @@ describe('UserServiceTest', () => {
 If you prefer to use [@ngneat/spectator](https://www.npmjs.com/package/@ngneat/spectator) for testing, you can do that in the following way:
 
 ```ts
+// TODO: check Spectator example
 import {
   HateoasResourceService,
   NgxHateoasClientModule,
   PagedResourceCollection,
   ResourceCollection
 } from '@lagoshny/ngx-hateoas-client';
-// TODO: 
-
 import { waitForAsync } from '@angular/core/testing';
 import { of } from 'rxjs';
 import { createServiceFactory, SpectatorService } from '@ngneat/spectator';
@@ -622,8 +620,6 @@ describe('UserServiceTest', () => {
     expect(userService).toBeTruthy();
   });
 
-// TODO: 
-  
   it('should create new user', waitForAsync(() => {
     const userService = spectator.inject(UserService);
 
@@ -640,8 +636,6 @@ describe('UserServiceTest', () => {
     });
   }));
 
-// TODO: 
-  
   it('should return paged user list', waitForAsync(() => {
     const userService = spectator.inject(UserService);
 

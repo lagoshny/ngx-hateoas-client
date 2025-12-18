@@ -8,15 +8,14 @@
   "scripts": {
     "ng": "ng",
     "build-prod-win": "ng build --configuration production && npm run copy-files-win",
-    "build-publish-win": "npm run test-flow && npm run build-prod-win && cd dist/ngx-hateoas-client && npm publish --tag latest",
+    "build-publish-win": "npm run test && npm run build-prod-win && cd dist/ngx-hateoas-client && npm publish --tag latest",
     "copy-files-win": "copy .\\README.md .\\dist\\ngx-hateoas-client\\ && copy .\\CHANGELOG.md .\\dist\\ngx-hateoas-client\\",
     "build-prod-linux": "ng build --configuration production && npm run copy-files-linux",
-    "build-publish-linux": "npm run test-flow && npm run build-prod-linux && cd dist/ngx-hateoas-client && npm publish --tag latest",
+    "build-publish-linux": "npm run test && npm run build-prod-linux && cd dist/ngx-hateoas-client && npm publish --tag latest",
     "copy-files-linux": "cp ./README.md ./CHANGELOG.md ./dist/ngx-hateoas-client/",
     "start": "ng serve",
     "build": "ng build",
     "test": "ng test",
-    "test-flow": "ng test --browsers=ChromeHeadless --watch=false --progress=false",
     "lint": "ng lint",
     "e2e": "ng e2e"
   },

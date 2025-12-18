@@ -5,7 +5,14 @@ import { Resource } from './resource/resource';
 import { EmbeddedResource } from './resource/embedded-resource';
 import { BaseResource } from './resource/base-resource';
 import { DEFAULT_ROUTE_NAME, ResourceOption } from '../config/hateoas-configuration.interface';
-import { RESOURCE_NAME_PROP, RESOURCE_OPTIONS_PROP } from './declarations';
+import { RESOURCE_NAME_PROP, RESOURCE_OPTIONS_PROP, RESOURCE_PROJECTION_NAME_PROP } from './declarations';
+
+export type ResourceCtor<T extends Resource = Resource> =
+  (new (...args: any[]) => T) & {
+  [RESOURCE_NAME_PROP]?: string;
+  [RESOURCE_OPTIONS_PROP]?: ResourceOption;
+  [RESOURCE_PROJECTION_NAME_PROP]?: string;
+};
 
 
 /**
@@ -15,25 +22,25 @@ import { RESOURCE_NAME_PROP, RESOURCE_OPTIONS_PROP } from './declarations';
  * @param resourceName resource name which will be used to build a resource URL.
  * @param options additional resource options. See more {@link ResourceOption}.
  */
-export function HateoasResource(resourceName: string, options: ResourceOption = {routeName: DEFAULT_ROUTE_NAME}) {
-  return <T extends new(...args: any[]) => any>(constructor: T) => {
-    if (isNull(resourceName) || isUndefined(resourceName) || !resourceName) {
-      throw new Error(`Init resource '${ constructor.name }' error. @HateoasResource decorator param resourceName can not be null/undefined/empty, please pass a valid resourceName.`);
+export function HateoasResource(resourceName: string, options: ResourceOption = { routeName: DEFAULT_ROUTE_NAME }) {
+  return <T extends ResourceCtor>(constructor: T): T => {
+    if (!resourceName) {
+      throw new Error(
+        `Init resource '${constructor.name}' error. ` +
+        `@HateoasResource decorator param resourceName can not be null/undefined/empty.`
+      );
     }
 
     if (!isInstanceOfParent(constructor, Resource)) {
-      throw new Error(`Init resource '${ constructor.name }' error. @HateoasResource decorator applied only to 'Resource' type, you used it with ${ Object.getPrototypeOf(constructor) } type.`);
+      throw new Error(
+        `Init resource '${constructor.name}' error. ` +
+        `@HateoasResource decorator applied only to 'Resource' type.`
+      );
     }
+
     constructor[RESOURCE_NAME_PROP] = resourceName;
-    ResourceUtils.RESOURCE_NAME_TYPE_MAP.set(resourceName.toLowerCase(), constructor);
-
-    if (!options?.routeName) {
-      options = {
-        routeName: DEFAULT_ROUTE_NAME
-      };
-    }
     constructor[RESOURCE_OPTIONS_PROP] = options;
-
+    ResourceUtils.RESOURCE_NAME_TYPE_MAP.set(resourceName.toLowerCase(), constructor);
     return constructor;
   };
 }
@@ -49,11 +56,11 @@ export function HateoasEmbeddedResource(relationNames: Array<string>) {
     if (isNull(relationNames)
       || isUndefined(relationNames)
       || (isArray(relationNames) && isEmpty(relationNames))) {
-      throw new Error(`Init resource '${ constructor.name }' error. @HateoasEmbeddedResource decorator param relationNames can not be null/undefined/empty, please pass a valid relationNames.`);
+      throw new Error(`Init resource '${constructor.name}' error. @HateoasEmbeddedResource decorator param relationNames can not be null/undefined/empty, please pass a valid relationNames.`);
     }
 
     if (!isInstanceOfParent(constructor, EmbeddedResource)) {
-      throw new Error(`Init resource '${ constructor.name }' error. @HateoasEmbeddedResource decorator applied only to 'EmbeddedResource' type, you used it with ${ Object.getPrototypeOf(constructor) } type.`);
+      throw new Error(`Init resource '${constructor.name}' error. @HateoasEmbeddedResource decorator applied only to 'EmbeddedResource' type, you used it with ${Object.getPrototypeOf(constructor)} type.`);
     }
     relationNames.forEach(relationName => {
       ResourceUtils.EMBEDDED_RESOURCE_TYPE_MAP.set(relationName, constructor);
@@ -67,22 +74,46 @@ export function HateoasEmbeddedResource(relationNames: Array<string>) {
  * @param resourceType type of resource that using for projection.
  * @param projectionName name of projection, will be used as projection request param.
  */
-export function HateoasProjection(resourceType: new() => Resource, projectionName: string) {
-  return <T extends new(...args: any[]) => any>(constructor: T) => {
-    if (isNull(resourceType) || isUndefined(resourceType)) {
-      throw new Error(`Init resource projection '${ constructor.name }' error. @HateoasProjection decorator param resourceType can not be null/undefined, please pass a valid resourceType.`);
+export function HateoasProjection(resourceType: ResourceCtor, projectionName: string) {
+  return <T extends ResourceCtor>(constructor: T): T => {
+
+    if (!resourceType) {
+      throw new Error(
+        `Init resource projection '${constructor.name}' error. ` +
+        `@HateoasProjection decorator param resourceType can not be null/undefined.`
+      );
     }
-    if (isNull(projectionName) || isUndefined(projectionName) || !projectionName) {
-      throw new Error(`Init resource projection '${ constructor.name }' error. @HateoasProjection decorator param projectionName can not be null/undefined/empty, please pass a valid projectionName.`);
+
+    if (!projectionName) {
+      throw new Error(
+        `Init resource projection '${constructor.name}' error. ` +
+        `@HateoasProjection decorator param projectionName can not be null/undefined/empty.`
+      );
     }
 
     if (!isInstanceOfParent(constructor, Resource)) {
-      throw new Error(`Init resource projection '${ constructor.name }' error. @HateoasProjection decorator applied only to 'Resource' type, you used it with ${ Object.getPrototypeOf(constructor) } type.`);
+      throw new Error(
+        `Init resource projection '${constructor.name}' error. ` +
+        `@HateoasProjection decorator applied only to 'Resource' type.`
+      );
     }
+
     constructor[RESOURCE_NAME_PROP] = resourceType[RESOURCE_NAME_PROP];
     constructor[RESOURCE_OPTIONS_PROP] = resourceType[RESOURCE_OPTIONS_PROP];
-    constructor['__projectionName__'] = projectionName;
-    ResourceUtils.RESOURCE_NAME_PROJECTION_TYPE_MAP.set(resourceType[RESOURCE_NAME_PROP].toLowerCase(), constructor);
+    constructor[RESOURCE_PROJECTION_NAME_PROP] = projectionName;
+
+    const resourceName = resourceType[RESOURCE_NAME_PROP];
+    if (!resourceName) {
+      throw new Error(
+        `Init resource projection '${constructor.name}' error. ` +
+        `Base resource does not have resource name metadata.`
+      );
+    }
+
+    ResourceUtils.RESOURCE_NAME_PROJECTION_TYPE_MAP.set(
+      resourceName.toLowerCase(),
+      constructor
+    );
 
     return constructor;
   };
@@ -97,7 +128,7 @@ export function HateoasProjection(resourceType: new() => Resource, projectionNam
 export function ProjectionRel(relationType: new() => BaseResource) {
   return (target: object, propertyKey: string) => {
     if (isNull(relationType) || isUndefined(relationType)) {
-      throw new Error(`Init resource projection '${ target.constructor.name }' relation type error. @ProjectionRel decorator param relationType can not be null/undefined, please pass a valid relationType.`);
+      throw new Error(`Init resource projection '${target.constructor.name}' relation type error. @ProjectionRel decorator param relationType can not be null/undefined, please pass a valid relationType.`);
     }
 
     ResourceUtils.RESOURCE_PROJECTION_REL_NAME_TYPE_MAP.set(propertyKey, relationType);

@@ -12,7 +12,7 @@ export class CacheUtils {
    *
    * @param useCache desired param can be undefined when caller has not passed it
    */
-  public static shouldUseCache(useCache: boolean): boolean {
+  public static shouldUseCache(useCache?: boolean): boolean {
     return LibConfig.getConfig().cache.enabled &&
       ((CacheMode.ALWAYS === LibConfig.getConfig().cache.mode && (!isBoolean(useCache) || useCache))
       || (CacheMode.ON_DEMAND === LibConfig.getConfig().cache.mode && isBoolean(useCache) && useCache));

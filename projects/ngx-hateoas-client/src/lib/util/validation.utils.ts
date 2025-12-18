@@ -2,6 +2,7 @@ import { StageLogger } from '../logger/stage-logger';
 import { Stage } from '../logger/stage.enum';
 import { isArray, isEmpty, isFunction, isNil, isObject, isPlainObject, isString } from 'lodash-es';
 import { RESOURCE_NAME_PROP } from '../model/declarations';
+import { isResourceCtor } from '../model/resource-type';
 
 export class ValidationUtils {
 
@@ -15,15 +16,15 @@ export class ValidationUtils {
   public static validateInputParams(params: object): void {
     if (isNil(params)) {
       const errMsg = 'Passed params object is not valid';
-      StageLogger.stageErrorLog(Stage.CHECK_PARAMS, {error: errMsg});
+      StageLogger.stageErrorLog(Stage.CHECK_PARAMS, { error: errMsg });
       throw new Error(errMsg);
     }
 
     const notValidParams = [];
     for (const [key, value] of Object.entries(params)) {
       // tslint:disable-next-line:no-string-literal
-      if (isFunction(value) && isFunction(value.constructor) && !value[RESOURCE_NAME_PROP]) {
-        throw new Error(`Resource '${ value.name }' has not 'resourceName' value. Set it with @HateoasResource decorator on '${ value.name }' class.`);
+      if (isFunction(value) && isFunction(value.constructor) && isResourceCtor(value) && !value[RESOURCE_NAME_PROP]) {
+        throw new Error(`Resource '${value.name}' has not 'resourceName' value. Set it with @HateoasResource decorator on '${value.name}' class.`);
       }
 
       if (isNil(value)
@@ -35,12 +36,12 @@ export class ValidationUtils {
         if (isObject(value)) {
           formattedValue = JSON.stringify(value, null, 2);
         }
-        notValidParams.push(`'${ key } = ${ formattedValue }'`);
+        notValidParams.push(`'${key} = ${formattedValue}'`);
       }
     }
     if (notValidParams.length > 0) {
-      const errMsg = `Passed param(s) ${ notValidParams.join(', ') } ${ notValidParams.length > 1 ? 'are' : 'is' } not valid`;
-      StageLogger.stageErrorLog(Stage.CHECK_PARAMS, {error: errMsg});
+      const errMsg = `Passed param(s) ${notValidParams.join(', ')} ${notValidParams.length > 1 ? 'are' : 'is'} not valid`;
+      StageLogger.stageErrorLog(Stage.CHECK_PARAMS, { error: errMsg });
       throw new Error(errMsg);
     }
   }

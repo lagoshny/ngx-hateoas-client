@@ -15,18 +15,24 @@ export class StageLogger {
     if (!LibConfig.getConfig().logs.verboseLogs && !LibConfig.getConfig().isProduction) {
       return;
     }
-    const paramToLog = this.prepareParams(params);
 
-    let resourceName;
+    let paramToLog: object;
+    if (params) {
+      paramToLog = this.prepareParams(params);
+    } else {
+      paramToLog = {};
+    }
+
+    let resourceName: string;
     if (isString(resource)) {
       resourceName = resource;
     } else if (!isNil(resource)) {
-      resourceName = RESOURCE_NAME_PROP in resource ? resource[RESOURCE_NAME_PROP] : 'EmbeddedResource';
+      resourceName = RESOURCE_NAME_PROP in resource ? String(resource[RESOURCE_NAME_PROP]) : 'EmbeddedResource';
     } else {
       resourceName = 'NOT_DEFINED_RESOURCE_NAME';
     }
-    ConsoleLogger.resourcePrettyInfo(`${ capitalize(resourceName) } ${ method }`,
-      `STAGE ${ Stage.BEGIN }`, paramToLog);
+    ConsoleLogger.resourcePrettyInfo(`${capitalize(resourceName)} ${method}`,
+      `STAGE ${Stage.BEGIN}`, paramToLog);
   }
 
   public static resourceEndLog(resource: object | string, method: string, params: object): void {
@@ -39,11 +45,11 @@ export class StageLogger {
     if (isString(resource)) {
       resourceName = resource;
     } else {
-      resourceName = RESOURCE_NAME_PROP in resource ? resource[RESOURCE_NAME_PROP] : 'EmbeddedResource';
+      resourceName = RESOURCE_NAME_PROP in resource ? String(resource[RESOURCE_NAME_PROP]) : 'EmbeddedResource';
     }
 
-    ConsoleLogger.resourcePrettyInfo(`${ capitalize(resourceName) } ${ method }`,
-      `STAGE ${ Stage.END }`, paramToLog);
+    ConsoleLogger.resourcePrettyInfo(`${capitalize(resourceName)} ${method}`,
+      `STAGE ${Stage.END}`, paramToLog);
   }
 
   public static stageLog(stage: Stage, params: object): void {
@@ -52,7 +58,7 @@ export class StageLogger {
     }
     const paramToLog = this.prepareParams(params);
 
-    ConsoleLogger.prettyInfo(`STAGE ${ stage }`, paramToLog);
+    ConsoleLogger.prettyInfo(`STAGE ${stage}`, paramToLog);
   }
 
   public static stageErrorLog(stage: Stage, params: object): void {
@@ -61,7 +67,7 @@ export class StageLogger {
     }
     const paramToLog = this.prepareParams(params);
 
-    ConsoleLogger.prettyError(`STAGE ${ stage }`, paramToLog);
+    ConsoleLogger.prettyError(`STAGE ${stage}`, paramToLog);
   }
 
   public static stageWarnLog(stage: Stage, params: object): void {
@@ -70,11 +76,11 @@ export class StageLogger {
     }
     const paramToLog = this.prepareParams(params);
 
-    ConsoleLogger.prettyWarn(`STAGE ${ stage }`, paramToLog);
+    ConsoleLogger.prettyWarn(`STAGE ${stage}`, paramToLog);
   }
 
   private static prepareParams(params: object) {
-    const paramToLog = {};
+    const paramToLog: Record<string, any> = {};
     if (isEmpty(params)) {
       return paramToLog;
     }

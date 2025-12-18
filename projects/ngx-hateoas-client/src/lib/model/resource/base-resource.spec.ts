@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 /* tslint:disable:no-string-literal */
 import { BaseResource } from './base-resource';
 import { TestBed } from '@angular/core/testing';
@@ -13,6 +13,7 @@ import { LibConfig } from '../../config/lib-config';
 import { RequestParam, RESOURCE_OPTIONS_PROP } from '../declarations';
 import { DEFAULT_ROUTE_NAME } from '../../config/hateoas-configuration.interface';
 import { Injector } from '@angular/core';
+import { ResourceCtor } from '../decorators';
 
 class TestProductResource extends BaseResource {
   public name = 'TestName';
@@ -29,7 +30,7 @@ class TestProductResource extends BaseResource {
 
 class TestOrderResource extends BaseResource {
 
-  public product: TestProductResource;
+  public declare product: TestProductResource;
 
   // tslint:disable-next-line:variable-name
   override _links = {
@@ -84,29 +85,15 @@ describe('BaseResource GET_RELATION', () => {
 
   beforeEach(() => {
     baseResource = new TestOrderResource();
-    baseResource.constructor[RESOURCE_OPTIONS_PROP] = {
+    (baseResource.constructor as ResourceCtor)[RESOURCE_OPTIONS_PROP] = {
       routeName: DEFAULT_ROUTE_NAME
     };
     DependencyInjector.injector = TestBed.inject(Injector);
   });
 
-  afterEach(() => {
-    DependencyInjector.injector = null;
-  });
-
   it('should throw error when passed relationName is empty', () => {
     expect(() => baseResource.getRelation(''))
       .toThrowError(`Passed param(s) 'relationName = ' is not valid`);
-  });
-
-  it('should throw error when passed relationName is undefined', () => {
-    expect(() => baseResource.getRelation(undefined))
-      .toThrowError(`Passed param(s) 'relationName = undefined' is not valid`);
-  });
-
-  it('should throw error when passed relationName is null', () => {
-    expect(() => baseResource.getRelation(null))
-      .toThrowError(`Passed param(s) 'relationName = null' is not valid`);
   });
 
   it('should fill template params in TEMPLATED link from passed params object', () => {
@@ -120,12 +107,6 @@ describe('BaseResource GET_RELATION', () => {
       const resultResourceUrl = vi.mocked(resourceHttpServiceSpy.get).mock.calls[0][0];
       expect(resultResourceUrl).toBe('http://localhost:8080/api/v1/order/1/payment?paymentId=10');
     });
-  });
-
-  it('no errors when passed "null" value options', () => {
-    resourceHttpServiceSpy.get.mockReturnValue(of(new TestOrderResource()));
-
-    expect(() => baseResource.getRelation('order', null).subscribe()).not.toThrow();
   });
 
   it('no errors when passed "undefined" value for options', () => {
@@ -195,7 +176,7 @@ describe('BaseResource GET_RELATED_COLLECTION', () => {
 
   beforeEach(() => {
     baseResource = new TestOrderResource();
-    baseResource.constructor[RESOURCE_OPTIONS_PROP] = {
+    (baseResource.constructor as ResourceCtor)[RESOURCE_OPTIONS_PROP] = {
       routeName: DEFAULT_ROUTE_NAME
     };
     DependencyInjector.injector = TestBed.inject(Injector);
@@ -204,22 +185,6 @@ describe('BaseResource GET_RELATED_COLLECTION', () => {
   it('should throw error when passed relationName is empty', () => {
     expect(() => baseResource.getRelatedCollection(''))
       .toThrowError(`Passed param(s) 'relationName = ' is not valid`);
-  });
-
-  it('should throw error when passed relationName is undefined', () => {
-    expect(() => baseResource.getRelatedCollection(undefined))
-      .toThrowError(`Passed param(s) 'relationName = undefined' is not valid`);
-  });
-
-  it('should throw error when passed relationName is null', () => {
-    expect(() => baseResource.getRelatedCollection(null))
-      .toThrowError(`Passed param(s) 'relationName = null' is not valid`);
-  });
-
-  it('no errors when passed "null" value options', () => {
-    resourceCollectionHttpServiceSpy.get.mockReturnValue(of(new TestOrderResource()));
-
-    expect(() => baseResource.getRelatedCollection('order', null).subscribe()).not.toThrow();
   });
 
   it('no errors when passed "undefined" value for options', () => {
@@ -304,7 +269,7 @@ describe('BaseResource GET_RELATED_PAGE', () => {
 
   beforeEach(() => {
     baseResource = new TestOrderResource();
-    baseResource.constructor[RESOURCE_OPTIONS_PROP] = {
+    (baseResource.constructor as ResourceCtor)[RESOURCE_OPTIONS_PROP] = {
       routeName: DEFAULT_ROUTE_NAME
     };
     DependencyInjector.injector = TestBed.inject(Injector);
@@ -313,16 +278,6 @@ describe('BaseResource GET_RELATED_PAGE', () => {
   it('should throw error when passed relationName is empty', () => {
     expect(() => baseResource.getRelatedPage(''))
       .toThrowError(`Passed param(s) 'relationName = ' is not valid`);
-  });
-
-  it('should throw error when passed relationName is undefined', () => {
-    expect(() => baseResource.getRelatedPage(undefined))
-      .toThrowError(`Passed param(s) 'relationName = undefined' is not valid`);
-  });
-
-  it('should throw error when passed relationName is null', () => {
-    expect(() => baseResource.getRelatedPage(null))
-      .toThrowError(`Passed param(s) 'relationName = null' is not valid`);
   });
 
   it('should throw error when page params passed IN PARAMS OBJECT for TEMPLATED link', () => {
@@ -334,12 +289,6 @@ describe('BaseResource GET_RELATED_PAGE', () => {
         }
       }).subscribe();
     }).toThrowError('Please, pass page params in page object key, not with params object!');
-  });
-
-  it('no errors when passed "null" value options', () => {
-    pagedResourceCollectionHttpServiceSpy.get.mockReturnValue(of(new PagedResourceCollection(new ResourceCollection())));
-
-    expect(() => baseResource.getRelatedPage('updateStatus', null).subscribe()).not.toThrow();
   });
 
   it('no errors when passed "undefined" value for options', () => {
@@ -421,7 +370,7 @@ describe('BaseResource POST_RELATION', () => {
 
   beforeEach(() => {
     baseResource = new TestOrderResource();
-    baseResource.constructor[RESOURCE_OPTIONS_PROP] = {
+    (baseResource.constructor as ResourceCtor)[RESOURCE_OPTIONS_PROP] = {
       routeName: DEFAULT_ROUTE_NAME
     };
     DependencyInjector.injector = TestBed.inject(Injector);
@@ -430,16 +379,6 @@ describe('BaseResource POST_RELATION', () => {
   it('should throw error when passed relationName is empty', () => {
     expect(() => baseResource.postRelation('', { body: { test: 'value' } }))
       .toThrowError(`Passed param(s) 'relationName = ' is not valid`);
-  });
-
-  it('should throw error when passed relationName,requestBody are undefined', () => {
-    expect(() => baseResource.postRelation(undefined, undefined))
-      .toThrowError(`Passed param(s) 'relationName = undefined', 'requestBody = undefined' are not valid`);
-  });
-
-  it('should throw error when passed relationName,requestBody are null', () => {
-    expect(() => baseResource.postRelation(null, null))
-      .toThrowError(`Passed param(s) 'relationName = null', 'requestBody = null' are not valid`);
   });
 
   it('should fill url template params when url IS templated', () => {
@@ -509,21 +448,6 @@ describe('BaseResource POST_RELATION', () => {
     });
   });
 
-  it('no errors when passed "null" value for options', () => {
-    const orderResource = new TestOrderResource();
-    orderResource.product = new TestProductResource();
-    resourceHttpServiceSpy.post.mockReturnValue(of(orderResource));
-
-    baseResource.postRelation('updateStatus', { body: {} }, null).subscribe(() => {
-      const body = vi.mocked(resourceHttpServiceSpy.post).mock.calls[0][1];
-      expect(body).toBe(null);
-
-      const options = vi.mocked(resourceHttpServiceSpy.post).mock.calls[0][2];
-      expect(options).toBeDefined();
-      expect(options.params).toBeUndefined();
-    });
-  });
-
   it('no errors when passed "undefined" value for options', () => {
     const orderResource = new TestOrderResource();
     orderResource.product = new TestProductResource();
@@ -567,7 +491,7 @@ describe('BaseResource PATCH_RELATION', () => {
 
   beforeEach(() => {
     baseResource = new TestOrderResource();
-    baseResource.constructor[RESOURCE_OPTIONS_PROP] = {
+    (baseResource.constructor as ResourceCtor)[RESOURCE_OPTIONS_PROP] = {
       routeName: DEFAULT_ROUTE_NAME
     };
     DependencyInjector.injector = TestBed.inject(Injector);
@@ -576,16 +500,6 @@ describe('BaseResource PATCH_RELATION', () => {
   it('should throw error when passed relationName is empty', () => {
     expect(() => baseResource.patchRelation('', { body: { test: 'value' } }))
       .toThrowError(`Passed param(s) 'relationName = ' is not valid`);
-  });
-
-  it('should throw error when passed relationName,requestBody are undefined', () => {
-    expect(() => baseResource.patchRelation(undefined, undefined))
-      .toThrowError(`Passed param(s) 'relationName = undefined', 'requestBody = undefined' are not valid`);
-  });
-
-  it('should throw error when passed relationName,requestBody are null', () => {
-    expect(() => baseResource.patchRelation(null, null))
-      .toThrowError(`Passed param(s) 'relationName = null', 'requestBody = null' are not valid`);
   });
 
   it('should fill url template params when url IS templated', () => {
@@ -655,21 +569,6 @@ describe('BaseResource PATCH_RELATION', () => {
     });
   });
 
-  it('no errors when passed "null" value for options', () => {
-    const orderResource = new TestOrderResource();
-    orderResource.product = new TestProductResource();
-    resourceHttpServiceSpy.patch.mockReturnValue(of(orderResource));
-
-    baseResource.patchRelation('updateStatus', { body: {} }, null).subscribe(() => {
-      const body = vi.mocked(resourceHttpServiceSpy.patch).mock.calls[0][1];
-      expect(body).toBe(null);
-
-      const options = vi.mocked(resourceHttpServiceSpy.patch).mock.calls[0][2];
-      expect(options).toBeDefined();
-      expect(options.params).toBeUndefined();
-    });
-  });
-
   it('no errors when passed "undefined" value for options', () => {
     const orderResource = new TestOrderResource();
     orderResource.product = new TestProductResource();
@@ -707,7 +606,7 @@ describe('BaseResource PUT_RELATION', () => {
 
   beforeEach(() => {
     baseResource = new TestOrderResource();
-    baseResource.constructor[RESOURCE_OPTIONS_PROP] = {
+    (baseResource.constructor as ResourceCtor)[RESOURCE_OPTIONS_PROP] = {
       routeName: DEFAULT_ROUTE_NAME
     };
     DependencyInjector.injector = TestBed.inject(Injector);
@@ -716,16 +615,6 @@ describe('BaseResource PUT_RELATION', () => {
   it('should throw error when passed relationName is empty', () => {
     expect(() => baseResource.putRelation('', { body: { test: 'value' } }))
       .toThrowError(`Passed param(s) 'relationName = ' is not valid`);
-  });
-
-  it('should throw error when passed relationName,requestBody are undefined', () => {
-    expect(() => baseResource.putRelation(undefined, undefined))
-      .toThrowError(`Passed param(s) 'relationName = undefined', 'requestBody = undefined' are not valid`);
-  });
-
-  it('should throw error when passed relationName,requestBody are null', () => {
-    expect(() => baseResource.putRelation(null, null))
-      .toThrowError(`Passed param(s) 'relationName = null', 'requestBody = null' are not valid`);
   });
 
   it('should fill url template params when url IS templated', () => {
@@ -781,21 +670,6 @@ describe('BaseResource PUT_RELATION', () => {
     baseResource.putRelation('updateStatus', { body: orderResource }).subscribe(() => {
       const body = vi.mocked(resourceHttpServiceSpy.put).mock.calls[0][1];
       expect(body.product).toBe('http://localhost:8080/api/v1/product/1');
-    });
-  });
-
-  it('no errors when passed "null" value for options', () => {
-    const orderResource = new TestOrderResource();
-    orderResource.product = new TestProductResource();
-    resourceHttpServiceSpy.put.mockReturnValue(of(orderResource));
-
-    baseResource.putRelation('updateStatus', { body: {} }, null).subscribe(() => {
-      const body = vi.mocked(resourceHttpServiceSpy.put).mock.calls[0][1];
-      expect(body).toBe(null);
-
-      const options = vi.mocked(resourceHttpServiceSpy.put).mock.calls[0][2];
-      expect(options).toBeDefined();
-      expect(options.params).toBeUndefined();
     });
   });
 

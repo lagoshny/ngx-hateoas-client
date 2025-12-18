@@ -49,7 +49,7 @@ export class RawResource extends Resource {
 
 @HateoasResource('test')
 export class SimpleResource extends Resource {
-  public name = 'Test';
+  public name: string | null = 'Test';
 
 // tslint:disable-next-line:variable-name
   override _links = {
@@ -78,7 +78,7 @@ export const rawCaseSensitiveResource = {
 @HateoasProjection(SimpleResource, 'simpleProjection')
 export class SimpleResourceProjection extends Resource {
   @ProjectionRel(RawResource)
-  public rawResource: ProjectionRelType<RawResource>;
+  public declare rawResource: ProjectionRelType<RawResource>;
 
   // tslint:disable-next-line:variable-name
   override _links = {
@@ -95,7 +95,7 @@ export class SimpleResourceProjection extends Resource {
 @HateoasEmbeddedResource(['anotherResource'])
 export class SimpleEmbeddedResource extends EmbeddedResource {
 
-  public name: string;
+  public declare name: string;
 
   // tslint:disable-next-line:variable-name
   override _links = {
@@ -250,7 +250,7 @@ export class SimplePagedResourceCollection extends SimpleResourceCollection {
     }
   };
 
-  page: {
+  declare page: {
     totalElements: 100,
     number: 2,
     size: 10,

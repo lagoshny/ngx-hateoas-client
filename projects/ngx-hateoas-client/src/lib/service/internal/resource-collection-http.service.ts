@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LibConfig } from '../../config/lib-config';
-import { Observable, throwError as observableThrowError } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { getResourceType, isResourceCollection } from '../../model/resource-type';
 import { ResourceUtils } from '../../util/resource.utils';
@@ -53,14 +53,15 @@ export class ResourceCollectionHttpService extends HttpExecutor {
             if (LibConfig.getConfig().cache.enabled) {
               this.cacheService.evictResource(CacheKey.of(url, httpOptions));
             }
-            const errMsg = `You try to get the wrong resource type: expected ResourceCollection type, actual ${ getResourceType(data) } type.`;
-            StageLogger.stageErrorLog(Stage.INIT_RESOURCE, {error: errMsg, options});
+            const errMsg = `You try to get the wrong resource type: expected ResourceCollection type,` +
+            ` actual ${getResourceType(data)} type.`;
+            StageLogger.stageErrorLog(Stage.INIT_RESOURCE, { error: errMsg, options });
             throw new Error(errMsg);
           }
 
           return ResourceUtils.instantiateResourceCollection(data, httpOptions?.params?.has('projection')) as T;
         }),
-        catchError(error => observableThrowError(error)));
+        catchError(error => throwError(() => error)));
   }
 
   /**
@@ -74,13 +75,12 @@ export class ResourceCollectionHttpService extends HttpExecutor {
   public getResourceCollection<T extends ResourceCollection<BaseResource>>(resourceName: string,
                                                                            resourceOptions: ResourceOption,
                                                                            options?: GetOption): Observable<T> {
-    ValidationUtils.validateInputParams({resourceName});
-
+    ValidationUtils.validateInputParams({ resourceName });
     const url = UrlUtils.generateResourceUrl(UrlUtils.getApiUrl(resourceOptions.routeName), resourceName);
 
     StageLogger.stageLog(Stage.PREPARE_URL, {
       result: url,
-      urlParts: `baseUrl: '${ UrlUtils.getApiUrl(resourceOptions.routeName) }', resource: '${ resourceName }'`,
+      urlParts: `baseUrl: '${UrlUtils.getApiUrl(resourceOptions.routeName)}', resource: '${resourceName}'`,
       options
     });
 
@@ -100,14 +100,14 @@ export class ResourceCollectionHttpService extends HttpExecutor {
                                                             resourceOptions: ResourceOption,
                                                             searchQuery: string,
                                                             options?: GetOption): Observable<T> {
-    ValidationUtils.validateInputParams({resourceName, searchQuery});
+    ValidationUtils.validateInputParams({ resourceName, searchQuery });
 
     const url = UrlUtils.generateResourceUrl(UrlUtils.getApiUrl(resourceOptions.routeName), resourceName)
       .concat('/search/' + searchQuery);
 
     StageLogger.stageLog(Stage.PREPARE_URL, {
       result: url,
-      urlParts: `baseUrl: '${ UrlUtils.getApiUrl(resourceOptions.routeName) }', resource: '${ resourceName }', searchQuery: '${ searchQuery }'`,
+      urlParts: `baseUrl: '${UrlUtils.getApiUrl(resourceOptions.routeName)}', resource: '${resourceName}', searchQuery: '${searchQuery}'`,
       options
     });
 

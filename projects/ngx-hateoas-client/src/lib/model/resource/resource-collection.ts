@@ -1,5 +1,6 @@
 import { AbstractResource } from './abstract-resource';
 import { BaseResource } from './base-resource';
+import { Link } from '../declarations';
 
 /**
  * Collection of resources without pagination.
@@ -7,6 +8,9 @@ import { BaseResource } from './base-resource';
  * If you want to have a pagination {@see PagedResourceCollection}.
  */
 export class ResourceCollection<T extends BaseResource> extends AbstractResource {
+
+  // tslint:disable-next-line:variable-name
+  declare _links: Link;
 
   public resources: Array<T> = [];
 

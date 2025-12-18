@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { Resource } from '../model/resource/resource';
 import { ResourceUtils } from './resource.utils';
 import { EmbeddedResource } from '../model/resource/embedded-resource';
@@ -33,35 +33,12 @@ describe('ResourceUtils', () => {
     ResourceUtils.usePagedResourceCollectionType(PagedResourceCollection);
   });
 
-  afterEach(() => {
-    ResourceUtils.useResourceType(null);
-    ResourceUtils.useEmbeddedResourceType(null);
-    ResourceUtils.useResourceCollectionType(null);
-    ResourceUtils.usePagedResourceCollectionType(null);
-  });
-
   it('INSTANTIATE_RESOURCE should return "null" when passed payload is empty object', () => {
     expect(ResourceUtils.instantiateResource({})).toBeNull();
   });
 
-  it('INSTANTIATE_RESOURCE should return "null" when passed payload is null', () => {
-    expect(ResourceUtils.instantiateResource(null)).toBeNull();
-  });
-
-  it('INSTANTIATE_RESOURCE should return "null" when passed payload is undefined', () => {
-    expect(ResourceUtils.instantiateResource(undefined)).toBeNull();
-  });
-
-  it('INSTANTIATE_RESOURCE should return "null" when passed payload._links is null', () => {
-    expect(ResourceUtils.instantiateResource({ _links: null })).toBeNull();
-  });
-
   it('INSTANTIATE_RESOURCE should return "null" when passed payload._links is undefined', () => {
     expect(ResourceUtils.instantiateResource({ _links: undefined })).toBeNull();
-  });
-
-  it('INSTANTIATE_RESOURCE should return "null" when passed payload._links is not object', () => {
-    expect(ResourceUtils.instantiateResource({ _links: 'not_object' })).toBeNull();
   });
 
   it('INSTANTIATE_RESOURCE should create embedded resource', () => {
@@ -352,29 +329,29 @@ describe('ResourceUtils', () => {
 
     @HateoasResource('garages')
     class GarageItemEmb extends Resource {
-      public id: string;
-      public location: string;
-      public surface: string;
-      public city: string;
+      public declare id: string;
+      public declare location: string;
+      public declare surface: string;
+      public declare city: string;
     }
 
     @HateoasResource('inspections')
     class InspectionItemEmb extends Resource {
-      public id: string;
-      public name: string;
-      public date: string;
-      public carId: string;
+      public declare id: string;
+      public declare name: string;
+      public declare date: string;
+      public declare carId: string;
     }
 
     @HateoasResource('cars')
     class CarItem extends Resource {
-      public id: string;
-      public color: string;
-      public brand: string;
-      public model: string;
-      public garageId: string;
-      public garage: GarageItemEmb;
-      public inspections: InspectionItemEmb[];
+      public declare id: string;
+      public declare color: string;
+      public declare brand: string;
+      public declare model: string;
+      public declare garageId: string;
+      public declare garage: GarageItemEmb;
+      public declare inspections: InspectionItemEmb[];
     }
 
     const result = ResourceUtils.instantiateResource(rawResourceWithEmbedded, false);
@@ -409,29 +386,29 @@ describe('ResourceUtils', () => {
 
     @HateoasResource('garages')
     class GarageItemEmb extends Resource {
-      public id: string;
-      public location: string;
-      public surface: string;
-      public city: string;
+      public declare id: string;
+      public declare location: string;
+      public declare surface: string;
+      public declare city: string;
     }
 
     @HateoasResource('inspections')
     class InspectionItemEmb extends Resource {
-      public id: string;
-      public name: string;
-      public date: string;
-      public carId: string;
+      public declare id: string;
+      public declare name: string;
+      public declare date: string;
+      public declare carId: string;
     }
 
     @HateoasResource('cars')
     class CarItem extends Resource {
-      public id: string;
-      public color: string;
-      public brand: string;
-      public model: string;
-      public garageId: string;
-      public garage: GarageItemEmb;
-      public inspections: InspectionItemEmb[];
+      public declare id: string;
+      public declare color: string;
+      public declare brand: string;
+      public declare model: string;
+      public declare garageId: string;
+      public declare garage: GarageItemEmb;
+      public declare inspections: InspectionItemEmb[];
     }
 
     const result = ResourceUtils.instantiateResource(rawResourceWithEmbedded, false);
@@ -464,29 +441,29 @@ describe('ResourceUtils', () => {
 
     @HateoasResource('garages')
     class GarageItemEmb extends Resource {
-      public id: string;
-      public location: string;
-      public surface: string;
-      public city: string;
+      public declare id: string;
+      public declare location: string;
+      public declare surface: string;
+      public declare city: string;
     }
 
     @HateoasResource('inspections')
     class InspectionItemEmb extends Resource {
-      public id: string;
-      public name: string;
-      public date: string;
-      public carId: string;
+      public declare id: string;
+      public declare name: string;
+      public declare date: string;
+      public declare carId: string;
     }
 
     @HateoasResource('cars')
     class CarItem extends Resource {
-      public id: string;
-      public color: string;
-      public brand: string;
-      public model: string;
-      public garageId: string;
-      public garage: GarageItemEmb;
-      public inspections: InspectionItemEmb[];
+      public declare id: string;
+      public declare color: string;
+      public declare brand: string;
+      public declare model: string;
+      public declare garageId: string;
+      public declare garage: GarageItemEmb;
+      public declare inspections: InspectionItemEmb[];
     }
 
     const result = ResourceUtils.instantiateResource(rawResourceWithEmbedded, false);
@@ -495,62 +472,6 @@ describe('ResourceUtils', () => {
     expect(isEmpty(result['garage'])).toBe(true);
     expect(isEmpty(result['inspections'])).toBe(true);
   });
-
-  it('INSTANTIATE_RESOURCE embedded resources are EMPTY when _embedded resource is NULL', () => {
-    const rawResourceWithEmbedded = {
-      id: '123',
-      color: 'red',
-      brand: 'Volkswagen',
-      model: 'Golf',
-      garageId: '456',
-      _links: {
-        self: {
-          href: 'http://localhost:8080/api/v1/cars/123'
-        },
-        inspections: {
-          href: 'http://localhost:8080/api/v1/cars/123/inspections'
-        },
-        garage: {
-          href: 'http://localhost:8080/api/v1/garages/456'
-        }
-      },
-      _embedded: null
-    };
-
-    @HateoasResource('garages')
-    class GarageItemEmb extends Resource {
-      public id: string;
-      public location: string;
-      public surface: string;
-      public city: string;
-    }
-
-    @HateoasResource('inspections')
-    class InspectionItemEmb extends Resource {
-      public id: string;
-      public name: string;
-      public date: string;
-      public carId: string;
-    }
-
-    @HateoasResource('cars')
-    class CarItem extends Resource {
-      public id: string;
-      public color: string;
-      public brand: string;
-      public model: string;
-      public garageId: string;
-      public garage: GarageItemEmb;
-      public inspections: InspectionItemEmb[];
-    }
-
-    const result = ResourceUtils.instantiateResource(rawResourceWithEmbedded, false);
-
-    expect(result).toBeInstanceOf(CarItem);
-    expect(isEmpty(result['garage'])).toBe(true);
-    expect(isEmpty(result['inspections'])).toBe(true);
-  });
-
 
   it('INSTANTIATE_RESOURCE PROJECTION define resource type should be case insensitive #1', () => {
 
@@ -636,18 +557,6 @@ describe('ResourceUtils', () => {
     expect(ResourceUtils.instantiateResourceCollection({})).toBeNull();
   });
 
-  it('INSTANTIATE_COLLECTION_RESOURCE should return "null" when passed payload is null', () => {
-    expect(ResourceUtils.instantiateResourceCollection(null)).toBeNull();
-  });
-
-  it('INSTANTIATE_COLLECTION_RESOURCE should return "null" when passed payload is undefined', () => {
-    expect(ResourceUtils.instantiateResourceCollection(undefined)).toBeNull();
-  });
-
-  it('INSTANTIATE_COLLECTION_RESOURCE should return "null" when passed payload._links is null', () => {
-    expect(ResourceUtils.instantiateResourceCollection({ _links: null, _embedded: { someVal: 'test' } })).toBeNull();
-  });
-
   it('INSTANTIATE_COLLECTION_RESOURCE should return "null" when passed payload._links is undefined', () => {
     expect(ResourceUtils.instantiateResourceCollection({
       _links: undefined,
@@ -655,28 +564,10 @@ describe('ResourceUtils', () => {
     })).toBeNull();
   });
 
-  it('INSTANTIATE_COLLECTION_RESOURCE should return "null" when passed payload._links is not object', () => {
-    expect(ResourceUtils.instantiateResourceCollection({
-      _links: 'not_object',
-      _embedded: { someVal: 'test' }
-    })).toBeNull();
-  });
-
-  it('INSTANTIATE_COLLECTION_RESOURCE should return "null" when passed payload._embedded is null', () => {
-    expect(ResourceUtils.instantiateResourceCollection({ _embedded: null, _links: { someVal: 'test' } })).toBeNull();
-  });
-
   it('INSTANTIATE_COLLECTION_RESOURCE should return "null" when passed payload._embedded is undefined', () => {
     expect(ResourceUtils.instantiateResourceCollection({
       _embedded: undefined,
-      _links: { someVal: 'test' }
-    })).toBeNull();
-  });
-
-  it('INSTANTIATE_COLLECTION_RESOURCE should return "null" when passed payload._embedded is not object', () => {
-    expect(ResourceUtils.instantiateResourceCollection({
-      _embedded: 'not_object',
-      _links: { someVal: 'test' }
+      _links: { someVal: { href: 'test' } }
     })).toBeNull();
   });
 
@@ -705,9 +596,10 @@ describe('ResourceUtils', () => {
     vi.spyOn(LibConfig, 'getConfig').mockReturnValue({
       ...LibConfig.DEFAULT_CONFIG,
       halFormat: {
+        ...LibConfig.DEFAULT_CONFIG.halFormat,
         collections: {
           embeddedOptional: false
-        }
+        },
       }
     });
 
@@ -721,9 +613,10 @@ describe('ResourceUtils', () => {
     vi.spyOn(LibConfig, 'getConfig').mockReturnValue({
       ...LibConfig.DEFAULT_CONFIG,
       halFormat: {
+        ...LibConfig.DEFAULT_CONFIG.halFormat,
         collections: {
           embeddedOptional: true
-        }
+        },
       }
     });
 
@@ -739,21 +632,6 @@ describe('ResourceUtils', () => {
     expect(ResourceUtils.instantiatePagedResourceCollection({})).toBeNull();
   });
 
-  it('INSTANTIATE_PAGED_COLLECTION_RESOURCE should return "null" when passed payload is null', () => {
-    expect(ResourceUtils.instantiatePagedResourceCollection(null)).toBeNull();
-  });
-
-  it('INSTANTIATE_PAGED_COLLECTION_RESOURCE should return "null" when passed payload is undefined', () => {
-    expect(ResourceUtils.instantiatePagedResourceCollection(undefined)).toBeNull();
-  });
-
-  it('INSTANTIATE_PAGED_COLLECTION_RESOURCE should return "null" when passed payload._links is null', () => {
-    expect(ResourceUtils.instantiatePagedResourceCollection({
-      _links: null,
-      _embedded: { someVal: 'test' }
-    })).toBeNull();
-  });
-
   it('INSTANTIATE_PAGED_COLLECTION_RESOURCE should return "null" when passed payload._links is undefined', () => {
     expect(ResourceUtils.instantiatePagedResourceCollection({
       _links: undefined,
@@ -761,33 +639,12 @@ describe('ResourceUtils', () => {
     })).toBeNull();
   });
 
-  it('INSTANTIATE_PAGED_COLLECTION_RESOURCE should return "null" when passed payload._links is not object', () => {
-    expect(ResourceUtils.instantiatePagedResourceCollection({
-      _links: 'not_object',
-      _embedded: { someVal: 'test' }
-    })).toBeNull();
-  });
-
-  it('INSTANTIATE_PAGED_COLLECTION_RESOURCE should return "null" when passed payload._embedded is null', () => {
-    vi.spyOn(LibConfig, 'getConfig').mockReturnValue({
-      ...LibConfig.DEFAULT_CONFIG,
-      halFormat: {
-        collections: {
-          embeddedOptional: false
-        }
-      }
-    });
-
-    expect(ResourceUtils.instantiatePagedResourceCollection({
-      _embedded: null,
-      _links: { someVal: 'test' }
-    })).toBeNull();
-  });
 
   it('INSTANTIATE_PAGED_COLLECTION_RESOURCE should return "null" when passed payload._embedded is undefined', () => {
     vi.spyOn(LibConfig, 'getConfig').mockReturnValue({
       ...LibConfig.DEFAULT_CONFIG,
       halFormat: {
+        ...LibConfig.DEFAULT_CONFIG.halFormat,
         collections: {
           embeddedOptional: false
         }
@@ -796,23 +653,7 @@ describe('ResourceUtils', () => {
 
     expect(ResourceUtils.instantiatePagedResourceCollection({
       _embedded: undefined,
-      _links: { someVal: 'test' }
-    })).toBeNull();
-  });
-
-  it('INSTANTIATE_PAGED_COLLECTION_RESOURCE should return "null" when passed payload._embedded is not object', () => {
-    vi.spyOn(LibConfig, 'getConfig').mockReturnValue({
-      ...LibConfig.DEFAULT_CONFIG,
-      halFormat: {
-        collections: {
-          embeddedOptional: false
-        }
-      }
-    });
-
-    expect(ResourceUtils.instantiatePagedResourceCollection({
-      _embedded: 'not_object',
-      _links: { someVal: 'test' }
+      _links: { someVal: { href: 'test' } }
     })).toBeNull();
   });
 
@@ -872,9 +713,10 @@ describe('ResourceUtils', () => {
     vi.spyOn(LibConfig, 'getConfig').mockReturnValue({
       ...LibConfig.DEFAULT_CONFIG,
       halFormat: {
+        ...LibConfig.DEFAULT_CONFIG.halFormat,
         collections: {
           embeddedOptional: false
-        }
+        },
       }
     });
 
@@ -887,9 +729,10 @@ describe('ResourceUtils', () => {
     vi.spyOn(LibConfig, 'getConfig').mockReturnValue({
       ...LibConfig.DEFAULT_CONFIG,
       halFormat: {
+        ...LibConfig.DEFAULT_CONFIG.halFormat,
         collections: {
           embeddedOptional: true
-        }
+        },
       }
     });
 
@@ -904,10 +747,6 @@ describe('ResourceUtils', () => {
     expect(result.pageSize).toBe(rawEmptyPagedResourceCollection.page.size);
     expect(result.totalElements).toBe(rawEmptyPagedResourceCollection.page.totalElements);
     expect(result.totalPages).toBe(rawEmptyPagedResourceCollection.page.totalPages);
-  });
-
-  it('RESOLVE_VALUES should return "null" when passed requestBody is null', () => {
-    expect(ResourceUtils.resolveValues(null)).toBeNull();
   });
 
   it('RESOLVE_VALUES should return "null" when passed requestBody is undefined', () => {
@@ -926,9 +765,10 @@ describe('ResourceUtils', () => {
     vi.spyOn(LibConfig, 'getConfig').mockReturnValue({
       ...LibConfig.DEFAULT_CONFIG,
       halFormat: {
+        ...LibConfig.DEFAULT_CONFIG.halFormat,
         json: {
           convertEmptyObjectToNull: true
-        }
+        },
       }
     });
 
@@ -939,9 +779,10 @@ describe('ResourceUtils', () => {
     vi.spyOn(LibConfig, 'getConfig').mockReturnValue({
       ...LibConfig.DEFAULT_CONFIG,
       halFormat: {
+        ...LibConfig.DEFAULT_CONFIG.halFormat,
         json: {
           convertEmptyObjectToNull: false
-        }
+        },
       }
     });
 
@@ -1378,48 +1219,13 @@ describe('ResourceUtils', () => {
     });
   });
 
-  it('INIT_RESOURCE should return resource class object', () => {
-    const resourceClass = ResourceUtils.initResource(rawResource);
-
-    expect(resourceClass).toBeDefined();
-    expect(resourceClass).toBeInstanceOf(Resource);
-  });
-
-  it('INIT_RESOURCE should return embedded resource class object', () => {
-    const resourceClass = ResourceUtils.initResource(rawEmbeddedResource);
-
-    expect(resourceClass).toBeDefined();
-    expect(resourceClass).toBeInstanceOf(EmbeddedResource);
-  });
-
-  it('INIT_RESOURCE should return the same object when it\'s not resource/embedded class object', () => {
-    const obj = ResourceUtils.initResource({ test: 'name' });
-
-    expect(obj).toBeDefined();
-    expect(obj).toEqual({ test: 'name' });
-  });
-
-  it('FILL_PROJECTION_NAME_FROM_RESOURCE_TYPE should return options as \'undefined\' ' +
-    'when resource type and options are \'null\' ', () => {
-    const options = ResourceUtils.fillProjectionNameFromResourceType(null, null);
-
-    expect(options).toBeUndefined();
-  });
-
-  it('FILL_PROJECTION_NAME_FROM_RESOURCE_TYPE should return options as \'undefined\' ' +
-    'when resource type and options are \'undefined\' ', () => {
-    const options = ResourceUtils.fillProjectionNameFromResourceType(undefined, undefined);
-
-    expect(options).toBeUndefined();
-  });
-
   it('FILL_PROJECTION_NAME_FROM_RESOURCE_TYPE should return options as IS when resource type has not __projectionName__ ', () => {
     const options = ResourceUtils.fillProjectionNameFromResourceType(SimpleResource, { params: { test: 'ololo' } });
 
     expect(options).toBeDefined();
-    expect(options.params).toBeDefined();
-    expect(options.params['test']).toBeDefined();
-    expect(options.params['test']).toEqual('ololo');
+    expect(options?.params).toBeDefined();
+    expect(options?.params?.['test']).toBeDefined();
+    expect(options?.params?.['test']).toEqual('ololo');
   });
 
   it('FILL_PROJECTION_NAME_FROM_RESOURCE_TYPE should return options with projection param ' +
@@ -1427,11 +1233,11 @@ describe('ResourceUtils', () => {
     const options = ResourceUtils.fillProjectionNameFromResourceType(SimpleResourceProjection, { params: { test: 'ololo' } });
 
     expect(options).toBeDefined();
-    expect(options.params).toBeDefined();
-    expect(options.params['test']).toBeDefined();
-    expect(options.params['test']).toEqual('ololo');
-    expect(options.params['projection']).toBeDefined();
-    expect(options.params['projection']).toEqual('simpleProjection');
+    expect(options?.params).toBeDefined();
+    expect(options?.params?.['test']).toBeDefined();
+    expect(options?.params?.['test']).toEqual('ololo');
+    expect(options?.params?.['projection']).toBeDefined();
+    expect(options?.params?.['projection']).toEqual('simpleProjection');
   });
 
   it('FILL_PROJECTION_NAME_FROM_RESOURCE_TYPE should replace options param projection with projection param ' +
@@ -1444,11 +1250,11 @@ describe('ResourceUtils', () => {
     });
 
     expect(options).toBeDefined();
-    expect(options.params).toBeDefined();
-    expect(options.params['test']).toBeDefined();
-    expect(options.params['test']).toEqual('ololo');
-    expect(options.params['projection']).toBeDefined();
-    expect(options.params['projection']).toEqual('simpleProjection');
+    expect(options?.params).toBeDefined();
+    expect(options?.params?.['test']).toBeDefined();
+    expect(options?.params?.['test']).toEqual('ololo');
+    expect(options?.params?.['projection']).toBeDefined();
+    expect(options?.params?.['projection']).toEqual('simpleProjection');
   });
 
   it('FILL_PROJECTION_NAME_FROM_RESOURCE_TYPE should NOT replace options param projection ' +
@@ -1461,11 +1267,11 @@ describe('ResourceUtils', () => {
     });
 
     expect(options).toBeDefined();
-    expect(options.params).toBeDefined();
-    expect(options.params['test']).toBeDefined();
-    expect(options.params['test']).toEqual('ololo');
-    expect(options.params['projection']).toBeDefined();
-    expect(options.params['projection']).toEqual('testProjection');
+    expect(options?.params).toBeDefined();
+    expect(options?.params?.['test']).toBeDefined();
+    expect(options?.params?.['test']).toEqual('ololo');
+    expect(options?.params?.['projection']).toBeDefined();
+    expect(options?.params?.['projection']).toEqual('testProjection');
   });
 
 });

@@ -515,7 +515,8 @@ import {
   PagedResourceCollection,
   ResourceCollection
 } from '@lagoshny/ngx-hateoas-client';
-import { TestBed, waitForAsync } from '@angular/core/testing';
+// TODO: 
+import { TestBed } from '@angular/core/testing';
 import { of } from 'rxjs';
 
 describe('UserServiceTest', () => {
@@ -544,6 +545,7 @@ describe('UserServiceTest', () => {
     expect(userService).toBeTruthy();
   });
 
+// TODO:
   it('should create new user', waitForAsync(() => {
     const userService = TestBed.inject(UserService);
 
@@ -558,6 +560,7 @@ describe('UserServiceTest', () => {
       expect(createdUser.id).toEqual('1');
     });
   }));
+// TODO: 
 
   it('should return paged user list', waitForAsync(() => {
     const userService = TestBed.inject(UserService);
@@ -592,6 +595,8 @@ import {
   PagedResourceCollection,
   ResourceCollection
 } from '@lagoshny/ngx-hateoas-client';
+// TODO: 
+
 import { waitForAsync } from '@angular/core/testing';
 import { of } from 'rxjs';
 import { createServiceFactory, SpectatorService } from '@ngneat/spectator';
@@ -617,6 +622,8 @@ describe('UserServiceTest', () => {
     expect(userService).toBeTruthy();
   });
 
+// TODO: 
+  
   it('should create new user', waitForAsync(() => {
     const userService = spectator.inject(UserService);
 
@@ -633,6 +640,8 @@ describe('UserServiceTest', () => {
     });
   }));
 
+// TODO: 
+  
   it('should return paged user list', waitForAsync(() => {
     const userService = spectator.inject(UserService);
 

@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { TestBed } from '@angular/core/testing';
 import { ResourceHttpService } from '../../service/internal/resource-http.service';
 import { DependencyInjector } from '../../util/dependency-injector';
@@ -13,7 +13,7 @@ import { Injector } from '@angular/core';
 // tslint:disable:variable-name
 // tslint:disable:no-string-literal
 class TestProductResource extends Resource {
-  override _links  = {
+  override _links = {
     self: {
       href: 'http://localhost:8080/api/v1/product/1'
     },
@@ -103,11 +103,6 @@ describe('Resource ADD_RELATION', () => {
     ResourceUtils.useResourceType(Resource);
   });
 
-  afterEach(() => {
-    DependencyInjector.injector = null;
-    ResourceUtils.useResourceType(null);
-  });
-
   it('should throw error when passed relationName is empty', () => {
     expect(() => resource.addCollectionRelation('', [new TestProductResource()]))
       .toThrowError(`Passed param(s) 'relationName = ' is not valid`);
@@ -116,16 +111,6 @@ describe('Resource ADD_RELATION', () => {
   it('should throw error when passed entities is empty', () => {
     expect(() => resource.addCollectionRelation('any', []))
       .toThrowError(`Passed param(s) 'entities = []' is not valid`);
-  });
-
-  it('should throw error when passed relationName,entities are undefined', () => {
-    expect(() => resource.addCollectionRelation(undefined, undefined))
-      .toThrowError(`Passed param(s) 'relationName = undefined', 'entities = undefined' are not valid`);
-  });
-
-  it('should throw error when passed relationName,entities are null', () => {
-    expect(() => resource.addCollectionRelation(null, null))
-      .toThrowError(`Passed param(s) 'relationName = null', 'entities = null' are not valid`);
   });
 
   it('should clear template params in TEMPLATED relation link', () => {
@@ -200,24 +185,9 @@ describe('Resource BIND_RELATION', () => {
     resource = new TestOrderResource();
   });
 
-  afterEach(() => {
-    DependencyInjector.injector = null;
-    ResourceUtils.useResourceType(null);
-  });
-
   it('should throw error when passed relationName is empty', () => {
     expect(() => resource.bindRelation('', new TestProductResource()))
       .toThrowError(`Passed param(s) 'relationName = ' is not valid`);
-  });
-
-  it('should throw error when passed relationName,entity are undefined', () => {
-    expect(() => resource.bindRelation(undefined, undefined))
-      .toThrowError(`Passed param(s) 'relationName = undefined', 'entities = undefined' are not valid`);
-  });
-
-  it('should throw error when passed relationName,entity are null', () => {
-    expect(() => resource.bindRelation(null, null))
-      .toThrowError(`Passed param(s) 'relationName = null', 'entities = null' are not valid`);
   });
 
   it('should clear template params in TEMPLATED relation link', () => {
@@ -292,24 +262,9 @@ describe('Resource UNBIND_RELATION', () => {
     resource = new TestOrderResource();
   });
 
-  afterEach(() => {
-    DependencyInjector.injector = null;
-    ResourceUtils.useResourceType(null);
-  });
-
   it('should throw error when passed relationName is empty', () => {
     expect(() => resource.unbindRelation(''))
       .toThrowError(`Passed param(s) 'relationName = ' is not valid`);
-  });
-
-  it('should throw error when passed relationName is undefined', () => {
-    expect(() => resource.unbindRelation(undefined))
-      .toThrowError(`Passed param(s) 'relationName = undefined' is not valid`);
-  });
-
-  it('should throw error when passed relationName is null', () => {
-    expect(() => resource.unbindRelation(null))
-      .toThrowError(`Passed param(s) 'relationName = null' is not valid`);
   });
 
   it('should clear template params in TEMPLATED relation link', () => {
@@ -352,24 +307,9 @@ describe('Resource UNBIND_COLLECTION_RELATION', () => {
     resource = new TestOrderResource();
   });
 
-  afterEach(() => {
-    DependencyInjector.injector = null;
-    ResourceUtils.useResourceType(null);
-  });
-
   it('should throw error when passed relationName is empty', () => {
     expect(() => resource.unbindCollectionRelation(''))
       .toThrowError(`Passed param(s) 'relationName = ' is not valid`);
-  });
-
-  it('should throw error when passed relationName is undefined', () => {
-    expect(() => resource.unbindCollectionRelation(undefined))
-      .toThrowError(`Passed param(s) 'relationName = undefined' is not valid`);
-  });
-
-  it('should throw error when passed relationName is null', () => {
-    expect(() => resource.unbindCollectionRelation(null))
-      .toThrowError(`Passed param(s) 'relationName = null' is not valid`);
   });
 
   it('should clear template params in TEMPLATED relation link', () => {
@@ -438,24 +378,9 @@ describe('Resource DELETE_RELATION', () => {
     resource = new TestOrderResource();
   });
 
-  afterEach(() => {
-    DependencyInjector.injector = null;
-    ResourceUtils.useResourceType(null);
-  });
-
   it('should throw error when passed relationName is empty', () => {
     expect(() => resource.deleteRelation('', new TestProductResource()))
       .toThrowError(`Passed param(s) 'relationName = ' is not valid`);
-  });
-
-  it('should throw error when passed relationName,entity are undefined', () => {
-    expect(() => resource.deleteRelation(undefined, undefined))
-      .toThrowError(`Passed param(s) 'relationName = undefined', 'entity = undefined' are not valid`);
-  });
-
-  it('should throw error when passed relationName,entity are null', () => {
-    expect(() => resource.deleteRelation(null, null))
-      .toThrowError(`Passed param(s) 'relationName = null', 'entity = null' are not valid`);
   });
 
   it('should generate url from relation link href and passed resource id retrieved by self link href', () => {

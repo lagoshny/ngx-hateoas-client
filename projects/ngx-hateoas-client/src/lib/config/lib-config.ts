@@ -1,5 +1,6 @@
 import { DEFAULT_ROUTE_NAME, HateoasConfiguration } from './hateoas-configuration.interface';
 import { CacheMode } from '../model/declarations';
+import { ResolvedHateoasConfig, toMultipleResourceRoutes } from './hateoas-internal-configuration.interface';
 
 /**
  * Contains all configuration lib params.
@@ -7,7 +8,7 @@ import { CacheMode } from '../model/declarations';
 // tslint:disable:no-string-literal
 export class LibConfig {
 
-  public static readonly DEFAULT_CONFIG: HateoasConfiguration = {
+  public static readonly DEFAULT_CONFIG = {
     http: {
       [DEFAULT_ROUTE_NAME]: {
         rootUrl: 'http://localhost:8080/api/v1'
@@ -39,41 +40,78 @@ export class LibConfig {
       }
     },
     isProduction: false
-  };
+  } satisfies ResolvedHateoasConfig;
 
-  private static config: HateoasConfiguration = LibConfig.DEFAULT_CONFIG;
+  private static config: ResolvedHateoasConfig = LibConfig.DEFAULT_CONFIG;
 
   public static setConfig(hateoasConfiguration: HateoasConfiguration) {
     LibConfig.config = LibConfig.mergeConfigs(hateoasConfiguration);
   }
 
-  public static getConfig(): HateoasConfiguration {
+  public static getConfig(): ResolvedHateoasConfig {
     return LibConfig.config;
   }
 
-  public static mergeConfigs(config: HateoasConfiguration): HateoasConfiguration {
+  public static mergeConfigs(config: HateoasConfiguration): ResolvedHateoasConfig {
+    const defaults = LibConfig.DEFAULT_CONFIG;
+
     return {
-      ...LibConfig.DEFAULT_CONFIG,
-      ...config,
-      halFormat: {
-        json: {
-          ...LibConfig.DEFAULT_CONFIG.halFormat.json,
-          ...config?.halFormat?.json
-        },
-        collections: {
-          ...LibConfig.DEFAULT_CONFIG.halFormat.collections,
-          ...config?.halFormat?.collections
-        }
+      http: toMultipleResourceRoutes(config.http ?? defaults.http),
+
+      logs: {
+        verboseLogs:
+          config.logs?.verboseLogs
+          ?? defaults.logs.verboseLogs,
       },
+
+      cache: {
+        enabled:
+          config.cache?.enabled
+          ?? defaults.cache.enabled,
+
+        mode:
+          config.cache?.mode
+          ?? defaults.cache.mode,
+
+        lifeTime:
+          config.cache?.lifeTime
+          ?? defaults.cache.lifeTime,
+      },
+
       pagination: {
         defaultPage: {
-          ...LibConfig.DEFAULT_CONFIG.pagination.defaultPage,
-          ...config?.pagination?.defaultPage
-        }
+          size:
+            config.pagination?.defaultPage?.size
+            ?? defaults.pagination.defaultPage.size,
+
+          page:
+            config.pagination?.defaultPage?.page
+            ?? defaults.pagination.defaultPage.page,
+        },
       },
-      cache: {
-        ...LibConfig.DEFAULT_CONFIG.cache,
-        ...config?.cache
+
+      halFormat: {
+        json: {
+          convertEmptyObjectToNull:
+            config.halFormat?.json?.convertEmptyObjectToNull
+            ?? defaults.halFormat.json.convertEmptyObjectToNull,
+        },
+        collections: {
+          embeddedOptional:
+            config.halFormat?.collections?.embeddedOptional
+            ?? defaults.halFormat.collections.embeddedOptional,
+        },
+      },
+
+      isProduction:
+        config.isProduction
+        ?? defaults.isProduction,
+
+      useTypes: {
+        resources:
+          config.useTypes?.resources
+          ?? defaults.useTypes.resources,
+        embeddedResources: config.useTypes?.embeddedResources
       },
     };
   }

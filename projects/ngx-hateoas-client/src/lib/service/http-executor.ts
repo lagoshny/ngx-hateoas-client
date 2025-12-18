@@ -24,32 +24,30 @@ export class HttpExecutor {
 
   private static logRequest(method: string,
                             url: string,
-                            options: HttpClientOptions,
+                            options?: HttpClientOptions,
                             body?: any) {
     const params = {
       method,
       url,
       options: {
         ...options,
-        params: options?.params?.keys().length > 0 ? options?.params.toString() : '',
-      }
+        params: options?.params?.keys() && options?.params?.keys().length > 0 ? options?.params.toString() : '',
+      },
+      ...(body ? { body } : {}),
     };
-    if (body) {
-      params['body'] = body;
-    }
     StageLogger.stageLog(Stage.HTTP_REQUEST, params);
   }
 
   private static logResponse(method: string,
                              url: string,
-                             options: HttpClientOptions,
-                             data: any) {
+                             data: any,
+                             options?: HttpClientOptions) {
     StageLogger.stageLog(Stage.HTTP_RESPONSE, {
       method,
       url,
       options: {
         ...options,
-        params: options?.params?.keys().length > 0 ? options?.params.toString() : '',
+        params: options?.params?.keys() && options?.params?.keys().length > 0 ? options?.params.toString() : '',
       },
       result: data
     });

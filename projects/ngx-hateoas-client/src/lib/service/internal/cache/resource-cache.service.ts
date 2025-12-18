@@ -22,7 +22,7 @@ export class ResourceCacheService {
    * @param key cache key
    * @return cached value or {@code null} when cached value is not exist or expired
    */
-  public getResource(key: CacheKey): ResourceIdentifiable {
+  public getResource(key: CacheKey): ResourceIdentifiable | null {
     ValidationUtils.validateInputParams({key});
 
     const cacheValue = this.cacheMap.get(key.value);

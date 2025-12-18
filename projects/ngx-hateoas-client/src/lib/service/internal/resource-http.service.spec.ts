@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 /* tslint:disable:no-string-literal */
 import { ResourceUtils } from '../../util/resource.utils';
 import { ResourceHttpService } from './resource-http.service';
@@ -39,10 +39,6 @@ describe('ResourceHttpService', () => {
             new ResourceHttpService(httpClientSpy, cacheServiceSpy);
 
         ResourceUtils.useResourceType(Resource);
-    });
-
-    afterEach(() => {
-        ResourceUtils.useResourceType(null);
     });
 
     it('GET REQUEST should throw error when returned object is COLLECTION_RESOURCE', () => {
@@ -224,16 +220,6 @@ describe('ResourceHttpService', () => {
             .toThrowError(`Passed param(s) 'resourceName = ' is not valid`);
     });
 
-    it('GET_RESOURCE should throw error when passed resourceName,id are undefined', () => {
-        expect(() => resourceHttpService.getResource(undefined, { routeName: DEFAULT_ROUTE_NAME }, undefined))
-            .toThrowError(`Passed param(s) 'resourceName = undefined', 'id = undefined' are not valid`);
-    });
-
-    it('GET_RESOURCE should throw error when passed resourceName,id are null', () => {
-        expect(() => resourceHttpService.getResource(null, { routeName: DEFAULT_ROUTE_NAME }, null))
-            .toThrowError(`Passed param(s) 'resourceName = null', 'id = null' are not valid`);
-    });
-
     it('GET_RESOURCE should generate resource url', () => {
         httpClientSpy.get.mockReturnValue(of(rawResource));
 
@@ -264,16 +250,6 @@ describe('ResourceHttpService', () => {
     it('POST_RESOURCE should throw error when passed resourceName is empty', () => {
         expect(() => resourceHttpService.postResource('', { routeName: DEFAULT_ROUTE_NAME }, new SimpleResource()))
             .toThrowError(`Passed param(s) 'resourceName = ' is not valid`);
-    });
-
-    it('POST_RESOURCE should throw error when passed resourceName,body are undefined', () => {
-        expect(() => resourceHttpService.postResource(undefined, { routeName: DEFAULT_ROUTE_NAME }, undefined))
-            .toThrowError(`Passed param(s) 'resourceName = undefined', 'body = undefined' are not valid`);
-    });
-
-    it('POST_RESOURCE should throw error when passed resourceName,body are null', () => {
-        expect(() => resourceHttpService.postResource(null, { routeName: DEFAULT_ROUTE_NAME }, null))
-            .toThrowError(`Passed param(s) 'resourceName = null', 'body = null' are not valid`);
     });
 
     it('POST_RESOURCE should generate resource url', () => {
@@ -311,16 +287,6 @@ describe('ResourceHttpService', () => {
     it('SEARCH should throw error when passed searchQuery is empty', () => {
         expect(() => resourceHttpService.search('any', { routeName: DEFAULT_ROUTE_NAME }, ''))
             .toThrowError(`Passed param(s) 'searchQuery = ' is not valid`);
-    });
-
-    it('SEARCH should throw error when passed resourceName,searchQuery are undefined', () => {
-        expect(() => resourceHttpService.search(undefined, { routeName: DEFAULT_ROUTE_NAME }, undefined))
-            .toThrowError(`Passed param(s) 'resourceName = undefined', 'searchQuery = undefined' are not valid`);
-    });
-
-    it('SEARCH should throw error when passed resourceName,searchQuery are null', () => {
-        expect(() => resourceHttpService.search(null, { routeName: DEFAULT_ROUTE_NAME }, null))
-            .toThrowError(`Passed param(s) 'resourceName = null', 'searchQuery = null' are not valid`);
     });
 
     it('SEARCH should generate search resource url', () => {

@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 /* tslint:disable:no-string-literal */
 import { PagedResourceCollection } from './paged-resource-collection';
 import { SimpleResourceCollection } from './resources.test-utils';
@@ -54,10 +54,6 @@ describe('PagedResourceCollection', () => {
 
   beforeEach(() => {
     DependencyInjector.injector = TestBed.inject(Injector);
-  });
-
-  afterEach(() => {
-    DependencyInjector.injector = null;
   });
 
   it('should be created from resource collection with default page options', () => {
@@ -119,17 +115,17 @@ describe('PagedResourceCollection', () => {
         const options: PagedGetOption = vi.mocked(pagedResourceCollectionHttpServiceSpy.get).mock.calls[0][1];
         expect(options).toBeDefined();
         expect(options.pageParams).toBeDefined();
-        expect(options.pageParams.page).toBeDefined();
-        expect(options.pageParams.page).toEqual(2);
+        expect(options?.pageParams?.page).toBeDefined();
+        expect(options?.pageParams?.page).toEqual(2);
 
-        expect(options.pageParams.size).toBeDefined();
-        expect(options.pageParams.size).toEqual(8);
+        expect(options?.pageParams?.size).toBeDefined();
+        expect(options?.pageParams?.size).toEqual(8);
 
-        expect(options.sort).toBeDefined();
-        expect(options.sort['first']).toBeDefined();
-        expect(options.sort['first']).toEqual('ASC');
-        expect(options.sort['second']).toBeDefined();
-        expect(options.sort['second']).toEqual('DESC');
+        expect(options?.sort).toBeDefined();
+        expect(options?.sort?.['first']).toBeDefined();
+        expect(options?.sort?.['first']).toEqual('ASC');
+        expect(options?.sort?.['second']).toBeDefined();
+        expect(options?.sort?.['second']).toEqual('DESC');
       });
   });
 

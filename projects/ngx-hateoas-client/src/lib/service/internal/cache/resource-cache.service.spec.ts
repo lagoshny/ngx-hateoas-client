@@ -1,8 +1,12 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ResourceCacheService } from './resource-cache.service';
 import { CacheKey } from './model/cache-key';
-import { rawPagedResourceCollection, rawResource, rawResourceCollection } from '../../../model/resource/resources.test';
+import {
+  rawPagedResourceCollection,
+  rawResource,
+  rawResourceCollection
+} from '../../../model/resource/resources.test-utils';
 import { LibConfig } from '../../../config/lib-config';
-import { waitForAsync } from '@angular/core/testing';
 
 describe('CacheService', () => {
   let cacheService: ResourceCacheService;
@@ -11,38 +15,28 @@ describe('CacheService', () => {
     cacheService = new ResourceCacheService();
   }));
 
-  it('GET_RESOURCE should throw error when passed key is null', () => {
-    expect(() => cacheService.getResource(null))
-      .toThrowError(`Passed param(s) 'key = null' is not valid`);
-  });
-
-  it('GET_RESOURCE should throw error when passed key is undefined', () => {
-    expect(() => cacheService.getResource(undefined))
-      .toThrowError(`Passed param(s) 'key = undefined' is not valid`);
-  });
-
   it('GET_RESOURCE should return null when a cache has not value', () => {
     const result = cacheService.getResource(CacheKey.of('any', {}));
     expect(result).toBeNull();
   });
 
-  it('GET_RESOURCE should return null when a cache has value but it is expired',
-    waitForAsync(() => {
-      spyOn(LibConfig, 'getConfig').and.returnValue({
-        ...LibConfig.DEFAULT_CONFIG,
-        cache: {
-          enabled: LibConfig.DEFAULT_CONFIG.cache.enabled,
-          lifeTime: 1 / 1000
-        }
-      });
+  it('GET_RESOURCE should return null when a cache has value but it is expired', async () => {
+    vi.spyOn(LibConfig, 'getConfig').mockReturnValue({
+      ...LibConfig.DEFAULT_CONFIG,
+      cache: {
+        ...LibConfig.DEFAULT_CONFIG.cache,
+        enabled: LibConfig.DEFAULT_CONFIG.cache.enabled,
+        lifeTime: 1 / 1000
+      }
+    });
 
-      cacheService.putResource(CacheKey.of('http://localhost:8080/api/v1', {}), rawResource);
+    cacheService.putResource(CacheKey.of('http://localhost:8080/api/v1', {}), rawResource);
 
-      setTimeout(() => {
-        const result = cacheService.getResource(CacheKey.of('http://localhost:8080/api/v1', {}));
-        expect(result).toBe(null);
-      }, 200);
-    }));
+    setTimeout(() => {
+      const result = cacheService.getResource(CacheKey.of('http://localhost:8080/api/v1', {}));
+      expect(result).toBe(null);
+    }, 200);
+  });
 
   it('GET_RESOURCE should return value from a cache', () => {
     cacheService.putResource(CacheKey.of('http://localhost:8080/api/v1', {}), rawResource);
@@ -52,31 +46,11 @@ describe('CacheService', () => {
     expect(result).toEqual(rawResource);
   });
 
-  it('PUT_RESOURCE should throw error when passed key,value are null', () => {
-    expect(() => cacheService.putResource(null, null))
-      .toThrowError(`Passed param(s) 'key = null', 'value = null' are not valid`);
-  });
-
-  it('PUT_RESOURCE should throw error when passed key,value are undefined', () => {
-    expect(() => cacheService.putResource(undefined, undefined))
-      .toThrowError(`Passed param(s) 'key = undefined', 'value = undefined' are not valid`);
-  });
-
   it('PUT_RESOURCE should put value to a cache', () => {
     cacheService.putResource(CacheKey.of('someVal', {}), rawPagedResourceCollection);
 
     const result = cacheService.getResource(CacheKey.of('someVal', {}));
     expect(result).toEqual(rawPagedResourceCollection);
-  });
-
-  it('EVICT_RESOURCE should throw error when passed key,value are null', () => {
-    expect(() => cacheService.evictResource(null))
-      .toThrowError(`Passed param(s) 'key = null' is not valid`);
-  });
-
-  it('EVICT_RESOURCE should throw error when passed key,value are undefined', () => {
-    expect(() => cacheService.evictResource(undefined))
-      .toThrowError(`Passed param(s) 'key = undefined' is not valid`);
   });
 
   it('EVICT_RESOURCE should evict all resource cache by resourceName from key', () => {

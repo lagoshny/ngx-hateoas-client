@@ -10,7 +10,7 @@ export abstract class AbstractResource {
    * List of links related with the resource.
    */
     // tslint:disable-next-line:variable-name
-  protected _links: Link;
+  abstract _links: Link;
 
   /**
    * Get relation link by relation name.

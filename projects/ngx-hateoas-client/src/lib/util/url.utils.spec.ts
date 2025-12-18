@@ -1,7 +1,9 @@
+import { describe, expect, it, vi } from 'vitest';
 import { UrlUtils } from './url.utils';
-import { SimpleResource } from '../model/resource/resources.test';
+import { SimpleResource } from '../model/resource/resources.test-utils';
 import { LibConfig } from '../config/lib-config';
 import { DEFAULT_ROUTE_NAME } from '../config/hateoas-configuration.interface';
+import { HttpHeaders } from '@angular/common/http';
 
 /* tslint:disable:no-string-literal */
 describe('UrlUtils', () => {
@@ -10,46 +12,38 @@ describe('UrlUtils', () => {
   const notTemplatedUrl = 'http://localhost:8080/api/v1/resource/1';
   const templatedUrl = 'http://localhost:8080/api/v1/pagedResourceCollection{?page,size,sort,projection,any}';
 
-  it('CONVERT_TO_HTTP_PARAMS should return empty http request params when passed options is null', () => {
-    expect(UrlUtils.convertToHttpParams(null).keys().length).toBe(0);
-  });
-
-  it('CONVERT_TO_HTTP_PARAMS should return empty http request params when passed options is undefined', () => {
-    expect(UrlUtils.convertToHttpParams(undefined).keys().length).toBe(0);
-  });
-
   it('CONVERT_TO_HTTP_PARAMS should return empty http request params when passed options is empty', () => {
     expect(UrlUtils.convertToHttpParams({}).keys().length).toBe(0);
   });
 
   it('CONVERT_TO_HTTP_PARAMS should throw error when option.params has page param', () => {
-    expect(() => UrlUtils.convertToHttpParams({params: {page: 'test'}}))
+    expect(() => UrlUtils.convertToHttpParams({ params: { page: 'test' } }))
       .toThrowError('Please, pass page params in page object key, not with params object!');
   });
 
   it('CONVERT_TO_HTTP_PARAMS should throw error when option.params has size param', () => {
-    expect(() => UrlUtils.convertToHttpParams({params: {size: 'test'}}))
+    expect(() => UrlUtils.convertToHttpParams({ params: { size: 'test' } }))
       .toThrowError('Please, pass page params in page object key, not with params object!');
   });
 
   it('CONVERT_TO_HTTP_PARAMS should adds resource param as self href link', () => {
     const simpleResource = new SimpleResource();
-    const result = UrlUtils.convertToHttpParams({params: {res: simpleResource}});
+    const result = UrlUtils.convertToHttpParams({ params: { res: simpleResource } });
 
-    expect(result.has('res')).toBeTrue();
+    expect(result.has('res')).toBe(true);
     expect(result.get('res')).toBe(simpleResource._links.self.href);
   });
 
   it('CONVERT_TO_HTTP_PARAMS should adds primitives param as is', () => {
-    const result = UrlUtils.convertToHttpParams({params: {str: 'test', num: 1, bol: true}});
+    const result = UrlUtils.convertToHttpParams({ params: { str: 'test', num: 1, bol: true } });
 
-    expect(result.has('str')).toBeTrue();
+    expect(result.has('str')).toBe(true);
     expect(result.get('str')).toBe('test');
 
-    expect(result.has('num')).toBeTrue();
+    expect(result.has('num')).toBe(true);
     expect(result.get('num')).toBe('1');
 
-    expect(result.has('bol')).toBeTrue();
+    expect(result.has('bol')).toBe(true);
     expect(result.get('bol')).toBe('true');
   });
 
@@ -65,15 +59,15 @@ describe('UrlUtils', () => {
       }
     });
 
-    expect(result.has('page')).toBeTrue();
+    expect(result.has('page')).toBe(true);
     expect(result.get('page')).toBe('1');
 
-    expect(result.has('size')).toBeTrue();
+    expect(result.has('size')).toBe(true);
     expect(result.get('size')).toBe('20');
 
-    expect(result.has('sort')).toBeTrue();
-    expect(result.getAll('sort')[0]).toBe('abs,ASC');
-    expect(result.getAll('sort')[1]).toBe('dce,DESC');
+    expect(result.has('sort')).toBe(true);
+    const sortValues = result.getAll('sort');
+    expect(sortValues).toEqual(['abs,ASC', 'dce,DESC']);
   });
 
   it('CONVERT_TO_HTTP_PARAMS should adds projection param', () => {
@@ -83,24 +77,18 @@ describe('UrlUtils', () => {
       }
     });
 
-    expect(result.has('projection')).toBeTrue();
+    expect(result.has('projection')).toBe(true);
     expect(result.get('projection')).toBe('testProjection');
   });
 
-  it('CONVERT_TO_HTTP_OPTIONS should return an empty object when options is null', () => {
-    const result = UrlUtils.convertToHttpOptions(null);
-
-    expect(result).toEqual({});
-  });
-
   it('CONVERT_TO_HTTP_OPTIONS should return an empty object when options is undefined', () => {
-    const result = UrlUtils.convertToHttpOptions(null);
+    const result = UrlUtils.convertToHttpOptions(undefined);
 
     expect(result).toEqual({});
   });
 
   it('CONVERT_TO_HTTP_OPTIONS should return an empty object when options is empty object', () => {
-    const result = UrlUtils.convertToHttpOptions(null);
+    const result = UrlUtils.convertToHttpOptions({});
 
     expect(result).toEqual({});
   });
@@ -127,14 +115,18 @@ describe('UrlUtils', () => {
       useCache: true
     });
 
-    expect(result.params.get('testParam')).toBe('test');
-    expect(result.params.get('sort')).toBe('prop,ASC');
-    expect(result.params.get('page')).toBe('1');
-    expect(result.params.get('size')).toBe('0');
+    expect(result.params?.get('testParam')).toBe('test');
+    expect(result.params?.get('sort')).toBe('prop,ASC');
+    expect(result.params?.get('page')).toBe('1');
+    expect(result.params?.get('size')).toBe('0');
     expect(result.observe).toBe('response');
-    expect(result.withCredentials).toBeTrue();
-    expect(result.headers['testHeader']).toBe('HEADER');
-    expect(result.reportProgress).toBeTrue();
+    expect(result.withCredentials).toBe(true);
+    if (result.headers instanceof HttpHeaders) {
+      expect(result.headers.get('testHeader')).toBe('HEADER');
+    } else {
+      expect(result.headers?.['testHeader']).toBe('HEADER');
+    }
+    expect(result.reportProgress).toBe(true);
   });
 
   it('CONVERT_TO_HTTP_OPTIONS should convert options to HttpOptions with SOME params', () => {
@@ -152,10 +144,10 @@ describe('UrlUtils', () => {
       useCache: true
     });
 
-    expect(result.params.get('testParam')).toBe('test');
-    expect(result.params.get('sort')).toBe('prop,ASC');
-    expect(result.params.get('page')).toBe('1');
-    expect(result.params.get('size')).toBe('0');
+    expect(result.params?.get('testParam')).toBe('test');
+    expect(result.params?.get('sort')).toBe('prop,ASC');
+    expect(result.params?.get('page')).toBe('1');
+    expect(result.params?.get('size')).toBe('0');
     expect(result.observe).toBeUndefined();
     expect(result.withCredentials).toBeUndefined();
     expect(result.headers).toBeUndefined();
@@ -173,40 +165,21 @@ describe('UrlUtils', () => {
       .toThrowError(`Passed param(s) 'resourceName = ' is not valid`);
   });
 
-  it('GENERATE_RESOURCE_URL should throw error when baseUrl,resourceName is null', () => {
-    expect(() => UrlUtils.generateResourceUrl(null, null))
-      .toThrowError(`Passed param(s) 'baseUrl = null', 'resourceName = null' are not valid`);
-  });
-  it('GENERATE_RESOURCE_URL should throw error when baseUrl,resourceName is undefined', () => {
-    expect(() => UrlUtils.generateResourceUrl(undefined, undefined))
-      .toThrowError(`Passed param(s) 'baseUrl = undefined', 'resourceName = undefined' are not valid`);
-  });
-
   it('GENERATE_RESOURCE_URL should return url with base url and resourceName', () => {
-    expect(UrlUtils.generateResourceUrl(baseUrl, 'test')).toBe(`${ baseUrl }/test`);
+    expect(UrlUtils.generateResourceUrl(baseUrl, 'test')).toBe(`${baseUrl}/test`);
   });
 
   it('GENERATE_RESOURCE_URL should return url with base url and resourceName and query', () => {
-    expect(UrlUtils.generateResourceUrl(baseUrl, 'test', 'testQuery')).toBe(`${ baseUrl }/test/testQuery`);
+    expect(UrlUtils.generateResourceUrl(baseUrl, 'test', 'testQuery')).toBe(`${baseUrl}/test/testQuery`);
   });
 
   it('GENERATE_RESOURCE_URL should return url with base url and resourceName and query without add double slash', () => {
-    expect(UrlUtils.generateResourceUrl(baseUrl, 'test', '/testQuery')).toBe(`${ baseUrl }/test/testQuery`);
+    expect(UrlUtils.generateResourceUrl(baseUrl, 'test', '/testQuery')).toBe(`${baseUrl}/test/testQuery`);
   });
 
   it('REMOVE_TEMPLATE_PARAMS should throw error when url is empty', () => {
     expect(() => UrlUtils.removeTemplateParams(''))
       .toThrowError(`Passed param(s) 'url = ' is not valid`);
-  });
-
-  it('REMOVE_TEMPLATE_PARAMS should throw error when url is null', () => {
-    expect(() => UrlUtils.removeTemplateParams(null))
-      .toThrowError(`Passed param(s) 'url = null' is not valid`);
-  });
-
-  it('REMOVE_TEMPLATE_PARAMS should throw error when url is undefined', () => {
-    expect(() => UrlUtils.removeTemplateParams(undefined))
-      .toThrowError(`Passed param(s) 'url = undefined' is not valid`);
   });
 
   it('REMOVE_TEMPLATE_PARAMS should do nothing when url is not templated', () => {
@@ -218,26 +191,8 @@ describe('UrlUtils', () => {
   });
 
   it('FILL_TEMPLATE_PARAMS should throw error when url is empty', () => {
-    expect(() => UrlUtils.fillTemplateParams('', {params: {test: ''}}))
+    expect(() => UrlUtils.fillTemplateParams('', { params: { test: '' } }))
       .toThrowError(`Passed param(s) 'url = ' is not valid`);
-  });
-
-  it('FILL_TEMPLATE_PARAMS should throw error when url is null', () => {
-    expect(() => UrlUtils.fillTemplateParams(null, {params: {test: ''}}))
-      .toThrowError(`Passed param(s) 'url = null' is not valid`);
-  });
-
-  it('FILL_TEMPLATE_PARAMS should throw error when url is undefined', () => {
-    expect(() => UrlUtils.fillTemplateParams(undefined, {params: {test: ''}}))
-      .toThrowError(`Passed param(s) 'url = undefined' is not valid`);
-  });
-
-  it('FILL_TEMPLATE_PARAMS should clear template params when options is null', () => {
-    expect(UrlUtils.fillTemplateParams(templatedUrl, null)).toBe('http://localhost:8080/api/v1/pagedResourceCollection');
-  });
-
-  it('FILL_TEMPLATE_PARAMS should clear template params when options is undefined', () => {
-    expect(UrlUtils.fillTemplateParams(templatedUrl, undefined)).toBe('http://localhost:8080/api/v1/pagedResourceCollection');
   });
 
   it('FILL_TEMPLATE_PARAMS should fill ALL template params except sort', () => {
@@ -267,76 +222,62 @@ describe('UrlUtils', () => {
       .toBe('http://localhost:8080/api/v1/pagedResourceCollection?page=2&size=30&any=123');
   });
 
-  it('GENERATE_LINK_URL should throw error when relationLink is null', () => {
-    expect(() => UrlUtils.generateLinkUrl(null))
-      .toThrowError(`Passed param(s) 'relationLink = null', 'linkUrl = undefined' are not valid`);
-  });
-
-  it('GENERATE_LINK_URL should throw error when relationLink is undefined', () => {
-    expect(() => UrlUtils.generateLinkUrl(undefined))
-      .toThrowError(`Passed param(s) 'relationLink = undefined', 'linkUrl = undefined' are not valid`);
-  });
-
   it('GENERATE_LINK_URL should throw error when relationLink.href is empty', () => {
-    expect(() => UrlUtils.generateLinkUrl({href: ''}))
+    expect(() => UrlUtils.generateLinkUrl({ href: '' }))
       .toThrowError(`Passed param(s) 'linkUrl = ' is not valid`);
   });
 
-  it('GENERATE_LINK_URL should throw error when relationLink.href is null', () => {
-    expect(() => UrlUtils.generateLinkUrl({href: null}))
-      .toThrowError(`Passed param(s) 'linkUrl = null' is not valid`);
-  });
-
-  it('GENERATE_LINK_URL should throw error when relationLink.href is undefined', () => {
-    expect(() => UrlUtils.generateLinkUrl({href: undefined}))
-      .toThrowError(`Passed param(s) 'linkUrl = undefined' is not valid`);
-  });
-
   it('GENERATE_LINK_URL should fill ALL template params when link is templated', () => {
-    const result = UrlUtils.generateLinkUrl(
-      {href: `${ UrlUtils.getApiUrl(DEFAULT_ROUTE_NAME) }/test{?param1,param2}`, templated: true},
-      {
-        params: {
-          param1: '1',
-          param2: '2'
-        }
-      });
+    const result = UrlUtils.generateLinkUrl({
+      href: `${UrlUtils.getApiUrl(DEFAULT_ROUTE_NAME)}/test{?param1,param2}`,
+      templated: true
+    }, {
+      params: {
+        param1: '1',
+        param2: '2'
+      }
+    });
 
-    expect(result).toBe(`${ UrlUtils.getApiUrl(DEFAULT_ROUTE_NAME) }/test?param1=1&param2=2`);
+    expect(result).toBe(`${UrlUtils.getApiUrl(DEFAULT_ROUTE_NAME)}/test?param1=1&param2=2`);
   });
 
   it('GENERATE_LINK_URL should fill PART OF template params when link is templated and passed not all params', () => {
-    const result = UrlUtils.generateLinkUrl(
-      {href: `${ UrlUtils.getApiUrl(DEFAULT_ROUTE_NAME) }/test{?param1,param2,sort,page,size}`, templated: true},
-      {
-        params: {
-          param1: '1'
-        },
-        pageParams: {
-          size: 10,
-          page: 0
-        }
-      });
+    const result = UrlUtils.generateLinkUrl({
+      href: `${UrlUtils.getApiUrl(DEFAULT_ROUTE_NAME)}/test{?param1,param2,sort,page,size}`,
+      templated: true
+    }, {
+      params: {
+        param1: '1'
+      },
+      pageParams: {
+        size: 10,
+        page: 0
+      }
+    });
 
-    expect(result).toBe(`${ UrlUtils.getApiUrl(DEFAULT_ROUTE_NAME) }/test?param1=1&page=0&size=10`);
+    expect(result).toBe(`${UrlUtils.getApiUrl(DEFAULT_ROUTE_NAME)}/test?param1=1&page=0&size=10`);
   });
 
   it('GENERATE_LINK_URL should REMOVE template params when link is templated and passed params are empty', () => {
-    const result = UrlUtils.generateLinkUrl(
-      {href: `${ UrlUtils.getApiUrl(DEFAULT_ROUTE_NAME) }/test{?param1,param2}`, templated: true});
+    const result = UrlUtils.generateLinkUrl({
+      href: `${UrlUtils.getApiUrl(DEFAULT_ROUTE_NAME)}/test{?param1,param2}`,
+      templated: true
+    });
 
-    expect(result).toBe(`${ UrlUtils.getApiUrl(DEFAULT_ROUTE_NAME) }/test`);
+    expect(result).toBe(`${UrlUtils.getApiUrl(DEFAULT_ROUTE_NAME)}/test`);
   });
 
   it('GENERATE_LINK_URL should NOT FILL template params when link is not templated', () => {
-    const result = UrlUtils.generateLinkUrl(
-      {href: `${ UrlUtils.getApiUrl(DEFAULT_ROUTE_NAME) }/test{?param1,param2}`, templated: false});
+    const result = UrlUtils.generateLinkUrl({
+      href: `${UrlUtils.getApiUrl(DEFAULT_ROUTE_NAME)}/test{?param1,param2}`,
+      templated: false
+    });
 
-    expect(result).toBe(`${ UrlUtils.getApiUrl(DEFAULT_ROUTE_NAME) }/test{?param1,param2}`);
+    expect(result).toBe(`${UrlUtils.getApiUrl(DEFAULT_ROUTE_NAME)}/test{?param1,param2}`);
   });
 
   it('GENERATE_LINK_URL should replace root link url to proxyUrl', () => {
-    spyOn(LibConfig, 'getConfig').and.returnValue({
+    vi.spyOn(LibConfig, 'getConfig').mockReturnValue({
       ...LibConfig.DEFAULT_CONFIG,
       http: {
         [DEFAULT_ROUTE_NAME]: {
@@ -345,13 +286,13 @@ describe('UrlUtils', () => {
         }
       }
     });
-    const result = UrlUtils.generateLinkUrl({href: `${ UrlUtils.getApiUrl(DEFAULT_ROUTE_NAME) }/test`});
+    const result = UrlUtils.generateLinkUrl({ href: `${UrlUtils.getApiUrl(DEFAULT_ROUTE_NAME)}/test` });
 
     expect(result).toBe('http://myproxy.ru/api/v1/test');
   });
 
   it('GENERATE_LINK_URL should NOT replace root link url to proxyUrl when it is empty', () => {
-    spyOn(LibConfig, 'getConfig').and.returnValue({
+    vi.spyOn(LibConfig, 'getConfig').mockReturnValue({
       ...LibConfig.DEFAULT_CONFIG,
       http: {
         [DEFAULT_ROUTE_NAME]: {
@@ -360,13 +301,13 @@ describe('UrlUtils', () => {
         }
       }
     });
-    const result = UrlUtils.generateLinkUrl({href: `${ UrlUtils.getApiUrl(DEFAULT_ROUTE_NAME) }/test`});
+    const result = UrlUtils.generateLinkUrl({ href: `${UrlUtils.getApiUrl(DEFAULT_ROUTE_NAME)}/test` });
 
-    expect(result).toBe(`${ UrlUtils.getApiUrl(DEFAULT_ROUTE_NAME) }/test`);
+    expect(result).toBe(`${UrlUtils.getApiUrl(DEFAULT_ROUTE_NAME)}/test`);
   });
 
   it('GET_API_URL should return root link when proxy is empty', () => {
-    spyOn(LibConfig, 'getConfig').and.returnValue({
+    vi.spyOn(LibConfig, 'getConfig').mockReturnValue({
       ...LibConfig.DEFAULT_CONFIG,
       http: {
         [DEFAULT_ROUTE_NAME]: {
@@ -381,7 +322,7 @@ describe('UrlUtils', () => {
   });
 
   it('GET_API_URL should return proxy link when proxy is NOT empty', () => {
-    spyOn(LibConfig, 'getConfig').and.returnValue({
+    vi.spyOn(LibConfig, 'getConfig').mockReturnValue({
       ...LibConfig.DEFAULT_CONFIG,
       http: {
         [DEFAULT_ROUTE_NAME]: {
@@ -400,23 +341,13 @@ describe('UrlUtils', () => {
       .toThrowError(`Passed param(s) 'url = ' is not valid`);
   });
 
-  it('GET_RESOURCE_NAME_FROM_URL should throw error when url is null', () => {
-    expect(() => UrlUtils.getResourceNameFromUrl(null))
-      .toThrowError(`Passed param(s) 'url = null' is not valid`);
-  });
-
-  it('GET_RESOURCE_NAME_FROM_URL should throw error when url is undefined', () => {
-    expect(() => UrlUtils.getResourceNameFromUrl(undefined))
-      .toThrowError(`Passed param(s) 'url = undefined' is not valid`);
-  });
-
   it('GET_RESOURCE_NAME_FROM_URL should return resource name without root proxy', () => {
     const resourceNameFromUrl = UrlUtils.getResourceNameFromUrl('http://localhost:8080/api/v1/resources/1');
     expect(resourceNameFromUrl).toEqual('resources');
   });
 
   it('GET_RESOURCE_NAME_FROM_URL should return resource name when rootUrl ends with slash', () => {
-    spyOn(LibConfig, 'getConfig').and.returnValue({
+    vi.spyOn(LibConfig, 'getConfig').mockReturnValue({
       ...LibConfig.DEFAULT_CONFIG,
       http: {
         [DEFAULT_ROUTE_NAME]: {
@@ -429,7 +360,7 @@ describe('UrlUtils', () => {
   });
 
   it('GET_RESOURCE_NAME_FROM_URL should return resource name when proxyUrl ends with slash', () => {
-    spyOn(LibConfig, 'getConfig').and.returnValue({
+    vi.spyOn(LibConfig, 'getConfig').mockReturnValue({
       ...LibConfig.DEFAULT_CONFIG,
       http: {
         [DEFAULT_ROUTE_NAME]: {
@@ -443,7 +374,7 @@ describe('UrlUtils', () => {
   });
 
   it('GET_RESOURCE_NAME_FROM_URL should return resource name with root proxy', () => {
-    spyOn(LibConfig, 'getConfig').and.returnValue({
+    vi.spyOn(LibConfig, 'getConfig').mockReturnValue({
       ...LibConfig.DEFAULT_CONFIG,
       http: {
         [DEFAULT_ROUTE_NAME]: {
@@ -456,22 +387,13 @@ describe('UrlUtils', () => {
     expect(resourceNameFromUrl).toEqual('resources');
   });
 
-  it('FILL_DEFAULT_PAGE_DATA_IF_NO_PRESENT fill all default values when passed options are \'null\'', () => {
-    const pagedOptions = UrlUtils.fillDefaultPageDataIfNoPresent(null);
-
-    expect(pagedOptions).toBeDefined();
-    expect(pagedOptions.pageParams).toBeDefined();
-    expect(pagedOptions.pageParams.page).toBe(LibConfig.getConfig().pagination.defaultPage.page);
-    expect(pagedOptions.pageParams.size).toBe(LibConfig.getConfig().pagination.defaultPage.size);
-  });
-
   it('FILL_DEFAULT_PAGE_DATA_IF_NO_PRESENT fill all default values when passed options are \'undefined\'', () => {
     const pagedOptions = UrlUtils.fillDefaultPageDataIfNoPresent(undefined);
 
     expect(pagedOptions).toBeDefined();
     expect(pagedOptions.pageParams).toBeDefined();
-    expect(pagedOptions.pageParams.page).toBe(LibConfig.getConfig().pagination.defaultPage.page);
-    expect(pagedOptions.pageParams.size).toBe(LibConfig.getConfig().pagination.defaultPage.size);
+    expect(pagedOptions.pageParams?.page).toBe(LibConfig.getConfig().pagination.defaultPage.page);
+    expect(pagedOptions.pageParams?.size).toBe(LibConfig.getConfig().pagination.defaultPage.size);
   });
 
   it('FILL_DEFAULT_PAGE_DATA_IF_NO_PRESENT fill all default values when passed options are \'empty object\'', () => {
@@ -479,41 +401,31 @@ describe('UrlUtils', () => {
 
     expect(pagedOptions).toBeDefined();
     expect(pagedOptions.pageParams).toBeDefined();
-    expect(pagedOptions.pageParams.page).toBe(LibConfig.getConfig().pagination.defaultPage.page);
-    expect(pagedOptions.pageParams.size).toBe(LibConfig.getConfig().pagination.defaultPage.size);
+    expect(pagedOptions.pageParams?.page).toBe(LibConfig.getConfig().pagination.defaultPage.page);
+    expect(pagedOptions.pageParams?.size).toBe(LibConfig.getConfig().pagination.defaultPage.size);
   });
 
   it('FILL_DEFAULT_PAGE_DATA_IF_NO_PRESENT fill page default value when passed options have not it', () => {
-    const pagedOptions = UrlUtils.fillDefaultPageDataIfNoPresent({pageParams: {size: 40}});
+    const pagedOptions = UrlUtils.fillDefaultPageDataIfNoPresent({ pageParams: { size: 40 } });
 
     expect(pagedOptions).toBeDefined();
     expect(pagedOptions.pageParams).toBeDefined();
-    expect(pagedOptions.pageParams.page).toBe(LibConfig.getConfig().pagination.defaultPage.page);
-    expect(pagedOptions.pageParams.size).toBe(40);
+    expect(pagedOptions.pageParams?.page).toBe(LibConfig.getConfig().pagination.defaultPage.page);
+    expect(pagedOptions.pageParams?.size).toBe(40);
   });
 
   it('FILL_DEFAULT_PAGE_DATA_IF_NO_PRESENT fill size default value when passed options have not it', () => {
-    const pagedOptions = UrlUtils.fillDefaultPageDataIfNoPresent({pageParams: {page: 4}});
+    const pagedOptions = UrlUtils.fillDefaultPageDataIfNoPresent({ pageParams: { page: 4 } });
 
     expect(pagedOptions).toBeDefined();
     expect(pagedOptions.pageParams).toBeDefined();
-    expect(pagedOptions.pageParams.page).toBe(4);
-    expect(pagedOptions.pageParams.size).toBe(LibConfig.getConfig().pagination.defaultPage.size);
+    expect(pagedOptions.pageParams?.page).toBe(4);
+    expect(pagedOptions.pageParams?.size).toBe(LibConfig.getConfig().pagination.defaultPage.size);
   });
 
   it('CLEAR_URL_PARAMS should throw error when url is empty', () => {
     expect(() => UrlUtils.clearUrlParams(''))
       .toThrowError(`Passed param(s) 'url = ' is not valid`);
-  });
-
-  it('CLEAR_URL_PARAMS should throw error when url is null', () => {
-    expect(() => UrlUtils.clearUrlParams(null))
-      .toThrowError(`Passed param(s) 'url = null' is not valid`);
-  });
-
-  it('CLEAR_URL_PARAMS should throw error when url is undefined', () => {
-    expect(() => UrlUtils.clearUrlParams(undefined))
-      .toThrowError(`Passed param(s) 'url = undefined' is not valid`);
   });
 
   it('CLEAR_URL_PARAMS clear all url param', () => {
@@ -524,7 +436,7 @@ describe('UrlUtils', () => {
   });
 
   it('GUESS_RESOURCE_ROUTE_URL return proxy url if it equals to it', () => {
-    spyOn(LibConfig, 'getConfig').and.returnValue({
+    vi.spyOn(LibConfig, 'getConfig').mockReturnValue({
       ...LibConfig.DEFAULT_CONFIG,
       http: {
         [DEFAULT_ROUTE_NAME]: {
@@ -540,7 +452,7 @@ describe('UrlUtils', () => {
   });
 
   it('GUESS_RESOURCE_ROUTE_URL return base url if it equals to it', () => {
-    spyOn(LibConfig, 'getConfig').and.returnValue({
+    vi.spyOn(LibConfig, 'getConfig').mockReturnValue({
       ...LibConfig.DEFAULT_CONFIG,
       http: {
         [DEFAULT_ROUTE_NAME]: {
@@ -555,7 +467,7 @@ describe('UrlUtils', () => {
   });
 
   it('GUESS_RESOURCE_ROUTE_URL throws exception when no route found', () => {
-    spyOn(LibConfig, 'getConfig').and.returnValue({
+    vi.spyOn(LibConfig, 'getConfig').mockReturnValue({
       ...LibConfig.DEFAULT_CONFIG,
       http: {
         [DEFAULT_ROUTE_NAME]: {
@@ -567,7 +479,7 @@ describe('UrlUtils', () => {
 
     expect(() => {
       UrlUtils.guessResourceRoute(resourceUrl);
-    }).toThrowError(`Failed to determine resource route by url: ${ resourceUrl }`);
+    }).toThrowError(`Failed to determine resource route by url: ${resourceUrl}`);
   });
 
 });

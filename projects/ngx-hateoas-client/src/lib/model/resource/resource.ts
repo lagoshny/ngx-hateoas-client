@@ -2,7 +2,7 @@ import { BaseResource } from './base-resource';
 import { getResourceHttpService } from '../../service/internal/resource-http.service';
 import { HttpHeaders, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { ResourceUtils } from '../../util/resource.utils';
+import { HateoasPayload } from '../../util/resource.utils';
 import { UrlUtils } from '../../util/url.utils';
 import { LinkData } from '../declarations';
 import { tap } from 'rxjs/operators';
@@ -19,12 +19,12 @@ import { isArray, isNil, last, split } from 'lodash-es';
  */
 // tslint:disable:variable-name
 // tslint:disable:no-string-literal
-export class Resource extends BaseResource {
+export class Resource extends BaseResource implements HateoasPayload {
 
   /**
    * Resource should has self link.
    */
-  protected _links: {
+  declare _links: {
     self: LinkData;
     [key: string]: LinkData;
   };
@@ -48,7 +48,7 @@ export class Resource extends BaseResource {
 
     const body = entities
       .map(entity => {
-        return ResourceUtils.initResource(entity).getSelfLinkHref();
+        return entity.getSelfLinkHref();
       })
       .join('\n');
 
@@ -83,11 +83,11 @@ export class Resource extends BaseResource {
     if (isArray(entities)) {
       body = entities
         .map(entity => {
-          return ResourceUtils.initResource(entity).getSelfLinkHref();
+          return entity.getSelfLinkHref();
         })
         .join('\n');
     } else {
-      body = ResourceUtils.initResource(entities).getSelfLinkHref();
+      body = entities.getSelfLinkHref();
     }
 
     return getResourceHttpService().put(UrlUtils.generateLinkUrl(relationLink), body, {
@@ -167,14 +167,13 @@ export class Resource extends BaseResource {
     ValidationUtils.validateInputParams({relationName, entity});
 
     const relationLink = this.getRelationLink(relationName);
-    const resource = ResourceUtils.initResource(entity) as Resource;
-    const resourceId = last(split(UrlUtils.generateLinkUrl(resource._links.self), '/'));
+    const resourceId = last(split(UrlUtils.generateLinkUrl(entity._links.self), '/'));
 
     if (isNil(resourceId) || resourceId === '') {
       StageLogger.stageErrorLog(Stage.PREPARE_URL, {
         step: 'ResolveResourceId',
         error: 'Passed resource self link should has id',
-        selfLink: UrlUtils.generateLinkUrl(resource._links.self)
+        selfLink: UrlUtils.generateLinkUrl(entity._links.self)
       });
       throw Error('Passed resource self link should has id');
     }

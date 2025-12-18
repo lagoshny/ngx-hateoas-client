@@ -6,7 +6,7 @@ import { ValidationUtils } from './validation.utils';
 import { LibConfig } from '../config/lib-config';
 import { isArray, isEmpty, isNil, isObject, toString } from 'lodash-es';
 import { UriTemplate } from 'uri-templates-es';
-import { MultipleResourceRoutes, ResourceRoute } from '../config/hateoas-configuration.interface';
+import { DEFAULT_ROUTE_NAME, MultipleResourceRoutes, ResourceRoute } from '../config/hateoas-configuration.interface';
 import { ConsoleLogger } from '../logger/console-logger';
 
 export class UrlUtils {
@@ -33,7 +33,7 @@ export class UrlUtils {
           } else if (isArray(options.params[key])) {
             // Append arrays params as repeated key with each value from array
             (options.params[key] as Array<any>).forEach((item) => {
-              resultParams = resultParams.append(`${ key.toString() }`, item);
+              resultParams = resultParams.append(`${key.toString()}`, item);
             });
           } else {
             // Else append simple param as is
@@ -58,7 +58,7 @@ export class UrlUtils {
    * Convert ngx-hateoas-client option to Angular HttpClient.
    * @param options ngx-hateoas-client options
    */
-  public static convertToHttpOptions(options: PagedGetOption): HttpClientOptions {
+  public static convertToHttpOptions(options?: PagedGetOption): HttpClientOptions {
     if (isEmpty(options) || isNil(options)) {
       return {};
     }
@@ -81,7 +81,7 @@ export class UrlUtils {
    * @throws error when required params are not valid
    */
   public static generateLinkUrl(relationLink: LinkData, options?: PagedGetOption): string {
-    ValidationUtils.validateInputParams({relationLink, linkUrl: relationLink?.href});
+    ValidationUtils.validateInputParams({ relationLink, linkUrl: relationLink?.href });
     let url;
     if (options && !isEmpty(options)) {
       url = relationLink.templated ? UrlUtils.fillTemplateParams(relationLink.href, options) : relationLink.href;
@@ -101,8 +101,8 @@ export class UrlUtils {
    *
    * @param routeName resource route name that configured in {@link MultipleResourceRoutes}.
    */
-  public static getApiUrl(routeName: string): string {
-    const route = UrlUtils.getRouteByName(routeName);
+  public static getApiUrl(routeName?: string): string {
+    const route = UrlUtils.getRouteByName(routeName ?? DEFAULT_ROUTE_NAME);
     if (route.proxyUrl) {
       return route.proxyUrl;
     } else {
@@ -115,19 +115,19 @@ export class UrlUtils {
    * @param url resource url
    */
   public static guessResourceRoute(url: string): ResourceRoute {
-    let resourceRoute: ResourceRoute;
+    let resourceRoute: ResourceRoute | undefined;
     for (const [routeName] of Object.entries(UrlUtils.getRoutes())) {
       const route = UrlUtils.getRouteByName(routeName);
       const lowerCaseUrl = url.toLowerCase();
       if (lowerCaseUrl.includes(route.rootUrl.toLowerCase())
-        || (!isEmpty(route.proxyUrl) && lowerCaseUrl.includes(route.proxyUrl.toLowerCase()))) {
+        || (!isEmpty(route.proxyUrl) && route.proxyUrl && lowerCaseUrl.includes(route.proxyUrl.toLowerCase()))) {
         resourceRoute = route;
         break;
       }
     }
 
     if (isEmpty(resourceRoute)) {
-      throw new Error(`Failed to determine resource route by url: ${ url }`);
+      throw new Error(`Failed to determine resource route by url: ${url}`);
     }
 
     return resourceRoute;
@@ -142,13 +142,13 @@ export class UrlUtils {
    * @throws error when required params are not valid
    */
   public static generateResourceUrl(baseUrl: string, resourceName: string, query?: string): string {
-    ValidationUtils.validateInputParams({baseUrl, resourceName});
+    ValidationUtils.validateInputParams({ baseUrl, resourceName });
 
     let url = baseUrl;
     if (!url.endsWith('/')) {
       url = url.concat('/');
     }
-    return url.concat(resourceName).concat(query ? `${ query.startsWith('/') ? query : '/' + query }` : '');
+    return url.concat(resourceName).concat(query ? `${query.startsWith('/') ? query : '/' + query}` : '');
   }
 
   /**
@@ -157,24 +157,25 @@ export class UrlUtils {
    * @param url resource url
    */
   public static getResourceNameFromUrl(url: string): string {
-    ValidationUtils.validateInputParams({url});
+    ValidationUtils.validateInputParams({ url });
     const lowerCaseUrl = url.toLowerCase();
     const resourceRoute = UrlUtils.guessResourceRoute(url);
 
     let baseUrl;
     if (lowerCaseUrl.includes(resourceRoute.rootUrl)) {
       baseUrl = resourceRoute.rootUrl;
-    } else if (!isEmpty(resourceRoute.proxyUrl) && lowerCaseUrl.includes(resourceRoute.proxyUrl)) {
+    } else if (!isEmpty(resourceRoute.proxyUrl) && resourceRoute.proxyUrl
+      && lowerCaseUrl.includes(resourceRoute.proxyUrl)) {
       baseUrl = resourceRoute.proxyUrl;
     } else {
-      throw new Error(`Failed to determine resource name from url: ${ url }, found resource route ${ JSON.stringify(resourceRoute) }`);
+      throw new Error(`Failed to determine resource name from url: ${url}, found resource route ${JSON.stringify(resourceRoute)}`);
     }
 
     if (!baseUrl.endsWith('/')) {
       baseUrl = baseUrl.concat('/');
     }
 
-    return url.toLowerCase().replace(`${ baseUrl }`, '').split('/')[0];
+    return url.toLowerCase().replace(`${baseUrl}`, '').split('/')[0];
   }
 
   /**
@@ -184,7 +185,7 @@ export class UrlUtils {
    * @throws error when required params are not valid
    */
   public static removeTemplateParams(url: string): string {
-    ValidationUtils.validateInputParams({url});
+    ValidationUtils.validateInputParams({ url });
 
     return UrlUtils.fillTemplateParams(url, {});
   }
@@ -196,7 +197,7 @@ export class UrlUtils {
    * @throws error when required params are not valid
    */
   public static clearUrlParams(url: string): string {
-    ValidationUtils.validateInputParams({url});
+    ValidationUtils.validateInputParams({ url });
     const srcUrl = new URL(url);
 
     return srcUrl.origin + srcUrl.pathname;
@@ -210,7 +211,7 @@ export class UrlUtils {
    * @throws error when required params are not valid
    */
   public static fillTemplateParams(url: string, options: PagedGetOption): string {
-    ValidationUtils.validateInputParams({url});
+    ValidationUtils.validateInputParams({ url });
     UrlUtils.checkDuplicateParams(options);
 
     /*
@@ -227,7 +228,7 @@ export class UrlUtils {
     return new UriTemplate(url).fill(isNil(paramsWithoutSortParam) ? {} : paramsWithoutSortParam);
   }
 
-  public static fillDefaultPageDataIfNoPresent(options: PagedGetOption) {
+  public static fillDefaultPageDataIfNoPresent(options?: PagedGetOption) {
     const pagedOptions = !isEmpty(options) ? options : {};
     if (isEmpty(pagedOptions.pageParams)) {
       pagedOptions.pageParams = LibConfig.getConfig().pagination.defaultPage;
@@ -244,7 +245,7 @@ export class UrlUtils {
     let resultParams = httpParams ? httpParams : new HttpParams();
     if (!isEmpty(sort)) {
       for (const [sortPath, sortOrder] of Object.entries(sort)) {
-        resultParams = resultParams.append('sort', `${ sortPath },${ sortOrder }`);
+        resultParams = resultParams.append('sort', `${sortPath},${sortOrder}`);
       }
     }
 
@@ -263,10 +264,10 @@ export class UrlUtils {
   public static getRouteByName(routeName: string): ResourceRoute {
     const route = LibConfig.getConfig().http[routeName];
     if (isEmpty(route)) {
-      ConsoleLogger.error(`No Resource route found by name: '${ routeName }'. Check you configuration. Read more about this ...`, {
+      ConsoleLogger.error(`No Resource route found by name: '${routeName}'. Check you configuration. Read more about this ...`, {
         availableRoutes: UrlUtils.getRoutes()
       });
-      throw Error(`No Resource route found by name: '${ routeName }'.`);
+      throw Error(`No Resource route found by name: '${routeName}'.`);
     }
 
     return route;

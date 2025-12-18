@@ -38,14 +38,21 @@ export const rawResource = {
 @HateoasResource('resource')
 export class RawResource extends Resource {
   public name = 'Test';
+
+// tslint:disable-next-line:variable-name
+  override _links = {
+    self: {
+      href: 'http://localhost:8080/api/v1/resource/1'
+    }
+  };
 }
 
 @HateoasResource('test')
 export class SimpleResource extends Resource {
-  public name = 'Test';
+  public name: string | null = 'Test';
 
 // tslint:disable-next-line:variable-name
-  _links = {
+  override _links = {
     self: {
       href: 'http://localhost:8080/api/v1/test/1'
     },
@@ -71,10 +78,10 @@ export const rawCaseSensitiveResource = {
 @HateoasProjection(SimpleResource, 'simpleProjection')
 export class SimpleResourceProjection extends Resource {
   @ProjectionRel(RawResource)
-  public rawResource: ProjectionRelType<RawResource>;
+  public declare rawResource: ProjectionRelType<RawResource>;
 
   // tslint:disable-next-line:variable-name
-  _links = {
+  override _links = {
     self: {
       href: 'http://localhost:8080/api/v1/test/1'
     },
@@ -88,10 +95,10 @@ export class SimpleResourceProjection extends Resource {
 @HateoasEmbeddedResource(['anotherResource'])
 export class SimpleEmbeddedResource extends EmbeddedResource {
 
-  public name: string;
+  public declare name: string;
 
   // tslint:disable-next-line:variable-name
-  _links = {
+  override _links = {
     anotherResource: {
       href: 'http://localhost:8080/api/v1/anotherResource/1'
     }
@@ -137,10 +144,10 @@ export const rawResourceCollection = {
 
 export class SimpleResourceCollection extends ResourceCollection<SimpleResource> {
 
-  resources = [new SimpleResource()];
+  override resources = [new SimpleResource()];
 
   // tslint:disable-next-line:variable-name
-  _links = {
+  override _links = {
     self: {
       href: 'http://localhost:8080/api/v1/resourceCollection/1'
     }
@@ -222,10 +229,10 @@ export const rawPagedResourceCollection = {
 
 export class SimplePagedResourceCollection extends SimpleResourceCollection {
 
-  resources = [new SimpleResource()];
+  override resources = [new SimpleResource()];
 
   // tslint:disable-next-line:variable-name
-  _links = {
+  override _links = {
     self: {
       href: 'http://localhost:8080/api/v1/pagedResourceCollection'
     },
@@ -243,7 +250,7 @@ export class SimplePagedResourceCollection extends SimpleResourceCollection {
     }
   };
 
-  page: {
+  declare page: {
     totalElements: 100,
     number: 2,
     size: 10,

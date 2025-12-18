@@ -1,26 +1,36 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "baseUrl": "./",
-    "outDir": "./dist/out-tsc",
-    "sourceMap": true,
-    "esModuleInterop": true,
-    "declaration": false,
-    "experimentalDecorators": true,
-    "module": "esnext",
-    "moduleResolution": "bundler",
-    "importHelpers": true,
-    "target": "ES2022",
+    "strict": true,
+    "noImplicitOverride": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "noImplicitReturns": true,
     "paths": {
       "ngx-hateoas-client": [
-        "dist/ngx-hateoas-client/ngx-hateoas-client",
-        "dist/ngx-hateoas-client"
+        "./dist/ngx-hateoas-client"
       ]
     },
-    "useDefineForClassFields": false
+    "noFallthroughCasesInSwitch": true,
+    "skipLibCheck": true,
+    "isolatedModules": true,
+    "experimentalDecorators": true,
+    "importHelpers": true,
+    "target": "ES2022",
+    "module": "preserve"
   },
   "angularCompilerOptions": {
-    "fullTemplateTypeCheck": true,
-    "strictInjectionParameters": true
-  }
+    "enableI18nLegacyMessageIdFormat": false,
+    "strictInjectionParameters": true,
+    "strictInputAccessModifiers": true,
+    "strictTemplates": true
+  },
+  "files": [],
+  "references": [
+    {
+      "path": "./projects/ngx-hateoas-client/tsconfig.lib.json"
+    },
+    {
+      "path": "./projects/ngx-hateoas-client/tsconfig.spec.json"
+    }
+  ]
 }

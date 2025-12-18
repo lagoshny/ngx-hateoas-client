@@ -6,6 +6,7 @@ import { Resource } from '../../model/resource/resource';
 import { PagedResourceCollection } from '../../model/resource/paged-resource-collection';
 import { ResourceCollection } from '../../model/resource/resource-collection';
 import { HttpResponse } from '@angular/common/http';
+import { ResourceCtor } from '../../model/decorators';
 
 /**
  * Main resource operation class.
@@ -13,11 +14,11 @@ import { HttpResponse } from '@angular/common/http';
  */
 export class HateoasResourceOperation<T extends Resource> {
 
-  private readonly resourceType: new() => T;
+  private readonly resourceType: ResourceCtor<T>;
 
   private hateoasResourceService: HateoasResourceService;
 
-  constructor(resourceType: new() => T) {
+  constructor(resourceType: ResourceCtor<T>) {
     this.resourceType = resourceType;
     this.hateoasResourceService = DependencyInjector.get(HateoasResourceService);
   }

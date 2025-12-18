@@ -11,7 +11,7 @@ export class CacheKey {
    */
   public value: string;
 
-  private constructor(public readonly url: string, private readonly options: {
+  private constructor(public readonly url: string, private readonly options?: {
     observe?: 'body' | 'response';
     params?: HttpParams
   }) {
@@ -32,7 +32,7 @@ export class CacheKey {
    * @param url resource url
    * @param params request params
    */
-  public static of(url: string, params: {
+  public static of(url: string, params?: {
     observe?: 'body' | 'response';
     params?: HttpParams
   }): CacheKey {

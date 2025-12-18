@@ -75,7 +75,7 @@ export class CommonResourceHttpService extends HttpExecutor {
       default:
         const errMsg = `allowed ony GET/POST/PUT/PATCH http methods you pass ${ method }`;
         StageLogger.stageErrorLog(Stage.HTTP_REQUEST, {error: errMsg, options});
-        return observableThrowError(new Error(errMsg));
+        return observableThrowError(() => new Error(errMsg));
     }
 
     return result.pipe(

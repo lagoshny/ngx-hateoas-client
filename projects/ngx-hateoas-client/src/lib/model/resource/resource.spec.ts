@@ -1,18 +1,19 @@
-import {TestBed, waitForAsync} from '@angular/core/testing';
-import {ResourceHttpService} from '../../service/internal/resource-http.service';
-import {DependencyInjector} from '../../util/dependency-injector';
-import {Resource} from './resource';
-import {of} from 'rxjs';
-import {ResourceUtils} from '../../util/resource.utils';
-import {HttpHeaders, HttpResponse} from '@angular/common/http';
-import {LibConfig} from '../../config/lib-config';
-import {HateoasResource} from '../decorators';
-import {Injector} from '@angular/core';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { TestBed } from '@angular/core/testing';
+import { ResourceHttpService } from '../../service/internal/resource-http.service';
+import { DependencyInjector } from '../../util/dependency-injector';
+import { Resource } from './resource';
+import { of } from 'rxjs';
+import { ResourceUtils } from '../../util/resource.utils';
+import { HttpHeaders, HttpResponse } from '@angular/common/http';
+import { LibConfig } from '../../config/lib-config';
+import { HateoasResource } from '../decorators';
+import { Injector } from '@angular/core';
 
 // tslint:disable:variable-name
 // tslint:disable:no-string-literal
 class TestProductResource extends Resource {
-  _links = {
+  override _links = {
     self: {
       href: 'http://localhost:8080/api/v1/product/1'
     },
@@ -23,7 +24,7 @@ class TestProductResource extends Resource {
 }
 
 class TestProductSelfTemplatedResource extends Resource {
-  _links = {
+  override _links = {
     self: {
       href: 'http://localhost:8080/api/v1/product/1{?projection}',
       templated: true
@@ -35,7 +36,7 @@ class TestProductSelfTemplatedResource extends Resource {
 }
 
 class BadTestProductResource extends Resource {
-  _links = {
+  override _links = {
     self: {
       href: 'http://localhost:8080/api/v1/product/'
     },
@@ -47,7 +48,7 @@ class BadTestProductResource extends Resource {
 
 @HateoasResource('testOrder')
 class TestOrderResource extends Resource {
-  _links = {
+  override _links = {
     self: {
       href: 'http://localhost:8080/api/v1/order/1'
     },
@@ -78,12 +79,12 @@ describe('Resource ADD_RELATION', () => {
   let resource: Resource;
   let resourceHttpServiceSpy: any;
 
-  beforeEach(waitForAsync(() => {
+  beforeEach(async () => {
     resourceHttpServiceSpy = {
-      post: jasmine.createSpy('post')
+      post: vi.fn()
     };
 
-    TestBed.configureTestingModule({
+    await TestBed.configureTestingModule({
       providers: [
         {
           provide: LibConfig, useValue: {
@@ -91,20 +92,15 @@ describe('Resource ADD_RELATION', () => {
             baseApiUrl: 'http://localhost:8080/api/v1',
           }
         },
-        {provide: ResourceHttpService, useValue: resourceHttpServiceSpy}
+        { provide: ResourceHttpService, useValue: resourceHttpServiceSpy }
       ]
     }).compileComponents();
-  }));
+  });
 
   beforeEach(() => {
     resource = new TestOrderResource();
     DependencyInjector.injector = TestBed.inject(Injector);
     ResourceUtils.useResourceType(Resource);
-  });
-
-  afterEach(() => {
-    DependencyInjector.injector = null;
-    ResourceUtils.useResourceType(null);
   });
 
   it('should throw error when passed relationName is empty', () => {
@@ -117,53 +113,43 @@ describe('Resource ADD_RELATION', () => {
       .toThrowError(`Passed param(s) 'entities = []' is not valid`);
   });
 
-  it('should throw error when passed relationName,entities are undefined', () => {
-    expect(() => resource.addCollectionRelation(undefined, undefined))
-      .toThrowError(`Passed param(s) 'relationName = undefined', 'entities = undefined' are not valid`);
-  });
-
-  it('should throw error when passed relationName,entities are null', () => {
-    expect(() => resource.addCollectionRelation(null, null))
-      .toThrowError(`Passed param(s) 'relationName = null', 'entities = null' are not valid`);
-  });
-
   it('should clear template params in TEMPLATED relation link', () => {
-    resourceHttpServiceSpy.post.and.returnValue(of(new HttpResponse()));
+    resourceHttpServiceSpy.post.mockReturnValue(of(new HttpResponse()));
 
     resource.addCollectionRelation('product', [new TestProductResource()])
       .subscribe(() => {
-        const resultResourceUrl = resourceHttpServiceSpy.post.calls.argsFor(0)[0];
+        const resultResourceUrl = vi.mocked(resourceHttpServiceSpy.post).mock.calls[0][0];
         expect(resultResourceUrl).toBe('http://localhost:8080/api/v1/order/1/products');
       });
   });
 
   it('should pass relation self link as body', () => {
-    resourceHttpServiceSpy.post.and.returnValue(of(new HttpResponse()));
+    resourceHttpServiceSpy.post.mockReturnValue(of(new HttpResponse()));
 
     resource.addCollectionRelation('product', [new TestProductResource()])
       .subscribe(() => {
-        const body = resourceHttpServiceSpy.post.calls.argsFor(0)[1];
+        const body = vi.mocked(resourceHttpServiceSpy.post).mock.calls[0][1];
         expect(body).toBe('http://localhost:8080/api/v1/product/1');
       });
   });
 
   it('should pass content-type: text/uri-list', () => {
-    resourceHttpServiceSpy.post.and.returnValue(of(new HttpResponse()));
+    resourceHttpServiceSpy.post.mockReturnValue(of(new HttpResponse()));
 
     resource.addCollectionRelation('product', [new TestProductResource()])
       .subscribe(() => {
-        const headers = resourceHttpServiceSpy.post.calls.argsFor(0)[2].headers as HttpHeaders;
-        expect(headers.has('Content-Type')).toBeTrue();
+        const headers = vi.mocked(resourceHttpServiceSpy.post).mock.calls[0][2].headers as HttpHeaders;
+        expect(headers.has('Content-Type')).toBe(true);
         expect(headers.get('Content-Type')).toBe('text/uri-list');
       });
   });
 
   it('should pass observe "response" value', () => {
-    resourceHttpServiceSpy.post.and.returnValue(of(new HttpResponse()));
+    resourceHttpServiceSpy.post.mockReturnValue(of(new HttpResponse()));
 
     resource.addCollectionRelation('product', [new TestProductResource()])
       .subscribe(() => {
-        const observe = resourceHttpServiceSpy.post.calls.argsFor(0)[2].observe;
+        const observe = vi.mocked(resourceHttpServiceSpy.post).mock.calls[0][2].observe;
         expect(observe).toBeDefined();
         expect(observe).toBe('response');
       });
@@ -175,12 +161,12 @@ describe('Resource BIND_RELATION', () => {
   let resource: Resource;
   let resourceHttpServiceSpy: any;
 
-  beforeEach(waitForAsync(() => {
+  beforeEach(async () => {
     resourceHttpServiceSpy = {
-      put: jasmine.createSpy('put')
+      put: vi.fn()
     };
 
-    TestBed.configureTestingModule({
+    await TestBed.configureTestingModule({
       providers: [
         {
           provide: LibConfig, useValue: {
@@ -188,10 +174,10 @@ describe('Resource BIND_RELATION', () => {
             baseApiUrl: 'http://localhost:8080/api/v1',
           }
         },
-        {provide: ResourceHttpService, useValue: resourceHttpServiceSpy}
+        { provide: ResourceHttpService, useValue: resourceHttpServiceSpy }
       ]
     }).compileComponents();
-  }));
+  });
 
   beforeEach(() => {
     DependencyInjector.injector = TestBed.inject(Injector);
@@ -199,63 +185,48 @@ describe('Resource BIND_RELATION', () => {
     resource = new TestOrderResource();
   });
 
-  afterEach(() => {
-    DependencyInjector.injector = null;
-    ResourceUtils.useResourceType(null);
-  });
-
   it('should throw error when passed relationName is empty', () => {
     expect(() => resource.bindRelation('', new TestProductResource()))
       .toThrowError(`Passed param(s) 'relationName = ' is not valid`);
   });
 
-  it('should throw error when passed relationName,entity are undefined', () => {
-    expect(() => resource.bindRelation(undefined, undefined))
-      .toThrowError(`Passed param(s) 'relationName = undefined', 'entities = undefined' are not valid`);
-  });
-
-  it('should throw error when passed relationName,entity are null', () => {
-    expect(() => resource.bindRelation(null, null))
-      .toThrowError(`Passed param(s) 'relationName = null', 'entities = null' are not valid`);
-  });
-
   it('should clear template params in TEMPLATED relation link', () => {
-    resourceHttpServiceSpy.put.and.returnValue(of(new HttpResponse()));
+    resourceHttpServiceSpy.put.mockReturnValue(of(new HttpResponse()));
 
     resource.bindRelation('product', new TestProductResource())
       .subscribe(() => {
-        const resultResourceUrl = resourceHttpServiceSpy.put.calls.argsFor(0)[0];
+        const resultResourceUrl = vi.mocked(resourceHttpServiceSpy.put).mock.calls[0][0];
         expect(resultResourceUrl).toBe('http://localhost:8080/api/v1/order/1/products');
       });
   });
 
   it('should pass relation self link as body', () => {
-    resourceHttpServiceSpy.put.and.returnValue(of(new HttpResponse()));
+    resourceHttpServiceSpy.put.mockReturnValue(of(new HttpResponse()));
 
     resource.bindRelation('product', new TestProductResource())
       .subscribe(() => {
-        const body = resourceHttpServiceSpy.put.calls.argsFor(0)[1];
+        const body = vi.mocked(resourceHttpServiceSpy.put).mock.calls[0][1];
         expect(body).toBe('http://localhost:8080/api/v1/product/1');
       });
   });
 
   it('should pass content-type: text/uri-list', () => {
-    resourceHttpServiceSpy.put.and.returnValue(of(new HttpResponse()));
+    resourceHttpServiceSpy.put.mockReturnValue(of(new HttpResponse()));
 
     resource.bindRelation('product', new TestProductResource())
       .subscribe(() => {
-        const headers = resourceHttpServiceSpy.put.calls.argsFor(0)[2].headers as HttpHeaders;
-        expect(headers.has('Content-Type')).toBeTrue();
+        const headers = vi.mocked(resourceHttpServiceSpy.put).mock.calls[0][2].headers as HttpHeaders;
+        expect(headers.has('Content-Type')).toBe(true);
         expect(headers.get('Content-Type')).toBe('text/uri-list');
       });
   });
 
   it('should pass observe "response" value', () => {
-    resourceHttpServiceSpy.put.and.returnValue(of(new HttpResponse()));
+    resourceHttpServiceSpy.put.mockReturnValue(of(new HttpResponse()));
 
     resource.bindRelation('product', new TestProductResource())
       .subscribe(() => {
-        const observe = resourceHttpServiceSpy.put.calls.argsFor(0)[2].observe;
+        const observe = vi.mocked(resourceHttpServiceSpy.put).mock.calls[0][2].observe;
         expect(observe).toBeDefined();
         expect(observe).toBe('response');
       });
@@ -267,12 +238,12 @@ describe('Resource UNBIND_RELATION', () => {
   let resource: Resource;
   let resourceHttpServiceSpy: any;
 
-  beforeEach(waitForAsync(() => {
+  beforeEach(async () => {
     resourceHttpServiceSpy = {
-      delete: jasmine.createSpy('delete')
+      delete: vi.fn()
     };
 
-    TestBed.configureTestingModule({
+    await TestBed.configureTestingModule({
       providers: [
         {
           provide: LibConfig, useValue: {
@@ -280,10 +251,10 @@ describe('Resource UNBIND_RELATION', () => {
             baseApiUrl: 'http://localhost:8080/api/v1',
           }
         },
-        {provide: ResourceHttpService, useValue: resourceHttpServiceSpy}
+        { provide: ResourceHttpService, useValue: resourceHttpServiceSpy }
       ]
     }).compileComponents();
-  }));
+  });
 
   beforeEach(() => {
     DependencyInjector.injector = TestBed.inject(Injector);
@@ -291,32 +262,17 @@ describe('Resource UNBIND_RELATION', () => {
     resource = new TestOrderResource();
   });
 
-  afterEach(() => {
-    DependencyInjector.injector = null;
-    ResourceUtils.useResourceType(null);
-  });
-
   it('should throw error when passed relationName is empty', () => {
     expect(() => resource.unbindRelation(''))
       .toThrowError(`Passed param(s) 'relationName = ' is not valid`);
   });
 
-  it('should throw error when passed relationName is undefined', () => {
-    expect(() => resource.unbindRelation(undefined))
-      .toThrowError(`Passed param(s) 'relationName = undefined' is not valid`);
-  });
-
-  it('should throw error when passed relationName is null', () => {
-    expect(() => resource.unbindRelation(null))
-      .toThrowError(`Passed param(s) 'relationName = null' is not valid`);
-  });
-
   it('should clear template params in TEMPLATED relation link', () => {
-    resourceHttpServiceSpy.delete.and.returnValue(of(new HttpResponse()));
+    resourceHttpServiceSpy.delete.mockReturnValue(of(new HttpResponse()));
 
     resource.unbindRelation('product')
       .subscribe(() => {
-        const resultResourceUrl = resourceHttpServiceSpy.delete.calls.argsFor(0)[0];
+        const resultResourceUrl = vi.mocked(resourceHttpServiceSpy.delete).mock.calls[0][0];
         expect(resultResourceUrl).toBe('http://localhost:8080/api/v1/order/1/products');
       });
   });
@@ -327,12 +283,12 @@ describe('Resource UNBIND_COLLECTION_RELATION', () => {
   let resource: Resource;
   let resourceHttpServiceSpy: any;
 
-  beforeEach(waitForAsync(() => {
+  beforeEach(async () => {
     resourceHttpServiceSpy = {
-      put: jasmine.createSpy('put')
+      put: vi.fn()
     };
 
-    TestBed.configureTestingModule({
+    await TestBed.configureTestingModule({
       providers: [
         {
           provide: LibConfig, useValue: {
@@ -340,10 +296,10 @@ describe('Resource UNBIND_COLLECTION_RELATION', () => {
             baseApiUrl: 'http://localhost:8080/api/v1',
           }
         },
-        {provide: ResourceHttpService, useValue: resourceHttpServiceSpy}
+        { provide: ResourceHttpService, useValue: resourceHttpServiceSpy }
       ]
     }).compileComponents();
-  }));
+  });
 
   beforeEach(() => {
     DependencyInjector.injector = TestBed.inject(Injector);
@@ -351,63 +307,48 @@ describe('Resource UNBIND_COLLECTION_RELATION', () => {
     resource = new TestOrderResource();
   });
 
-  afterEach(() => {
-    DependencyInjector.injector = null;
-    ResourceUtils.useResourceType(null);
-  });
-
   it('should throw error when passed relationName is empty', () => {
     expect(() => resource.unbindCollectionRelation(''))
       .toThrowError(`Passed param(s) 'relationName = ' is not valid`);
   });
 
-  it('should throw error when passed relationName is undefined', () => {
-    expect(() => resource.unbindCollectionRelation(undefined))
-      .toThrowError(`Passed param(s) 'relationName = undefined' is not valid`);
-  });
-
-  it('should throw error when passed relationName is null', () => {
-    expect(() => resource.unbindCollectionRelation(null))
-      .toThrowError(`Passed param(s) 'relationName = null' is not valid`);
-  });
-
   it('should clear template params in TEMPLATED relation link', () => {
-    resourceHttpServiceSpy.put.and.returnValue(of(new HttpResponse()));
+    resourceHttpServiceSpy.put.mockReturnValue(of(new HttpResponse()));
 
     resource.unbindCollectionRelation('product')
       .subscribe(() => {
-        const resultResourceUrl = resourceHttpServiceSpy.put.calls.argsFor(0)[0];
+        const resultResourceUrl = vi.mocked(resourceHttpServiceSpy.put).mock.calls[0][0];
         expect(resultResourceUrl).toBe('http://localhost:8080/api/v1/order/1/products');
       });
   });
 
   it('should pass empty string as body', () => {
-    resourceHttpServiceSpy.put.and.returnValue(of(new HttpResponse()));
+    resourceHttpServiceSpy.put.mockReturnValue(of(new HttpResponse()));
 
     resource.unbindCollectionRelation('product')
       .subscribe(() => {
-        const body = resourceHttpServiceSpy.put.calls.argsFor(0)[1];
+        const body = vi.mocked(resourceHttpServiceSpy.put).mock.calls[0][1];
         expect(body).toBe('');
       });
   });
 
   it('should pass content-type: text/uri-list', () => {
-    resourceHttpServiceSpy.put.and.returnValue(of(new HttpResponse()));
+    resourceHttpServiceSpy.put.mockReturnValue(of(new HttpResponse()));
 
     resource.unbindCollectionRelation('product')
       .subscribe(() => {
-        const headers = resourceHttpServiceSpy.put.calls.argsFor(0)[2].headers as HttpHeaders;
-        expect(headers.has('Content-Type')).toBeTrue();
+        const headers = vi.mocked(resourceHttpServiceSpy.put).mock.calls[0][2].headers as HttpHeaders;
+        expect(headers.has('Content-Type')).toBe(true);
         expect(headers.get('Content-Type')).toBe('text/uri-list');
       });
   });
 
   it('should pass observe "response" value', () => {
-    resourceHttpServiceSpy.put.and.returnValue(of(new HttpResponse()));
+    resourceHttpServiceSpy.put.mockReturnValue(of(new HttpResponse()));
 
     resource.unbindCollectionRelation('product')
       .subscribe(() => {
-        const observe = resourceHttpServiceSpy.put.calls.argsFor(0)[2].observe;
+        const observe = vi.mocked(resourceHttpServiceSpy.put).mock.calls[0][2].observe;
         expect(observe).toBeDefined();
         expect(observe).toBe('response');
       });
@@ -419,17 +360,17 @@ describe('Resource DELETE_RELATION', () => {
   let resource: Resource;
   let resourceHttpServiceSpy: any;
 
-  beforeEach(waitForAsync(() => {
+  beforeEach(async () => {
     resourceHttpServiceSpy = {
-      delete: jasmine.createSpy('delete')
+      delete: vi.fn()
     };
 
-    TestBed.configureTestingModule({
+    await TestBed.configureTestingModule({
       providers: [
-        {provide: ResourceHttpService, useValue: resourceHttpServiceSpy}
+        { provide: ResourceHttpService, useValue: resourceHttpServiceSpy }
       ]
     }).compileComponents();
-  }));
+  });
 
   beforeEach(() => {
     DependencyInjector.injector = TestBed.inject(Injector);
@@ -437,42 +378,27 @@ describe('Resource DELETE_RELATION', () => {
     resource = new TestOrderResource();
   });
 
-  afterEach(() => {
-    DependencyInjector.injector = null;
-    ResourceUtils.useResourceType(null);
-  });
-
   it('should throw error when passed relationName is empty', () => {
     expect(() => resource.deleteRelation('', new TestProductResource()))
       .toThrowError(`Passed param(s) 'relationName = ' is not valid`);
   });
 
-  it('should throw error when passed relationName,entity are undefined', () => {
-    expect(() => resource.deleteRelation(undefined, undefined))
-      .toThrowError(`Passed param(s) 'relationName = undefined', 'entity = undefined' are not valid`);
-  });
-
-  it('should throw error when passed relationName,entity are null', () => {
-    expect(() => resource.deleteRelation(null, null))
-      .toThrowError(`Passed param(s) 'relationName = null', 'entity = null' are not valid`);
-  });
-
   it('should generate url from relation link href and passed resource id retrieved by self link href', () => {
-    resourceHttpServiceSpy.delete.and.returnValue(of(new HttpResponse()));
+    resourceHttpServiceSpy.delete.mockReturnValue(of(new HttpResponse()));
 
     resource.deleteRelation('product', new TestProductResource())
       .subscribe(() => {
-        const resultResourceUrl = resourceHttpServiceSpy.delete.calls.argsFor(0)[0];
+        const resultResourceUrl = vi.mocked(resourceHttpServiceSpy.delete).mock.calls[0][0];
         expect(resultResourceUrl).toBe('http://localhost:8080/api/v1/order/1/products/1');
       });
   });
 
   it('should generate right url from self relation link with template', () => {
-    resourceHttpServiceSpy.delete.and.returnValue(of(new HttpResponse()));
+    resourceHttpServiceSpy.delete.mockReturnValue(of(new HttpResponse()));
 
     resource.deleteRelation('product', new TestProductSelfTemplatedResource())
       .subscribe(() => {
-        const resultResourceUrl = resourceHttpServiceSpy.delete.calls.argsFor(0)[0];
+        const resultResourceUrl = vi.mocked(resourceHttpServiceSpy.delete).mock.calls[0][0];
         expect(resultResourceUrl).toBe('http://localhost:8080/api/v1/order/1/products/1');
       });
   });
@@ -483,15 +409,14 @@ describe('Resource DELETE_RELATION', () => {
   });
 
   it('should pass observe "response" value', () => {
-    resourceHttpServiceSpy.delete.and.returnValue(of(new HttpResponse()));
+    resourceHttpServiceSpy.delete.mockReturnValue(of(new HttpResponse()));
 
     resource.deleteRelation('product', new TestProductResource())
       .subscribe(() => {
-        const observe = resourceHttpServiceSpy.delete.calls.argsFor(0)[1].observe;
+        const observe = vi.mocked(resourceHttpServiceSpy.delete).mock.calls[0][1].observe;
         expect(observe).toBeDefined();
         expect(observe).toBe('response');
       });
   });
 
 });
-

@@ -6,7 +6,7 @@ import { Injector, Type } from '@angular/core';
 /* tslint:disable:variable-name */
 export class DependencyInjector {
 
-  private static _injector: Injector = null;
+  private static _injector: Injector;
 
   static get<T>(type: Type<T>): T {
     if (this._injector) {

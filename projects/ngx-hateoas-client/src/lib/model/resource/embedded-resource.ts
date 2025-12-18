@@ -1,3 +1,4 @@
+import { Link } from '../declarations';
 import { BaseResource } from './base-resource';
 
 /**
@@ -17,5 +18,7 @@ import { BaseResource } from './base-resource';
  *   product: Product;
  * }
  */
+// tslint:disable:variable-name
 export class EmbeddedResource extends BaseResource {
+  declare _links: Link;
 }

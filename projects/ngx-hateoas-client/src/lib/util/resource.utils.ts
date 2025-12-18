@@ -1,8 +1,8 @@
 import { BaseResource } from '../model/resource/base-resource';
-import { isEmbeddedResource, isResource } from '../model/resource-type';
+import { getResourceProjection, isEmbeddedResource, isResource } from '../model/resource-type';
 import { ResourceCollection } from '../model/resource/resource-collection';
 import { PagedResourceCollection } from '../model/resource/paged-resource-collection';
-import { GetOption, Include, Link, PageData, RequestBody } from '../model/declarations';
+import { GetOption, Include, Link, LinkData, PageData, RequestBody } from '../model/declarations';
 import { Resource } from '../model/resource/resource';
 import { EmbeddedResource } from '../model/resource/embedded-resource';
 import { UrlUtils } from './url.utils';
@@ -12,6 +12,7 @@ import { includes, isArray, isEmpty, isNil, isObject, isPlainObject } from 'loda
 import { ConsoleLogger } from '../logger/console-logger';
 import { LibConfig } from '../config/lib-config';
 import { isMatch, parse } from 'date-fns';
+import { ResourceCtor } from '../model/decorators';
 
 /* tslint:disable:no-string-literal */
 export class ResourceUtils {
@@ -47,18 +48,18 @@ export class ResourceUtils {
     this.embeddedResourceType = type;
   }
 
-  public static instantiateResource<T extends BaseResource>(payload: object, isProjection?: boolean): T {
+  public static instantiateResource<T extends BaseResource>(payload: HateoasPayload, isProjection?: boolean): T | any {
     // @ts-ignore
     if (isEmpty(payload)
       || (!isObject(payload['_links']) || isEmpty(payload['_links']))) {
-      ConsoleLogger.warn('Incorrect resource object! Returned \'null\' value, because it has not \'_links\' array. Check that server send right resource object.', {incorrectResource: payload});
+      ConsoleLogger.warn('Incorrect resource object! Returned \'null\' value, because it has not \'_links\' array. Check that server send right resource object.', { incorrectResource: payload });
       return null;
     }
 
     return this.createResource(this.resolvePayloadProperties(payload, isProjection), isProjection);
   }
 
-  private static resolvePayloadProperties<T extends BaseResource>(payload: object, isProjection?: boolean): object {
+  private static resolvePayloadProperties(payload: HateoasPayload, isProjection?: boolean): object {
     for (const key of Object.keys(payload)) {
       if (key === 'hibernateLazyInitializer') {
         delete payload[key];
@@ -79,9 +80,10 @@ export class ResourceUtils {
         continue;
       }
 
-      if (LibConfig.getConfig()?.typesFormat?.date?.patterns && !isEmpty(LibConfig.getConfig().typesFormat.date.patterns)) {
-        for (const pattern of LibConfig.getConfig().typesFormat.date.patterns) {
-          if (isMatch(payload[key], pattern)) {
+      const configDatePatterns = LibConfig.getConfig().typesFormat?.date?.patterns;
+      if (configDatePatterns && !isEmpty(configDatePatterns)) {
+        for (const pattern of configDatePatterns) {
+          if (typeof payload[key] === 'string' && isMatch(payload[key], pattern)) {
             const valueAsDate = parse(payload[key], pattern, new Date());
             if (valueAsDate) {
               payload[key] = valueAsDate;
@@ -100,7 +102,7 @@ export class ResourceUtils {
     return payload;
   }
 
-  private static resolvePayloadType<T extends BaseResource>(key: string, payload: object, isProjection?: boolean): object {
+  private static resolvePayloadType(key: string, payload: HateoasPayload, isProjection?: boolean): object {
     if (isNil(payload)) {
       return payload;
     } else if (isArray(payload)) {
@@ -121,7 +123,7 @@ export class ResourceUtils {
     return payload;
   }
 
-  private static createResource<T extends BaseResource>(payload: any, isProjection?: boolean): T {
+  private static createResource<T extends BaseResource>(payload: HateoasPayload, isProjection?: boolean): T | BaseResource {
     const resourceName = this.findResourceName(payload);
     let resourceClass;
     if (isProjection && !ResourceUtils.RESOURCE_NAME_PROJECTION_TYPE_MAP.get(resourceName)) {
@@ -147,7 +149,7 @@ export class ResourceUtils {
     }
   }
 
-  private static createResourceProjectionRel<T extends Resource>(relationName: string, payload: any): T {
+  private static createResourceProjectionRel<T extends Resource>(relationName: string, payload: HateoasPayload): T | BaseResource {
     const relationClass = ResourceUtils.RESOURCE_PROJECTION_REL_NAME_TYPE_MAP.get(relationName);
     if (relationClass) {
       return Object.assign(new (relationClass)() as T, payload);
@@ -174,34 +176,37 @@ export class ResourceUtils {
     }
   }
 
-  public static instantiateResourceCollection<T extends ResourceCollection<BaseResource>>(payload: object, isProjection?: boolean): T {
+  public static instantiateResourceCollection<T extends ResourceCollection<BaseResource>>(
+    payload: HateoasPayload,
+    isProjection?: boolean
+  ): T | any {
     if (isEmpty(payload)
       || (!isObject(payload['_links']) || isEmpty(payload['_links']))
-      || (!LibConfig.getConfig().halFormat.collections.embeddedOptional &&
+      || (!LibConfig.getConfig().halFormat?.collections?.embeddedOptional &&
         (!('_embedded' in payload) || !isObject(payload['_embedded']) || isEmpty(payload['_embedded'])))) {
       return null;
     }
     const result = new this.resourceCollectionType() as T;
     if ('_embedded' in payload && isObject(payload['_embedded']) && !isEmpty(payload['_embedded'])) {
       for (const resourceName of Object.keys(payload['_embedded'])) {
-        payload['_embedded'][resourceName].forEach((resource) => {
+        payload['_embedded'][resourceName].forEach((resource: any) => {
           result.resources.push(this.instantiateResource(resource, isProjection));
         });
       }
     }
-    result['_links'] = {...payload['_links']};
+    result['_links'] = { ...payload['_links'] };
 
     return result;
   }
 
-  public static instantiatePagedResourceCollection<T extends PagedResourceCollection<BaseResource>>(payload: object,
-                                                                                                    isProjection?: boolean): T {
+  public static instantiatePagedResourceCollection<T extends PagedResourceCollection<BaseResource>>(payload: HateoasPayload,
+                                                                                                    isProjection?: boolean): T | any {
     const resourceCollection = this.instantiateResourceCollection(payload, isProjection);
     if (resourceCollection == null) {
       return null;
     }
 
-    let result;
+    let result: PagedResourceCollection<BaseResource>;
     if (payload['page']) {
       result = new this.pagedResourceCollectionType(resourceCollection, payload as PageData);
     } else {
@@ -217,26 +222,25 @@ export class ResourceUtils {
    *
    * @param requestBody that contains the body directly and optional body values option {@link ValuesOption}
    */
-  public static resolveValues(requestBody: RequestBody<any>): any {
+  public static resolveValues(requestBody?: RequestBody<any>): any {
     if (isEmpty(requestBody) || isNil(requestBody.body)
-      || (LibConfig.getConfig().halFormat.json.convertEmptyObjectToNull
+      || (LibConfig.getConfig().halFormat?.json?.convertEmptyObjectToNull
         && !isArray(requestBody.body) && isObject(requestBody.body) && isEmpty(requestBody.body))) {
-      StageLogger.stageLog(Stage.RESOLVE_VALUES, {result: 'body is empty return null'});
+      StageLogger.stageLog(Stage.RESOLVE_VALUES, { result: 'body is empty return null' });
       return null;
     }
 
-    const body = requestBody.body;
-    if (!isObject(body) || isArray(body)) {
-      StageLogger.stageLog(Stage.RESOLVE_VALUES, {result: 'body is not object or array return as is'});
-      return body;
+    if (!isObject(requestBody.body) || isArray(requestBody.body)) {
+      StageLogger.stageLog(Stage.RESOLVE_VALUES, { result: 'body is not object or array return as is' });
+      return requestBody.body;
     }
-
+    const body = requestBody.body as Record<string, any>;
     let includeOptions = requestBody?.valuesOption?.include;
-    if (!isArray(includeOptions)) {
+    if (includeOptions && !isArray(includeOptions)) {
       includeOptions = [includeOptions];
     }
 
-    const result: object = {};
+    const result: Record<string, any> = {};
     for (const key in body) {
       if (!body.hasOwnProperty(key)) {
         continue;
@@ -255,35 +259,20 @@ export class ResourceUtils {
           if (isResource(element) && !includes(includeOptions, Include.REL_RESOURCES_AS_OBJECTS)) {
             result[key].push(element?._links?.self?.href);
           } else {
-            result[key].push(this.resolveValues({body: element, valuesOption: requestBody?.valuesOption}));
+            result[key].push(this.resolveValues({ body: element, valuesOption: requestBody?.valuesOption }));
           }
         });
       } else if (isResource(body[key]) && !includes(includeOptions, Include.REL_RESOURCES_AS_OBJECTS)) {
         result[key] = body[key]._links?.self?.href;
       } else if (isPlainObject(body[key])) {
-        result[key] = this.resolveValues({body: body[key], valuesOption: requestBody?.valuesOption});
+        result[key] = this.resolveValues({ body: body[key], valuesOption: requestBody?.valuesOption });
       } else {
         result[key] = body[key];
       }
     }
-    StageLogger.stageLog(Stage.RESOLVE_VALUES, {result});
+    StageLogger.stageLog(Stage.RESOLVE_VALUES, { result });
 
     return result;
-  }
-
-  /**
-   * Assign {@link Resource} or {@link EmbeddedResource} properties to passed entity.
-   *
-   * @param entity to be converter to resource
-   */
-  public static initResource(entity: any): BaseResource | any {
-    if (isResource(entity)) {
-      return Object.assign(new this.resourceType(), entity);
-    } else if (isEmbeddedResource(entity)) {
-      return Object.assign(new this.embeddedResourceType(), entity);
-    } else {
-      return entity;
-    }
   }
 
   /**
@@ -292,16 +281,16 @@ export class ResourceUtils {
    *
    * @param payload that can be a resource for which to find the name
    */
-  private static findResourceName(payload: object): string {
+  private static findResourceName(payload: HateoasPayload): string {
     if (!payload || !payload['_links'] || !payload['_links'].self) {
       return '';
     }
     const resourceLinks = payload['_links'] as Link;
-    if (isEmpty(resourceLinks) || isEmpty(resourceLinks.self) || isNil(resourceLinks.self.href)) {
+    if (isEmpty(resourceLinks) || isEmpty(resourceLinks['self']) || isNil(resourceLinks['self'].href)) {
       return '';
     }
 
-    return UrlUtils.getResourceNameFromUrl(UrlUtils.removeTemplateParams(resourceLinks.self.href));
+    return UrlUtils.getResourceNameFromUrl(UrlUtils.removeTemplateParams(resourceLinks['self'].href));
   }
 
   /**
@@ -309,7 +298,7 @@ export class ResourceUtils {
    *
    * @param payload object that can be resource or resource projection
    */
-  private static isResourceProjection(payload: object): boolean {
+  private static isResourceProjection(payload: HateoasPayload): boolean {
     if (!payload || !payload['_links'] || !payload['_links'].self) {
       return false;
     }
@@ -331,13 +320,13 @@ export class ResourceUtils {
    * @param resourceType from get projectionName
    * @param options to set projectionName
    */
-  public static fillProjectionNameFromResourceType<T extends Resource>(resourceType: new () => T, options?: GetOption) {
+  public static fillProjectionNameFromResourceType<T extends Resource>(resourceType: ResourceCtor<T>, options?: GetOption) {
     if (!resourceType) {
-      return;
+      return undefined;
     }
-    const projectionName = resourceType['__projectionName__'];
+    const projectionName = getResourceProjection(resourceType);
     if (projectionName) {
-      options = options ? options : {params: {}};
+      options = options ? options : { params: {} };
       options = {
         ...options,
         params: {
@@ -351,3 +340,17 @@ export class ResourceUtils {
   }
 
 }
+
+export interface HateoasEmbeddedPayload {
+  [resourceName: string]: any;
+}
+
+export interface HateoasPayload {
+  [propertyName: string]: any;
+  _links?: {
+    self?: LinkData;
+  } & Record<string, LinkData>;
+  hibernateLazyInitializer?: any;
+  _embedded?: HateoasEmbeddedPayload;
+}
+

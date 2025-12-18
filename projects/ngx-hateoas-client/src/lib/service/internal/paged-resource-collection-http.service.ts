@@ -56,8 +56,8 @@ export class PagedResourceCollectionHttpService extends HttpExecutor {
             if (LibConfig.getConfig().cache.enabled) {
               this.cacheService.evictResource(CacheKey.of(url, httpOptions));
             }
-            const errMsg = `You try to get wrong resource type: expected PagedResourceCollection type, actual ${ getResourceType(data) } type.`;
-            StageLogger.stageErrorLog(Stage.INIT_RESOURCE, {error: errMsg, options});
+            const errMsg = `You try to get wrong resource type: expected PagedResourceCollection type, actual ${getResourceType(data)} type.`;
+            StageLogger.stageErrorLog(Stage.INIT_RESOURCE, { error: errMsg, options });
             throw new Error(errMsg);
           }
 
@@ -77,13 +77,13 @@ export class PagedResourceCollectionHttpService extends HttpExecutor {
   public getResourcePage<T extends PagedResourceCollection<BaseResource>>(resourceName: string,
                                                                           resourceOptions: ResourceOption,
                                                                           options?: PagedGetOption): Observable<T> {
-    ValidationUtils.validateInputParams({resourceName});
-
-    const url = UrlUtils.removeTemplateParams(UrlUtils.generateResourceUrl(UrlUtils.getApiUrl(resourceOptions.routeName), resourceName));
+    ValidationUtils.validateInputParams({ resourceName });
+    const url = UrlUtils.removeTemplateParams(
+      UrlUtils.generateResourceUrl(UrlUtils.getApiUrl(resourceOptions.routeName), resourceName));
 
     StageLogger.stageLog(Stage.PREPARE_URL, {
       result: url,
-      urlParts: `baseUrl: '${ UrlUtils.getApiUrl(resourceOptions.routeName) }', resource: '${ resourceName }'`,
+      urlParts: `baseUrl: '${UrlUtils.getApiUrl(resourceOptions.routeName)}', resource: '${resourceName}'`,
       options
     });
 
@@ -103,14 +103,14 @@ export class PagedResourceCollectionHttpService extends HttpExecutor {
                                                                  resourceOptions: ResourceOption,
                                                                  searchQuery: string,
                                                                  options?: PagedGetOption): Observable<T> {
-    ValidationUtils.validateInputParams({resourceName, searchQuery});
-
+    ValidationUtils.validateInputParams({ resourceName, searchQuery });
     const url = UrlUtils.removeTemplateParams(
-      UrlUtils.generateResourceUrl(UrlUtils.getApiUrl(resourceOptions.routeName), resourceName)).concat('/search/' + searchQuery);
+      UrlUtils.generateResourceUrl(UrlUtils.getApiUrl(resourceOptions.routeName), resourceName))
+      .concat('/search/' + searchQuery);
 
     StageLogger.stageLog(Stage.PREPARE_URL, {
       result: url,
-      urlParts: `baseUrl: '${ UrlUtils.getApiUrl(resourceOptions.routeName) }', resource: '${ resourceName }'`,
+      urlParts: `baseUrl: '${UrlUtils.getApiUrl(resourceOptions.routeName)}', resource: '${resourceName}'`,
       options
     });
 

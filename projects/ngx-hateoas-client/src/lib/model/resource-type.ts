@@ -1,5 +1,8 @@
 import { isObject } from 'lodash-es';
 import { LibConfig } from '../config/lib-config';
+import { ResourceCtor } from './decorators';
+import { RESOURCE_NAME_PROP, RESOURCE_OPTIONS_PROP, RESOURCE_PROJECTION_NAME_PROP } from './declarations';
+import { ResourceOption } from '../config/hateoas-configuration.interface';
 
 export function isEmbeddedResource(object: any) {
   // Embedded resource doesn't have self link in _links object
@@ -20,7 +23,7 @@ export function isResourceCollection(object: any): boolean {
     return false;
   }
 
-  if (LibConfig.getConfig().halFormat.collections.embeddedOptional) {
+  if (LibConfig.getConfig().halFormat?.collections?.embeddedOptional) {
     return baseCondition && (Object.keys(object).length === 1 ||
       '_embedded' in object && Object.keys(object).length === 2);
   } else {
@@ -71,3 +74,46 @@ export function getResourceType(object: any): string {
     return 'Unknown';
   }
 }
+
+/**
+ * Get resource name from resource constructor meta info.
+ * @throws Error when resource does not have a name.
+ */
+export function getResourceName(ctor: ResourceCtor): string {
+  const name = ctor[RESOURCE_NAME_PROP];
+  if (!name) {
+    throw new Error(
+      `Resource '${ctor.name}' does not have resourceName metadata`
+    );
+  }
+  return name;
+}
+
+/**
+ * Get resource options from resource constructor meta info.
+ * @throws Error when resource does not have options.
+ */
+export function getResourceOptions(ctor: ResourceCtor): ResourceOption {
+  const options = ctor[RESOURCE_OPTIONS_PROP];
+  if (!options) {
+    throw new Error(
+      `Resource '${ctor.name}' does not have resourceOptions metadata`
+    );
+  }
+  return options;
+}
+
+/**
+ * Get resource projection from resource constructor meta info.
+ */
+export function getResourceProjection(ctor: ResourceCtor): string | undefined {
+  return ctor[RESOURCE_PROJECTION_NAME_PROP];
+}
+
+/**
+ * Returns {@code true} if value is [ResourceCtor], false otherwise.
+ */
+export function isResourceCtor(value: any): value is ResourceCtor {
+  return typeof value === 'function';
+}
+

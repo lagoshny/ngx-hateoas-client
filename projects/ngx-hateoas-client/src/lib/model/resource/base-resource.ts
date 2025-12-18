@@ -9,7 +9,7 @@ import { HttpResponse } from '@angular/common/http';
 import { getPagedResourceCollectionHttpService } from '../../service/internal/paged-resource-collection-http.service';
 import { PagedResourceCollection } from './paged-resource-collection';
 import { ResourceUtils } from '../../util/resource.utils';
-import { tap } from 'rxjs/operators';
+import { map, tap } from 'rxjs/operators';
 import { StageLogger } from '../../logger/stage-logger';
 import { ValidationUtils } from '../../util/validation.utils';
 
@@ -29,20 +29,21 @@ export abstract class BaseResource extends AbstractResource {
   public getRelation<T extends BaseResource>(relationName: string,
                                              options?: GetOption
   ): Observable<T> {
-    ValidationUtils.validateInputParams({relationName});
-    StageLogger.resourceBeginLog(this, 'GET_RELATION', {relationName, options});
+    ValidationUtils.validateInputParams({ relationName });
+    StageLogger.resourceBeginLog(this, 'GET_RELATION', { relationName, options });
 
     const relationLink = this.getRelationLink(relationName);
     const optionsToRequest = relationLink.templated
-      ? {...options, params: undefined, sort: undefined}
+      ? { ...options, params: undefined, sort: undefined }
       : options;
 
     return getResourceHttpService()
       .get(UrlUtils.generateLinkUrl(relationLink, options), optionsToRequest)
       .pipe(
         tap(() => {
-          StageLogger.resourceEndLog(this, 'GET_RELATION', {result: `relation ${ relationName } was got successful`});
-        })
+          StageLogger.resourceEndLog(this, 'GET_RELATION', { result: `relation ${relationName} was got successful` });
+        }),
+        map(result => result as T)
       ) as Observable<T>;
   }
 
@@ -56,21 +57,22 @@ export abstract class BaseResource extends AbstractResource {
   public getRelatedCollection<T extends ResourceCollection<BaseResource>>(relationName: string,
                                                                           options?: GetOption
   ): Observable<T> {
-    ValidationUtils.validateInputParams({relationName});
-    StageLogger.resourceBeginLog(this, 'GET_RELATED_COLLECTION', {relationName, options});
+    ValidationUtils.validateInputParams({ relationName });
+    StageLogger.resourceBeginLog(this, 'GET_RELATED_COLLECTION', { relationName, options });
 
     const relationLink = this.getRelationLink(relationName);
     // For templated links removed some part of params to avoid duplication in template params and http request params
     const optionsToRequest = relationLink.templated
-      ? {...options, params: undefined}
+      ? { ...options, params: undefined }
       : options;
 
     return getResourceCollectionHttpService()
       .get(UrlUtils.generateLinkUrl(relationLink, options), optionsToRequest)
       .pipe(
         tap(() => {
-          StageLogger.resourceEndLog(this, 'GET_RELATED_COLLECTION', {result: `related collection ${ relationName } was got successful`});
-        })
+          StageLogger.resourceEndLog(this, 'GET_RELATED_COLLECTION', { result: `related collection ${relationName} was got successful` });
+        }),
+        map(result => result as T)
       ) as Observable<T>;
   }
 
@@ -84,13 +86,13 @@ export abstract class BaseResource extends AbstractResource {
    */
   public getRelatedPage<T extends PagedResourceCollection<BaseResource>>(relationName: string,
                                                                          options?: PagedGetOption): Observable<T> {
-    ValidationUtils.validateInputParams({relationName});
-    StageLogger.resourceBeginLog(this, 'GET_RELATED_PAGE', {relationName, options});
+    ValidationUtils.validateInputParams({ relationName });
+    StageLogger.resourceBeginLog(this, 'GET_RELATED_PAGE', { relationName, options });
 
     const relationLink = this.getRelationLink(relationName);
     // For templated links removed some part of params to avoid duplication in template params and http request params
     const optionsToRequest = relationLink.templated
-      ? {...options, params: undefined, pageParams: undefined}
+      ? { ...options, params: undefined, pageParams: undefined }
       : options;
 
     return getPagedResourceCollectionHttpService()
@@ -100,8 +102,9 @@ export abstract class BaseResource extends AbstractResource {
       .pipe(
         tap(() => {
           StageLogger.resourceEndLog(this, 'GET_RELATED_PAGE', {result: `related page ${ relationName } was got successful`});
-        })
-      ) as Observable<T>;
+        }),
+        map(result => result as T)
+      );
   }
 
   /**
@@ -115,8 +118,8 @@ export abstract class BaseResource extends AbstractResource {
   public postRelation(relationName: string,
                       requestBody: RequestBody<any>,
                       options?: RequestOption): Observable<HttpResponse<any> | any> {
-    ValidationUtils.validateInputParams({relationName, requestBody});
-    StageLogger.resourceBeginLog(this, 'POST_RELATION', {relationName, requestBody, options});
+    ValidationUtils.validateInputParams({ relationName, requestBody });
+    StageLogger.resourceBeginLog(this, 'POST_RELATION', { relationName, requestBody, options });
 
     const relationLink = this.getRelationLink(relationName);
 
@@ -131,7 +134,7 @@ export abstract class BaseResource extends AbstractResource {
         })
       .pipe(
         tap(() => {
-          StageLogger.resourceEndLog(this, 'POST_RELATION', {result: `relation ${ relationName } was posted successful`});
+          StageLogger.resourceEndLog(this, 'POST_RELATION', { result: `relation ${relationName} was posted successful` });
         })
       );
   }
@@ -148,8 +151,8 @@ export abstract class BaseResource extends AbstractResource {
   public patchRelation(relationName: string,
                        requestBody: RequestBody<any>,
                        options?: RequestOption): Observable<HttpResponse<any> | any> {
-    ValidationUtils.validateInputParams({relationName, requestBody});
-    StageLogger.resourceBeginLog(this, 'PATCH_RELATION', {relationName, requestBody, options});
+    ValidationUtils.validateInputParams({ relationName, requestBody });
+    StageLogger.resourceBeginLog(this, 'PATCH_RELATION', { relationName, requestBody, options });
 
     const relationLink = this.getRelationLink(relationName);
 
@@ -164,7 +167,7 @@ export abstract class BaseResource extends AbstractResource {
         })
       .pipe(
         tap(() => {
-          StageLogger.resourceEndLog(this, 'PATCH_RELATION', {result: `relation ${ relationName } was patched successful`});
+          StageLogger.resourceEndLog(this, 'PATCH_RELATION', { result: `relation ${relationName} was patched successful` });
         })
       );
   }
@@ -181,8 +184,8 @@ export abstract class BaseResource extends AbstractResource {
   public putRelation(relationName: string,
                      requestBody: RequestBody<any>,
                      options?: RequestOption): Observable<HttpResponse<any> | any> {
-    ValidationUtils.validateInputParams({relationName, requestBody});
-    StageLogger.resourceBeginLog(this, 'PUT_RELATION', {relationName, requestBody, options});
+    ValidationUtils.validateInputParams({ relationName, requestBody });
+    StageLogger.resourceBeginLog(this, 'PUT_RELATION', { relationName, requestBody, options });
 
     const relationLink = this.getRelationLink(relationName);
 
@@ -197,7 +200,7 @@ export abstract class BaseResource extends AbstractResource {
         })
       .pipe(
         tap(() => {
-          StageLogger.resourceEndLog(this, 'PUT_RELATION', {result: `relation ${ relationName } was put successful`});
+          StageLogger.resourceEndLog(this, 'PUT_RELATION', { result: `relation ${relationName} was put successful` });
         })
       );
   }

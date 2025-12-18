@@ -11,7 +11,7 @@
     "date-fns": "^4.1.0"
   },
   "dependencies": {
-    "uri-templates-es": "^1.0.1",
+    "uri-templates-es": "^2.0.2",
     "lodash-es": "^4.17.21",
     "date-fns": "^4.1.0",
     "tslib": "^2.8.1"

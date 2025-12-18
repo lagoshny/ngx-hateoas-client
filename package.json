@@ -35,7 +35,7 @@
   },
   "devDependencies": {
     "@angular/build": "^21.0.1",
-    "@angular/cli": "^21.0.1",
+    "@angular/cli": "^21.0.3",
     "@angular/compiler-cli": "^21.0.1",
     "@types/lodash-es": "^4.17.12",
     "@types/node": "^22.10.1",

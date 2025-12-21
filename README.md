@@ -31,7 +31,6 @@
 
 ### 💡 Old versioning policy.
 - Versions that work with old `View Engine` compilation [`2.0.0`-`2.x.x`].
-
 - Versions that work with new `Ivy` compilation [`3.0.0`-`x.x.x`] and supports Angular from 12.x.x - 21.x.x.
 
 ### 💡 New versioning policy.

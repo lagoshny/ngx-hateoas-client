@@ -33,7 +33,8 @@
 
 - Versions that work with old `View Engine` compilation [`2.0.0`-`2.x.x`].
 
-- Versions that work with new `Ivy` compilation [`3.0.0`-`x.x.x`].
+- Versions that work with new `Ivy` compilation [`3.0.0`-`x.x.x`] and supports Angular from 12.x.x - 21.x.x.
+- New releases will respect with Angular versions. For example current Angular has 21 version, then lib version will be 21.x.x. The lib will be respect only with *major* version. Minor and patched version will be own not respect to Angular version. New lib versioning policy helps you choose the right release, depends on your Angular version.
 
 This client can be used to develop `Angular 12+` applications working with RESTfull server API.
 By `RESTfull API` means when the server application implements all the layers of the [Richardson Maturity Model](https://martinfowler.com/articles/richardsonMaturityModel.html)
@@ -506,15 +507,21 @@ Note, `UserService` extends `HateoasResourceOperation` and uses `HateoasResource
 
 ### Using TestBed
 
+#### Standalone system
+>If you have the app with standalone components then you don't need any lib configuration to test it.
+>You don't need to configure TestBed additionally.
+
+#### NgModule system
+
 If you prefer to use standard `TestBed` for testing, you can do that in the following way:
 
 ````ts
-// TODO: check test example
 import {
   HateoasResourceService,
   NgxHateoasClientModule,
   PagedResourceCollection,
-  ResourceCollection
+  ResourceCollection,
+  provideNgxHateoasClientTesting
 } from '@lagoshny/ngx-hateoas-client';
 import { TestBed } from '@angular/core/testing';
 import { of } from 'rxjs';
@@ -531,11 +538,7 @@ describe('UserServiceTest', () => {
     TestBed.configureTestingModule({
       providers: [
         UserService,
-        provideNgxHateoasClient({
-          http: {
-            rootUrl: 'http://localhost:8080/api/v1'
-          },
-        }),
+        provideNgxHateoasClientTesting(), // also you can provide custom configuration if need it
         {provide: HateoasResourceService, useValue: hateoasResourceServiceSpy}
       ]
     });
@@ -588,14 +591,13 @@ describe('UserServiceTest', () => {
 If you prefer to use [@ngneat/spectator](https://www.npmjs.com/package/@ngneat/spectator) for testing, you can do that in the following way:
 
 ```ts
-// TODO: check Spectator example
 import {
   HateoasResourceService,
   NgxHateoasClientModule,
   PagedResourceCollection,
-  ResourceCollection
+  ResourceCollection,
+  provideNgxHateoasClientTesting
 } from '@lagoshny/ngx-hateoas-client';
-import { waitForAsync } from '@angular/core/testing';
 import { of } from 'rxjs';
 import { createServiceFactory, SpectatorService } from '@ngneat/spectator';
 
@@ -604,7 +606,7 @@ describe('UserServiceTest', () => {
   let spectator: SpectatorService<UserService>;
 
   const createService = createServiceFactory({
-    imports: [NgxHateoasClientModule.forRoot()],
+    providers: [provideNgxHateoasClientTesting()],
     service: UserService,
     mocks: [HateoasResourceService]
   });

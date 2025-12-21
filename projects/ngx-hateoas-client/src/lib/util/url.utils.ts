@@ -35,7 +35,7 @@ export class UrlUtils {
             (options.params[key] as Array<any>).forEach((item) => {
               resultParams = resultParams.append(`${key.toString()}`, item);
             });
-          } else {
+          } else if (key && value) {
             // Else append simple param as is
             resultParams = resultParams.append(key, value.toString());
           }

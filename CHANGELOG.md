@@ -1,3 +1,11 @@
+## 21.0.0 (2025-12-21)
+#### Changes
+- New versioning policy. Now lib respect to major Angular version.
+- The lib migrate from Jasmine / Karma test frameworks to recommended by Angular Vitest.
+- Enabled TypeScript strict mode and fixed all typing issues.
+- For `NgModules` projects added new test configuration `provideNgxHateoasClientTesting` that not require lib configuration. If you don't pass configuration, then will be used lib default one.
+- Updated lib dependencies
+
 ## 3.13.0 (2025-12-01)
 #### Changes
 Migrate to standalone component system.

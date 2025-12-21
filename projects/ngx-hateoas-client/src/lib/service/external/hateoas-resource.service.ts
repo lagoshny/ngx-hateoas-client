@@ -136,17 +136,18 @@ export class HateoasResourceService {
                                             requestBody?: RequestBody<any>,
                                             options?: RequestOption): Observable<T | any> {
     ValidationUtils.validateInputParams({ entity });
-    StageLogger.resourceBeginLog(entity, 'ResourceService UPDATE_RESOURCE', {
+    const entitySelfLink = entity._links.self.href;
+    StageLogger.resourceBeginLog(entitySelfLink, 'ResourceService UPDATE_RESOURCE', {
       body: requestBody ? requestBody : entity,
       options
     });
 
     const body = ResourceUtils.resolveValues(requestBody ? requestBody : { body: entity });
 
-    return this.resourceHttpService.put(entity.getSelfLinkHref(), body, options)
+    return this.resourceHttpService.put(entitySelfLink, body, options)
       .pipe(tap(() => {
-        StageLogger.resourceEndLog(entity, 'ResourceService UPDATE_RESOURCE',
-          { result: `resource '${getResourceName(entity.constructor as ResourceCtor)}' was updated successful` });
+        StageLogger.resourceEndLog(entitySelfLink, 'ResourceService UPDATE_RESOURCE',
+          { result: `resource was updated successful` });
       }));
   }
 
@@ -197,17 +198,19 @@ export class HateoasResourceService {
                                            requestBody?: RequestBody<any>,
                                            options?: RequestOption): Observable<T | any> {
     ValidationUtils.validateInputParams({ entity });
-    StageLogger.resourceBeginLog(entity, 'ResourceService PATCH_RESOURCE', {
+    const entitySelfLink = entity._links.self.href;
+
+    StageLogger.resourceBeginLog(entitySelfLink, 'ResourceService PATCH_RESOURCE', {
       body: requestBody ? requestBody : entity,
       options
     });
 
     const body = ResourceUtils.resolveValues(requestBody ? requestBody : { body: entity });
 
-    return this.resourceHttpService.patch(entity.getSelfLinkHref(), body, options)
+    return this.resourceHttpService.patch(entitySelfLink, body, options)
       .pipe(tap(() => {
-        StageLogger.resourceEndLog(entity, 'ResourceService PATCH_RESOURCE',
-          { result: `resource '${getResourceName(entity.constructor as ResourceCtor)}' was patched successful` });
+        StageLogger.resourceEndLog(entitySelfLink, 'ResourceService PATCH_RESOURCE',
+          { result: `resource was patched successful` });
       }));
   }
 
@@ -252,12 +255,14 @@ export class HateoasResourceService {
    */
   public deleteResource<T extends Resource>(entity: T, options?: RequestOption): Observable<HttpResponse<any> | any> {
     ValidationUtils.validateInputParams({ entity });
-    StageLogger.resourceBeginLog(entity, 'ResourceService DELETE_RESOURCE', { options });
+    const entitySelfLink = entity._links.self.href;
 
-    return this.resourceHttpService.delete(entity.getSelfLinkHref(), options)
+    StageLogger.resourceBeginLog(entitySelfLink, 'ResourceService DELETE_RESOURCE', { options });
+
+    return this.resourceHttpService.delete(entitySelfLink, options)
       .pipe(tap(() => {
-        StageLogger.resourceEndLog(entity, 'ResourceService DELETE_RESOURCE',
-          { result: `resource '${getResourceName(entity.constructor as ResourceCtor)}' was deleted successful` });
+        StageLogger.resourceEndLog(entitySelfLink, 'ResourceService DELETE_RESOURCE',
+          { result: `resource was deleted successful` });
       }));
   }
 

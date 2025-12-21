@@ -29,12 +29,13 @@
 >
 >See more about it [here](https://github.com/lagoshny/ngx-hateoas-client/blob/master/CHANGELOG.md#303-2021-12-23).
 
-### 💡 New versioning policy.
-
+### 💡 Old versioning policy.
 - Versions that work with old `View Engine` compilation [`2.0.0`-`2.x.x`].
 
 - Versions that work with new `Ivy` compilation [`3.0.0`-`x.x.x`] and supports Angular from 12.x.x - 21.x.x.
-- New releases will respect with Angular versions. For example current Angular has 21 version, then lib version will be 21.x.x. The lib will be respect only with *major* version. Minor and patched version will be own not respect to Angular version. New lib versioning policy helps you choose the right release, depends on your Angular version.
+
+### 💡 New versioning policy.
+>New releases will respect with Angular versions. For example current Angular has 21 version, then lib version will be 21.x.x. The lib will be respect only with *major* version. Minor and patched version will be own not respect to Angular version. New lib versioning policy helps you choose the right release, depends on your Angular version.
 
 This client can be used to develop `Angular 12+` applications working with RESTfull server API.
 By `RESTfull API` means when the server application implements all the layers of the [Richardson Maturity Model](https://martinfowler.com/articles/richardsonMaturityModel.html)

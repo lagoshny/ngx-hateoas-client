@@ -47,9 +47,9 @@ describe('CacheService', () => {
   });
 
   it('PUT_RESOURCE should put value to a cache', () => {
-    cacheService.putResource(CacheKey.of('someVal', {}), rawPagedResourceCollection);
+    cacheService.putResource(CacheKey.of('http://localhost:8080/api/v1/resources/1', {}), rawPagedResourceCollection);
 
-    const result = cacheService.getResource(CacheKey.of('someVal', {}));
+    const result = cacheService.getResource(CacheKey.of('http://localhost:8080/api/v1/resources/1', {}));
     expect(result).toEqual(rawPagedResourceCollection);
   });
 

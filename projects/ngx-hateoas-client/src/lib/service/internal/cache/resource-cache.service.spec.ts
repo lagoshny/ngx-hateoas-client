@@ -13,6 +13,15 @@ describe('CacheService', () => {
 
   beforeEach((() => {
     cacheService = new ResourceCacheService();
+
+    vi.spyOn(LibConfig, 'getConfig').mockReturnValue({
+      ...LibConfig.DEFAULT_CONFIG,
+      cache: {
+        ...LibConfig.DEFAULT_CONFIG.cache,
+        enabled: LibConfig.DEFAULT_CONFIG.cache.enabled,
+        lifeTime: 5000
+      }
+    });
   }));
 
   it('GET_RESOURCE should return null when a cache has not value', () => {

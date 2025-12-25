@@ -1,4 +1,4 @@
-## 21.0.0 (2025-12-21)
+## 21.0.1 (2025-12-25)
 #### Changes
 - New versioning policy. Now lib respect to major Angular version.
 - The lib migrate from Jasmine / Karma test frameworks to recommended by Angular Vitest.

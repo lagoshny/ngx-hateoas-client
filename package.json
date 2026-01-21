@@ -43,7 +43,7 @@
     "codelyzer": "^6.0.2",
     "date-fns": "^4.1.0",
     "jsdom": "^27.3.0",
-    "lodash-es": "^4.17.21",
+    "lodash-es": "^4.17.23",
     "ng-packagr": "^21.0.0",
     "ts-node": "~10.9.2",
     "tslint": "~6.1.3",

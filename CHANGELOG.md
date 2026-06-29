@@ -1,3 +1,7 @@
+## 22.0.0 (2026-06-29)
+#### Changes
+Updated to Angular 22.
+
 ## 21.0.1 (2025-12-25)
 #### Changes
 - New versioning policy. Now lib respect to major Angular version.

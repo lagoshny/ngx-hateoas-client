@@ -22,7 +22,7 @@
 <br />
 <br />
 
-## ⭐Compatible with Angular 12.x.x - 21.x.x versions that uses `Ivy compilation`.
+## ⭐Compatible with Angular 12.x.x - 22.x.x versions that uses `Ivy compilation`.
 
 
 ### ⚠ If you use old `View Engine` compilation or Angular 6.x.x - 11.x.x you need to use [2.x.x](https://github.com/lagoshny/ngx-hateoas-client/tree/ng-ve) lib version.
@@ -31,10 +31,10 @@
 
 ### 💡 Old versioning policy.
 - Versions that work with old `View Engine` compilation [`2.0.0`-`2.x.x`].
-- Versions that work with new `Ivy` compilation [`3.0.0`-`x.x.x`] and supports Angular from 12.x.x - 21.x.x.
+- Versions that work with new `Ivy` compilation [`3.0.0`-`x.x.x`] and supports Angular from 12.x.x - 22.x.x.
 
 ### 💡 New versioning policy.
->New releases will respect with Angular versions. For example current Angular has 21 version, then lib version will be 21.x.x. The lib will be respect only with *major* version. Minor and patched version will be own not respect to Angular version. New lib versioning policy helps you choose the right release, depends on your Angular version.
+>New releases will respect with Angular versions. For example current Angular has 22 version, then lib version will be 22.x.x. The lib will be respect only with *major* version. Minor and patched version will be own not respect to Angular version. New lib versioning policy helps you choose the right release, depends on your Angular version.
 
 This client can be used to develop `Angular 12+` applications working with RESTfull server API.
 By `RESTfull API` means when the server application implements all the layers of the [Richardson Maturity Model](https://martinfowler.com/articles/richardsonMaturityModel.html)
